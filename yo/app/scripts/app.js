@@ -6,6 +6,7 @@
 angular.module('hopsWorksApp', [
   'ngAnimate',
   'ngCookies',
+  'angularConsent',
   'ngResource',
   'ngRoute',
   'ngSanitize',

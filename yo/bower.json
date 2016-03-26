@@ -28,6 +28,7 @@
     "angular-tour": "^0.2.5",
     "angular-hamburger-toggle": "0.2.0",
     "ngclipboard": "1.1.1",
+    "angular-consent": "1.0.0",
     "angular-utils-pagination": "0.8.3"
   },
   "devDependencies": {

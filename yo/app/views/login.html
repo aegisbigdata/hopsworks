@@ -7,6 +7,15 @@
     </div>
   </div>
 </div>
+
+<div id="consent"> 
+  <section consent>
+    <section ng-if="$consent.hasNotAgreedYet()">
+      <p>HopsWorks uses cookies to store user data.</p>
+      <button ng-click="$consent.agree();">Agree</button>
+    </section>
+  </section>
+</div>
 <div class="container">
   <div class="row">
     <div class="center-block" style="width: 320px;">
@@ -38,13 +47,13 @@
                      placeholder="Mobile PIN or Yubikey PIN"
                      name="otp_password">
             </div>
-            
+
             <div class="clearfix">
               <div class="pull-left">
-                 <a class="text-muted" href="https://groups.google.com/forum/#!forum/hopshadoop">Need support?</a>
+                <a class="text-muted" href="https://groups.google.com/forum/#!forum/hopshadoop">Need support?</a>
               </div>            
               <div class="pull-right">
-                 <a class="text-muted" href="/hopsworks/security/login_issue.xhtml">Login help?</a>
+                <a class="text-muted" href="/hopsworks/security/login_issue.xhtml">Login help?</a>
               </div>
             </div>
             <button class="btn btn-block btn-primary mt-lg" type="submit" data-ng-disabled="loginCtrl.working">Login</button>
