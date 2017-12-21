@@ -78,7 +78,8 @@ a:focus {
 }
 .panel-heading {
   border-color: #cfdbe2;
-  background-color: #3a3f51;		
+  /*background-color: #3a3f51;*/
+  background-color: #00A2CA;
   color: #fff;
   border-bottom: 0 none;
   font-size: 14px;
