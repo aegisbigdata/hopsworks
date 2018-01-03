@@ -12,12 +12,12 @@
         </a>
       </li>
 
-      <li ng-click="projectCtrl.goToJupyter()" ng-show="projectCtrl.showJupyter()">
+      <!--li ng-click="projectCtrl.goToJupyter()" ng-show="projectCtrl.showJupyter()">
         <a>
           Jupyter <img class="pull-right" style="margin-right:5px" width="30" src="images/jupyter-200x200-bw.png"
                        id="jupyterTab"/>
           <i class="pull-left fa"  
-             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
+             uib-tooltip="Orange tria<!--ngle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>          
         </a>
@@ -42,7 +42,7 @@
              tooltip-placement="auto right"
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
         </a>
-      </li>
+      </li-->
       <!--
             <li ng-click="projectCtrl.goToHistory()" style="margin-top:40px;"  ng-show="projectCtrl.showJobs()">
               <a>
@@ -56,7 +56,7 @@
               </a>
             </li>-->
 
-      <li ng-click="projectCtrl.goToBiobanking()" ng-show="projectCtrl.showBiobanking()">
+      <!--li ng-click="projectCtrl.goToBiobanking()" ng-show="projectCtrl.showBiobanking()">
         <a>
           Forms<span class="sub_icon fa fa-medkit fa-lg pull-right"></span>
         </a>
@@ -90,9 +90,9 @@
         <a>
           Oozie<span class="sub_icon fa fa-code-fork fa-lg pull-right"></span>
         </a>
-      </li>
-
-      <li ng-click="projectCtrl.goToDatasets()" style="margin-top:40px;" ng-show="projectCtrl.cloak">
+      </li--><!-- MOD A11F -->
+      <!--li ng-click="projectCtrl.goToDatasets()" style="margin-top:40px;" ng-show="projectCtrl.cloak"-->
+      <li ng-click="projectCtrl.goToDatasets()"ng-show="projectCtrl.cloak">
         <a>
           Data Sets <span class="sub_icon fa fa-folder-open fa-lg pull-right"></span>
           <i class=" pull-left fa " 
@@ -108,7 +108,16 @@
         </a>
       </li-->
       
-      
+      <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
+        <a>
+          Queries 
+          <img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        </a>
+      </li>
       
       <li ng-click="projectCtrl.goToSettings()" style="margin-top:40px;" ng-show="projectCtrl.cloak">
         <a>
@@ -121,13 +130,13 @@
           Members<span class="sub_icon fa fa-users fa-lg pull-right"></span>
         </a>
       </li>
-
-      <li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
+      <!-- MOD A11F -->
+      <!--li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
         <a>
           Metadata Designer<span
             class="sub_icon fa fa-edit fa-lg pull-right"></span>
         </a>
-      </li>
+      </li-->
       <br>
       <div>
         <div class="sidebar-nav-static">
