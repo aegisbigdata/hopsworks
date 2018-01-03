@@ -78,7 +78,8 @@ a:focus {
 }
 .panel-heading {
   border-color: #cfdbe2;
-  background-color: #3a3f51;		
+  /*background-color: #3a3f51;*/
+  background-color: #00A2CA;
   color: #fff;
   border-bottom: 0 none;
   font-size: 14px;
@@ -125,7 +126,9 @@ a:focus {
 
 /* Project list in home */
 .pager {
-  background-color: #2e353d;
+  /*background-color: #2e353d; MOD A11F */
+  /* previous / next panel */
+  background-color: #00A2CA;
   margin:0px;
 }
 
@@ -133,7 +136,8 @@ a:focus {
   background-color: inherit;
   border: 0 none;
   border-radius: 0;
-  color: grey;
+  /*color: grey; MOD A11F*/
+  color: #FFF;
   cursor: not-allowed;
   padding-top: 10px;
 }

@@ -1,11 +1,11 @@
 <div ng-controller="MainCtrl as mainCtrl">
   <div ng-include="'nav.html'"></div>
+  <div id="wrapper" class="toggled">
   <div ng-if="mainCtrl.showSearchPage" class="row">
     <div id="projectSearchResults">
       <div ng-include="'views/search.html'"></div>
     </div>
   </div>
-
   <div class="container content-wrapper" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl">
     <div class="pull-left" id="toursBox">
       <div class="pull-left" style="min-width: 220px; max-width: 220px">
@@ -55,8 +55,8 @@
         <span class="list-group-item active">
           <span class="badge pull-left" style="margin-right: 10px;">{{homeCtrl.projects.length}}</span> Projects
 
-          <button class="btn btn-success pull-right" id="buttonCreateProject"
-                  style="height: 43px;margin-right: -16px;margin-top: -11px;width: 70px; border-radius: 0px;"
+          <button class="btn btn-success pull-right"  id="buttonCreateProject"
+                  style="height: 43px;margin-right: -16px;margin-top: -11px;width: 70px; border-radius: 0px; background-color: #E6AD1E; border-color: #E6AD1E;"
                   ng-click="homeCtrl.newProject()">
             <i class="fa fa-plus-circle fa-lg"></i>
             <span style="margin-left:3px;">New</span>
@@ -152,7 +152,6 @@
       tourtip-offset-horizontal="13"
       ></virtual-step>
   </tour>
-
   <tour class="ng-scope" step="homeCtrl.tourService.toursInfoStep"
         post-tour="closeTour()"
         ng-if="homeCtrl.loadedView
@@ -169,4 +168,5 @@
             tourtip-offset-horizontal="50"
     ></virtual-step>
   </tour>
+      </div>
 </div>

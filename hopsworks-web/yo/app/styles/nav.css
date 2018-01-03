@@ -7,7 +7,9 @@
     background-color: transparent;
     color: #fff;
 }
-nav.navbar-sics { background: #2e353d; border-color: #ccc; box-shadow: 0 0 2px 0 #ccc; }
+/*nav.navbar-sics { background: #2e353d; border-color: #ccc; box-shadow: 0 0 2px 0 #ccc; }*/
+nav.navbar-sics { background: #00A2CA; border-color: #ccc; box-shadow: 0 0 2px 0 #ccc; }
+
 nav.navbar-sics a { color: #337ab7; }
 
 nav.navbar-sics ul.navbar-nav a {
@@ -42,8 +44,10 @@ nav.navbar-sics span.badge.new { background: rgba(255, 0, 0, 0.8); color: #fff; 
 }
 
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
-    background-color: #2e353d;
-    border-color: #2e353d;
+    /*background-color: #2e353d; MOD A11F */
+    background-color: #00A2CA;
+    /*border-color: #2e353d; MOD A11F */
+    border-color: #00A2CA;
     color: #fff;
     z-index: 100;
     height: 43px;
