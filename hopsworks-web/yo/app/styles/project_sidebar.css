@@ -23,7 +23,8 @@
   margin-left: -200px;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #2e353d;
+  /*background: #2e353d; MOD A11F */
+   background: #00A2CA;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;

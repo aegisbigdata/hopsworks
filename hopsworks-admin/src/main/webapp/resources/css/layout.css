@@ -291,7 +291,8 @@ body {
 }
 
 .MainToolbar .ui-toolbar-group-left     {
-  height: 28px; 
+  /*height: 28px; MOD A11F */
+  height: 20px; 
 }
 
 .MainToolbar .ui-commandlink {
