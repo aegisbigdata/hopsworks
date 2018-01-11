@@ -98,7 +98,9 @@ a:focus {
   content:"\e080";
 }
 .modal-header {
-  background-color:  #2e353d;
+  /*background-color:  #2e353d;*/
+  background-color:  #00A2CA;
+  
   color: #ffffff;
 }
 
@@ -137,14 +139,14 @@ a:focus {
   border: 0 none;
   border-radius: 0;
   /*color: grey; MOD A11F*/
-  color: #FFF;
+  /*color: #FFF;*/
   cursor: not-allowed;
   padding-top: 10px;
 }
 
 .pager li > a, .pager li > span {
   background-color: inherit;
-  color: #fff;
+  /*color: #fff;*/
   border: 0px;
   border-radius: 0;
   display: inline-block;

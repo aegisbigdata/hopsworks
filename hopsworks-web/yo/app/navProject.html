@@ -5,13 +5,14 @@
 
     <ul class="nav sidebar-nav" ng-cloak ng-controller="ClusterUtilisationCtrl as clusterUtilCtrl">
 
-      <li style="background: #1a1a1a;">
-        <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
+      <!--li style="background: #1a1a1a;" MOD A11F 2018-01-15-12_35-->
+      <li style="background: #757575;">
+        <a style="background-color: #757575; text-decoration: underline;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
+        <!--a style="background-color: #757575;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"--> 
           {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17
           ? '...' : ''}}
         </a>
       </li>
-
       <!--li ng-click="projectCtrl.goToJupyter()" ng-show="projectCtrl.showJupyter()">
         <a>
           Jupyter <img class="pull-right" style="margin-right:5px" width="30" src="images/jupyter-200x200-bw.png"
@@ -32,9 +33,8 @@
              tooltip-placement="auto right"
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
         </a>
-      </li>
-
-      <li ng-click="projectCtrl.goToJobs()" ng-show="projectCtrl.showJobs()" id="jobsTab">
+      </li-->
+      <!--li ng-click="projectCtrl.goToJobs()" ng-show="projectCtrl.showJobs()" id="jobsTab">
         <a>
           Jobs <span class="sub_icon fa fa-cogs fa-lg pull-right"></span>
           <i class=" pull-left fa " 
@@ -55,7 +55,6 @@
                 Ssh <span class="sub_icon fa fa-terminal fa-lg pull-right"></span>
               </a>
             </li>-->
-
       <!--li ng-click="projectCtrl.goToBiobanking()" ng-show="projectCtrl.showBiobanking()">
         <a>
           Forms<span class="sub_icon fa fa-medkit fa-lg pull-right"></span>
@@ -93,8 +92,9 @@
       </li--><!-- MOD A11F -->
       <!--li ng-click="projectCtrl.goToDatasets()" style="margin-top:40px;" ng-show="projectCtrl.cloak"-->
       <li ng-click="projectCtrl.goToDatasets()"ng-show="projectCtrl.cloak">
-        <a>
-          Data Sets <span class="sub_icon fa fa-folder-open fa-lg pull-right"></span>
+        <a>Data Sets 
+          <!--span class="sub_icon fa fa-folder-open fa-lg pull-right"></span  MOD A11F 2018-01-15-10_40-->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/dataset.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: the filesystem is encountering problems. Red means the filesystem is down."                          
              tooltip-placement="auto right"
@@ -109,9 +109,9 @@
       </li-->
       
       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
-        <a>
-          Queries 
-          <img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/>
+        <a>Queries 
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F 2018-01-15-10_40-->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/queries.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
@@ -119,15 +119,18 @@
         </a>
       </li>
       
-      <li ng-click="projectCtrl.goToSettings()" style="margin-top:40px;" ng-show="projectCtrl.cloak">
-        <a>
-          Settings<span class="sub_icon fa fa-dashboard fa-lg pull-right" id="settingsTab"></span>
+      <li ng-click="projectCtrl.goToSettings()" ng-show="projectCtrl.cloak">
+      <!--li ng-click="projectCtrl.goToSettings()" style="margin-top:40px;" ng-show="projectCtrl.cloak" MOD A11F-->
+        <a>Settings 
+          <!--span class="sub_icon fa fa-dashboard fa-lg pull-right" id="settingsTab"></span MOD A11F 2018-01-15-12_25-->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/settings.png"/>
         </a>
       </li>
 
       <li ng-click="projectCtrl.membersModal()" ng-show="projectCtrl.cloak">
-        <a>
-          Members<span class="sub_icon fa fa-users fa-lg pull-right"></span>
+        <a>Members 
+          <!--span class="sub_icon fa fa-users fa-lg pull-right"></spanMOD A11F 2018-01-15-12_30-->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/users.png"/>
         </a>
       </li>
       <!-- MOD A11F -->

@@ -1,6 +1,7 @@
 <div ng-controller="MainCtrl as mainCtrl">
   <div ng-include="'nav.html'"></div>
-  <div id="wrapper" class="toggled">
+  <div id="wrapper" class="toggled" >
+      
   <div ng-if="mainCtrl.showSearchPage" class="row">
     <div id="projectSearchResults">
       <div ng-include="'views/search.html'"></div>
@@ -44,7 +45,8 @@
           <a href="#!/delaclusterDataset" class="list-group-item">
             <span class="fa fa-server"></span>
             Cluster Datasets</a>
-          <a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item">
+          <a class="list-group-item">
+          <!--a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item"-->
             <span class="glyphicon glyphicon-user"></span>
             Need support?
             <span class="glyphicon glyphicon-earphone pull-right" style="margin-right: 1px;"></span>
@@ -52,7 +54,11 @@
             </div>
         </div>
     </div>
+      
+      
+      
     <div class="pull-right">
+    <!--div class="pull-left">-->
       <div class="pull-left" style="min-width: 330px; max-width: 330px">
         <span class="list-group-item active">
           <span class="badge pull-left" style="margin-right: 10px;">{{homeCtrl.projects.length}}</span> Projects
@@ -65,7 +71,6 @@
           </button>
 
         </span>
-
         <div class="list-group-item"
              style="background-color: #f5f5f5;">
           <div class="input-group-btn search-panel pull-left" uib-dropdown
@@ -136,11 +141,13 @@
               </li>
             </ul>
           </div>
-        </div>
+        </div> 
       </div>
-      <ul uib-pager total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" ></ul>
+      <ul uib-pager total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" style="background-color: #f5f5f5;"></ul>
+       <!--div><a href="" class="list-group-item active">Help</a></div-->  
     </div>
   </div>
+      <!--
   <tour class="ng-scope" step="homeCtrl.tourService.currentStep_TourOne" post-tour="closeTour()" ng-if="homeCtrl.loadedView">
     <virtual-step
       class="ng-scope"
@@ -170,5 +177,6 @@
             tourtip-offset-horizontal="50"
     ></virtual-step>
   </tour>
+      -->
       </div>
 </div>
