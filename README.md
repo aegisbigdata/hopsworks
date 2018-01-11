@@ -107,3 +107,45 @@ You should also add the chef recipe to the end of your Vagrantfile (or Karamel c
  hopsworks::image
 ```
 
+## Setting up the development environment
+1. we are running hospworks as a vm on a remote machine. we assume we can ssh into the remote machine.
+2. developing environment - ubuntu 16.04.3
+3. java 8 required
+```
+sudo apt-get install default-jdk
+```
+4. maven, git required. maven requires a bit of memory to compile and package everything
+```
+export MAVEN_OPTS="-Xmx1G"
+```
+5. compiling the front end requires npm, node, grunt, bower.
+```
+sudo apt-get install nodejs-legacy npm
+sudo npm cache clean
+sudo npm install bower -g
+sudo npm install grunt -g
+```
+6. the vm might be running on a machine that does not have all ports accessible(bbc6). in this case in order to be able to access your hopsworks installation and to run the scp-web script you need to ssh tunnel the used ports. You will run each of the following two commands in a different terminal and leave this connections open and alone (do not run other commands here)
+```
+ssh -L {PORT}:localhost:{PORT} {USR}@{SERVER}
+ssh -L {WEBPORT}:localhost:{WEBPORT} {USR}@{SERVER}
+```
+When replaced with correct values, these command would look similar to:
+```
+ssh -L 55170:localhost:55170 aaor@bbc6.sics.se
+```
+7. fast deployment of html/javascript files to the vm:
+```
+cd scripts
+./scp-web.sh
+```
+Note: before running the script, update the PORT, WEBPORT, USR in the scp-web.sh script.
+```
+PORT - located in Vagrantfile - 22 ssh (guest) forwarded port (host)
+WEBPORT - located in Vagrantfile - 8080 http (guest) forwarded port (host)
+USR - user used to ssh into the remote machine(not the user within the vm - that is vagrant for a typical vm installation)
+SERVER - change if necessary to the remote machine
+```
+Note: fast deployment of html/javascript files does NOT require compiling it. just run the scp-web script from the scripts folder.
+Note: youtube help [video](https://youtu.be/Ws_aW-incFQ).
+
