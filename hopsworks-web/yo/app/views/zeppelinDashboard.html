@@ -16,11 +16,12 @@
         <div class="content-wrapper">                      
           <div growl reference="10" class="pull-right" ></div>
           <h3>
-            <div ng-if="zeppelinCtrl.pathArray.length <= 0" class="col-sm-3 col-md-3 col-lg-3 " style="margin-top: -17px; margin-left: 15px;">
+            <!--div ng-if="zeppelinCtrl.pathArray.length <= 0" class="col-sm-3 col-md-3 col-lg-3 " style="margin-top: -17px; margin-left: 15px;">
+              
               <button class="btn btn-success" ng-click="zeppelinCtrl.createNewNote()" type="button" id="newNotebook">
                 Create New Notebook
               </button>
-            </div>
+            </div-->
             <div ng-if="zeppelinCtrl.pathArray.length > 0" class="col-sm-8 col-md-8 col-lg-8 " style=" margin-left: 15px;">
               <span style=" margin-right: 10px;" title="Home">
                 <a class="fa fa-home" aria-hidden="true" style="text-decoration: none" ng-click="zeppelinCtrl.home()"></a>
@@ -60,7 +61,7 @@
             <div class="row row-no-margin-left" style="margin-top: 15px;">
               <div class="col-lg-12">
                 <div ng-if="zeppelinCtrl.pathArray.length === 0">
-                  <div class="file-box">
+                  <!--div class="file-box" MOD A11F>
                     <div  class="file" ng-click="zeppelinCtrl.openZeppelin()">
                       <div class="icon" style="text-align: center;">
                         <img width="100" src="images/zepLogo.png"/>
@@ -71,14 +72,16 @@
                         </div>                                                
                       </div>
                     </div>
-                  </div>
+                  </div-->
                   <div class="file-box">
                     <div  class="file" ng-click="zeppelinCtrl.createNewNote()">
                       <div class="icon">
-                        <i class="glyphicon glyphicon-plus"></i>
+                        <!--i class="glyphicon glyphicon-plus"></i MOD A11F 2018-01-11-17_28-->
+                        <img src="images/aegis/queries_add.png"></img>
                       </div>
                       <div class="file-name">
-                        <div style="text-align: center; color: green;">
+                        <!--div style="text-align: center; color: green;"-->
+                        <div style="text-align: center; color: #00A2CA;">
                           Create New Notebook
                         </div>                                                
                       </div>
@@ -89,11 +92,23 @@
                   <div class="file-box" context-menu data-target="menu-{{ $index}}">
                     <div class="file" ng-click="zeppelinCtrl.openNote(note)">
                       <a><span class="corner"></span>
+                        <!-- MOD A11F 2018-01-11-17_36 -->
                         <div class="icon">
+                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open.png"></img>
+                          <img ng-if="note.children == null " src="images/aegis/queries_open.png"></i>
+                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del.png"></img>
+                          <!--
                           <i ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" class="fa fa-folder"></i>
                           <i ng-if="note.children == null " class="fa fa-file-code-o"></i>
                           <i ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" class="fa fa-trash"></i>
+                          -->
                         </div>
+                        <!--
+                        <div class="icon">
+   
+                        <img src="images/aegis_notepad.png"></img>
+                        </div>
+                        -->
                         <div class="file-name" style="text-align: center;">
                           <span ng-if="note.id !== zeppelinCtrl.TRASH_FOLDER_ID" tooltip-enable="{{note.name.length > 28}}" 
                                 tooltip-placement="bottom" uib-tooltip="{{note.name}}">{{note.name}}</span> 

@@ -9,17 +9,22 @@
 </div>
 <div class="container content-wrapper" ng-if="!loginCtrl.secondFactorRequired" style="border-top:none">
   <div class="row">
-    <div class="center-block" style="width: 320px;">
+      <!-- MOD A11F-->
+    <!--div class="center-block" style="width: 320px;"-->
+    <div class="center-block" style="width: 496px;"> 
+      <div style="margin-bottom: 30px">
+        <img alt="hops icon" class="block-center img-rounded text-center" style="margin-left:10px;" src="images/aegis-1.png"/>
+        <p>Advanced Big Data Value Chain for Public Safety and Personal Security</p>
+      </div>
       <div class="panel">
         <div class="panel-heading text-center">
           <!--a style="text-decoration:none; font-family: Lobster; font-size: 30px; margin-left: 5px; color: #fff;">HopsWorks Beta
             <img alt="" class="block-center img-rounded" style="margin-left:10px" width="30" src="images/hops.png">
-          </a-->
-            
-          <a style="text-decoration:none; font-family: Lobster; font-size: 30px; margin-left: 5px; color: #fff;">
+          </a--> 
+          <!--a style="text-decoration:none; font-family: Lobster; font-size: 30px; margin-left: 5px; color: #fff;">
              <img alt="" class="block-center img-rounded" style="background-color: #FFFFFF; margin-left:10px" width="105" src="images/AEGIS_Logo_Web.gif"/>
-          </a>  
-            
+          </a-->
+          <a style="text-decoration: none; font-size: 20px; color: #fff;">Sign in to continue</a>
         </div>
         <div class="panel-body">
           <p class="text-center">SIGN IN TO CONTINUE.</p>
@@ -40,10 +45,12 @@
             </div>            
             <div class="clearfix">
               <div class="pull-left">
-                 <a class="text-muted" href="https://groups.google.com/forum/#!forum/hopshadoop">Need support?</a>
+                 <a class="text-muted" >Need support?</a>
+                 <!--a class="text-muted" href="https://groups.google.com/forum/#!forum/hopshadoop">Need support?</a-->
               </div>            
               <div class="pull-right">
-                 <a class="text-muted" href="/hopsworks-admin/security/login_issue.xhtml">Login help?</a>
+                 <a class="text-muted">Login help?</a>
+                 <!--a class="text-muted" href="/hopsworks-admin/security/login_issue.xhtml">Login help?</a-->
               </div>
             </div>
             <button class="btn btn-block btn-primary mt-lg" type="submit" data-ng-disabled="loginCtrl.working">Login</button>

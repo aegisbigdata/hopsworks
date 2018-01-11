@@ -461,13 +461,19 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
   color: #fff;
 }
 .btn-primary {
+  /*MOD A11F
   background-color: #1ab394;
-  border-color: #1ab394;
+  border-color: #1ab394; */
+  background-color: #e6ad1e;
+  border-color: #e6ad1e;
   color: #ffffff;
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+  /*MOD A11F
   background-color: #18a689;
-  border-color: #18a689;
+  border-color: #18a689; */
+  background-color: #c6ad1e;
+  border-color: #c6ad1e;
   color: #ffffff;
 }
 .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
