@@ -118,7 +118,12 @@
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
         </a>
       </li>
-      
+      <li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
+        <a>
+          Metadata Designer<span
+            class="sub_icon fa fa-edit fa-lg pull-right"></span>
+        </a>
+      </li>
       <li ng-click="projectCtrl.goToSettings()" ng-show="projectCtrl.cloak">
       <!--li ng-click="projectCtrl.goToSettings()" style="margin-top:40px;" ng-show="projectCtrl.cloak" MOD A11F-->
         <a>Settings 
@@ -133,13 +138,8 @@
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/users.png"/>
         </a>
       </li>
-      <!-- MOD A11F -->
-      <!--li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
-        <a>
-          Metadata Designer<span
-            class="sub_icon fa fa-edit fa-lg pull-right"></span>
-        </a>
-      </li-->
+      
+      
       <br>
       <div>
         <div class="sidebar-nav-static">
