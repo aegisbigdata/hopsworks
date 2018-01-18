@@ -1,9 +1,9 @@
 #!/bin/bash
 # Deploy the frontend to the glassfish home directory and run bower
 
-PORT=27320
-WEBPORT=39087
-USR=alecalcagno
+PORT=55170
+WEBPORT=48203
+USR=aaor
 SERVER=bbc6.sics.se
 
 TSERVER=localhost
