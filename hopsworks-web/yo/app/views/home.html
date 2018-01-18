@@ -1,13 +1,14 @@
 <div ng-controller="MainCtrl as mainCtrl">
-  <div ng-include="'nav.html'"></div>
+  <!--div ng-include="'nav.html'"></div MOD A11F-->
+  <div ng-include="'navBarProject.html'"></div>
   <div id="wrapper" class="toggled" >
-      
+     
   <div ng-if="mainCtrl.showSearchPage" class="row">
     <div id="projectSearchResults">
       <div ng-include="'views/search.html'"></div>
     </div>
   </div>
-
+      
   <div class="container content-wrapper-home" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl">
     
       <div class="pull-left" id="toursBox">
