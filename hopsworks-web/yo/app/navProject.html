@@ -1,13 +1,13 @@
 <aside class="offsidebar">
-  <!--nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:50px;"  ng-cloak-->
+  <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:50px;"  ng-cloak>
   <!-- MOD A11F  -->
-  <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:150px;"  ng-cloak>
+  <!--nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:150px;"  ng-cloak-->
 
     <ul class="nav sidebar-nav" ng-cloak ng-controller="ClusterUtilisationCtrl as clusterUtilCtrl">
 
-      <!--li style="background: #1a1a1a;" MOD A11F 2018-01-15-12_35-->
+      <!--li style="background: #1a1a1a;" MOD A11F -->
       <li style="background: #757575;">
-        <a style="background-color: #757575; text-decoration: underline;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
+        <a style="background-color: #757575;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
         <!--a style="background-color: #757575;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"--> 
           {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17
           ? '...' : ''}}
@@ -93,7 +93,7 @@
       <!--li ng-click="projectCtrl.goToDatasets()" style="margin-top:40px;" ng-show="projectCtrl.cloak"-->
       <li ng-click="projectCtrl.goToDatasets()"ng-show="projectCtrl.cloak">
         <a>Data Sets 
-          <!--span class="sub_icon fa fa-folder-open fa-lg pull-right"></span  MOD A11F 2018-01-15-10_40-->
+          <!--span class="sub_icon fa fa-folder-open fa-lg pull-right"></span  MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/dataset.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: the filesystem is encountering problems. Red means the filesystem is down."                          
@@ -110,7 +110,7 @@
       
       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
         <a>Queries 
-          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F 2018-01-15-10_40-->
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/queries.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
@@ -120,21 +120,22 @@
       </li>
       <li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
         <a>
-          Metadata Designer<span
-            class="sub_icon fa fa-edit fa-lg pull-right"></span>
+          Metadata Designer
+          <!--span class="sub_icon fa fa-edit fa-lg pull-right"></span-->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/metadata_designer.png"/>
         </a>
       </li>
       <li ng-click="projectCtrl.goToSettings()" ng-show="projectCtrl.cloak">
       <!--li ng-click="projectCtrl.goToSettings()" style="margin-top:40px;" ng-show="projectCtrl.cloak" MOD A11F-->
         <a>Settings 
-          <!--span class="sub_icon fa fa-dashboard fa-lg pull-right" id="settingsTab"></span MOD A11F 2018-01-15-12_25-->
+          <!--span class="sub_icon fa fa-dashboard fa-lg pull-right" id="settingsTab"></span MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/settings.png"/>
         </a>
       </li>
 
       <li ng-click="projectCtrl.membersModal()" ng-show="projectCtrl.cloak">
         <a>Members 
-          <!--span class="sub_icon fa fa-users fa-lg pull-right"></spanMOD A11F 2018-01-15-12_30-->
+          <!--span class="sub_icon fa fa-users fa-lg pull-right"></spanMOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/users.png"/>
         </a>
       </li>
