@@ -83,7 +83,8 @@
 }
 
 .file .icon, .file .image {
-  height: 100px;
+  /*height: 200px; MOD A11F*/
+  height: 160px;
   overflow: hidden;
 }
 .file .icon {

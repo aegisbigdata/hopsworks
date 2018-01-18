@@ -1,5 +1,6 @@
 <div ng-controller="MainCtrl as mainCtrl">
-  <div ng-include="'nav.html'"></div>
+ <!--div ng-include="'nav.html'"></div MOD A11F-->
+  <div ng-include="'navBarProject.html'"></div>
   <div id="wrapper"
        class="toggled"
        ng-controller="ZeppelinCtrl as zeppelinCtrl">
@@ -76,8 +77,8 @@
                   <div class="file-box">
                     <div  class="file" ng-click="zeppelinCtrl.createNewNote()">
                       <div class="icon">
-                        <!--i class="glyphicon glyphicon-plus"></i MOD A11F 2018-01-11-17_28-->
-                        <img src="images/aegis/queries_add.png"></img>
+                        <!--i class="glyphicon glyphicon-plus"></i MOD A11F-->
+                        <img src="images/aegis/queries_add_large.png"></img>
                       </div>
                       <div class="file-name">
                         <!--div style="text-align: center; color: green;"-->
@@ -92,11 +93,11 @@
                   <div class="file-box" context-menu data-target="menu-{{ $index}}">
                     <div class="file" ng-click="zeppelinCtrl.openNote(note)">
                       <a><span class="corner"></span>
-                        <!-- MOD A11F 2018-01-11-17_36 -->
+                        <!-- MOD A11F -->
                         <div class="icon">
-                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open.png"></img>
-                          <img ng-if="note.children == null " src="images/aegis/queries_open.png"></i>
-                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del.png"></img>
+                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open_large.png"></img>
+                          <img ng-if="note.children == null " src="images/aegis/queries_open_large.png"></i>
+                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del_large.png"></img>
                           <!--
                           <i ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" class="fa fa-folder"></i>
                           <i ng-if="note.children == null " class="fa fa-file-code-o"></i>
