@@ -107,6 +107,31 @@ You should also add the chef recipe to the end of your Vagrantfile (or Karamel c
  hopsworks::image
 ```
 
+## Port forwarding
+If you are trying to access a port that is not open on a machine, but you have access through ssh, you can do port forwarding:
+```
+ssh -L {REMOTE_PORT}:{TARGET_SERVER}:{LOCAL_PORT} {USR}@{BRIDGE_SERVER}
+```
+In most cases the TARGET_SERVER will be the same as BRIDGE_SERVER (if the service you want to access is on the same machine as the one you have ssh access to).
+
+Remember to keep these connections open for the durations of your work.
+
+If before you were accessing the remote service on:
+{TARGET_SERVER}:{REMOTE_PORT}
+you can now access them on
+localhost:{LOCAL_PORT}
+
+## Relevant vm ports
+In many cases you will want to access some of the deployed service, or you might want to forward ports to some of the vm services. Since you can run many vms on the same machine, the services will be running on different ports than the default. If the default WEBPORT is 8080(within the vm) the service might be provided on the 8080 but forwarded to the host machine on port 45678 and thus you will access the http service on 45678 for this particular vm.
+Relevant port for access/debugging can be found in the Vagrantfile of your vm:
+1. Ssh port - 22
+2. Hopsworks http port - 8080
+3. Karamel http port - 9090 - in case your vm deployment fails, you can run karamel in headless mode and retry by accessing the web-ui of karamel.
+4. Glassfish debug port - 9009 - used for hopsworks back-end remote debugging.
+5. Glassfish admin UI - 4848 - used for deploying the services on the glassfish server
+
+Note: Remember that you will find these services on the Vagrantfile forwarded ports and not on the default ports. Furthermore, the host-machine forwarded port might itself not be accessible to the outside, so you will need to do port forwarding (above section) through a ssh connection.
+
 ## Setting up the development environment
 1. we are running hospworks as a vm on a remote machine. we assume we can ssh into the remote machine.
 2. developing environment - ubuntu 16.04.3
@@ -125,14 +150,14 @@ sudo npm cache clean
 sudo npm install bower -g
 sudo npm install grunt -g
 ```
-6. the vm might be running on a machine that does not have all ports accessible(bbc6). in this case in order to be able to access your hopsworks installation and to run the scp-web script you need to ssh tunnel the used ports. You will run each of the following two commands in a different terminal and leave this connections open and alone (do not run other commands here)
-```
-ssh -L {PORT}:localhost:{PORT} {USR}@{SERVER}
-ssh -L {WEBPORT}:localhost:{WEBPORT} {USR}@{SERVER}
-```
+6. the vm might be running on a machine that does not have all ports accessible(bbc6). you will need to port-forward the WEBPORT(check port-forwarding section above).
 When replaced with correct values, these command would look similar to:
 ```
-ssh -L 55170:localhost:55170 aaor@bbc6.sics.se
+ssh -L 55170:bbc6.sics.se:55170 aaor@bbc6.sics.se
+```
+and you can access your service on
+```
+localhost:55170
 ```
 7. fast deployment of html/javascript files to the vm:
 ```
