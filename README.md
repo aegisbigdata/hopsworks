@@ -124,11 +124,11 @@ localhost:{LOCAL_PORT}
 ## Relevant vm ports
 In many cases you will want to access some of the deployed service, or you might want to forward ports to some of the vm services. Since you can run many vms on the same machine, the services will be running on different ports than the default. If the default WEBPORT is 8080(within the vm) the service might be provided on the 8080 but forwarded to the host machine on port 45678 and thus you will access the http service on 45678 for this particular vm.
 Relevant port for access/debugging can be found in the Vagrantfile of your vm:
-1. Ssh port - 22
-2. Hopsworks http port - 8080
-3. Karamel http port - 9090 - in case your vm deployment fails, you can run karamel in headless mode and retry by accessing the web-ui of karamel.
-4. Glassfish debug port - 9009 - used for hopsworks back-end remote debugging.
-5. Glassfish admin UI - 4848 - used for deploying the services on the glassfish server
+1. ssh port - 22
+2. hopsworks http port - 8080
+3. karamel http port - 9090 - in case your vm deployment fails, you can run karamel in headless mode and retry by accessing the web-ui of karamel.
+4. glassfish debug port - 9009 - used for hopsworks back-end remote debugging.
+5. glassfish admin UI - 4848 - used for deploying the services on the glassfish server
 
 Note: Remember that you will find these services on the Vagrantfile forwarded ports and not on the default ports. Furthermore, the host-machine forwarded port might itself not be accessible to the outside, so you will need to do port forwarding (above section) through a ssh connection.
 
@@ -168,7 +168,7 @@ sudo npm cache clean
 sudo npm install bower -g
 sudo npm install grunt -g
 ```
-6. the vm might be running on a machine that does not have all ports accessible(bbc6). you will need to port-forward the WEBPORT(check port-forwarding section above).
+6. the vm might be running on a machine that does not have all ports accessible(bbc6). you will need to port-forward hopsworks http port(check port-forwarding section above).
 When replaced with correct values, these command would look similar to:
 ```
 ssh -L 55170:bbc6.sics.se:55170 aaor@bbc6.sics.se
@@ -184,10 +184,21 @@ cd scripts
 ```
 Note: before running the script, update the PORT, WEBPORT, USR in the scp-web.sh script.
 ```
-PORT - located in Vagrantfile - 22 ssh (guest) forwarded port (host)
-WEBPORT - located in Vagrantfile - 8080 http (guest) forwarded port (host)
-USR - user used to ssh into the remote machine(not the user within the vm - that is vagrant for a typical vm installation)
+PORT - ssh port
+WEBPORT - hopsworks http port
+USR - user used to ssh into the remote machine(NOT the user within the vm, which is vagrant for a typical vm installation)
 SERVER - change if necessary to the remote machine
 ```
 Note: fast deployment of html/javascript files does NOT require compiling it. just run the scp-web script from the scripts folder.
 Note: youtube help [video](https://youtu.be/Ws_aW-incFQ).
+
+## Hopsworks backend remote debugging with Netbeans
+The first thing to do is to enable remote debugging on your glassfish server. Access the glassfish admin-ui (on port 4848 - forwarded) and go to:
+Configurations -> server-config -> JVM settings -> General and enable Debug (by default the box is unchecked). 
+You save and next we need to restart glassfish so that the new settings get loaded. Go to your vm and inside the vm run:
+```
+sudo systemctl restart glassfish-domain1
+```
+These steps for enabling debug on glassfish are a one time per vm setup.
+
+Next we add a new glassfish remote connection to Netbeans:
