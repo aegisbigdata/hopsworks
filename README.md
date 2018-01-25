@@ -210,3 +210,4 @@ At times remote debugging might fail while deploying. This might take down the g
 sudo systemctl restart glassfish-domain1
 ```
 In order to debug: [video](https://youtu.be/UsWMjFSVVrA)
+The first time you debug, the deployment might take a couple of minutes. Further debug session will have far less to deploy since they will only synchronize the modified java files.
