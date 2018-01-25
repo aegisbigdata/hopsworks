@@ -190,7 +190,8 @@ USR - user used to ssh into the remote machine(NOT the user within the vm, which
 SERVER - change if necessary to the remote machine
 ```
 Note: fast deployment of html/javascript files does NOT require compiling it. just run the scp-web script from the scripts folder.
-Note: youtube help [video](https://youtu.be/Ws_aW-incFQ).
+
+Note: youtube help [video](https://youtu.be/GdFrOLsZHq4).
 
 ## Hopsworks backend remote debugging with Netbeans
 The first thing to do is to enable remote debugging on your glassfish server. Access the glassfish admin-ui (on port 4848 - forwarded) and go to:
@@ -201,4 +202,10 @@ sudo systemctl restart glassfish-domain1
 ```
 These steps for enabling debug on glassfish are a one time per vm setup.
 
-Next we add a new glassfish remote connection to Netbeans:
+Next we add a new glassfish server remote connection to Netbeans: [video](https://youtu.be/GdFrOLsZHq4)
+
+At times remote debugging might fail while deploying. This might take down the glassfish server, so you need to restart it before attempting again. Within your vm run:
+```
+sudo systemctl restart glassfish-domain1
+```
+In order to debug: [video](https://youtu.be/UsWMjFSVVrA)
