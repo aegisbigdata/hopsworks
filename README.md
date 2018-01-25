@@ -177,7 +177,8 @@ and you can access your service on
 ```
 localhost:55170
 ```
-7. fast deployment of html/javascript files to the vm:
+## Fast deployment of frontend
+Fast deployment of html/javascript files to the vm:
 ```
 cd scripts
 ./scp-web.sh
@@ -189,7 +190,7 @@ WEBPORT - hopsworks http port
 USR - user used to ssh into the remote machine(NOT the user within the vm, which is vagrant for a typical vm installation)
 SERVER - change if necessary to the remote machine
 ```
-Note: fast deployment of html/javascript files does NOT require compiling it. just run the scp-web script from the scripts folder.
+Note: fast deployment of html/javascript files does NOT require compiling it. Just run the scp-web script from the scripts folder. This is only for development - after you are satisfied with your changes, deploy the frontend as described in the deploy services section.
 
 Note: youtube help [video](https://youtu.be/GdFrOLsZHq4).
 
