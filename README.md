@@ -132,6 +132,24 @@ Relevant port for access/debugging can be found in the Vagrantfile of your vm:
 
 Note: Remember that you will find these services on the Vagrantfile forwarded ports and not on the default ports. Furthermore, the host-machine forwarded port might itself not be accessible to the outside, so you will need to do port forwarding (above section) through a ssh connection.
 
+## Deploying services on your vm's glassfish server
+
+You can access the glassfish server on your vm on the 4848 port and it will have the default user/password. Go to the Applications section and you will see 3 packages deployed:
+1. hopsworks-ca - part of the security services
+2. hopsworks-web - the web-ui - html/javascript
+3. hopsworks-ear - the back-end with the rest endpoints
+
+If you modified the web-ui or the backend you can generate the above packages with mvn:
+```
+mvn clean install -DskipTests
+```
+and then you will find the packages:
+1. hopsworks-ca - hopsworks/hopsworks-ca/target/hopsworks-ca.war
+2. hopworks-web - hopsworks-web/target/hopsworks-web.war - when redeploying you actually have to rename this war to hopsworks.war
+3. hopsworks-ear - hopsworks-ear/target/hopsworks-ear.ear
+
+Having your new packages, you can undeploy the old version from the glassfish version and deploy your new version. The ear package is a bit bigger so it might take a few minutes to deploy.
+
 ## Setting up the development environment
 1. we are running hospworks as a vm on a remote machine. we assume we can ssh into the remote machine.
 2. developing environment - ubuntu 16.04.3
@@ -173,4 +191,3 @@ SERVER - change if necessary to the remote machine
 ```
 Note: fast deployment of html/javascript files does NOT require compiling it. just run the scp-web script from the scripts folder.
 Note: youtube help [video](https://youtu.be/Ws_aW-incFQ).
-
