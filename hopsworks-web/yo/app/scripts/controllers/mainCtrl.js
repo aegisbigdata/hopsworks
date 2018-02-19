@@ -171,6 +171,7 @@ angular.module('hopsWorksApp')
             };
 
             self.search = function () {
+              
               self.showSearchPage = true;
               self.currentPage = 1;
               self.pageSize = 9;
@@ -179,9 +180,11 @@ angular.module('hopsWorksApp')
               if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
                 return;
               }
+              
               self.searching = true;
               if (self.searchType === "global" && $rootScope.isDelaEnabled) {
-                var global_data;
+                
+                    var global_data;
                 var searchHits;
                 //triggering a global search
                 self.searchResult = [];
@@ -211,7 +214,8 @@ angular.module('hopsWorksApp')
                           growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
                         });
               } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {
-                var searchHits;
+              
+                    var searchHits;
                 //triggering a global search
                 self.searchResult = [];
                 elasticService.globalSearch(self.searchTerm)
@@ -230,7 +234,8 @@ angular.module('hopsWorksApp')
                           growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
                         });
               } else if (self.searchType === "projectCentric") {
-                elasticService.projectSearch($routeParams.projectID, self.searchTerm)
+                
+                    elasticService.projectSearch($routeParams.projectID, self.searchTerm)
                         .then(function (response) {
                           self.searching = false;
                           var searchHits = response.data;
@@ -246,7 +251,8 @@ angular.module('hopsWorksApp')
                           growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
                         });
               } else if (self.searchType === "datasetCentric") {
-                elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
+             
+                    elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
                         .then(function (response) {
                           self.searching = false;
                           var searchHits = response.data;
@@ -262,7 +268,9 @@ angular.module('hopsWorksApp')
                           growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
                         });
               }
+              
               datePicker();// this will load the function so that the date picker can call it.
+              //alert("test res:" + self.searchResult );
             };
 
             var concatUnique = function (a, array2) {
@@ -384,4 +392,30 @@ angular.module('hopsWorksApp')
                 ModalService.viewSearchResult('lg', result, result, null);
               }
             };
+            
+            /*MOD A11F*/
+            self.showDiv = function($divString) {
+                   var divs = $divString.split(";");
+                
+                   var elem;
+                   for (elem=0;elem<divs.length;elem++) {
+                     var divName = divs[elem].split(":");
+                     if (divName[1] == '1') {
+                      
+                      if (document.getElementById(divs[elem].split(":")[0]).style.display == "none" ){
+                          document.getElementById(divs[elem].split(":")[0]).style.display = "block";
+                      }
+                      else {
+                          document.getElementById(divs[elem].split(":")[0]).style.display = "none";
+                      }
+                     }
+            
+                     else {
+                       document.getElementById(divs[elem].split(":")[0]).style.display = "none";  
+                     }
+                     
+                   }
+               
+                 
+               };
           }]);

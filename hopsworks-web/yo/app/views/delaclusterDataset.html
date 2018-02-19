@@ -1,5 +1,6 @@
 <div class="container content-wrapper" ng-controller="MainCtrl as mainCtrl" id="publicdatasetWrapper" style="width: 1500px;">
-  <div ng-include="'nav.html'"></div>
+  <!--div ng-include="'nav.html'"></div MOD A11F-->
+  <div ng-include="'navBarProject.html'"></div>
   <div ng-if="mainCtrl.showSearchPage" class="row" ng-init="publicDataset.overflowYAuto()">
     <div id="projectSearchResults">
       <div ng-include="'views/search.html'"></div>

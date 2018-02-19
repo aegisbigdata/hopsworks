@@ -9,8 +9,7 @@
     </div>
   </div>
       
-  <div class="container content-wrapper-home" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl">
-    
+  <div class="container content-wrapper-home" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl"> 
       <div class="pull-left" id="toursBox">
       <div class="pull-left" style="min-width: 330px; max-width: 330px">
         <div class="list-group">
@@ -46,8 +45,8 @@
           <a href="#!/delaclusterDataset" class="list-group-item">
             <span class="fa fa-server"></span>
             Cluster Datasets</a>
-          <a class="list-group-item">
-          <!--a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item"-->
+          
+          <a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item">
             <span class="glyphicon glyphicon-user"></span>
             Need support?
             <span class="glyphicon glyphicon-earphone pull-right" style="margin-right: 1px;"></span>
@@ -55,13 +54,198 @@
             </div>
         </div>
     </div>
+    <!-- **************** -->                  
+    <!-- Section Assets -->
+    <!--
+    <div class="pull-left">
+        <div  ng-init="indextab = 0">
+            <uib-tabset active="indextab">
+              <uib-tab index="0" heading="Popular Assets">
+                  <form role="form" name="popularAssets"">       
+                      <div style="width: 750px;">
+                            <nav class="navbar navbar-default">
+    <div class="container-fluid">
       
-      
-      
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#search-navbar" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" >Search results</a>
+      </div>
+      <div class="collapse navbar-collapse" id="search-navbar">
+        <ul class="nav navbar-nav navbar-right search-result-menu">
+          <li>
+            <a data-toggle="collapse" data-target="#filterdropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</a>         
+          </li>
+          <li>
+            <a ng-click="listView =! listView; mainCtrl.viewType(listView)"
+               data-toggle="view-type" role="button" aria-haspopup="true" aria-expanded="false">
+              <span class="glyphicon" ng-class="{'glyphicon-th-list' : !listView, 'glyphicon-th': listView}" 
+                    aria-hidden="true" style="font-size: 20px;"></span></a>
+          </li>
+          <li>
+            <a ng-click="mainCtrl.clearSearch()"
+               data-toggle="view-type" role="button" aria-haspopup="true" aria-expanded="false">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true" style="font-size: 20px;"></span></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <section id="filterdropdown" class="collapse search-result-filter">
+    <div class="row result-filter-body">
+      <li class="col-md-4">
+        <ul>
+          <li class="dropdown-header">Type</li>
+          <li><a class="filter-menu-uppercase"
+                 data-toggle="collapse" data-target="#filterdropdown"
+                 ng-click="searchTypePub=undefined; searchType=undefined;">all</a></li>
+          <li><a class="filter-menu-uppercase"
+                 data-toggle="collapse" data-target="#filterdropdown"
+                 style="color: #FC5120;"
+                 ng-click="searchType=undefined; searchTypePub='true'">public</a></li>
+          <li><a class="filter-menu-uppercase" 
+                 data-toggle="collapse" data-target="#filterdropdown"
+                 style="color: #4178BE;"
+                 ng-click="searchTypePub=undefined; searchType='proj';">project</a></li>
+          <li><a class="filter-menu-uppercase" 
+                 data-toggle="collapse" data-target="#filterdropdown"
+                 style="color: #5DA51D; "
+                 ng-click="searchTypePub=undefined; searchType='ds';">dataset</a></li>
+        </ul>
+      </li>
+      <li class="col-md-4">
+        <ul>
+          <li class="dropdown-header">Size</li>
+          <li>
+            <div class="input-group">
+              <label class="sr-only" for="from">From</label>
+              <input type="number" class="form-control" id="from" placeholder="From">
+                 <span class="input-group-addon">-</span>
+              <label class="sr-only" for="to">To</label>
+              <input type="number" class="form-control" id="to" placeholder="To">
+            </div>
+          </li>
+          <li class="divider"></li>
+          <li class="dropdown-header">Date</li>
+          <li> <a>Created</a>
+            <div class="input-group">
+              <label class="sr-only" for="from">From</label>
+              <input type="datepicker" class="form-control" id="datepicker1" placeholder="From">
+              <span  class="input-group-addon">-</span>
+              <label class="sr-only" for="to">To</label>
+              <input type="datepicker" class="form-control" id="datepicker2" placeholder="To">
+            </div>
+          </li>
+        </ul>
+      </li>
+       <li class="col-sm-4">
+        <ul>
+          <li class="dropdown-header">Owner</li> 
+          <li>
+            <div>
+              <label class="sr-only" for="email">Email address</label>
+              <input type="email" class="form-control" id="email" placeholder="Enter name" ng-model="searchOwner">
+            </div>
+          </li>
+          <li class="dropdown-header">Name</li> 
+          <li>
+            <div>
+              <label class="sr-only" for="filter">Filter</label>
+              <input type="text" class="form-control" id="filter" placeholder="Filter result..." ng-model="searchName">
+            </div>
+          </li>
+          <li class="divider"></li>
+          <li class="dropdown-header">Sort by</li>
+          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='name'">Name</a></li>
+          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='user'">Owner</a></li>
+          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='createDate'">Date</a></li>
+          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='size'">Size</a></li>
+        </ul>
+      </li>
+    </div>
+    <div class="row result-filter-body">
+      <div class="pull-right">
+        <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-primary btn-block"
+              ng-click="searchTypePub=undefined; 
+                        searchType=undefined; 
+                        sortKey=undefined;
+                        searchName=undefined; 
+                        searchOwner=undefined;">Clear</button>
+      </div>
+    </div>
+  </section> 
+                               <section class="search-result">
+    
+                                        <div class="row search-result-header">
+                                          <div class="col-md-11 pull-left">
+                                            <h3>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
+                                                {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h3>
+                                          </div>
+                                          <div class="col-xs-1 col-sm-1 col-md-1 pull-right">
+                                            <div class="input-group spinner">  
+                                              <input type="text" class="form-control" ng-model="mainCtrl.pageSize">
+                                              <div class="input-group-btn-vertical">
+                                                <button class="btn btn-default" ng-click="mainCtrl.incrementPage()" type="button"><i class="fa fa-caret-up"></i></button>
+                                                <button class="btn btn-default" ng-click="mainCtrl.decrementPage()" type="button"><i class="fa fa-caret-down"></i></button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="search-result-body row thin-scrollbar" ng-controller="SearchResultCtrl as searchResultCtrl">
+                                          <div class="loader loader-md" ng-show="mainCtrl.searching"></div>
+                                          <div ng-if="!mainCtrl.searching" ng-init="searchResultCtrl.init(mainCtrl.searchResult)"></div>
+                                          <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: searchType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize">
+                                            <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12" ng-class="{'col-sm-4 col-md-4': !listView, 'col-sm-12 col-md-12': listView}">
+                                              <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
+                                                       details-fn="mainCtrl.viewDetail(result)" 
+                                                       download-fn="mainCtrl.downloadPublicDataset(result)"
+                                                       page-no="mainCtrl.currentPage" 
+                                                       card-index="$index"
+                                                       dela-enabled="mainCtrl.isDelaEnabled"> 
+                                              </hw-card>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="row divider" style="margin-bottom: 0px;"></div>
+                                        <div class="row" style="margin-top: -20px">
+                                            <dir-pagination-controls ng-show="(mainCtrl.searchResult.length /mainCtrl.pageSize) > 1 "
+                                                max-size="15"
+                                                direction-links="true"
+                                                boundary-links="true"
+                                                class="no-margin-pagination pull-right">
+                                            </dir-pagination-controls>
+                                        </div>
+                                      </section>
+                      </div>
+                  </form>
+                </uib-tab>
+              <uib-tab index="1" heading="Latest Assets">
+                  <form role="form" name="latestAssets"">
+                      
+                  </form>
+                </uib-tab>
+              <uib-tab index="2" heading="Offers Assets">
+                <form role="form" name="offersAssets"">
+                      
+                </form>
+              </uib-tab>
+            </uib-tabset>
+
+    </div>
+   
+  </div>
+    -->
+    <!-- **************** -->                  
+    <!-- Section Projects -->
     <div class="pull-right">
     <!--div class="pull-left">-->
       <div class="pull-left" style="min-width: 330px; max-width: 330px">
-        <span class="list-group-item active">
+        <!--span class="list-group-item active" MOD A11F>
           <span class="badge pull-left" style="margin-right: 10px;">{{homeCtrl.projects.length}}</span> Projects
 
           <button class="btn btn-success pull-right"  id="buttonCreateProject"
@@ -71,28 +255,29 @@
             <span style="margin-left:3px;">New</span>
           </button>
 
+        </span-->
+        <span class="list-group-item active" style="text-align: right; font-style: italic; font">
+            <span class="badge pull-left" style="margin-right: 10px;"></span> <b>Projects</b>
         </span>
+        <span class="list-group-item active">
+          <button class="btn btn-success pull-right"  id="buttonCreateProject"
+                  style="text-align: left; height: 43px;margin-right: -16px;margin-top: -11px;min-width: 330px; max-width: 330px; border-radius: 0px; background-color: #E6AD1E; border-color: #E6AD1E;"
+                  ng-click="homeCtrl.newProject()">
+            <i class="fa fa-plus-circle fa-lg"></i>
+            <span style="margin-left:3px;">New Projects</span>
+          </button>
+        </span>
+        <span class="list-group-item neutral">
+          <span class="badge pull-left" style="margin-right: 10px;"></span> 
+          <li ng-click="mainCtrl.showDiv('myDiv:1;pvDiv:0;pbDiv:0')">My Projects</li>
+        </span>
+        <div style="display:none;" id="myDiv">
         <div class="list-group-item"
              style="background-color: #f5f5f5;">
-          <div class="input-group-btn search-panel pull-left" uib-dropdown
-               style="width: 83px;">
-            <button type="button" class="btn btn-default" ihhd="filterByButton" uib-dropdown-toggle>
-              <span id="search_concept">Filter by</span>
-              <span class="caret"></span>
-            </button>
-
-            <ul uib-dropdown-menu class="dropdown-menu" role="menu">
-              <li><a href="#its_equal"> My own</a></li>
-              <li><a href="#greather_than"> Private</a></li>
-              <li><a href="#less_than"> Public </a></li>
-              <li class="divider"></li>
-              <li><a href="#all">All</a></li>
-            </ul>
-          </div>
           <input type="hidden" name="search_param" value="all" id="search_param">
-          <input type="text" class="form-control pull-left" ng-model="searchProject"
+          <input type="text" class="form-control pull-left ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="searchProject"
                  style="width: 155px; border-radius: 0;"
-                 name="x" placeholder="Find project...">
+                 name="x" placeholder="Find project..." aria-invalid="false">
           <span class="input-group-btn">
             <button class="btn btn-default" type="button" style="height:34px;">
               <span class="glyphicon glyphicon-search"></span>
@@ -142,12 +327,151 @@
               </li>
             </ul>
           </div>
-        </div> 
+        </div>
+        </div>
+        <span class="list-group-item neutral">
+          <span class="badge pull-left" style="margin-right: 10px;"></span> 
+          <li ng-click="mainCtrl.showDiv('myDiv:0;pvDiv:1;pbDiv:0')">Private Projects</li>
+        </span>
+        <div style="display:none;" id="pvDiv">
+        <div class="list-group-item"
+             style="background-color: #f5f5f5;">
+          <input type="hidden" name="search_param" value="all" id="search_param">
+          <input type="text" class="form-control pull-left ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="searchProject"
+                 style="width: 155px; border-radius: 0;"
+                 name="x" placeholder="Find project..." aria-invalid="false">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" style="height:34px;">
+              <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </span>
+        </div>
+        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects">
+          <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
+             href="#!/project/{{project.project.id}}"
+             class="list-group-item"
+             context-menu
+             data-target="menu-{{$index}}"
+             id="{{project.project.name.substr(0, 5) === 'demo_'}}">
+            <div ng-if="project.teamRole === 'Data scientist'">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px;" class="fa fa-lock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.teamRole === 'Data owner'">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px;" class="fa fa-unlock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.project.archived">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px; color: #9d261d"
+                 class="fa fa-ban fa-2 pull-left"></i>
+            </div>
+            {{ project.project.name | limitTo: 17 }}{{project.project.name.length > 17 ? '...' : ''}}
+            <span ng-if="project.project.name.substr(0, 5) === 'demo_'" class="glyphicon glyphicon-play-circle pull-right" style="margin-top: 5px;"></span>
+            <i class="fa fa-cog fa-spin fa-2x  fa-fw pull-right" ng-show="homeCtrl.working[project.project.id]"></i>
+          </a>
+          <div uib-dropdown class="dropdown position-fixed" id="menu-{{$index}}">
+            <ul uib-dropdown-menu class="dropdown-amore">
+              <!--            <li>
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="1"
+                               ng-click="">
+                              <span><i class="fa fa-share-alt"></i>
+                                Share...</span>
+                            </a>
+                          </li>-->
+              <li>
+                <a class="pointer"
+                   role="menuitem"
+                   tabindex="2"
+                   ng-click="homeCtrl.deleteProjectAndDatasets(project.project.id)">
+                  <span><i class="fa fa-trash"></i>
+                    Remove and delete DataSets </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        </div>
+        <span class="list-group-item neutral">
+          <span class="badge pull-left" style="margin-right: 10px;"></span> 
+          <li ng-click="mainCtrl.showDiv('myDiv:0;pvDiv:0;pbDiv:1')">Public Projects</li>
+        </span>
+        <div style="display:none;" id="pbDiv">
+        <div class="list-group-item"
+             style="background-color: #f5f5f5;">
+          <!--div class="input-group-btn search-panel pull-left" uib-dropdown 
+               style="width: 83px;">
+            <button type="button" class="btn btn-default" ihhd="filterByButton" uib-dropdown-toggle>
+              <span id="search_concept">Filter by</span>
+              <span class="caret"></span>
+            </button>
+
+            <ul uib-dropdown-menu class="dropdown-menu" role="menu">
+              <li><a href="#its_equal"> My own</a></li>
+              <li><a href="#greather_than"> Private</a></li>
+              <li><a href="#less_than"> Public </a></li>
+              <li class="divider"></li>
+              <li><a href="#all">All</a></li>
+            </ul>
+          </div-->
+          <input type="hidden" name="search_param" value="all" id="search_param">
+          <input type="text" class="form-control pull-left ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="searchProject"
+                 style="width: 155px; border-radius: 0;"
+                 name="x" placeholder="Find project..." aria-invalid="false">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" style="height:34px;">
+              <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </span>
+        </div>
+        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects">
+          <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
+             href="#!/project/{{project.project.id}}"
+             class="list-group-item"
+             context-menu
+             data-target="menu-{{$index}}"
+             id="{{project.project.name.substr(0, 5) === 'demo_'}}">
+            <div ng-if="project.teamRole === 'Data scientist'">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px;" class="fa fa-lock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.teamRole === 'Data owner'">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px;" class="fa fa-unlock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.project.archived">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px; color: #9d261d"
+                 class="fa fa-ban fa-2 pull-left"></i>
+            </div>
+            {{ project.project.name | limitTo: 17 }}{{project.project.name.length > 17 ? '...' : ''}}
+            <span ng-if="project.project.name.substr(0, 5) === 'demo_'" class="glyphicon glyphicon-play-circle pull-right" style="margin-top: 5px;"></span>
+            <i class="fa fa-cog fa-spin fa-2x  fa-fw pull-right" ng-show="homeCtrl.working[project.project.id]"></i>
+          </a>
+          <div uib-dropdown class="dropdown position-fixed" id="menu-{{$index}}">
+            <ul uib-dropdown-menu class="dropdown-amore">
+              <!--            <li>
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="1"
+                               ng-click="">
+                              <span><i class="fa fa-share-alt"></i>
+                                Share...</span>
+                            </a>
+                          </li>-->
+              <li>
+                <a class="pointer"
+                   role="menuitem"
+                   tabindex="2"
+                   ng-click="homeCtrl.deleteProjectAndDatasets(project.project.id)">
+                  <span><i class="fa fa-trash"></i>
+                    Remove and delete DataSets </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        </div>
       </div>
       <ul uib-pager total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" style="background-color: #f5f5f5;"></ul>
        <!--div><a href="" class="list-group-item active">Help</a></div-->  
     </div>
-  </div>
       <!--
   <tour class="ng-scope" step="homeCtrl.tourService.currentStep_TourOne" post-tour="closeTour()" ng-if="homeCtrl.loadedView">
     <virtual-step

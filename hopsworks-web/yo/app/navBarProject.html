@@ -63,7 +63,7 @@
             </ul>
           </li>          
         </ul>
-        <form class="navbar-form navbar-right">
+        <form class="navbar-form navbar-right ng-valid ng-dirty ng-valid-parse">
             <div class="col-xs-12 col-sm-4 col-md-4 input-group" ng-class="{'col-md-offset-0': !projectView, 'col-md-offset-1': projectView}">
                       <div class="input-group-btn" style="width: 10px;"> 
               <button class="btn btn-default" style="border-color: #33B5D5;background-color: #33B5D5;color: white;margin-top: 3px; padding: 6px 12px;"
@@ -71,9 +71,9 @@
                 <i class="glyphicon glyphicon-search"></i>
               </button>
             </div>
-              <input type="text" class="form-control" style="height: 28px;margin-top: 3px;border-color: #33B5D5;background-color:#33B5D5;width: 250px;" placeholder="Search"
+              <input type="text" class="form-control ng-valid ng-touched ng-not-empty ng-dirty ng-valid-parse" style="height: 28px;margin-top: 3px;border-color: #33B5D5;background-color:#33B5D5;width: 250px;" placeholder="Search"
                    name="srch-term" id="srch-term" ng-model="mainCtrl.searchTerm" ng-model-options="{debounce: 500}"
-                   ng-change="mainCtrl.keyTyped()" ng-keyup="mainCtrl.hitEnter($event)">
+                   ng-change="mainCtrl.keyTyped()" ng-keyup="mainCtrl.hitEnter($event)" aria-invalid="false">
           </div>
         </form>
       </div>

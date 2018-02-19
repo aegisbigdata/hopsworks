@@ -211,3 +211,10 @@ sudo systemctl restart glassfish-domain1
 ```
 In order to debug: [video](https://youtu.be/UsWMjFSVVrA)
 The first time you debug, the deployment might take a couple of minutes. Further debug session will have far less to deploy since they will only synchronize the modified java files.
+
+# Swagger
+In order to have a swagger serving point on your vm, build your packages with swagger and deploy them on glassfish.
+```
+mvn clean install -DskipTests -Pswagger-ui
+```
+You can now access swagger on your vm on "hopsworks/swagger-ui". Assuming you access your vm with port forwarding on port 43210, you can access swagger at: http://localhost:43210/hopsworks/swagger-ui
