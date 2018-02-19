@@ -1033,6 +1033,13 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
   color: #ffffff;
   z-index: 2;
 }
+/*MOD A11F*/
+a.list-group-item.neutral, a.list-group-item.neutral:hover, a.list-group-item.neutral:focus {
+  background-color: #1ab394;
+  border-color: #1ab394;
+  color: #000000;
+  z-index: 2;
+}
 .list-group-item-heading {
   margin-top: 10px;
 }

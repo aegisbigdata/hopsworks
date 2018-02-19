@@ -118,6 +118,32 @@
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
         </a>
       </li>
+      
+      
+       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
+        <a>Visualizations 
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F -->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/visualization.png"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        </a>
+      </li>
+       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
+        <a>Analytics 
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F -->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/analytics.png"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        </a>
+      </li>
+      
+      
+      
+      
       <li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
         <a>
           Metadata Designer

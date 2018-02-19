@@ -595,5 +595,5 @@ angular.module('hopsWorksApp')
                 var idx = self.projectTypes.indexOf(service);
                 return idx === -1
             }
-
+            
           }]);
