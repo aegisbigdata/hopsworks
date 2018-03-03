@@ -221,8 +221,11 @@ You can now access swagger on your vm on "hopsworks/swagger-ui". Assuming you ac
 
 # Resize disk of active vm without destroying
 Steps 1-8 from https://gist.github.com/christopher-hopper/9755310
+
 Resizing guest file system from https://www.laurentiupancescu.com/blog/591c105a/
+
 Video of the process: https://youtu.be/vtDHK79yHqI
+
 Other sources:
 https://medium.com/@phirschybar/resize-your-vagrant-virtualbox-disk-3c0fbc607817
 https://github.com/sprotheroe/vagrant-disksize
