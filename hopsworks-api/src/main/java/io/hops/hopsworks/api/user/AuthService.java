@@ -53,6 +53,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.security.Key;
+import java.util.Date;
+import java.time.LocalDateTime;
+import javax.ws.rs.core.UriInfo;
+import java.time.ZoneId;
+import javax.crypto.spec.SecretKeySpec;
 
 @Path("/auth")
 @Stateless
@@ -78,7 +86,10 @@ public class AuthService {
   private BbcGroupFacade bbcGroupFacade;
   @EJB
   private EmailBean emailBean;
-
+  
+  @Context
+  private UriInfo uriInfo;
+  
   @GET
   @Path("session")
   @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
@@ -213,6 +224,76 @@ public class AuthService {
             json).build();
   }
 
+  @POST
+  @Path("login/jwt")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  public Response loginJWT(@FormParam("email") String email,
+          @FormParam("password") String password, 
+          @FormParam("otp") String otp,
+          @Context SecurityContext sc,
+          @Context HttpServletRequest req, 
+          @Context HttpHeaders httpHeaders) throws AppException, MessagingException {
+    
+    req.getServletContext().log("email: " + email);
+    req.getServletContext().log("SESSIONID@login: " + req.getSession().getId());
+    req.getServletContext().log("SecurityContext: " + sc.getUserPrincipal());
+    req.getServletContext().log("SecurityContext in user role: " + sc.isUserInRole("HOPS_USER"));
+    req.getServletContext().log("SecurityContext in sysadmin role: " + sc.isUserInRole("HOPS_ADMIN"));
+    req.getServletContext().log("SecurityContext in agent role: " + sc.isUserInRole("AGENT"));
+    req.getServletContext().log("SecurityContext in cluster_agent role: " + sc.isUserInRole("CLUSTER_AGENT"));
+    JsonResponse json = new JsonResponse();
+    if (email == null || email.isEmpty()) {
+      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),"Email address field cannot be empty");
+    }
+    Users user = userBean.findByEmail(email);
+    if (user == null) {
+      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
+              "Unrecognized email address. Have you registered yet?");
+    }
+    String newPassword = null;
+    Variables varTwoFactor = settings.findById("twofactor_auth");
+    Variables varExclude = settings.findById("twofactor-excluded-groups");
+    String twoFactorMode = (varTwoFactor != null ? varTwoFactor.getValue() : "");
+    String excludes = (varExclude != null ? varExclude.getValue() : null);
+    String[] groups = (excludes != null && !excludes.isEmpty() ? excludes.split(";") : null);
+    if (!isInGroup(user, groups)) {
+      if ((twoFactorMode.equals("mandatory") || (twoFactorMode.equals("true") && user.getTwoFactor()))) {
+        if (otp == null || otp.isEmpty() && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE)) {
+          if (user.getPassword().equals(DigestUtils.sha256Hex(password))) {
+            throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Second factor required.");
+          }
+        }
+      }
+    }
+    // Add padding if custom realm is disabled
+    if (otp == null || otp.isEmpty() && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE)) {
+      otp = AuthenticationConstants.MOBILE_OTP_PADDING;
+    }
+    if (otp.length() == AuthenticationConstants.MOBILE_OTP_PADDING.length()
+            && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE)) {
+      newPassword = password + otp;
+    } else if (otp.length() == AuthenticationConstants.YUBIKEY_OTP_PADDING.
+            length() && user.getMode().equals(PeopleAccountType.Y_ACCOUNT_TYPE)) {
+      newPassword = password + otp + AuthenticationConstants.YUBIKEY_USER_MARKER;
+    } else {
+      throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.
+              getStatusCode(),
+              "Could not recognize the account type. Report a bug.");
+    }
+    
+    userController.setUserIsOnline(user, AuthenticationConstants.IS_ONLINE);
+    //read the user data from db and return to caller
+    json.setStatus("SUCCESS");
+    json.setSessionID(req.getSession().getId());
+      
+    // Issue a token for the user
+    String token = issueToken(email);
+      
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
+  }
+  
   @GET
   @Path("logout")
   @Produces(MediaType.APPLICATION_JSON)
@@ -497,5 +578,23 @@ public class AuthService {
     }
     return false;
   }
+  
+  private String issueToken(String login) {
+    String keyString = "2adfj517dAHD828ASiw1";
+    Key key = new SecretKeySpec(keyString.getBytes(), 0, keyString.getBytes().length, "DES");
 
+    String jwtToken = Jwts.builder()
+      .setSubject(login)
+      .setIssuer(uriInfo.getAbsolutePath().toString())
+      .setIssuedAt(new Date())
+      .setExpiration(toDate(LocalDateTime.now().plusMinutes(15L)))
+      .signWith(SignatureAlgorithm.HS512, key)
+      .compact();
+        
+    return jwtToken;
+  }
+  
+  private Date toDate(LocalDateTime localDateTime) {
+    return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+  }
 }
