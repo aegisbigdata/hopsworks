@@ -13,7 +13,7 @@ scp -o PasswordAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKe
 ssh -o PasswordAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i $key -p $PORT ${USER}@${SERVER} "cd ${DIR} && bower install && perl -pi -e \"s/getLocationBase\(\)/'http:\/\/${SERVER}:${WEBPORT}\/hopsworks'/g\" scripts/services/RequestInterceptorService.js"
 
 
-x-www-browser -new-tab http://${SERVER}:8080/${USER} &
+firefox -new-tab http://${SERVER}:8080/${USER} &
 
 watch -n 1 rsync -r ../hopsworks-web/yo/app/ ${USER}@aegis-hopsworks.fokus.fraunhofer.de:${DIR}
 
