@@ -30,6 +30,7 @@ import io.hops.hopsworks.common.dao.project.team.ProjectTeam;
 import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.project.MembersDTO;
 import io.hops.hopsworks.common.project.ProjectController;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -59,6 +60,7 @@ public class ProjectMembersService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findMembersByProjectID(
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
@@ -75,6 +77,7 @@ public class ProjectMembersService {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response addMembers(
           MembersDTO members,
           @Context SecurityContext sc,
@@ -120,6 +123,7 @@ public class ProjectMembersService {
   @Path("/{email}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response updateRoleByEmail(
           @PathParam("email") String email,
           @FormParam("role") String role,
@@ -153,6 +157,7 @@ public class ProjectMembersService {
   @Path("/{email}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response removeMembersByID(
           @PathParam("email") String email,
           @Context SecurityContext sc,

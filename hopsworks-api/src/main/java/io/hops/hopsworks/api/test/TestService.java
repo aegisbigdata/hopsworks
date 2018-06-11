@@ -1,6 +1,5 @@
 package io.hops.hopsworks.api.test;
 
-import io.hops.hopsworks.api.filter.JWTTokenNeeded;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -9,12 +8,12 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/test")
-@Produces(MediaType.TEXT_PLAIN)
 @Stateless
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class TestService {
@@ -25,9 +24,10 @@ public class TestService {
   private final static Logger logger = Logger.getLogger(TestService.class.getName());
   
   @GET
-  @Path("jwt")
-  @JWTTokenNeeded
-  public Response echoWithJWTToken() {
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity("OK").build();
+  @Path("/jwt")
+  @JWTokenNeeded
+  public Response echoWithJWTToken(@Context SecurityContext sc) {
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+            .entity(sc.getAuthenticationScheme()).build();
   }
 }

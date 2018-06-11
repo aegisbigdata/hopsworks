@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.zeppelin.rest;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfig;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfigFactory;
 import io.hops.hopsworks.api.zeppelin.util.ZeppelinResource;
@@ -11,7 +12,6 @@ import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.swagger.annotations.Api;
 import java.io.IOException;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -24,11 +24,11 @@ import javax.ws.rs.core.Response;
 import org.apache.zeppelin.user.AuthenticationInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/zeppelin/{projectID}/notebook")
 @Stateless
 @Produces("application/json")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Zeppelin notebook",
         description = "Zeppelin notebook")
 public class NotebookService {
@@ -49,7 +49,8 @@ public class NotebookService {
   private NotebookRestApi notebookRestApi;
 
   @Path("/")
-  @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public NotebookRestApi interpreter(@PathParam("projectID") String projectID,
           @Context HttpServletRequest httpReq) throws
           AppException, IOException {

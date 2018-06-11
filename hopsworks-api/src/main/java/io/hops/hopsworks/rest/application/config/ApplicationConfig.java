@@ -78,8 +78,8 @@ public class ApplicationConfig extends ResourceConfig {
     register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
     
     //JWT
-    register(io.hops.hopsworks.api.filter.JWTTokenNeeded.class);
-    register(io.hops.hopsworks.api.filter.JWTTokenNeededFilter.class);
+    register(io.hops.hopsworks.api.filter.JWTokenNeeded.class);
+    register(io.hops.hopsworks.api.filter.JWTokenNeededFilter.class);
     register(io.hops.hopsworks.api.test.TestService.class);
   }
 }

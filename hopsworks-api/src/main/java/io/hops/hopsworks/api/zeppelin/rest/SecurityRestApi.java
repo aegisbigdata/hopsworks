@@ -16,6 +16,7 @@
  */
 package io.hops.hopsworks.api.zeppelin.rest;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.zeppelin.server.JsonResponse;
 import io.hops.hopsworks.api.zeppelin.util.SecurityUtils;
 import io.hops.hopsworks.api.zeppelin.util.TicketContainer;
@@ -33,11 +34,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  * Zeppelin security rest api endpoint.
@@ -46,7 +47,6 @@ import javax.ws.rs.core.Context;
 @Path("/zeppelin/{projectID}/security")
 @Stateless
 @Produces("application/json")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Zeppelin Security",
         description = "Zeppelin Security")
 public class SecurityRestApi {
@@ -71,6 +71,8 @@ public class SecurityRestApi {
    */
   @GET
   @Path("ticket")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response ticket(@Context HttpServletRequest httpReq) {
     ZeppelinConfiguration conf = ZeppelinConfiguration.create();
     String principal = httpReq.getRemoteUser();//SecurityUtils.getPrincipal();
@@ -103,6 +105,8 @@ public class SecurityRestApi {
    */
   @GET
   @Path("userlist/{searchText}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getUserList(@PathParam("searchText") final String searchText) {
 
     List<String> autoSuggestList = new ArrayList<>();

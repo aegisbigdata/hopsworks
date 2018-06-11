@@ -22,6 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  *
@@ -50,6 +51,7 @@ public class CertService {
   @Path("/certpw")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getCertPw(@QueryParam("keyStore") String keyStore,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) {

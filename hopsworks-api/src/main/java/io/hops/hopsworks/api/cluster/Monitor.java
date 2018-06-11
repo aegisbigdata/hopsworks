@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.cluster;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.dao.host.Host;
@@ -9,7 +10,6 @@ import io.hops.hopsworks.common.dao.role.RoleEJB;
 import io.hops.hopsworks.common.exception.AppException;
 import io.swagger.annotations.Api;
 import java.util.List;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -26,9 +26,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/kmon")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Monitor Cluster Service")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -45,6 +45,8 @@ public class Monitor {
   @GET
   @Path("/roles")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getAllRoles(@Context SecurityContext sc, @Context HttpServletRequest req) {
     List<Role> list = roleEjb.findAll();
     GenericEntity<List<Role>> roles = new GenericEntity<List<Role>>(list) {
@@ -55,6 +57,8 @@ public class Monitor {
   @GET
   @Path("/services/{serviceName}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getServiceRoles(@PathParam("serviceName") String serviceName, @Context SecurityContext sc,
       @Context HttpServletRequest req) {
     List<Role> list = roleEjb.findServiceRoles(serviceName);
@@ -66,6 +70,8 @@ public class Monitor {
   @GET
   @Path("/hosts/{hostId}/roles")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getHostRoles(@PathParam("hostId") String hostId, @Context SecurityContext sc,
       @Context HttpServletRequest req) {
     List<Role> list = roleEjb.findHostRoles(hostId);
@@ -77,6 +83,8 @@ public class Monitor {
   @GET
   @Path("/services/{serviceName}/roles/{roleName}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getRoles(@PathParam("serviceName") String serviceName, @PathParam("roleName") String roleName,
       @Context SecurityContext sc, @Context HttpServletRequest req) {
     List<Role> list = roleEjb.findRoles(serviceName, roleName);
@@ -87,8 +95,9 @@ public class Monitor {
 
   @GET
   @Path("/hosts")
-  @RolesAllowed({"HOPS_ADMIN"}) //return the password in the host object
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getHosts(@Context SecurityContext sc, @Context HttpServletRequest req) {
     List<Host> list = hostEjb.find();
     GenericEntity<List<Host>> hosts = new GenericEntity<List<Host>>(list) {
@@ -98,8 +107,9 @@ public class Monitor {
 
   @GET
   @Path("/hosts/{hostId}")
-  @RolesAllowed({"HOPS_ADMIN"}) //return the password in the host object
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getHosts(@PathParam("hostId") String hostId, @Context SecurityContext sc,
       @Context HttpServletRequest req) {
     Host h = hostEjb.findByHostId(hostId);
@@ -115,9 +125,10 @@ public class Monitor {
   
   @POST
   @Path("/services/{serviceName}")
-  @RolesAllowed({"HOPS_ADMIN"})
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response serviceOp(@PathParam("serviceName") String serviceName, @Context SecurityContext sc,
       @Context HttpServletRequest req, RolesActionDTO action) throws AppException {
     String result = roleEjb.serviceOp(serviceName, action.getAction());
@@ -128,9 +139,10 @@ public class Monitor {
   
   @POST
   @Path("/services/{serviceName}/roles/{roleName}")
-  @RolesAllowed({"HOPS_ADMIN"})
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response roleOp(@PathParam("serviceName") String serviceName, @PathParam("roleName") String roleName,
       @Context SecurityContext sc, @Context HttpServletRequest req, RolesActionDTO action) throws AppException {
     JsonResponse json = new JsonResponse();
@@ -140,9 +152,10 @@ public class Monitor {
   
   @POST
   @Path("/services/{serviceName}/roles/{roleName}/hosts/{hostId}")
-  @RolesAllowed({"HOPS_ADMIN"})
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response roleOnHostOp(@PathParam("serviceName") String serviceName, @PathParam("roleName") String roleName,
       @PathParam("hostId") String hostId, @Context SecurityContext sc, @Context HttpServletRequest req,
       RolesActionDTO action) throws AppException {

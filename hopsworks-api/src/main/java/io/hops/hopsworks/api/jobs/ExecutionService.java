@@ -32,6 +32,7 @@ import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.jobs.execution.ExecutionController;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -71,6 +72,7 @@ public class ExecutionService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response getAllExecutions(@Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
     List<Execution> executions = executionFacade.findForJob(job);
@@ -92,6 +94,7 @@ public class ExecutionService {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response startExecution(@Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
     String loggedinemail = sc.getUserPrincipal().getName();
@@ -121,6 +124,7 @@ public class ExecutionService {
   @POST
   @Path("/stop")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response stopExecution(@PathParam("jobId") int jobId,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
@@ -155,6 +159,7 @@ public class ExecutionService {
   @Path("/{executionId}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response getExecution(@PathParam("executionId") int executionId,
       @Context SecurityContext sc, @Context HttpServletRequest req) throws
       AppException {

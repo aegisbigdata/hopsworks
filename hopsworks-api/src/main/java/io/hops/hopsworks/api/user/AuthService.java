@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.user;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.api.zeppelin.util.TicketContainer;
@@ -29,7 +30,6 @@ import io.swagger.annotations.Api;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -60,7 +60,11 @@ import java.util.Date;
 import java.time.LocalDateTime;
 import javax.ws.rs.core.UriInfo;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.crypto.spec.SecretKeySpec;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/auth")
 @Stateless
@@ -92,8 +96,9 @@ public class AuthService {
   
   @GET
   @Path("session")
-  @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response session(@Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
     JsonResponse json = new JsonResponse();
@@ -129,7 +134,7 @@ public class AuthService {
           @Context SecurityContext sc,
           @Context HttpServletRequest req, @Context HttpHeaders httpHeaders)
           throws AppException, MessagingException {
-
+        
     req.getServletContext().log("email: " + email);
     req.getServletContext().log("SESSIONID@login: " + req.getSession().getId());
     req.getServletContext().log("SecurityContext: " + sc.getUserPrincipal());
@@ -237,12 +242,10 @@ public class AuthService {
     
     req.getServletContext().log("email: " + email);
     req.getServletContext().log("SESSIONID@login: " + req.getSession().getId());
-    req.getServletContext().log("SecurityContext: " + sc.getUserPrincipal());
     req.getServletContext().log("SecurityContext in user role: " + sc.isUserInRole("HOPS_USER"));
     req.getServletContext().log("SecurityContext in sysadmin role: " + sc.isUserInRole("HOPS_ADMIN"));
     req.getServletContext().log("SecurityContext in agent role: " + sc.isUserInRole("AGENT"));
     req.getServletContext().log("SecurityContext in cluster_agent role: " + sc.isUserInRole("CLUSTER_AGENT"));
-    JsonResponse json = new JsonResponse();
     if (email == null || email.isEmpty()) {
       throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),"Email address field cannot be empty");
     }
@@ -282,13 +285,8 @@ public class AuthService {
               "Could not recognize the account type. Report a bug.");
     }
     
-    userController.setUserIsOnline(user, AuthenticationConstants.IS_ONLINE);
-    //read the user data from db and return to caller
-    json.setStatus("SUCCESS");
-    json.setSessionID(req.getSession().getId());
-      
     // Issue a token for the user
-    String token = issueToken(email);
+    String token = issueToken(email, userManager.findGroups(user.getUid()));
       
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
@@ -327,7 +325,8 @@ public class AuthService {
 
   @GET
   @Path("isAdmin")
-  @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response login(@Context SecurityContext sc,
           @Context HttpServletRequest req, @Context HttpHeaders httpHeaders)
           throws AppException, MessagingException {
@@ -579,19 +578,18 @@ public class AuthService {
     return false;
   }
   
-  private String issueToken(String login) {
+  private String issueToken(String email, List<String> bbcGroups) {
     String keyString = "2adfj517dAHD828ASiw1";
     Key key = new SecretKeySpec(keyString.getBytes(), 0, keyString.getBytes().length, "DES");
 
-    String jwtToken = Jwts.builder()
-      .setSubject(login)
-      .setIssuer(uriInfo.getAbsolutePath().toString())
-      .setIssuedAt(new Date())
-      .setExpiration(toDate(LocalDateTime.now().plusMinutes(15L)))
-      .signWith(SignatureAlgorithm.HS512, key)
-      .compact();
-        
-    return jwtToken;
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("sub", email);
+    claims.put("iss", uriInfo.getAbsolutePath().toString());
+    claims.put("iat", new Date());
+    claims.put("exp", toDate(LocalDateTime.now().plusHours(2L)));
+    claims.put("bbc", bbcGroups);
+    
+    return Jwts.builder().addClaims(claims).signWith(SignatureAlgorithm.HS512, key).compact();
   }
   
   private Date toDate(LocalDateTime localDateTime) {

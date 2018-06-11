@@ -47,7 +47,7 @@ public class YarnUIProxyServlet extends ProxyServlet {
               "Accept-Encoding", "accept-encoding",
               "Accept-Language",
               "accept-language",
-              "Accept-Charset", "accept-charset"));
+              "Accept-Charset", "accept-charset", "Authorization", "authorization"));
 
   protected void initTarget() throws ServletException {
     // TODO - should get the Kibana URI from Settings.java

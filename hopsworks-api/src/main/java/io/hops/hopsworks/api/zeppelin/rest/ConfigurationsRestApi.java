@@ -16,6 +16,7 @@
  */
 package io.hops.hopsworks.api.zeppelin.rest;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.zeppelin.server.JsonResponse;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfig;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfigFactory;
@@ -36,11 +37,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Map;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  * Configurations Rest API Endpoint
@@ -50,7 +51,6 @@ import javax.ws.rs.core.Context;
 @Produces("application/json")
 @Api(value = "Zeppelin configurations",
         description = "Zeppelin configurations")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 public class ConfigurationsRestApi {
 
   @EJB
@@ -73,6 +73,8 @@ public class ConfigurationsRestApi {
 
   @GET
   @Path("all")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getAll(@PathParam("projectID") String projectID,
           @Context HttpServletRequest httpReq) throws
           AppException {
@@ -110,6 +112,8 @@ public class ConfigurationsRestApi {
 
   @GET
   @Path("prefix/{prefix}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getByPrefix(@PathParam("prefix") final String prefix,
           @Context HttpServletRequest httpReq) throws AppException {
     Project project = zeppelinResource.getProjectNameFromCookies(httpReq);

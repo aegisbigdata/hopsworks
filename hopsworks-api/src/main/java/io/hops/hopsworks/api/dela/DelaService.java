@@ -2,6 +2,7 @@ package io.hops.hopsworks.api.dela;
 
 import com.google.gson.Gson;
 import io.hops.hopsworks.api.dela.dto.BootstrapDTO;
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.hopssite.dto.LocalDatasetDTO;
@@ -35,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -53,9 +53,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/dela")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Stateless
@@ -86,7 +86,9 @@ public class DelaService {
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getPublicDatasets(@Context SecurityContext sc, @Context HttpServletRequest req) throws AppException {
     List<Dataset> clusterDatasets = delaDatasetCtrl.getLocalPublicDatasets();
     DistributedFileSystemOps dfso = dfs.getDfsOps();
@@ -103,6 +105,8 @@ public class DelaService {
   @GET
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response publicSearch(@ApiParam(required=true) @QueryParam("query") String query)
     throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "dela:search");
@@ -133,6 +137,8 @@ public class DelaService {
   @GET
   @Path("/transfers/{publicDSId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response details(@PathParam("publicDSId")String publicDSId) throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "dela:dataset:details {0}", publicDSId);
     SearchServiceDTO.ItemDetails result = hopsSite.details(publicDSId);
@@ -148,6 +154,8 @@ public class DelaService {
   @GET
   @Path("/transfers")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getContentsForUser(@Context SecurityContext sc, 
     @QueryParam("filter") TransfersFilter filter) throws ThirdPartyException {
     if(!filter.equals(TransfersFilter.USER)) {
@@ -178,6 +186,8 @@ public class DelaService {
   @Path("/datasets/{publicDSId}/readme")
   @Produces(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "Gets readme file from a provided list of peers")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response readme(@PathParam("publicDSId") String publicDSId, BootstrapDTO peersJSON) 
     throws ThirdPartyException {
     for(ClusterAddressDTO peer : peersJSON.getBootstrap()) {

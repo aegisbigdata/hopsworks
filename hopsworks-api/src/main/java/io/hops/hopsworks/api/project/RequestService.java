@@ -1,8 +1,8 @@
 package io.hops.hopsworks.api.project;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -41,9 +41,9 @@ import io.hops.hopsworks.common.message.MessageController;
 import io.hops.hopsworks.common.util.EmailBean;
 import io.hops.hopsworks.common.util.Settings;
 import io.swagger.annotations.Api;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/request")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Request Service", description = "Request Service")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -77,7 +77,9 @@ public class RequestService {
   @POST
   @Path("/access")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response requestAccess(RequestDTO requestDTO,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
@@ -206,7 +208,9 @@ public class RequestService {
   @POST
   @Path("/join")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response requestJoin(RequestDTO requestDTO,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {

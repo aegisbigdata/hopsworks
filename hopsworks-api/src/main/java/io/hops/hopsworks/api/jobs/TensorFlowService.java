@@ -42,6 +42,7 @@ import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import org.apache.hadoop.security.AccessControlException;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -93,6 +94,7 @@ public class TensorFlowService {
   @Path("/programs")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getPrograms(@Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException, Exception {
 
@@ -112,6 +114,7 @@ public class TensorFlowService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response allocateResources(TfResourceCluster resourceReq,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
@@ -130,6 +133,7 @@ public class TensorFlowService {
   @Path("/cpu/{program}/remove")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response freeResources(@PathParam("program") String topicName,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
@@ -159,6 +163,7 @@ public class TensorFlowService {
   @Path("/inspect/{path: .+}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response inspectProgram(@PathParam("path") String path,
       @Context SecurityContext sc, @Context HttpServletRequest req) throws
       AppException, AccessControlException {
@@ -202,6 +207,7 @@ public class TensorFlowService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response createJob(TensorFlowJobConfiguration config,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {

@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.project;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import java.util.HashSet;
 import java.io.StringReader;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -71,9 +71,9 @@ import io.hops.hopsworks.common.metadata.exception.DatabaseException;
 import io.hops.hopsworks.common.util.HopsUtils;
 import io.hops.hopsworks.common.util.JsonUtil;
 import io.swagger.annotations.Api;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/metadata")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Metadata Service", description = "Metadata Service")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -122,7 +122,9 @@ public class MetadataService {
    * @throws AppException
    */
   @Path("upload")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public UploadService upload() throws AppException {
     this.uploader.confUploadTemplate();
     return this.uploader;
@@ -140,7 +142,9 @@ public class MetadataService {
   @GET
   @Path("{inodepid}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response fetchMetadataCompact(
           @PathParam("inodepid") Integer inodePid,
           @Context SecurityContext sc,
@@ -207,7 +211,9 @@ public class MetadataService {
   @GET
   @Path("fetchmetadata/{inodepid}/{inodename}/{tableid}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response fetchMetadata(
           @PathParam("inodepid") Integer inodePid,
           @PathParam("inodename") String inodeName,
@@ -289,7 +295,9 @@ public class MetadataService {
   @GET
   @Path("fetchtemplatesforinode/{inodeid}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response fetchTemplatesforInode(
           @PathParam("inodeid") Integer inodeid,
           @Context SecurityContext sc,
@@ -327,7 +335,9 @@ public class MetadataService {
   @GET
   @Path("fetchavailabletemplatesforinode/{inodeid}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response fetchAvailableTemplatesForInode(
           @PathParam("inodeid") Integer inodeid,
           @Context SecurityContext sc,
@@ -377,7 +387,9 @@ public class MetadataService {
   @GET
   @Path("detachtemplate/{inodeid}/{templateid}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response detachTemplateFromInode(
           @PathParam("inodeid") Integer inodeid,
           @PathParam("templateid") Integer templateid,
@@ -463,7 +475,9 @@ public class MetadataService {
   @GET
   @Path("fetchtemplate/{templateid}/{sender}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response fetchTemplate(
           @PathParam("templateid") Integer templateid,
           @PathParam("sender") String sender,
@@ -496,7 +510,9 @@ public class MetadataService {
   @POST
   @Path("addWithSchema")
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response addMetadataWithSchema(
           @Context SecurityContext sc, @Context HttpServletRequest req,
           String metaObj) throws
@@ -508,7 +524,9 @@ public class MetadataService {
   @POST
   @Path("updateWithSchema")
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response updateMetadataWithSchema(
           @Context SecurityContext sc, @Context HttpServletRequest req,
           String metaObj) throws
@@ -521,7 +539,9 @@ public class MetadataService {
   @POST
   @Path("removeWithSchema")
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response removeMetadataWithSchema(
           @Context SecurityContext sc, @Context HttpServletRequest req,
           String metaObj) throws
@@ -629,7 +649,9 @@ public class MetadataService {
   @POST
   @Path("attachSchemaless")
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response attachSchemalessMetadata(
           @Context SecurityContext sc, @Context HttpServletRequest req,
           String metaObj) throws
@@ -643,7 +665,9 @@ public class MetadataService {
   @POST
   @Path("detachSchemaless")
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response detachSchemalessMetadata(
           @Context SecurityContext sc, @Context HttpServletRequest req,
           String metaObj) throws

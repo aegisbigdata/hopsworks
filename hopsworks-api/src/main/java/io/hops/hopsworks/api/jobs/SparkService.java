@@ -40,6 +40,7 @@ import io.hops.hopsworks.common.jobs.spark.SparkController;
 import io.hops.hopsworks.common.jobs.spark.SparkJobConfiguration;
 import io.hops.hopsworks.common.util.HopsUtils;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  * Service offering functionality to run a Spark fatjar job.
@@ -88,6 +89,7 @@ public class SparkService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findAllSparkJobs(@Context SecurityContext sc,
       @Context HttpServletRequest req)
       throws AppException {
@@ -114,6 +116,7 @@ public class SparkService {
   @Path("/inspect/{path: .+}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response inspectJar(@PathParam("path") String path,
       @Context SecurityContext sc, @Context HttpServletRequest req) throws
       AppException, AccessControlException {
@@ -161,6 +164,7 @@ public class SparkService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response createJob(SparkJobConfiguration config,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {

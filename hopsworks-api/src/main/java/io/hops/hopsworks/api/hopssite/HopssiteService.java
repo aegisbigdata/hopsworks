@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.hopssite;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.hopssite.dto.CategoryDTO;
 import io.hops.hopsworks.api.hopssite.dto.DatasetIssueReqDTO;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -41,10 +41,10 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/hopssite/")
 @Stateless
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -70,6 +70,8 @@ public class HopssiteService {
 
   @GET
   @Path("services/{service}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getServiceInfo(@PathParam("service") String service) {
     boolean delaEnabled = settings.isDelaEnabled();
     HopsSiteServiceInfoDTO serviceInfo;
@@ -86,6 +88,8 @@ public class HopssiteService {
   @GET
   @Path("clusterId")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getClusterId() throws ThirdPartyException {
     String clusterId = settings.getDELA_CLUSTER_ID();
     LOGGER.log(Level.INFO, "Cluster id on hops-site: {0}", clusterId);
@@ -106,6 +110,8 @@ public class HopssiteService {
   }
   @GET
   @Path("datasets")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getAllDatasets(
     @ApiParam(required = true) @QueryParam("filter") CategoriesFilter filter) 
     throws ThirdPartyException {
@@ -126,6 +132,8 @@ public class HopssiteService {
 
   @GET
   @Path("datasets/{publicDSId}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getDataset(@PathParam("publicDSId") String publicDSId) throws ThirdPartyException {
     DatasetDTO.Complete datasets = hopsSite.getDataset(publicDSId);
     LOGGER.log(Settings.DELA_DEBUG, "Get a dataset");
@@ -134,6 +142,8 @@ public class HopssiteService {
 
   @GET
   @Path("datasets/{publicDSId}/local")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getLocalDataset(@PathParam("publicDSId") String publicDSId) {
     Optional<Dataset> datasets = datasetFacade.findByPublicDsId(publicDSId);
     if (!datasets.isPresent()) {
@@ -149,6 +159,8 @@ public class HopssiteService {
 
   @GET
   @Path("categories")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getDisplayCategories() {
     CategoryDTO categoryAll = new CategoryDTO(CategoriesFilter.ALL.name(), "All", false);
     CategoryDTO categoryNew = new CategoryDTO(CategoriesFilter.NEW.name(), "Recently added", false);
@@ -162,6 +174,8 @@ public class HopssiteService {
 
   @POST
   @Path("datasets/{publicDSId}/issue")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response addDatasetIssue(@PathParam("publicDSId") String publicDSId, DatasetIssueReqDTO datasetIssueReq,
           @Context SecurityContext sc) throws ThirdPartyException {
     if (datasetIssueReq == null) {
@@ -179,12 +193,16 @@ public class HopssiteService {
   }
 
   @Path("datasets/{publicDSId}/comments")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public CommentService getComments(@PathParam("publicDSId") String publicDSId) {
     this.commentService.setPublicDSId(publicDSId);
     return this.commentService;
   }
 
   @Path("datasets/{publicDSId}/rating")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public RatingService getRating(@PathParam("publicDSId") String publicDSId) {
     this.ratingService.setPublicDSId(publicDSId);
     return this.ratingService;

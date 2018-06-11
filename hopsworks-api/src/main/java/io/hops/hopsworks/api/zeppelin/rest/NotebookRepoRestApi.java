@@ -36,12 +36,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonSyntaxException;
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.zeppelin.rest.message.NotebookRepoSettingsRequest;
 import io.hops.hopsworks.api.zeppelin.server.JsonResponse;
 import io.hops.hopsworks.api.zeppelin.socket.NotebookServerImpl;
 import io.hops.hopsworks.api.zeppelin.util.SecurityUtils;
 import io.swagger.annotations.Api;
-import javax.annotation.security.RolesAllowed;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  * NoteRepo rest API endpoint.
@@ -49,7 +50,6 @@ import javax.annotation.security.RolesAllowed;
  */
 @Path("/zeppelin/{projectID}/notebook-repositories")
 @Produces("application/json")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "NotebookRepo Rest Api",
         description = "NotebookRepo Rest Api")
 public class NotebookRepoRestApi {
@@ -73,6 +73,8 @@ public class NotebookRepoRestApi {
    */
   @GET
   @ZeppelinApi
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response listRepoSettings() {
     AuthenticationInfo subject = new AuthenticationInfo(SecurityUtils.getPrincipal());
     LOG.info("Getting list of NoteRepo with Settings for user {}", subject.getUser());
@@ -86,6 +88,8 @@ public class NotebookRepoRestApi {
   @GET
   @Path("reload")
   @ZeppelinApi
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response refreshRepo(){
     AuthenticationInfo subject = new AuthenticationInfo(SecurityUtils.getPrincipal());
     LOG.info("Reloading notebook repository for user {}", subject.getUser());
@@ -101,6 +105,8 @@ public class NotebookRepoRestApi {
    */
   @PUT
   @ZeppelinApi
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response updateRepoSetting(String payload) {
     if (StringUtils.isBlank(payload)) {
       return new JsonResponse<>(Status.NOT_FOUND, "", Collections.emptyMap()).build();

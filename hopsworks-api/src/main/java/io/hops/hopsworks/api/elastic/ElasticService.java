@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.elastic;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.elastic.ElasticController;
@@ -9,7 +10,6 @@ import io.swagger.annotations.Api;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -24,9 +24,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/elastic")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Elastic Service", description = "Elastic Service")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -53,7 +53,9 @@ public class ElasticService {
   @GET
   @Path("globalsearch/{searchTerm}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response globalSearch(
           @PathParam("searchTerm") String searchTerm,
           @Context SecurityContext sc,
@@ -82,7 +84,9 @@ public class ElasticService {
   @GET
   @Path("projectsearch/{projectId}/{searchTerm}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response projectSearch(
       @PathParam("projectId") Integer projectId,
       @PathParam("searchTerm") String searchTerm,
@@ -111,7 +115,9 @@ public class ElasticService {
   @GET
   @Path("datasetsearch/{projectId}/{datasetName}/{searchTerm}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response datasetSearch(
       @PathParam("projectId") Integer projectId,
       @PathParam("datasetName") String datasetName,
@@ -127,5 +133,4 @@ public class ElasticService {
                     datasetSearch(projectId, datasetName, searchTerm)) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK). entity(searchResults).build();
   }
-
 }

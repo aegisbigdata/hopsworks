@@ -1,8 +1,8 @@
 package io.hops.hopsworks.api.user;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import java.util.List;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -26,9 +26,9 @@ import io.hops.hopsworks.common.dao.user.activity.Activity;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
 import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
 import io.swagger.annotations.Api;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/activity")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
 @Api(value = "Activity", description = "User activity service")
@@ -46,6 +46,8 @@ public class ActivityService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response findAllByUser(@Context SecurityContext sc,
           @Context HttpServletRequest req) {
     Users user = userBean.getUserByEmail(sc.getUserPrincipal().getName());
@@ -62,6 +64,8 @@ public class ActivityService {
   @GET
   @Path("/inode")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response findByInode(@QueryParam("inodeId") int inodeId,
           @QueryParam("from") int from,
           @QueryParam("to") int to,
@@ -81,6 +85,8 @@ public class ActivityService {
   @GET
   @Path("/query")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response findPaginatedByUser(@QueryParam("from") int from,
           @QueryParam("to") int to,
           @Context SecurityContext sc,
@@ -98,7 +104,9 @@ public class ActivityService {
   @GET
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findAllByProject(@PathParam("id") Integer id,
           @Context SecurityContext sc, @Context HttpServletRequest req) {
     Project project = projectFacade.find(id);
@@ -114,7 +122,9 @@ public class ActivityService {
   @GET
   @Path("{id}/query")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findPaginatedByProject(@PathParam("id") Integer id,
           @QueryParam("from") int from,
           @QueryParam("to") int to,

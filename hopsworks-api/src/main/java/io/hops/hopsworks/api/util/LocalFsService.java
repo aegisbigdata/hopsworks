@@ -31,6 +31,7 @@ import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
 import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.util.Settings;
 import java.util.logging.Level;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -103,6 +104,7 @@ public class LocalFsService {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response createDataSetDir(
           String path,
           @Context SecurityContext sc,
@@ -132,6 +134,7 @@ public class LocalFsService {
   @Path("/{fileName: .+}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response removedataSetdir(
           @PathParam("fileName") String fileName,
           @Context SecurityContext sc,
@@ -159,6 +162,7 @@ public class LocalFsService {
   @Path("fileExists/{path: .+}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response checkFileExist(@PathParam("path") String path) throws
           AppException {
     if (path == null) {
@@ -185,6 +189,7 @@ public class LocalFsService {
   @Path("isDir/{path: .+}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response isDir(@PathParam("path") String path) throws
           AppException {
 

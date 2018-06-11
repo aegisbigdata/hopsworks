@@ -1,11 +1,11 @@
 package io.hops.hopsworks.api.user;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -37,9 +37,9 @@ import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.project.ProjectController;
 import io.hops.hopsworks.common.user.UsersController;
 import io.swagger.annotations.Api;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/user")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Stateless
 @Api(value = "User", description = "User service")
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -60,7 +60,9 @@ public class UserService {
   @GET
   @Path("allcards")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response findAllByUser(@Context SecurityContext sc,
           @Context HttpServletRequest req) {
 
@@ -80,6 +82,8 @@ public class UserService {
   @GET
   @Path("profile")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getUserProfile(@Context SecurityContext sc) throws
           AppException {
     Users user = userBean.findByEmail(sc.getUserPrincipal().getName());
@@ -98,6 +102,8 @@ public class UserService {
   @POST
   @Path("updateProfile")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response updateProfile(@FormParam("firstName") String firstName,
           @FormParam("lastName") String lastName,
           @FormParam("telephoneNum") String telephoneNum,
@@ -120,6 +126,8 @@ public class UserService {
   @POST
   @Path("changeLoginCredentials")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response changeLoginCredentials(
           @FormParam("oldPassword") String oldPassword,
           @FormParam("newPassword") String newPassword,
@@ -141,6 +149,8 @@ public class UserService {
   @POST
   @Path("changeSecurityQA")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response changeSecurityQA(@FormParam("oldPassword") String oldPassword,
           @FormParam("securityQuestion") String securityQuestion,
           @FormParam("securityAnswer") String securityAnswer,
@@ -160,6 +170,8 @@ public class UserService {
   @POST
   @Path("changeTwoFactor")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response changeTwoFactor(@FormParam("password") String password,
           @FormParam("twoFactor") boolean twoFactor,
           @Context SecurityContext sc,
@@ -189,6 +201,8 @@ public class UserService {
   @POST
   @Path("getQRCode")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getQRCode(@FormParam("password") String password,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
@@ -219,7 +233,9 @@ public class UserService {
   @Path("addSshKey")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response addSshkey(SshKeyDTO sshkey,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
@@ -234,7 +250,9 @@ public class UserService {
   @POST
   @Path("removeSshKey")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response removeSshkey(@FormParam("name") String name,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
@@ -251,7 +269,9 @@ public class UserService {
   @GET
   @Path("getSshKeys")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response getSshkeys(@Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
     Users user = userBean.findByEmail(sc.getUserPrincipal().getName());
@@ -268,6 +288,8 @@ public class UserService {
   @POST
   @Path("getRole")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getRole(@FormParam("projectId") int projectId,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {

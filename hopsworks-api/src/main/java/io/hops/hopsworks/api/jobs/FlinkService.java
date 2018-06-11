@@ -40,6 +40,7 @@ import io.hops.hopsworks.common.jobs.flink.FlinkJobConfiguration;
 import io.hops.hopsworks.common.jobs.jobhistory.JobType;
 import io.hops.hopsworks.common.util.HopsUtils;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  * Service offering functionality to run a Flink fatjar job.
@@ -88,6 +89,7 @@ public class FlinkService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findAllFlinkJobs(@Context SecurityContext sc,
       @Context HttpServletRequest req)
       throws AppException {
@@ -114,6 +116,7 @@ public class FlinkService {
   @Path("/inspect/{path: .+}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response inspectJar(@PathParam("path") String path,
       @Context SecurityContext sc, @Context HttpServletRequest req) throws
       AppException, AccessControlException {
@@ -158,6 +161,7 @@ public class FlinkService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response createJob(FlinkJobConfiguration config,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {

@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.admin;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.dao.user.BbcGroup;
 import io.hops.hopsworks.common.dao.user.BbcGroupFacade;
@@ -18,7 +19,6 @@ import io.swagger.annotations.Api;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -37,9 +37,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/admin")
-@RolesAllowed({"HOPS_ADMIN"})
 @Api(value = "Admin")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -62,6 +62,8 @@ public class UsersAdmin {
   @GET
   @Path("/users")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getAllUsers(@Context SecurityContext sc, @Context HttpServletRequest req,
       @QueryParam("status") String filter) throws AppException{
     List<Users> list = new ArrayList<>();
@@ -88,6 +90,8 @@ public class UsersAdmin {
   @GET
   @Path("/users/{email}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getUser(@Context SecurityContext sc, @Context HttpServletRequest req,
       @PathParam("email") String email) throws AppException {
     Users u = userFacade.findByEmail(email);
@@ -102,6 +106,8 @@ public class UsersAdmin {
   @POST
   @Path("/users/{email}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response updateUser(@Context SecurityContext sc, @Context HttpServletRequest req,
       @PathParam("email") String email, Users user) throws AppException {
     Users u = userFacade.findByEmail(email);
@@ -145,6 +151,8 @@ public class UsersAdmin {
   @POST
   @Path("/users/{email}/accepted")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response acceptUser(@Context SecurityContext sc, @Context HttpServletRequest req,
       @PathParam("email") String email, Users user) throws AppException {
     Users u = userFacade.findByEmail(email);
@@ -187,6 +195,8 @@ public class UsersAdmin {
   @POST
   @Path("/users/{email}/rejected")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response rejectUser(@Context SecurityContext sc, @Context HttpServletRequest req,
       @PathParam("email") String email) throws AppException {
     Users u = userFacade.findByEmail(email);
@@ -211,6 +221,8 @@ public class UsersAdmin {
   @POST
   @Path("/users/{email}/pending")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response pendingUser(@Context SecurityContext sc, @Context HttpServletRequest req,
       @PathParam("email") String email) throws AppException {
     Users u = userFacade.findByEmail(email);
@@ -234,6 +246,8 @@ public class UsersAdmin {
   @GET
   @Path("/usergroups")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getAllGroups(@Context SecurityContext sc, @Context HttpServletRequest req) {
     List<BbcGroup> list = bbcGroupFacade.findAll();
     GenericEntity<List<BbcGroup>> groups = new GenericEntity<List<BbcGroup>>(list) {

@@ -36,6 +36,7 @@ import io.hops.hopsworks.common.jobs.adam.AdamJobConfiguration;
 import io.hops.hopsworks.common.jobs.jobhistory.JobType;
 import io.hops.hopsworks.common.jobs.spark.SparkJobConfiguration;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 public class AdamService {
@@ -75,6 +76,7 @@ public class AdamService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findAllAdamJobs(@Context SecurityContext sc,
           @Context HttpServletRequest req)
           throws AppException {
@@ -98,6 +100,7 @@ public class AdamService {
   @Path("/commands")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getAdamCommands(@Context SecurityContext sc,
           @Context HttpServletRequest req) {
     JsonArrayBuilder array = Json.createArrayBuilder();
@@ -123,6 +126,7 @@ public class AdamService {
   @Path("/commands/{name}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getCommandDetails(@PathParam("name") String commandName,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) {
@@ -149,6 +153,7 @@ public class AdamService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response createJob(AdamJobConfiguration config,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {

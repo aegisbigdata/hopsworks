@@ -18,6 +18,7 @@
 package io.hops.hopsworks.api.admin;
 
 import io.hops.hopsworks.api.admin.dto.VariablesRequest;
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.constants.message.ResponseMessages;
@@ -28,7 +29,6 @@ import io.hops.hopsworks.common.security.CertificatesMgmService;
 import io.hops.hopsworks.common.util.Settings;
 import io.swagger.annotations.Api;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -50,9 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/admin")
-@RolesAllowed({"HOPS_ADMIN"})
 @Api(value = "Admin")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -80,6 +80,8 @@ public class SystemAdminService {
    */
   @PUT
   @Path("/encryptionPass")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response changeMasterEncryptionPassword(@Context SecurityContext sc, @Context HttpServletRequest request,
       @FormParam("oldPassword") String oldPassword, @FormParam("newPassword") String newPassword)
     throws AppException {
@@ -103,6 +105,8 @@ public class SystemAdminService {
   
   @POST
   @Path("/variables/refresh")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response refreshVariables(@Context SecurityContext sc, @Context HttpServletRequest request)
     throws AppException {
     LOG.log(Level.FINE, "Requested refreshing variables");
@@ -115,6 +119,8 @@ public class SystemAdminService {
   @POST
   @Consumes({MediaType.APPLICATION_JSON})
   @Path("/variables")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response updateVariables(@Context SecurityContext sc, @Context HttpServletRequest request,
       VariablesRequest variablesRequest)
     throws AppException {

@@ -39,6 +39,7 @@ import java.io.StringReader;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -66,6 +67,7 @@ public class InfluxDBService {
   @Path("/{database}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getMetrics(
           @PathParam("database") String database,
           @QueryParam("columns") String columns,
@@ -116,6 +118,7 @@ public class InfluxDBService {
   @Path("/allexecutors")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getAllExecutorsMetrics(
           @QueryParam("filters") final String filters,
           @Context SecurityContext sc, @Context HttpServletRequest req) throws

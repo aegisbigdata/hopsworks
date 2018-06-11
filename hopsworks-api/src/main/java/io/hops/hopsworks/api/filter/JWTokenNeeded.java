@@ -9,4 +9,4 @@ import java.lang.annotation.RetentionPolicy;
 @NameBinding
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface JWTTokenNeeded {}
+public @interface JWTokenNeeded {}

@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.zeppelin.rest;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfig;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfigFactory;
 import io.hops.hopsworks.api.zeppelin.util.ZeppelinResource;
@@ -9,7 +10,6 @@ import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.AppException;
 import io.swagger.annotations.Api;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -20,10 +20,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/zeppelin/{projectID}/helium")
 @Produces("application/json")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Helium Rest Api",
         description = "Helium Rest Api")
 public class HeliumService {
@@ -42,7 +42,8 @@ public class HeliumService {
   private HeliumRestApi heliumRestApi;
 
   @Path("/")
-  @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public HeliumRestApi interpreter(@PathParam("projectID") String projectID,
           @Context HttpServletRequest httpReq) throws
           AppException {

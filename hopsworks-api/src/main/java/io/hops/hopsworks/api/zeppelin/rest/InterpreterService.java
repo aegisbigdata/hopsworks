@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.zeppelin.rest;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.util.LivyController;
 import io.hops.hopsworks.api.zeppelin.server.JsonResponse;
 import io.hops.hopsworks.api.zeppelin.server.ZeppelinConfig;
@@ -12,7 +13,6 @@ import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.AppException;
 import io.swagger.annotations.Api;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -26,11 +26,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/zeppelin/{projectID}/interpreter")
 @Stateless
 @Produces("application/json")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Zeppelin interpreter",
         description = "Zeppelin interpreter")
 public class InterpreterService {
@@ -51,7 +51,8 @@ public class InterpreterService {
   private LivyController livyService;
 
   @Path("/")
-  @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public InterpreterRestApi interpreter(@PathParam("projectID") String projectID, @Context HttpServletRequest httpReq)
           throws AppException {
     Project project = zeppelinResource.getProject(projectID);
@@ -82,7 +83,8 @@ public class InterpreterService {
   @GET
   @Path("/check")
   @Produces("application/json")
-  @RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response interpreterCheck(@PathParam("projectID") String projectID, @Context HttpServletRequest httpReq) throws
           AppException {
     Project project = zeppelinResource.getProject(projectID);
@@ -111,7 +113,8 @@ public class InterpreterService {
   @GET
   @Path("/livy/sessions")
   @Produces("application/json")
-  @RolesAllowed({"HOPS_ADMIN"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getSessions(@PathParam("projectID") String projectID) {
     LivyMsg sessions = livyService.getLivySessions();
     return new JsonResponse(Response.Status.OK, "", sessions).build();
@@ -120,7 +123,8 @@ public class InterpreterService {
   @GET
   @Path("/livy/sessions/{sessionId}")
   @Produces("application/json")
-  @RolesAllowed({"HOPS_ADMIN"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getSession(@PathParam("projectID") String projectID, @PathParam("sessionId") int sessionId) {
     LivyMsg.Session session = livyService.getLivySession(sessionId);
     if (session == null) {
@@ -132,7 +136,8 @@ public class InterpreterService {
   @DELETE
   @Path("/livy/sessions/delete/{sessionId}")
   @Produces("application/json")
-  @RolesAllowed({"HOPS_ADMIN"})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response deleteSession(@PathParam("projectID") String projectID, @PathParam("sessionId") int sessionId) {
     int res = livyService.deleteLivySession(sessionId);
     if (res == Response.Status.NOT_FOUND.getStatusCode()) {

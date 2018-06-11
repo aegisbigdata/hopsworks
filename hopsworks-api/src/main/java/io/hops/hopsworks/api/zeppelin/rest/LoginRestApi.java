@@ -16,6 +16,7 @@
  */
 package io.hops.hopsworks.api.zeppelin.rest;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.zeppelin.server.JsonResponse;
 import io.hops.hopsworks.api.zeppelin.util.SecurityUtils;
 import io.hops.hopsworks.api.zeppelin.util.TicketContainer;
@@ -37,7 +38,6 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.servlet.ServletException;
@@ -49,6 +49,7 @@ import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.zeppelin.notebook.NotebookAuthorization;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 /**
  * Created for org.apache.zeppelin.rest.message on 17/03/16.
@@ -56,7 +57,6 @@ import org.apache.zeppelin.notebook.NotebookAuthorization;
 @Path("/zeppelin/{projectID}/login")
 @Stateless
 @Produces("application/json")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 public class LoginRestApi {
 
   private static final Logger LOG = LoggerFactory.getLogger(LoginRestApi.class);
@@ -86,6 +86,8 @@ public class LoginRestApi {
    * @return 200 response
    */
   @POST
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response postLogin(@FormParam("userName") String userName,
           @FormParam("password") String password) {
     JsonResponse response = null;
@@ -143,6 +145,8 @@ public class LoginRestApi {
 
   @POST
   @Path("logout")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response logout(@Context HttpServletRequest req) {
     JsonResponse response;
 

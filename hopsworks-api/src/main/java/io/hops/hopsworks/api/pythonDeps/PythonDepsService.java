@@ -49,6 +49,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.SecurityContext;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -108,6 +109,7 @@ public class PythonDepsService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response index() throws AppException {
 
     Collection<PythonDep> pythonDeps = project.getPythonDepCollection();
@@ -140,6 +142,7 @@ public class PythonDepsService {
   @GET
   @Path("/enable/{version}/{pythonKernelEnable}")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response enable(@PathParam("version") String version,
       @PathParam("pythonKernelEnable") String pythonKernelEnable,
       @Context SecurityContext sc,
@@ -170,6 +173,7 @@ public class PythonDepsService {
   @GET
   @Path("/installed")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response installed() throws AppException {
     Map<String, String> deps = pythonDepsFacade.getPreInstalledLibs(project);
 
@@ -184,6 +188,7 @@ public class PythonDepsService {
   @GET
   @Path("/enabled")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response enabled() throws AppException {
     boolean enabled = project.getConda();
     if (enabled) {
@@ -198,6 +203,7 @@ public class PythonDepsService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/remove")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response remove(PythonDepJson library) throws AppException {
 
     pythonDepsFacade.removeLibrary(project,
@@ -211,6 +217,7 @@ public class PythonDepsService {
   @Path("/install")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  @JWTokenNeeded
   public Response install(PythonDepJson library) throws AppException {
 
     if (project.getName().startsWith("demo_tensorflow")) {
@@ -237,6 +244,7 @@ public class PythonDepsService {
   @Path("/installOneHost/{hostId}")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  @JWTokenNeeded
   public Response installOneHost(
       @PathParam("hostId") String hostId,
       PythonDepJson library) throws AppException {
@@ -250,6 +258,7 @@ public class PythonDepsService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/upgrade")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response upgrade(PythonDepJson library) throws AppException {
 
     pythonDepsFacade.upgradeLibrary(project,
@@ -263,6 +272,7 @@ public class PythonDepsService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/status")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response status() throws AppException {
 
     List<OpStatus> response = pythonDepsFacade.opStatus(project);
@@ -279,6 +289,7 @@ public class PythonDepsService {
   @Path("/clone/{projectName}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response doClone(
       @PathParam("projectName") String srcProject,
       @PathParam("projectName") String destProject,
@@ -296,6 +307,7 @@ public class PythonDepsService {
   @Path("/createenv/{projectName}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response createEnv(@PathParam("projectName") String projectName,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
@@ -310,6 +322,7 @@ public class PythonDepsService {
   @Path("/removeenv/{projectName}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response removeEnv(@PathParam("projectName") String projectName,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
@@ -335,6 +348,7 @@ public class PythonDepsService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response search(@Context SecurityContext sc,
       @Context HttpServletRequest req,
       @Context HttpHeaders httpHeaders,

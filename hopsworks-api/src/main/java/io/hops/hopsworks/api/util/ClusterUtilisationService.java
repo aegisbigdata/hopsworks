@@ -1,11 +1,11 @@
 package io.hops.hopsworks.api.util;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.util.ClusterUtil;
 import io.hops.hopsworks.common.util.Settings;
 import io.swagger.annotations.Api;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -18,10 +18,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Stateless
 @Path("/clusterUtilisation")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Cluster Utilisation Service",
     description = "Cluster Utilisation Service")
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -39,6 +39,8 @@ public class ClusterUtilisationService {
   @GET
   @Path("/metrics")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getGpus() {
     Response response = null;
     String rmUrl = "http://" + settings.getRmIp() + ":" + settings.getRmPort() + "/ws/v1/cluster/metrics";

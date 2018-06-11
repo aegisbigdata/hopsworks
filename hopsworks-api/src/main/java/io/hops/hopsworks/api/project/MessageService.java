@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.project;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.dao.dataset.DatasetRequest;
@@ -13,7 +14,6 @@ import io.hops.hopsworks.common.message.MessageController;
 import io.swagger.annotations.Api;
 import java.util.List;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -32,10 +32,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.elasticsearch.common.Strings;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/message")
 @Stateless
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Message Service", description = "Message Service")
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class MessageService {
@@ -55,6 +55,8 @@ public class MessageService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getAllMessagesByUser(@Context SecurityContext sc) {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
@@ -69,6 +71,8 @@ public class MessageService {
   @GET
   @Path("deleted")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getAllDeletedMessagesByUser(@Context SecurityContext sc) {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
@@ -82,6 +86,8 @@ public class MessageService {
   @GET
   @Path("countUnread")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response countUnreadMessagesByUser(@Context SecurityContext sc) {
     JsonResponse json = new JsonResponse();
     String eamil = sc.getUserPrincipal().getName();
@@ -95,6 +101,8 @@ public class MessageService {
   @PUT
   @Path("markAsRead/{msgId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response markAsRead(@PathParam("msgId") Integer msgId,
           @Context SecurityContext sc) throws AppException {
     String eamil = sc.getUserPrincipal().getName();
@@ -120,6 +128,8 @@ public class MessageService {
   @PUT
   @Path("moveToTrash/{msgId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response moveToTrash(@PathParam("msgId") Integer msgId,
           @Context SecurityContext sc) throws AppException {
     String eamil = sc.getUserPrincipal().getName();
@@ -145,6 +155,8 @@ public class MessageService {
   @PUT
   @Path("restoreFromTrash/{msgId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response restoreFromTrash(@PathParam("msgId") Integer msgId,
           @Context SecurityContext sc) throws AppException {
     String eamil = sc.getUserPrincipal().getName();
@@ -163,6 +175,8 @@ public class MessageService {
   @DELETE
   @Path("{msgId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response deleteMessage(@PathParam("msgId") Integer msgId,
           @Context SecurityContext sc) throws AppException {
     String eamil = sc.getUserPrincipal().getName();
@@ -180,6 +194,8 @@ public class MessageService {
   @DELETE
   @Path("empty")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response emptyTrash(@Context SecurityContext sc) throws AppException {
     JsonResponse json = new JsonResponse();
     String eamil = sc.getUserPrincipal().getName();
@@ -194,6 +210,8 @@ public class MessageService {
   @Path("reply/{msgId}")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.TEXT_PLAIN)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response reply(@PathParam("msgId") Integer msgId,
           String content,
           @Context SecurityContext sc) throws AppException {

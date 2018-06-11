@@ -1,5 +1,6 @@
 package io.hops.hopsworks.api.project;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +12,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -55,9 +55,9 @@ import io.hops.hopsworks.common.jobs.jobhistory.JobHeuristicDetailsDTO;
 import io.hops.hopsworks.common.jobs.jobhistory.JobProposedConfigurationDTO;
 import io.hops.hopsworks.common.util.Settings;
 import io.swagger.annotations.Api;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("history")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "History Service", description = "History Service")
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class HistoryService {
@@ -117,7 +117,9 @@ public class HistoryService {
   @GET
   @Path("all/{projectId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getAllProjects(@PathParam("projectId") int projectId,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
@@ -149,7 +151,9 @@ public class HistoryService {
   @GET
   @Path("details/jobs/{jobId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getJob(@PathParam("jobId") String jobId,
           @Context SecurityContext sc,
           @Context HttpServletRequest req,
@@ -164,7 +168,9 @@ public class HistoryService {
   @GET
   @Path("config/jobs/{jobId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getConfig(@PathParam("jobId") String jobId,
           @Context SecurityContext sc,
           @Context HttpServletRequest req,
@@ -204,7 +210,9 @@ public class HistoryService {
   @Path("heuristics")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response Heuristics(JobDetailDTO jobDetailDTO,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {

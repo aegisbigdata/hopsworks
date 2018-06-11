@@ -2,6 +2,7 @@ package io.hops.hopsworks.api.project;
 
 import io.hops.hopsworks.api.dela.DelaClusterProjectService;
 import io.hops.hopsworks.api.dela.DelaProjectService;
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.jobs.BiobankingService;
@@ -44,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -65,9 +65,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.xml.rpc.ServiceException;
 import org.apache.hadoop.security.AccessControlException;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 @Path("/project")
-@RolesAllowed({"HOPS_ADMIN", "HOPS_USER"})
 @Api(value = "Project Service", description = "Project Service")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -126,7 +126,9 @@ public class ProjectService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response findAllByUser(@Context SecurityContext sc,
       @Context HttpServletRequest req) {
 
@@ -143,7 +145,9 @@ public class ProjectService {
   @GET
   @Path("/getAll")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getAllProjects(@Context SecurityContext sc,
       @Context HttpServletRequest req) {
 
@@ -157,7 +161,9 @@ public class ProjectService {
   @GET
   @Path("/getProjectInfo/{projectName}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getProjectByName(@PathParam("projectName") String projectName,
       @Context SecurityContext sc,
       @Context HttpServletRequest req) throws AppException {
@@ -172,6 +178,8 @@ public class ProjectService {
   @GET
   @Path("/getMoreInfo/{type}/{id}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getMoreInfo(@PathParam("type") String type,
       @PathParam("id") Integer id) throws AppException {
     MoreInfoDTO info = null;
@@ -208,7 +216,9 @@ public class ProjectService {
   @GET
   @Path("{id}/getMoreInfo/{type}/{inodeId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getMoreInfo(@PathParam("id") Integer projectId, @PathParam("type") String type,
       @PathParam("inodeId") Integer id) throws AppException {
     MoreInfoDTO info = null;
@@ -312,7 +322,9 @@ public class ProjectService {
   @GET
   @Path("getDatasetInfo/{inodeId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getDatasetInfo(
       @PathParam("inodeId") Integer inodeId,
       @Context SecurityContext sc,
@@ -347,7 +359,9 @@ public class ProjectService {
   @GET
   @Path("{id}/getInodeInfo/{inodeId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getDatasetInfo(
       @PathParam("id") Integer projectId,
       @PathParam("inodeId") Integer inodeId,
@@ -373,7 +387,9 @@ public class ProjectService {
   @GET
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response findByProjectID(
       @PathParam("id") Integer id,
       @Context SecurityContext sc,
@@ -391,7 +407,9 @@ public class ProjectService {
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response updateProject(
       ProjectDTO projectDTO,
       @PathParam("id") Integer id,
@@ -487,7 +505,9 @@ public class ProjectService {
   @POST
   @Path("starterProject/{type}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response starterProject(
       @PathParam("type") String type,
       @Context SecurityContext sc,
@@ -573,7 +593,9 @@ public class ProjectService {
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response createProject(
           ProjectDTO projectDTO,
           @Context SecurityContext sc,
@@ -605,7 +627,9 @@ public class ProjectService {
   @POST
   @Path("{id}/delete")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response removeProjectAndFiles(
           @PathParam("id") Integer id,
           @Context SecurityContext sc,
@@ -640,7 +664,9 @@ public class ProjectService {
 
 
   @Path("{id}/projectMembers")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public ProjectMembersService projectMembers(
       @PathParam("id") Integer id) throws AppException {
     this.projectMembers.setProjectId(id);
@@ -649,7 +675,9 @@ public class ProjectService {
   }
 
   @Path("{id}/dataset")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public DataSetService datasets(
       @PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
@@ -663,7 +691,9 @@ public class ProjectService {
   }
 
   @Path("{id}/localfs")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public LocalFsService localFs(
       @PathParam("id") Integer id) throws AppException {
     this.localFs.setProjectId(id);
@@ -672,7 +702,9 @@ public class ProjectService {
   }
 
   @Path("{projectId}/jobs")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public JobService jobs(@PathParam("projectId") Integer projectId) throws
       AppException {
     Project project = projectController.findProjectById(projectId);
@@ -684,7 +716,9 @@ public class ProjectService {
   }
 
   @Path("{projectId}/biobanking")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public BiobankingService biobanking(@PathParam("projectId") Integer projectId)
       throws
       AppException {
@@ -693,7 +727,9 @@ public class ProjectService {
   }
   
   @Path("{projectId}/certs")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public CertService certs(@PathParam("projectId") Integer projectId) throws
       AppException {
     Project project = projectController.findProjectById(projectId);
@@ -707,7 +743,9 @@ public class ProjectService {
   @GET
   @Path("{id}/quotas")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response quotasByProjectID(
       @PathParam("id") Integer id,
       @Context SecurityContext sc,
@@ -721,7 +759,9 @@ public class ProjectService {
   @GET
   @Path("{id}/multiplicators")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response getCurrentMultiplicator(
       @PathParam("id") Integer id,
       @Context SecurityContext sc,
@@ -737,7 +777,9 @@ public class ProjectService {
 
   @GET
   @Path("{id}/importPublicDataset/{projectName}/{inodeId}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response quotasByProjectID(
       @PathParam("id") Integer id,
       @PathParam("projectName") String projectName,
@@ -792,7 +834,9 @@ public class ProjectService {
   @POST
   @Path("{id}/logs/enable")
   @Produces(MediaType.TEXT_PLAIN)
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public Response enableLogs(@PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
     if (!project.getLogs()) {
@@ -809,7 +853,9 @@ public class ProjectService {
   }
 
   @Path("{id}/kafka")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public KafkaService kafka(
       @PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
@@ -823,7 +869,9 @@ public class ProjectService {
   }
   
   @Path("{id}/jupyter")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public JupyterService jupyter(
       @PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
@@ -837,7 +885,9 @@ public class ProjectService {
   }
 
   @Path("{id}/pythonDeps")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public PythonDepsService pysparkDeps(@PathParam("id") Integer id) throws
       AppException {
     Project project = projectController.findProjectById(id);
@@ -850,7 +900,9 @@ public class ProjectService {
   }
 
   @Path("{id}/dela")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public DelaProjectService dela(@PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
     if (project == null) {
@@ -863,7 +915,9 @@ public class ProjectService {
   }
   
   @Path("{id}/delacluster")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public DelaClusterProjectService delacluster(@PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
     if (project == null) {
