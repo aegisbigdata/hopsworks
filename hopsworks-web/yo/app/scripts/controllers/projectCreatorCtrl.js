@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('ProjectCreatorCtrl', ['$uibModalInstance', '$scope', '$rootScope', 'ProjectService', 'UserService', 'growl',
-          function ($uibModalInstance, $scope, $rootScope, ProjectService, UserService, growl) {
+        .controller('ProjectCreatorCtrl', ['$uibModalInstance', '$scope', '$rootScope', '$http', 'ProjectService', 'UserService', 'growl',
+          function ($uibModalInstance, $scope, $rootScope, $http, ProjectService, UserService, growl) {
 
             var self = this;
 
@@ -28,6 +28,9 @@ angular.module('hopsWorksApp')
 
             self.projectName = '';
             self.projectDesc = '';
+            self.publisherHomepage = '';
+            self.publisherName = '';
+
 
             self.regex = /^(?!.*?__|.*?-|.*?&|.*? |.*?\/|.*\\|.*?\?|.*?\*|.*?:|.*?\||.*?'|.*?\"|.*?<|.*?>|.*?%|.*?\(|.*?\)|.*?\;|.*?#|.*?å|.*?Å|.*?ö|.*?Ö|.*?ä|.*?Ä|.*?ü|.*?Ü|.*?à|.*?á|.*?é|.*?è|.*?â|.*?ê|.*?î|.*?ï|.*?ë|.*?@|.*?\{|.*?\}|.*?\[|.*?\]|.*?\$|.*?\+|.*?~|.*?\`|.*?\^).*$/;
 
@@ -116,6 +119,28 @@ angular.module('hopsWorksApp')
                       function (success) {
                         self.working = false;
                         growl.success(success.successMessage, {title: 'Success', ttl: 2000});
+
+                        $http({
+                          url: 'http://aegis-metadata.fokus.fraunhofer.de/api/catalogs',
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json;charset=utf-8'
+                          },
+                          data: {
+                            id: "3",
+                            title: self.projectName,
+                            description: self.projectDesc,
+                            publisher: {
+                              homepage: self.publisherHomepage,
+                              name: self.publisherName
+                            }
+                          }
+                        }).then(function (result) {
+                          console.log("successfully saved metadata", result);
+                        }, function (err) {
+                          console.log("error while saving metadata", err);
+                        });
+
                         if (success.errorMsg) {
                           growl.warning(success.errorMsg, {title: 'Error', ttl: 10000});
                         }

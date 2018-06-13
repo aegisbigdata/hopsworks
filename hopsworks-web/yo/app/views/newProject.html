@@ -37,7 +37,7 @@
 
             <div class="controls">
               <textarea class="form-control" style="resize:none;" ng-model="projectCreatorCtrl.projectDesc"
-                        rows="3" tabindex="2"></textarea>
+                        rows="3" tabindex="2" required></textarea>
             </div>
 
 
@@ -75,6 +75,29 @@
                 </button>
               </div>
             </div>
+
+            <label for="publisher_homepage" class="control-label">Homepage</label>
+
+            <md-input-container style="height: 50px" class="md-block">
+              <input
+                name="publisher_homepage"
+                type="text"
+                id="publisher_homepage"
+                ng-model="projectCreatorCtrl.publisherHomepage"ng-maxlength="88"
+                required>
+            </md-input-container>
+
+            <label for="publisher_name" class="control-label">Name</label>
+
+            <md-input-container class="md-block">
+              <input
+                name="publisher_name"
+                type="text"
+                id="publisher_name"
+                ng-model="projectCreatorCtrl.publisherName"
+                ng-maxlength="88"
+                required>
+            </md-input-container>
           </div>
         </fieldset>
       </div>

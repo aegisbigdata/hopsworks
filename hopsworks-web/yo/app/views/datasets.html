@@ -185,6 +185,14 @@
                                 Add metadata</span>
                             </a>
                           </li>
+                          <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
+                            <a class="pointer"
+                               role="menuitem"
+                               ng-click="metadataExtendedCtrl.attachTemplate(dataset); $event.stopPropagation();">
+                              <span><i class="fa fa-plus-circle"></i>&nbsp;
+                                Add extended metadata</span>
+                            </a>
+                          </li>
                           <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
                             <a class="pointer"
                                role="menuitem"

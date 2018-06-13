@@ -1154,5 +1154,40 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
+              addExtendedMetadata: function (size, file, templateId) {
+                var templateUrl = '';
+                if (file.dir) { // file is a folder or dataset
+                  templateUrl = 'views/metadata/metadataExtendedDataset.html';
+                } else { // file is not a folder or dataset
+                  templateUrl = 'views/metadata/metadataExtendedDistribution.html';
+                }
+
+                var modalInstance = $uibModal.open({
+                  templateUrl: templateUrl,
+                  controller: 'MetadataExtendedCtrl as metadataExtendedCtrl',
+                  size: size,
+                  backdrop: 'static',
+                  resolve: {
+                    auth: ['$q', '$location', 'AuthService',
+                      function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                                function (success) {
+                                },
+                                function (err) {
+                                  $location.path('/login');
+                                  $location.replace();
+                                  return $q.reject(err);
+                                });
+                      }],
+                    templateId: function () {
+                      return templateId;
+                    },
+                    file: function () {
+                      return file;
+                    }
+                  }
+                });
+                return modalInstance.result;
+              }
             };
           }]);

@@ -312,6 +312,15 @@
                                 Add metadata</span>
                             </a>
                           </li>
+                          <li ng-show="datasetsCtrl.isSelectedFiles() <= 1 && !file.dir" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="999"
+                               ng-click="metadataExtendedCtrl.attachTemplate(file); $event.stopPropagation();">
+                              <span><i class="fa fa-upload"></i>
+                                Add extended metadata</span>
+                            </a>
+                          </li>
                           <li ng-show="datasetsCtrl.isSelectedFiles() <= 1">
                             <a class="pointer"
                                role="menuitem"
