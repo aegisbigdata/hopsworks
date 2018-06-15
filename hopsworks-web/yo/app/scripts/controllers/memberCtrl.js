@@ -79,7 +79,9 @@ angular.module('hopsWorksApp')
                 }
 
                 if (index == -1) {
-                  self.addNewMember(selected.email, self.roles[0]);
+                    //A07F 13-03-2018
+                    //self.addNewMember(selected.email, self.roles[0]);
+                    self.addNewMember(selected.email, self.roles[0], selected.firstname, selected.lastname);
                 }
                 self.card.selected = undefined;
               }
@@ -102,13 +104,17 @@ angular.module('hopsWorksApp')
 
             getCard();
 
-
-            self.addNewMember = function (user, role) {
+            //A07F 13-03-2018
+            //self.addNewMember = function (user, role);
+            self.addNewMember = function (user, role, firstName, lastName) {
+               
               self.newMembers.projectTeam.push(
                       {'projectTeamPK':
                                 {
                                   'projectId': self.projectId,
-                                  'teamMember': user
+                                  'teamMember': user, 
+                                  //A07F 13-03-2018
+                                  'name': firstName +" "+ lastName
                                 },
                         'teamRole': role
                       }

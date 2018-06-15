@@ -26,7 +26,8 @@ angular.module('hopsWorksApp')
               street: '',
               city: '',
               postCode: '',
-              country: ''
+              country: '',
+              CaptchaInput: ''
             };
             
             self.userEmail ='';
@@ -85,5 +86,40 @@ angular.module('hopsWorksApp')
               ;
 
             };
-            self.countries = getAllCountries();
+            self.countries = getAllCountries(); 
+
+    self.resetCaptcha = function () {    
+    
+        var no_acak = "";
+        var possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+         var length = Math.floor((Math.random() * 3) + 6);
+         //alert(length);
+            for (var i = 0; i < length; i++) {
+                no_acak += possibleCharacters.charAt(Math.floor(Math.random() * possibleCharacters.length));
+            }
+	var posisi_x = Math.floor((Math.random() * 50) + 1);
+	var posisi_y = Math.floor((Math.random() * 50) + 10);
+        var c = document.getElementById("CaptchaDiv");
+        var canvas = c.getContext("2d");
+        canvas.clearRect(0, 0, 150, 60);
+        var gradient=canvas.createLinearGradient(0,0,c.width,0);
+        gradient.addColorStop("0","blue");
+        gradient.addColorStop("1","green");
+        canvas.fillStyle=gradient;	
+        canvas.beginPath();
+        canvas.rect(0, 0, 150, 60);
+        canvas.fill();	
+
+        var ctx = c.getContext("2d");
+        ctx.fillStyle="#000000";
+        ctx.font = '18px serif';
+        ctx.strokeText(no_acak, posisi_x, posisi_y);
+        document.getElementById("CaptchaInput").setAttribute("c", no_acak); 
+        document.getElementById("txtCaptcha").value = no_acak;      
+
+
+}
+     
+            
+            
           }]);

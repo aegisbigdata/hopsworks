@@ -7,9 +7,16 @@
   font-weight: 500;
   margin: 1rem 0;
 }
-.search-result-header {
-  border-bottom: 1px solid #e5e5e5;
+
+.label-title-overlay {
+  background-color: #00A2CA;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  padding: 5px;
+  font-size: 12px;
+  font-weight: 700;
 }
+
 .search-result-filter {
   background: #FFFFFF;
   width: 100%;
@@ -102,6 +109,7 @@
 
 .input-group.spinner {
   margin: 1rem 0;
+  width: 70px;
 }
 
 .spinner input {
@@ -125,6 +133,7 @@
   margin-left: -1px;
   position: relative;
   border-radius: 0;
+  color: #ddd;
 }
 
 .input-group-btn-vertical > .btn:first-child {
