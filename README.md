@@ -229,3 +229,17 @@ Video of the process: https://youtu.be/vtDHK79yHqI
 Other sources:
 https://medium.com/@phirschybar/resize-your-vagrant-virtualbox-disk-3c0fbc607817
 https://github.com/sprotheroe/vagrant-disksize
+
+# Simple starting code for Zeppelin on Hops
+Reading a csv file from hdfs:
+```
+val datasetDF = spark.read.format("csv").option("inferSchema", "true").load("hdfs:///filePath")
+datasetDF.show()
+```
+Writting a file for hdfs:
+```
+val data = Array(1, 2, 3, 4, 5)
+val distData = sc.parallelize(data).coalesce(1)
+distData.saveAsTextFile("hdfs:///dirPath")
+```
+In order for Zeppelin to be able to write file on your behalf, you should make the dataset group writtable. This can be achieved from the dataset view - right click menu.
