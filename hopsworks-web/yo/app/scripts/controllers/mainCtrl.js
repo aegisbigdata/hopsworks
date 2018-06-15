@@ -170,8 +170,7 @@ angular.module('hopsWorksApp')
               self.searchTerm = "";
             };
 
-            self.search = function () {
-              
+            self.search = function () {             
               self.showSearchPage = true;
               self.currentPage = 1;
               self.pageSize = 9;
@@ -272,6 +271,127 @@ angular.module('hopsWorksApp')
               datePicker();// this will load the function so that the date picker can call it.
               //alert("test res:" + self.searchResult );
             };
+
+
+            
+            
+            self.searchAssets = function (param) {
+                //self.searchTerm = "test";
+                
+              //alert(self.searchType);
+              
+              self.showSearchPage = false;
+              //self.showSearchAssets = true;
+              self.currentPage = 1;
+              self.pageSize = 9;
+              self.searchResult = [];
+
+              //if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+              if (param === undefined || param === "" || param === null) {
+                return;
+              }
+              
+              //self.searching = true;
+              self.searching = false;
+              if (self.searchType === "global" && $rootScope.isDelaEnabled) {
+                
+                    var global_data;
+                var searchHits;
+                //triggering a global search
+                self.searchResult = [];
+                //elasticService.globalSearch(self.searchTerm)
+                elasticService.globalSearch(param)
+                        .then(function (response) {
+                          searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                          //DelaService.search(self.searchTerm).then(function (response2) {
+                          DelaService.search(param).then(function (response2) {
+                            global_data = response2.data;
+                            if (global_data.length > 0) {
+                              self.searchResult = concatUnique(searchHits, global_data);
+                              self.searching = false;
+                            } else {
+                              self.searching = false;
+                            }
+                            self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                            self.resultItems = self.searchResult.length;
+                          });
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {
+              
+                    var searchHits;
+                    
+                //triggering a global search
+                self.searchResult = [];
+                //alert(self.searchTerm);
+                //elasticService.globalSearch(self.searchTerm)
+                elasticService.globalSearch(param).then(function (response) {
+                          searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.searching = false;
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;                          
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "projectCentric") {
+                
+                    //elasticService.projectSearch($routeParams.projectID, self.searchTerm)
+                    elasticService.projectSearch($routeParams.projectID, param)
+                        .then(function (response) {
+                          self.searching = false;
+                          var searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "datasetCentric") {
+             
+                    //elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
+                    elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, param)
+                        .then(function (response) {
+                          self.searching = false;
+                          var searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              }
+              
+              datePicker();// this will load the function so that the date picker can call it.
+              //alert("test res:" + self.searchResult );
+            };
+
+
+
 
             var concatUnique = function (a, array2) {
               a = a.concat(array2);

@@ -11,10 +11,6 @@
   transition: all 0.5s ease;
 }
 
-#wrapper.toggled {
-  padding-left: 200px;
-}
-
 #sidebar-wrapper {
   z-index: 12;
   left: 200px;

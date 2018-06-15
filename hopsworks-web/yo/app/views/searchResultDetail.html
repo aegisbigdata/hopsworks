@@ -1,41 +1,48 @@
-<div class="card-modal">
+<div class="card-modal" style="background-color: #FFFFFF">
   <div growl reference="21" class="pull-right"></div>
-  <div class="card-item-content 
-       {{viewSearchResultCtrl.content.type === 'proj'? 'red': ''}}
-       {{viewSearchResultCtrl.content.type === 'ds' && !viewSearchResultCtrl.content.public_ds ? 'green': ''}} 
-       {{viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && viewSearchResultCtrl.content.localDataset ? 'blue': ''}}
-       {{viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && !viewSearchResultCtrl.content.localDataset ? 'darkblue': ''}}">
+       
     <div class="header">
-      <label>        
-        {{viewSearchResultCtrl.content.type === 'proj'? 'project': ''}}
-        {{viewSearchResultCtrl.content.type === 'ds' && !viewSearchResultCtrl.content.public_ds ? 'dataset': ''}} 
-        {{viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && viewSearchResultCtrl.content.localDataset ? 'public dataset in cluster': ''}}
-        {{viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && !viewSearchResultCtrl.content.localDataset ? 'public dataset': ''}}
-      </label>
-
-      <button class="close" ng-click="viewSearchResultCtrl.close()" data-dismiss="modal" aria-hidden="true"
+        <div class="label-title-overlay">
+            <i ng-if="viewSearchResultCtrl.content.type === 'proj'" class="fa fa-file-text-o fa-2" style="width: 20px; margin-left: 10px; margin-top: 10px; font-size: 11px;"></i>
+            <i ng-if="viewSearchResultCtrl.content.type === 'ds' && !viewSearchResultCtrl.content.public_ds" class="fa fa-database fa-2" style="width: 20px; margin-left: 10px; margin-top: 10px; font-size: 11px;"></i>
+            <i ng-if="viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && viewSearchResultCtrl.content.localDataset" class="fa fa-folder-open-o fa-2" style="width: 20px; margin-left: 10px; margin-top: 10px; font-size: 11px;"></i>
+            <i ng-if="viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && !viewSearchResultCtrl.content.localDataset" class="fa fa-folder-open-o fa-2" style="width: 20px; margin-left: 10px; margin-top: 10px; font-size: 11px;"     ></i>           
+        
+            <label style="height: 40px; padding-top: 16px;">        
+              {{viewSearchResultCtrl.content.type === 'proj'? 'project': ''}}
+              {{viewSearchResultCtrl.content.type === 'ds' && !viewSearchResultCtrl.content.public_ds ? 'dataset': ''}} 
+              {{viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && viewSearchResultCtrl.content.localDataset ? 'public dataset in cluster': ''}}
+              {{viewSearchResultCtrl.content.type === 'ds' && viewSearchResultCtrl.content.public_ds && !viewSearchResultCtrl.content.localDataset ? 'public dataset': ''}}
+            </label>
+            
+            <button class="close" style="color: #FFFFFF; padding: 13px; opacity: 1" ng-click="viewSearchResultCtrl.close()" data-dismiss="modal" aria-hidden="true"
               type="button">&times;</button>
-      <h3>{{viewSearchResultCtrl.content.name}}</h3>
+            
+        </div>
+
+      <h3 style="padding-left: 15px; font-size: 18px;">{{viewSearchResultCtrl.content.name}}</h3>
     </div>
 
     <div class="card-body" ng-init="viewSearchResultCtrl.initProjectsList()">
-      <div class="details">
+      <div class="details" style="padding: 0px 20px">
         <div class="desc">{{viewSearchResultCtrl.content.details.description | limitTo: limit}}
           {{viewSearchResultCtrl.content.details.description.length > limit ? '...':''}}</div>
-        <div>
-          <label>owner</label>
-          <div class="value">{{viewSearchResultCtrl.content.details.user|| '--'}}</div>            
+          
+          <div class="row">
+          <div class="col-sm-3 col-md-3" style="margin-bottom: 15px">
+            <label style="color: #C8C8C8; text-transform: uppercase; font-size: 8px">owner</label>
+            <div class="value" style="font-size: 11px">{{viewSearchResultCtrl.content.details.user|| '--'}}</div>            
+          </div>
+          <div class="col-sm-7 col-md-7" style="margin-bottom: 15px">
+            <label style="color: #C8C8C8; text-transform: uppercase; font-size: 8px">Date</label>
+            <div class="value" style="font-size: 11px">{{viewSearchResultCtrl.content.details.createDate| date:'short'}}</div>            
+          </div>
+          <div class="col-sm-2 col-md-2" style="margin-bottom: 15px; text-align: right;">
+            <label style="color: #C8C8C8; text-transform: uppercase; font-size: 8px" ng-show="viewSearchResultCtrl.content.type === 'ds'">Size</label>
+            <div class="value"  style="text-align: right; font-size: 11px" ng-show="viewSearchResultCtrl.content.type === 'ds'">{{viewSearchResultCtrl.sizeOnDisk(viewSearchResultCtrl.content.details.size)}}</div>            
+          </div>
         </div>
-        <div class="row">
-          <div class="col-sm-5 col-md-5">
-            <label>Date</label>
-            <div class="value">{{viewSearchResultCtrl.content.details.createDate| date:'short'}}</div>        
-          </div>
-          <div class="col-sm-4 col-md-4">
-            <label ng-show="viewSearchResultCtrl.content.type === 'ds'">Size</label>
-            <div class="value" ng-show="viewSearchResultCtrl.content.type === 'ds'">{{viewSearchResultCtrl.sizeOnDisk(viewSearchResultCtrl.content.details.size)}}</div> 
-          </div>
-        </div> 
+         
       </div>
     </div>
     <div class="card-footer">
@@ -70,63 +77,66 @@
     <div class="view-info">           
       <div class="panel panel-default" id="panel1" ng-show="viewSearchResultCtrl.content.localDataset">
         <div class="panel-heading" style="background: #fff">
-          <h4 class="panel-title" style="color: black">
+          <h4 class="panel-title" style="color: #00A2CA; font-size: 12px">
             <a data-toggle="collapse" data-target="#moreInfo">
               More Information
+              
             </a>
           </h4>
         </div>
-        <div id="moreInfo" class="panel-collapse collapse"><br>
-          <div class="row" style="margin: -2px;">
-            <div class="col-md-6">
-              <label class="control-label">Members:</label>
-              <div class="scroll">
-                <ul type="none">
+        <div id="moreInfo" class="panel-collapse collapse" style="font-size: 11px; line-height: 16px"> 
+          <div class="row" style="margin: 0px; border-top: 1px solid #E6E6E6; border-bottom: 1px solid #E6E6E6">
+            <div class="col-md-6" style="padding: 10px;">
+              <label class="control-label">Members</label>
+                <ul type="none" style="padding: 0px">
                   <li style=" border-bottom: 1px solid #e6e6e6;" ng-repeat="member in viewSearchResultCtrl.result.projectTeam">
                     <div ng-show="viewSearchResultCtrl.type === 'Project'">
-                      <span>Name : </span><span class="text-muted"> {{member.user.fname}} {{member.user.lname}} </span><br>
-                      <span>Role :</span> <span class="text-muted"> {{member.teamRole}}</span><br>
-                    </div>
+                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Name </span><span class="text-black"> {{member.user.fname}} {{member.user.lname}} </span><br>
+                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8">Role </span> <span class="text-black"> {{member.teamRole}}</span><br>
+                      <br></div>
                     <div ng-show="viewSearchResultCtrl.type === 'Dataset' || viewSearchResultCtrl.type === 'Public Dataset'">
-                      <span>Name : </span><span class="text-muted"> {{member.firstname}} {{member.lastname}} </span><br>
-                    </div>
+                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Name </span><span class="text-black"> {{member.firstname}} {{member.lastname}} </span><br>
+                      <br></div>
                   </li>
                 </ul>
               </div>
-              <p><span class="glyphicon glyphicon-info-sign"></span> {{viewSearchResultCtrl.infoMembers}} </p>
-            </div>
-            <div class="col-md-6">
+            <div class="col-md-6" style="border-left: 1px solid #E6E6E6; padding: 10px">
               <div ng-show=" viewSearchResultCtrl.type === 'Project'">
-                <label class="control-label">Datasets:</label>
-                <div class="scroll">
-                  <ul type="none">
+                <label class="control-label">Datasets</label>
+                  <ul type="none" style="padding: 0px">
                     <li style=" border-bottom: 1px solid #e6e6e6;" ng-repeat="dataset in viewSearchResultCtrl.result.datasets">
-                      Name : <span class="text-muted"> {{dataset.name}}</span><br>
-                      Project : <span class="text-muted"> {{dataset.owningProjectName}}</span><br>
-                      Description : <span class="text-muted"> {{dataset.description}}</span>
-                    </li>
+                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Name</span> <span class="text-black"> {{dataset.name}}</span><br>
+                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8">Project</span> <span class="text-black"> {{dataset.owningProjectName}}</span><br>
+                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8">Description </span><span class="text-black"> {{dataset.description}}</span><br><br>
+                      </li>
                   </ul>
-                </div>
-              </div>
+              <br></div>
               <div ng-show="viewSearchResultCtrl.type === 'Dataset' || viewSearchResultCtrl.type === 'Public Dataset'">
-                <label class="control-label">Shared with:</label>
-                <div class="scroll">
-                  <ul type="none">
+                <label class="control-label">Shared with </label>
+                  <ul type="none" style="padding: 0px">
                     <li style=" border-bottom: 1px solid #e6e6e6;" ng-repeat="project in viewSearchResultCtrl.result.sharedWith">
-                      Project : <span class="text-muted"> {{project}}</span><br>
+                        <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Project</span> <span class="text-black"> {{project}}</span><br><br>
                     </li>
                   </ul>
-                </div>
-              </div>
-              <p><span class="glyphicon glyphicon-info-sign"></span> {{viewSearchResultCtrl.infoDS}} </p>
+                <br></div>
+              
             </div>
-          </div>
+              </div>
+            <div class="row" style="margin: 10px 0px; border: none">
+                <div class="col-md-6" style="text-align: right; padding-top: 5px; padding-bottom: 15px">
+                    <p style="color: #00A2CA; text-align: right"><span class="glyphicon glyphicon-info-sign" style="color: #00A2CA; padding-right: 5px"></span> {{viewSearchResultCtrl.infoMembers}} </p>
+                    </div>
+                <div class="col-md-6" style="text-align: right; padding-top: 5px; padding-bottom: 15px">
+                    <p style="color: #00A2CA; text-align: right"><span class="glyphicon glyphicon-info-sign" style="color: #00A2CA; padding-right: 5px"></span> {{viewSearchResultCtrl.infoDS}} </p>
+          
+                </div>
+            </div>
         </div>
       </div>
       <div ng-show="viewSearchResultCtrl.type === 'Dataset' || viewSearchResultCtrl.type === 'Public Dataset'" 
            ng-if="viewSearchResultCtrl.content.type !== 'inode'" class="panel panel-default" id="panel3">
         <div class="panel-heading" style="background: #fff" ng-click="viewSearchResultCtrl.getReadme()">
-          <h4 class="panel-title" style="color: black">
+          <h4 class="panel-title" style="color: black; color: #00A2CA; font-size: 12px">
             <a data-toggle="collapse" data-target="#readme">
               &nbsp;<i class="fa fa-book"></i>&nbsp; README.md
             </a>
@@ -158,7 +168,7 @@
           <ui-select-choices repeat="item.project.id as item in viewSearchResultCtrl.projects | filter: $select.search">
             <div ng-bind-html="item.project.name | highlight: $select.search"></div>
             <small>
-              Owner: {{item.project.owner.fname}} {{item.project.owner.lname}}
+              Owner {{item.project.owner.fname}} {{item.project.owner.lname}}
             </small>
           </ui-select-choices>
 
@@ -171,11 +181,12 @@
       </div>
     </div>        
     <br ng-show="viewSearchResultCtrl.type !== 'Project'" style="margin:15px">
-    <div class="modal-footer" style="padding-bottom: 1px; padding-right: 1px">
-      <button ng-show="viewSearchResultCtrl.content.details.project_id===viewSearchResultCtrl.thisProjectId" class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.goto()">Go to</button>
-      <button class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.close()">Cancel</button>
-      <button class="btn btn-primary" type="submit" ng-disabled="dataSetForm.project_name.$error.required || viewSearchResultCtrl.content.downloading" ng-if="viewSearchResultCtrl.content.type !== 'inode'">
+    <div class="modal-footer" style="padding-bottom: 1px; padding-right: 1px; border: none">
+      <button ng-show="viewSearchResultCtrl.content.details.project_id===viewSearchResultCtrl.thisProjectId" class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.goto()" style="height: 40px;">Go to</button>
+      <button class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.close()" style="height: 40px;">Cancel</button>
+      <button class="btn btn-primary" type="submit" ng-disabled="dataSetForm.project_name.$error.required || viewSearchResultCtrl.content.downloading" ng-if="viewSearchResultCtrl.content.type !== 'inode'" style="height: 40px;">
         {{viewSearchResultCtrl.requestType}}
+        
       </button>
 
     </div>

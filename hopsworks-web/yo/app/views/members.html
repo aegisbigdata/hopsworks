@@ -49,16 +49,18 @@
                    style="min-width: 300px;">
 
           <ui-select-match placeholder="Select member..."  style="height:24px;">{{$select.selected.email}}</ui-select-match>
-          <ui-select-choices
-            repeat="card in memberCtrl.cards | cardFilter: {email: $select.search, firstname: $select.search, lastname: $select.search}">
+          <!--A07F 11-03-2018 -->
+          <!--ui-select-choices repeat="card in memberCtrl.cards | cardFilter: {email: $select.search, firstname: $select.search, lastname: $select.search}"-->
+          <ui-select-choices repeat="card in memberCtrl.cards | cardFilter: {firstname: $select.search, lastname: $select.search}">
 
             <div ng-bind-html="memberCtrl.card.email | highlight: $select.search"></div>
             <small>
               <i class="fa fa-user-plus"></i>
-              <span style="font-size: 14px;"
+              <!--A07F 06-03-2018 -->
+              <!--span style="font-size: 14px;"
                     ng-bind-html="''+card.email | highlight: $select.search">
               </span>
-              <br/>
+              <br/-->
               <span ng-bind-html="''+card.firstname | highlight: $select.search"></span>
               <span ng-bind-html="''+card.lastname | highlight: $select.search"></span>
             </small>
@@ -87,7 +89,9 @@
                   <div class="media">
                     <div class="media-body" style="padding-top:8px;">
                       <h4 class="media-heading" style="margin-bottom:0px;">
-                        <b>{{newMember.projectTeamPK.teamMember}}</b>
+                          <!--A07F 06-03-2018 -->
+                        <!--b>{{newMember.projectTeamPK.teamMember}}</b-->
+                        <b>{{newMember.projectTeamPK.name}}</b>
                       </h4>
                     </div>
                   </div>
@@ -162,8 +166,8 @@
                 <h4 class="media-heading" style="margin-bottom:0px;">
                   <b>{{member.user.fname}} {{member.user.lname}} <span ng-show="member.user.email === mainCtrl.email"> (me)</span></b>
                 </h4>
-
-                <p><span style="font-size:12px;">{{member.user.email}}</span></p>
+                  <!--A07F 06-03-2018 -->
+                <p><!--span style="font-size:12px;">{{member.user.email}}</span--></p>
               </div>
             </div>
           </td>

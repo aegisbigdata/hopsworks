@@ -8,7 +8,7 @@
     <!--div ng-class="{'container': !projectView, 'container-fluid': projectView}"-->
     <div>
       <a href="#home" style="font-family: Lobster; font-size: 30px; color: #fff;">
-          <img class="block-center img-rounded" style="margin-left:5px; height: 50px;"" src="images/aegis/AEGIS_Logo_OrangeWhite.png"/>
+          <img class="block-center img-rounded" style="margin-left:5px; height: 50px;" src="images/aegis/AEGIS_Logo_OrangeWhite.png"/>
       </a>
     </div>
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -21,10 +21,80 @@
       </div>
     </div>
       <div class="collapse navbar-collapse" id="navbar">
+          
+          
         <ul class="nav navbar-nav navbar-right" style="margin-right:10px;">
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" style="padding:7px 10px 8px 10px; text-decoration:none;"  aria-expanded="false" id="navbarProfile">
-              <img alt="" src="https://gravatar.com/avatar/{{mainCtrl.emailHash}}?d=retro&s=50" style="height: 35px; margin-right: 10px;border: 0.5px solid gray;" class="profile-image img-circle">
+            <!--a href="" class="list-group-item active">Help</a-->
+            
+            <a class="dropdown-toggle" data-toggle="dropdown" style="padding:13px 10px 8px 10px; text-decoration:none;"  aria-expanded="false" id="navbarProfile">
+              
+                Help <b class="caret"></b>
+            </a>          
+            
+            
+            
+            
+            <ul class="dropdown-menu">
+                <!--commentato per adesso il link tours A07f 14-05-2018 -->
+             <!--li><a href=""
+             ng-click="homeCtrl.showTours = !homeCtrl.showTours; homeCtrl.getTours();" class="list-group-item"
+             ng-class="{'tour-highlight': homeCtrl.showGettingStarted()}">
+            
+            Tours
+
+           
+
+            <div ng-show="homeCtrl.showTours" ng-init="homeCtrl.initCheckBox()" style="margin-top: 10px">
+              <md-checkbox md-no-ink aria-label="Tour tips" class="md-primary"
+                ng-model="homeCtrl.showTourTips" ng-change="homeCtrl.toggleTourTips()"
+                ng-click="homeCtrl.showTours = !homeCtrl.showTours">
+                        Tour tips
+              </md-checkbox>
+            </div>
+            <div ng-show="homeCtrl.showTours" ng-repeat="tour in homeCtrl.tours">
+              <button style="margin: 0px; padding-bottom: 5px; padding-top: 5px; padding-left: 0px; padding-right: 0px;" uib-popover="Take a tour of Hopsworks by creating a project and running a Spark job!"
+                      type="button" class="btn btn-default btn-block" ng-click="homeCtrl.showTours = !homeCtrl.showTours; homeCtrl.createExampleProject(tour.name)">
+                <span style="margin-right: 5px" class="glyphicon glyphicon-play-circle pull-right" ng-hide="isCreating(tour.name) === true"></span>
+                <span style="margin-right: 5px" class="fa fa-spinner fa-spin pull-right" ng-hide="isCreating(tour.name) === false"></span>
+                <span class="button-text">{{tour.name}}</span>
+              </button>
+            </div>
+
+          </a></li-->
+             
+             
+              <li><a ng-if="isDelaEnabled" href="#!/delahopsDataset" class="list-group-item">
+            <span class="fa fa-globe"></span>
+            Hops Datasets</a></li>
+              <li><a href="#!/delaclusterDataset" class="list-group-item">
+            <span class="fa fa-server"></span>
+            Cluster Datasets</a></li>            
+              <li><a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item">
+            <span class="glyphicon glyphicon-user"></span>
+            Need support?
+            </a></li>
+            </ul>
+          </li>
+        </ul>  
+          
+          
+          
+          
+           
+          
+        
+          
+          
+          
+          
+          
+          
+          
+        <ul class="nav navbar-nav navbar-right" style="margin-right:10px;">
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" style="padding:13px 10px 8px 10px; text-decoration:none;"  aria-expanded="false" id="navbarProfile">
+              <img alt="" src="https://gravatar.com/avatar/{{mainCtrl.emailHash}}?d=retro&s=50" style="height: 25px; margin-right: 10px;border: 0.5px solid gray;" class="profile-image img-circle">
               {{mainCtrl.email}} <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
@@ -65,15 +135,15 @@
         </ul>
         <form class="navbar-form navbar-right ng-valid ng-dirty ng-valid-parse">
             <div class="col-xs-12 col-sm-4 col-md-4 input-group" ng-class="{'col-md-offset-0': !projectView, 'col-md-offset-1': projectView}">
-                      <div class="input-group-btn" style="width: 10px;"> 
+              <input type="text" class="form-control ng-valid ng-touched ng-not-empty ng-dirty ng-valid-parse" style="height: 28px;margin-top: 3px;border-color: #33B5D5;background-color:#33B5D5;width: 250px;" placeholder="Search"
+                   name="srch-term" id="srch-term" ng-model="mainCtrl.searchTerm" ng-model-options="{debounce: 500}"
+                   ng-change="mainCtrl.keyTyped()" ng-keyup="mainCtrl.hitEnter($event)" aria-invalid="false">
+              <div class="input-group-btn" style="width: 10px;"> 
               <button class="btn btn-default" style="border-color: #33B5D5;background-color: #33B5D5;color: white;margin-top: 3px; padding: 6px 12px;"
                       ng-click="mainCtrl.search()" type="button">
                 <i class="glyphicon glyphicon-search"></i>
               </button>
             </div>
-              <input type="text" class="form-control ng-valid ng-touched ng-not-empty ng-dirty ng-valid-parse" style="height: 28px;margin-top: 3px;border-color: #33B5D5;background-color:#33B5D5;width: 250px;" placeholder="Search"
-                   name="srch-term" id="srch-term" ng-model="mainCtrl.searchTerm" ng-model-options="{debounce: 500}"
-                   ng-change="mainCtrl.keyTyped()" ng-keyup="mainCtrl.hitEnter($event)" aria-invalid="false">
           </div>
         </form>
       </div>

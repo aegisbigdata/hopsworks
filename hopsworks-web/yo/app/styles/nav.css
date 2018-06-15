@@ -3,6 +3,28 @@
     border-color: #337ab7;
 }
 
+.nav-tabs > li > a {
+    border-radius: 0px;
+    margin-right: -1px;
+    color: #ddd;
+}
+
+.nav-tabs > li {
+    border-bottom: 1px solid #ddd;
+    width: 33%;
+    font-weight: bold;
+    text-align: center;
+}
+
+.nav-tabs > li.active {
+    border-bottom-color: transparent;
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    border-top: 3px solid #00A2CA;
+    border-radius: 0px;
+}
+
 .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
     background-color: transparent;
     color: #fff;
