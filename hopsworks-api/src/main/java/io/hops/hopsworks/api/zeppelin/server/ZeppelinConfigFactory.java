@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.zeppelin.server;
 
 import com.github.eirslett.maven.plugins.frontend.lib.TaskRunnerException;
@@ -8,7 +28,6 @@ import io.hops.hopsworks.common.dao.zeppelin.ZeppelinInterpreterConfFacade;
 import io.hops.hopsworks.common.dao.zeppelin.ZeppelinInterpreterConfs;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
-import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.util.ConfigFileGenerator;
 import io.hops.hopsworks.common.util.Settings;
@@ -44,8 +63,6 @@ public class ZeppelinConfigFactory {
   @EJB
   private ProjectFacade projectBean;
   @EJB
-  private UserFacade userFacade;
-  @EJB
   private HdfsUsersController hdfsUsername;
   @EJB
   private ZeppelinResource zeppelinResource;
@@ -79,8 +96,12 @@ public class ZeppelinConfigFactory {
    * server
    * connection is needed to create those.
    *
-   * @param projectName
-   * @return
+   * @param projectName project name
+   * @param nbs NotebookServer
+   * @return ZeppelinConfig object.
+   * @throws java.io.IOException IOException
+   * @throws org.sonatype.aether.RepositoryException RepositoryException
+   * @throws com.github.eirslett.maven.plugins.frontend.lib.TaskRunnerException TaskRunnerException
    */
   public ZeppelinConfig getZeppelinConfig(String projectName, NotebookServerImpl nbs) throws IOException,
       RepositoryException, TaskRunnerException {

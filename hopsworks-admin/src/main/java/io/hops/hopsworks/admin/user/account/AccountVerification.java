@@ -1,6 +1,26 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.admin.user.account;
 
-import io.hops.hopsworks.common.constants.auth.AuthenticationConstants;
+import io.hops.hopsworks.common.dao.user.UserFacade;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
@@ -12,20 +32,23 @@ import javax.persistence.QueryTimeoutException;
 import javax.servlet.http.HttpServletRequest;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.security.audit.AccountsAuditActions;
-import io.hops.hopsworks.common.dao.user.security.audit.AuditManager;
-import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountStatus;
-import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountType;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
+import io.hops.hopsworks.common.dao.user.security.audit.AccountAuditFacade;
+import io.hops.hopsworks.common.dao.user.security.ua.UserAccountStatus;
+import io.hops.hopsworks.common.dao.user.security.ua.UserAccountType;
+import io.hops.hopsworks.common.user.UsersController;
+import io.hops.hopsworks.common.util.Settings;
 
 @ManagedBean
 @RequestScoped
 public class AccountVerification {
 
   @EJB
-  private UserManager mgr;
+  private UserFacade userFacade;
+  @EJB
+  protected UsersController usersController;
 
   @EJB
-  private AuditManager am;
+  private AccountAuditFacade am;
 
   @ManagedProperty("#{param.key}")
   private String key;
@@ -40,9 +63,9 @@ public class AccountVerification {
   @PostConstruct
   public void init() {
     if (key != null) {
-      username = key.substring(0, AuthenticationConstants.USERNAME_LENGTH);
+      username = key.substring(0, Settings.USERNAME_LENGTH);
       // get the 8 char username
-      String secret = key.substring(AuthenticationConstants.USERNAME_LENGTH,
+      String secret = key.substring(Settings.USERNAME_LENGTH,
               key.length());
       valid = validateKey(secret);
     }
@@ -58,7 +81,7 @@ public class AccountVerification {
     Users user = null;
 
     try {
-      user = mgr.getUserByUsername(username);
+      user = userFacade.findByUsername(username);
     } catch (QueryTimeoutException ex) {
       dbDown = true;
       return false;
@@ -72,18 +95,16 @@ public class AccountVerification {
       return false;
     }
 
-    if ((!user.getStatus().equals(PeopleAccountStatus.NEW_MOBILE_ACCOUNT)
-            && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE))
-            || (!user.getStatus().equals(PeopleAccountStatus.NEW_YUBIKEY_ACCOUNT)
-            && user.getMode().equals(PeopleAccountType.Y_ACCOUNT_TYPE))) {
+    if (!user.getStatus().equals(UserAccountStatus.NEW_MOBILE_ACCOUNT)
+            && user.getMode().equals(UserAccountType.M_ACCOUNT_TYPE)) {
       am.registerAccountChange(user, AccountsAuditActions.REGISTRATION.name(),
               AccountsAuditActions.FAILED.name(),
-              "Could not verify the account due to wrong status.", user);
+              "Could not verify the account due to wrong status.", user, req);
 
-      if (user.getStatus().equals(PeopleAccountStatus.ACTIVATED_ACCOUNT)) {
+      if (user.getStatus().equals(UserAccountStatus.ACTIVATED_ACCOUNT)) {
         this.alreadyRegistered = true;
       }
-      if (user.getStatus().equals(PeopleAccountStatus.VERIFIED_ACCOUNT)) {
+      if (user.getStatus().equals(UserAccountStatus.VERIFIED_ACCOUNT)) {
         this.alreadyValidated = true;
       }
 
@@ -91,27 +112,27 @@ public class AccountVerification {
     }
 
     if (key.equals(user.getValidationKey())) {
-      mgr.changeAccountStatus(user.getUid(), "",
-              PeopleAccountStatus.VERIFIED_ACCOUNT);
+      usersController.changeAccountStatus(user.getUid(), "",
+              UserAccountStatus.VERIFIED_ACCOUNT);
       am.registerAccountChange(user, AccountsAuditActions.REGISTRATION.name(),
               AccountsAuditActions.SUCCESS.name(),
-              "Verified account email address.", user);
-      mgr.resetKey(user.getUid());
+              "Verified account email address.", user, req);
+      usersController.resetKey(user.getUid());
       return true;
     }
 
     int val = user.getFalseLogin();
-    mgr.increaseLockNum(user.getUid(), val + 1);
+    usersController.increaseLockNum(user.getUid(), val + 1);
 
     // if more than 5 times false logins set as spam
-    if (val > AuthenticationConstants.ACCOUNT_VALIDATION_TRIES) {
-      mgr.changeAccountStatus(user.getUid(), PeopleAccountStatus.SPAM_ACCOUNT.
+    if (val > Settings.ACCOUNT_VALIDATION_TRIES) {
+      usersController.changeAccountStatus(user.getUid(), UserAccountStatus.SPAM_ACCOUNT.
               toString(),
-              PeopleAccountStatus.SPAM_ACCOUNT);
-      mgr.resetKey(user.getUid());
+              UserAccountStatus.SPAM_ACCOUNT);
+      usersController.resetKey(user.getUid());
       am.registerAccountChange(user, AccountsAuditActions.REGISTRATION.name(),
               AccountsAuditActions.FAILED.name(),
-              "Too many false activation attemps.", user);
+              "Too many false activation attemps.", user, req);
 
     }
 

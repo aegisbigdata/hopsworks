@@ -1,21 +1,37 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.admin.security.ua;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import io.hops.hopsworks.common.dao.user.security.audit.AuditManager;
-import io.hops.hopsworks.common.dao.user.security.audit.UserAuditActions;
-import io.hops.hopsworks.common.constants.auth.AuthenticationConstants;
-import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountStatus;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
+import io.hops.hopsworks.common.dao.user.UserFacade;
+import io.hops.hopsworks.common.dao.user.security.ua.UserAccountStatus;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.util.AuditUtil;
+import io.hops.hopsworks.common.user.AuthController;
+import io.hops.hopsworks.common.user.UsersController;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,29 +42,20 @@ import javax.servlet.ServletException;
 public class RoleEnforcementPoint implements Serializable {
 
   @EJB
-  protected UserManager userManager;
-
+  protected UsersController usersController;
   @EJB
-  private AuditManager am;
+  protected AuthController authController;
+  @EJB
+  private UserFacade userFacade;
 
-  private boolean open_requests = false;
   private int tabIndex;
   private Users user;
 
-  public boolean isOpen_requests() {
-    return checkForRequests();
-  }
-
-  public void setOpen_requests(boolean open_reauests) {
-    this.open_requests = open_reauests;
-  }
-
   public Users getUserFromSession() {
     if (user == null) {
-      ExternalContext context = FacesContext.getCurrentInstance().
-              getExternalContext();
+      ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
       String userEmail = context.getUserPrincipal().getName();
-      user = userManager.findByEmail(userEmail);
+      user = userFacade.findByEmail(userEmail);
     }
     return user;
   }
@@ -64,8 +71,7 @@ public class RoleEnforcementPoint implements Serializable {
   }
 
   private HttpServletRequest getRequest() {
-    return (HttpServletRequest) FacesContext.getCurrentInstance().
-            getExternalContext().getRequest();
+    return (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
   }
 
   /**
@@ -75,8 +81,8 @@ public class RoleEnforcementPoint implements Serializable {
    */
   public boolean isAdmin() {
     if (getRequest().getRemoteUser() != null) {
-      Users p = userManager.findByEmail(getRequest().getRemoteUser());
-      return userManager.findGroups(p.getUid()).contains("HOPS_ADMIN");
+      Users p = userFacade.findByEmail(getRequest().getRemoteUser());
+      return usersController.isUserInRole(p, "HOPS_ADMIN");
     }
     return false;
   }
@@ -87,31 +93,13 @@ public class RoleEnforcementPoint implements Serializable {
    * @return
    */
   public boolean isUser() {
-
-    Users p = userManager.findByEmail(getRequest().getRemoteUser());
-    List<String> roles = userManager.findGroups(p.getUid());
-    return (roles.contains("HOPS_USER"));
-  }
-
-  public boolean isAuditorRole() {
-
-    Users p = userManager.findByEmail(getRequest().getRemoteUser());
-    List<String> roles = userManager.findGroups(p.getUid());
-    return (roles.contains("AUDITOR") || roles.contains("HOPS_ADMIN"));
-  }
-
-  public boolean isAgentRole() {
-
-    Users p = userManager.findByEmail(getRequest().getRemoteUser());
-    List<String> roles = userManager.findGroups(p.getUid());
-    return (roles.contains("AGENT"));
+    Users p = userFacade.findByEmail(getRequest().getRemoteUser());
+    return usersController.isUserInRole(p, "HOPS_USER");
   }
 
   public boolean isOnlyAuditorRole() {
-
-    Users p = userManager.findByEmail(getRequest().getRemoteUser());
-    List<String> roles = userManager.findGroups(p.getUid());
-    return (roles.contains("AUDITOR") && !roles.contains("HOPS_ADMIN"));
+    Users p = userFacade.findByEmail(getRequest().getRemoteUser());
+    return (usersController.isUserInRole(p,"AUDITOR") && !usersController.isUserInRole(p,"HOPS_ADMIN"));
   }
 
   /**
@@ -121,15 +109,10 @@ public class RoleEnforcementPoint implements Serializable {
   public boolean checkForRequests() {
     if (isAdmin()) {
       //return false if no requests
-      open_requests = !(userManager.findAllByStatus(
-              PeopleAccountStatus.NEW_MOBILE_ACCOUNT).isEmpty())
-              || !(userManager.findAllByStatus(
-                      PeopleAccountStatus.NEW_YUBIKEY_ACCOUNT).
-              isEmpty()
-              || !(userManager.findAllByStatus(
-              PeopleAccountStatus.VERIFIED_ACCOUNT).isEmpty()));
+      return !(userFacade.findAllByStatus(UserAccountStatus.NEW_MOBILE_ACCOUNT).isEmpty())
+              || !(userFacade.findAllByStatus(UserAccountStatus.VERIFIED_ACCOUNT).isEmpty());
     }
-    return open_requests;
+    return false;
   }
 
   public boolean isLoggedIn() {
@@ -138,46 +121,26 @@ public class RoleEnforcementPoint implements Serializable {
 
   public String openRequests() {
     this.tabIndex = 1;
-    if (!userManager.findMobileRequests().isEmpty()) {
+    if (!userFacade.findAllMobileRequests().isEmpty()) {
       return "mobUsers";
-    } else if (!userManager.findYubikeyRequests().isEmpty()) {
-      return "yubikeyUsers";
-    } else if (!userManager.findSPAMAccounts().isEmpty()) {
+    } else if (!userFacade.findAllByStatus(UserAccountStatus.SPAM_ACCOUNT).isEmpty()) {
       return "spamUsers";
     }
-
     return "mobUsers";
   }
 
-  // MOVE OUT THIS
   public String logOut() {
     try {
-      getRequest().getSession().invalidate();
-
-      FacesContext ctx = FacesContext.getCurrentInstance();
-      HttpSession sess = (HttpSession) ctx.getExternalContext().
-              getSession(false);
-      HttpServletRequest req = (HttpServletRequest) ctx.getExternalContext().
-              getRequest();
-
-      String ip = AuditUtil.getIPAddress();
-      String browser = AuditUtil.getBrowserInfo();
-      String os = AuditUtil.getOSInfo();
-      String macAddress = AuditUtil.getMacAddress(ip);
-
-      am.registerLoginInfo(getUserFromSession(), UserAuditActions.LOGOUT.
-              getValue(), ip,
-              browser, os, macAddress, UserAuditActions.SUCCESS.name());
-
-      userManager.setOnline(user.getUid(), AuthenticationConstants.IS_OFFLINE);
-      req.logout();
-      if (null != sess) {
-        sess.invalidate();
+      this.user = getUserFromSession();
+      HttpServletRequest req = getRequest();
+      req.getSession().invalidate();
+      req.logout(); 
+      if (user != null) {
+        authController.registerLogout(user, req);
       }
-      ctx.getExternalContext().redirect("/hopsworks/#!/home");
+      FacesContext.getCurrentInstance().getExternalContext().redirect("/hopsworks/#!/home");
     } catch (IOException | ServletException ex) {
-      Logger.getLogger(RoleEnforcementPoint.class.getName()).
-              log(Level.SEVERE, null, ex);
+      Logger.getLogger(RoleEnforcementPoint.class.getName()).log(Level.SEVERE, null, ex);
     }
     return ("welcome");
   }

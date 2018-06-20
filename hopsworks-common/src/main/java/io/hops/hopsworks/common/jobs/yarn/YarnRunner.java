@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.jobs.yarn;
 
 import io.hops.hopsworks.common.dao.project.Project;
@@ -57,15 +77,13 @@ import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.codehaus.plexus.util.FileUtils;
 
-/**
+/**d
  * <p>
  */
 public class YarnRunner {
 
-  private static final Logger logger = Logger.getLogger(YarnRunner.class.
-      getName());
-  public static final String APPID_PLACEHOLDER = "$APPID";
-  private static final String APPID_REGEX = "\\$APPID";
+  private static final Logger logger = Logger.getLogger(YarnRunner.class.getName());
+  public static final String APPID_PLACEHOLDER = "**APPID";
   public static final String KEY_CLASSPATH = "CLASSPATH";
   private static final String LOCAL_LOG_DIR_PLACEHOLDER = "<LOG_DIR>";
 
@@ -158,10 +176,10 @@ public class YarnRunner {
     List<LocalResourceDTO> materialResources = new ArrayList<>(2);
     Map<String, String> systemProperties = new HashMap<>(2);
 
-    HopsUtils.copyUserKafkaCerts(services.getUserCerts(), project, username,
+    HopsUtils.copyProjectUserCerts(project, username,
         services.getSettings().getHopsworksTmpCertDir(),
         services.getSettings().getHdfsTmpCertDir(), jobType,
-        dfso, materialResources, systemProperties,
+        dfso, materialResources, systemProperties, services.getSettings().getGlassfishTrustStoreHdfs(),
         applicationId, services.getCertificateMaterializer(),
         services.getSettings().getHopsRpcTls());
 
@@ -428,27 +446,27 @@ public class YarnRunner {
   //------------------------- UTILITY METHODS ---------------------------------
   //---------------------------------------------------------------------------
   private void fillInAppid(String id) {
-    localResourcesBasePath = localResourcesBasePath.replaceAll(APPID_REGEX, id).replace("\\", "");
-    appName = appName.replaceAll(APPID_REGEX, id);
+    localResourcesBasePath = localResourcesBasePath.replace(APPID_PLACEHOLDER, id);
+    appName = appName.replace(APPID_PLACEHOLDER, id);
     if (amArgs != null) {
-      amArgs = amArgs.replaceAll(APPID_REGEX, id);
+      amArgs = amArgs.replace(APPID_PLACEHOLDER, id);
     }
     for (Entry<String, LocalResourceDTO> entry : amLocalResourcesToCopy.
         entrySet()) {
       entry.getValue().setName(entry.getValue().getName().
-          replaceAll(APPID_REGEX, id));
+          replace(APPID_PLACEHOLDER, id));
     }
     //TODO(Theofilos): thread-safety?
     for (Entry<String, String> entry : amEnvironment.entrySet()) {
-      entry.setValue(entry.getValue().replaceAll(APPID_REGEX, id));
+      entry.setValue(entry.getValue().replace(APPID_PLACEHOLDER, id));
     }
     for (ListIterator<String> i = javaOptions.listIterator(); i.hasNext();) {
-      i.set(i.next().replaceAll(APPID_REGEX, id));
+      i.set(i.next().replace(APPID_PLACEHOLDER, id));
     }
     
     //Loop through files to remove
     for (ListIterator<String> i = filesToRemove.listIterator(); i.hasNext();) {
-      i.set(i.next().replaceAll(APPID_REGEX, id));
+      i.set(i.next().replace(APPID_PLACEHOLDER, id));
     }
   }
 
@@ -639,7 +657,7 @@ public class YarnRunner {
     env.put(Settings.HADOOP_HOME_KEY, hadoopDir);
     //Put some environment vars in env
     env.put(Settings.HADOOP_COMMON_HOME_KEY, hadoopDir);
-    env.put(Settings.HADOOP_CONF_DIR_KEY, Settings.getHadoopConfDir(hadoopDir));
+    env.put(Settings.HADOOP_CONF_DIR_KEY, services.getSettings().getHadoopConfDir(hadoopDir));
     env.put(Settings.HADOOP_HDFS_HOME_KEY, hadoopDir);
     env.put(Settings.HADOOP_YARN_HOME_KEY, hadoopDir);
   }
@@ -955,9 +973,6 @@ public class YarnRunner {
       this.amMemory = config.getAmMemory();
       this.amVCores = config.getAmVCores();
       this.appName = config.getAppName();
-//      for (LocalResourceDTO dto : config.getLocalResources()) {
-//        addLocalResource(dto,false);
-//      }
       return this;
     }
 

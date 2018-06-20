@@ -1,3 +1,23 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
 <div ng-controller="MainCtrl as mainCtrl">
   <!--div ng-include="'nav.html'"></div MOD A11F-->
   <div ng-include="'navBarProject.html'"></div>
@@ -90,8 +110,10 @@
                                     title="{{dataset.name.length > 17 ? dataset.name:''}}">
                                 {{dataset.name| cut:true:17:'...'}}
                               </span>
-                              <span class="glyphicon glyphicon-edit pull-right" ng-if="dataset.permission === 'rwxrwx--T'" data-toggle="tooltip"
-                                    title="This dataset is editable by all project members."></span>
+                              <span class="fa fa-user pull-right" ng-if="dataset.permission === 'rwxrwx--T'" data-toggle="tooltip"
+                                    title="This dataset is group writable and sticky bit is set."></span>
+                              <span class="fa fa-users pull-right" ng-if="dataset.permission === 'rwxrwx---'" data-toggle="tooltip"
+                                    title="This dataset is group writable."></span>
                               <br/>
                               <small><b>Owner:</b>
                                 <span data-toggle="tooltip"
@@ -156,30 +178,34 @@
                                 Remove Dataset</span>
                             </a>
                           </li>
-                          <li ng-if="dataset.name.indexOf('::') === -1 && dataset.permission !== 'rwxrwx--T'"
-                              ng-show="projectCtrl.role === 'Data owner'  && dataset.publicDs === 0">
-                            <a class="pointer"
-                               role="menuitem"
-                               tabindex="2"
-                               ng-click="datasetsCtrl.makeEditable(dataset.name)">
-                              <span><i class="glyphicon glyphicon-edit"></i>
-                                Make Editable</span>
+                          
+                          <li class="dropdown-submenu" ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner'">
+                            <a tabindex="-1">
+                              <span><i class="glyphicon glyphicon-edit"></i>Permissions</span>
                             </a>
+                            <ul class="dropdown-menu">
+                              <li ng-if="dataset.permission === 'rwxrwx--T' || dataset.permission === 'rwxrwx---'">
+                                <a tabindex="-1" ng-click="datasetsCtrl.permissions(dataset.name, 'OWNER_ONLY'); $event.stopPropagation();">
+                                  <span><i class="fa fa-lock"></i> Owner only</span>
+                                </a>
+                              </li>
+                              <li ng-if="dataset.permission !== 'rwxrwx--T'">
+                                <a tabindex="-1" ng-click="datasetsCtrl.permissions(dataset.name, 'GROUP_WRITABLE_SB'); $event.stopPropagation();">
+                                  <span><i class="fa fa-user"></i> Group writable & sticky bit set</span>
+                                </a>
+                              </li>
+                              <li ng-if="dataset.permission !== 'rwxrwx---'">
+                                <a tabindex="-1" ng-click="datasetsCtrl.permissions(dataset.name, 'GROUP_WRITABLE'); $event.stopPropagation();">
+                                  <span><i class="fa fa-users"></i> Group writable</span>
+                                </a>
+                              </li>
+                            </ul>
                           </li>
-                          <li ng-if="dataset.name.indexOf('::') === -1 && dataset.permission === 'rwxrwx--T'" ng-show="projectCtrl.role === 'Data owner'">
-                            <a class="pointer"
-                               role="menuitem"
-                               tabindex="2"
-                               ng-click="datasetsCtrl.removeEditable(dataset.name)">
-                              <span><i class="glyphicon glyphicon-edit"></i>
-                                Remove Editable</span>
-                            </a>
-                          </li>
-                          <li ng-if="dataset.name.indexOf('::') === -1" class="divider"></li>
+                          <li ng-if="dataset.name.indexOf('::') === -1 && projectCtrl.role === 'Data owner'" class="divider"></li>
                           <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
                             <a class="pointer"
                                role="menuitem"
-                               tabindex="3"
+                               tabindex="4"
                                ng-click="metadataCtrl.attachTemplate(dataset); $event.stopPropagation();">
                               <span><i class="fa fa-upload"></i>
                                 Add metadata</span>
@@ -188,7 +214,7 @@
                           <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
                             <a class="pointer"
                                role="menuitem"
-                               tabindex="4"
+                               tabindex="5"
                                ng-click="metadataCtrl.detachTemplate(dataset); $event.stopPropagation();">
                               <span><i class="fa fa-download"></i>
                                 Remove metadata</span>
@@ -214,7 +240,7 @@
                             </a>
                           </li>
                           <li class="divider" ng-if="dataset.name.indexOf('::') === -1 && projectCtrl.role === 'Data owner'  && (dataset.publicDs === 0)"></li>
-                          <li class="dropdown-submenu" ng-if="dataset.name.indexOf('::') === -1 && projectCtrl.role === 'Data owner' && (dataset.publicDs === 0)">
+                          <li ng-controller="DelaClientCtrl as delaClientCtrl" class="dropdown-submenu" ng-if="dataset.name.indexOf('::') === -1 && projectCtrl.role === 'Data owner' && (dataset.publicDs === 0)">
                             <a tabindex="-1"><span><i class="fa fa-share-alt"></i> Share with</span></a>
                             <ul class="dropdown-menu">
                               <li ng-if="dataset.publicDs === 0">
@@ -227,7 +253,7 @@
                                   <span><i class="fa fa-server"></i> Cluster</span>
                                 </a>
                               </li>
-                              <li ng-if="dataset.publicDs === 0 && isDelaEnabled">
+                              <li ng-if="dataset.publicDs === 0 && isDelaEnabled && delaClientCtrl.hopsUploadEnabled()">
                                 <a tabindex="-1" ng-click="datasetsCtrl.shareWithHops(dataset.id); $event.stopPropagation();">
                                   <span><i class="fa fa-globe"></i> Hops</span>
                                 </a>
@@ -292,7 +318,7 @@
                               <!--i class="glyphicon glyphicon-folder-open"></i</i MOD A11F -->
                               <img src="images/aegis/dataset_details.png"></img>
                             </div>
-                            Select a DataSet to view its details.
+                            Click on a DataSet's name to view its details.
                           </div>
                         </div>
                         <table id="mytable1" ng-show="datasetsCtrl.selected" class="table table-bordred table-striped" style="margin-top: 16px;">

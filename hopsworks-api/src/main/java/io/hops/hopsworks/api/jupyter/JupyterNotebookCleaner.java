@@ -1,9 +1,29 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.jupyter;
 
 import io.hops.hopsworks.api.util.LivyController;
 import io.hops.hopsworks.api.zeppelin.util.LivyMsg.Session;
 import io.hops.hopsworks.common.dao.jupyter.JupyterProject;
-import io.hops.hopsworks.common.dao.jupyter.config.JupyterProcessFacade;
+import io.hops.hopsworks.common.dao.jupyter.config.JupyterProcessMgr;
 import io.hops.hopsworks.common.dao.jupyter.config.JupyterFacade;
 import io.hops.hopsworks.common.dao.project.service.ProjectServiceEnum;
 import java.util.logging.Logger;
@@ -29,7 +49,7 @@ public class JupyterNotebookCleaner {
   @EJB
   private JupyterFacade jupyterFacade;
   @EJB
-  private JupyterProcessFacade jupyterProcessFacade;
+  private JupyterProcessMgr jupyterProcessFacade;
 
   public JupyterNotebookCleaner() {
   }
@@ -65,7 +85,7 @@ public class JupyterNotebookCleaner {
       List<JupyterProject> notebooks = jupyterProcessFacade.getAllNotebooks();
       for (JupyterProject jp : notebooks) {
         if (!jupyterProcessFacade.pingServerJupyterUser(jp.getPid())) {
-//          jupyterProcessFacade.killHardJupyterWithPid(jp.getPid());
+//          jupyterProcessFacade.killOrphanedWithPid(jp.getPid());
           int hdfsId = jp.getHdfsUserId();
 //          String hdfsUser = hdfsUsersFacade.
 //          jupyterProcessFacade.stopCleanly();

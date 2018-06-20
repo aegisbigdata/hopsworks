@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 /*jshint undef: false, unused: false, indent: 2*/
 /*global angular: false */
 
@@ -7,11 +27,11 @@ angular.module('hopsWorksApp')
         .controller('MainCtrl', ['$interval', '$cookies', '$location', '$scope', '$rootScope',
           'AuthService', 'UtilsService', 'ElasticService', 'DelaProjectService',
           'DelaService', 'md5', 'ModalService', 'ProjectService', 'growl',
-          'MessageService', '$routeParams', '$window', 'HopssiteService',
+          'MessageService', '$routeParams', '$window', 'HopssiteService', 'BannerService',
           function ($interval, $cookies, $location, $scope, $rootScope, AuthService, UtilsService,
-                  ElasticService, DelaProjectService, DelaService, md5, ModalService,
+                  ElasticService, DelaProjectService, DelaService, md5, ModalService, 
                   ProjectService, growl,
-                  MessageService, $routeParams, $window, HopssiteService) {
+                  MessageService, $routeParams, $window, HopssiteService, BannerService) {
             const MIN_SEARCH_TERM_LEN = 2;
             var self = this;
             self.email = $cookies.get('email');
@@ -25,7 +45,16 @@ angular.module('hopsWorksApp')
             } else {
               self.searchType = "global";
             }
-
+            
+            var checkeIsAdmin = function () {
+              AuthService.isAdmin().then(
+                  function (success) {
+                    $cookies.put("isAdmin", success.data === 'true');
+                },function (error) {
+                    $cookies.put("isAdmin", false);
+              });
+            };
+            checkeIsAdmin();
             self.isAdmin = function () {
               return $cookies.get('isAdmin');
             };
@@ -66,6 +95,22 @@ angular.module('hopsWorksApp')
               });
             };
             checkDelaEnabled(); // check 
+            
+            self.userNotification = '';
+            var getUserNotification = function () {
+              self.userNotification = '';
+              BannerService.findUserBanner().then(
+                function (success) {
+                  console.log(success);
+                  if (success.data.successMessage) {
+                    self.userNotification = success.data.successMessage;
+                  }
+                }, function (error) {
+                  console.log(error);
+                  self.userNotification = '';
+              });
+            };
+            getUserNotification();
 
             self.profileModal = function () {
               ModalService.profile('md');

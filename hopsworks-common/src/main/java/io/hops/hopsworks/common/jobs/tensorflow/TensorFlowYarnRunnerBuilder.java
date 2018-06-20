@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.jobs.tensorflow;
 
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
@@ -52,14 +72,10 @@ public class TensorFlowYarnRunnerBuilder {
   }
 
   public YarnRunner getYarnRunner(String project, String tfUser,
-      String jobUser, final String hadoopDir,
+      String jobUser,
       final DistributedFileSystemOps dfsClient, YarnClient yarnClient,
       AsynchronousJobExecutor services, Settings settings) throws IOException, Exception {
 
-//    if (!serviceProps.isAnacondaEnabled()) {
-//      //Throw error in Hopswors UI to notify user to enable Anaconda
-//      throw new IOException("Pyspark job needs to have Python Anaconda environment enabled");
-//    }
     YarnRunner.Builder builder = new YarnRunner.Builder(Settings.SPARK_AM_MAIN);
     JobType jobType = ((TensorFlowJobConfiguration) job.getJobConfig()).getType();
     builder.setJobType(jobType);
@@ -106,10 +122,10 @@ public class TensorFlowYarnRunnerBuilder {
         "hdfs:///Projects");
     client.setMain(appPath);
     client.setArguments(jobArgs.stream().toArray(String[]::new));
-    client.setAmJar(Settings.getTensorFlowJarPath(tfUser));
+    client.setAmJar(settings.getTensorFlowJarPath(tfUser));
     //client.setPython(serviceProps.getAnaconda().getEnvPath());
     client.setAllocationTimeout(15000);
-    client.setProjectDir("hdfs://" + Settings.getHdfsRootPath(project));
+    client.setProjectDir("hdfs://" + Settings.DIR_ROOT + "/" +project);
     builder.setTfClient(client);
     return builder.build(null, JobType.TENSORFLOW, services);
   }

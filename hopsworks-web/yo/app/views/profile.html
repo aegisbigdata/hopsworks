@@ -1,4 +1,24 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
 
+<div ng-show="profileCtrl.user.userAccountType !== 'LDAP_ACCOUNT_TYPE' ">
 <div class="modal-header">
   <button class="close" ng-click="profileCtrl.close()" data-dismiss="modal" aria-hidden="true" type="button">&times;</button>
   <h2 class="modal-title">Profile</h2>
@@ -48,11 +68,6 @@
                 class="text-danger ng-hide">Phone number should be in (+00-000-000000) format.</span>
         </div>
 
-        <div class="form-group has-feedback">
-          <label class="text-muted">Number of Projects Allowed: </label>&nbsp;&nbsp;{{profileCtrl.user.maxNumProjects}}
-        </div>
-
-
         <div class="row form-actions">
           <div class="col-xs-3 col-sm-3 col-md-3 pull-right">
             <button type="submit" class="btn btn-block btn-primary"
@@ -64,6 +79,12 @@
             <input type="button" class="btn btn-block btn-primary" ng-click="profileCtrl.reset()"
                    value="Reset" ng-disabled="profileForm.$pristine"/>
           </div>
+        </div>
+          
+          <div class="form-group has-feedback" style="margin-top: 15px;">
+            <div><label class="text-muted">Number of active projects: </label>&nbsp;&nbsp;{{profileCtrl.user.numActiveProjects}}</div>
+            <div><label class="text-muted">You can still create </label>&nbsp;{{profileCtrl.user.numRemainingProjects}}&nbsp;<label class="text-muted"> project(s)</label></div>
+            <div><label class="text-muted">You have created {{profileCtrl.user.numCreatedProjects}} project(s) out of a maximum of {{profileCtrl.user.maxNumProjects}}</label></div>
         </div>
       </form>
     </div>
@@ -202,4 +223,49 @@
       </div>
     </div>
   </form>
+</div>
+</div>
+<!-- LDAP user -->
+<div ng-if="profileCtrl.user.userAccountType === 'LDAP_ACCOUNT_TYPE' ">
+  <div class="modal-header">
+    <button class="close" ng-click="profileCtrl.close()" data-dismiss="modal" aria-hidden="true" type="button">&times;</button>
+    <h2 class="modal-title">LDAP Profile</h2>
+  </div>
+  <div class="modal-body" id="ldapProfileModal">
+    <div class="row">
+      <div class="col-xs-9 col-sm-9 col-md-9 pull-right">
+        <div class="row">
+          <div class="col-xs-6 col-sm-6 col-md-6">
+            <div class="form-group has-feedback">
+              <label class="text-muted">First Name</label>
+              <input name="first_name" placeholder="First Name"
+                     ng-model="profileCtrl.user.firstName" class="form-control "
+                     type="text" ng-disabled="true">
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-6">
+            <div class="form-group has-feedback">
+              <label class="text-muted">Last Name</label>
+              <input name="last_name" placeholder="Last Name"
+                     ng-model="profileCtrl.user.lastName" class="form-control "
+                     type="text" ng-disabled="true">
+            </div>
+          </div>
+        </div>
+        <div class="form-group has-feedback">
+          <label class="text-muted">Email</label>
+          <input name="phone_number" placeholder="Email"
+                 ng-model="profileCtrl.user.email" class="form-control " type="text" ng-disabled="true">
+          <span class="fa fa-envelope form-control-feedback text-muted"></span>
+        </div>
+        <div class="form-group has-feedback">
+          <label class="text-muted">Number of Projects Allowed: </label>&nbsp;&nbsp;{{profileCtrl.user.maxNumProjects}}
+        </div>
+      </div>
+      <div class="col-xs-3 col-sm-3 col-md-3 ">
+        <img class="img-thumbnail"
+             ng-src="https://www.gravatar.com/avatar/{{profileCtrl.emailHash}}?d=retro&s=200"/>
+      </div>
+    </div>
+  </div>
 </div>

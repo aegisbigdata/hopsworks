@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.dao.project;
 
 import java.util.Date;
@@ -6,7 +26,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.AbstractFacade;
@@ -29,7 +48,7 @@ public class ProjectFacade extends AbstractFacade<Project> {
   @Override
   public List<Project> findAll() {
     TypedQuery<Project> query = em.createNamedQuery("Project.findAll",
-            Project.class);
+        Project.class);
     return query.getResultList();
   }
 
@@ -39,8 +58,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
 
   public Project findByInodeId(Integer parentId, String name) {
     TypedQuery<Project> query = this.em.
-            createNamedQuery("Project.findByInodeId", Project.class).
-            setParameter("parentid", parentId).setParameter("name", name);
+        createNamedQuery("Project.findByInodeId", Project.class).
+        setParameter("parentid", parentId).setParameter("name", name);
 
     try {
       return query.getSingleResult();
@@ -58,8 +77,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public List<Project> findByUser(Users user) {
     TypedQuery<Project> query = em.createNamedQuery(
-            "Project.findByOwner", Project.class).setParameter(
-                    "owner", user);
+        "Project.findByOwner", Project.class).setParameter(
+            "owner", user);
     return query.getResultList();
   }
 
@@ -73,8 +92,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public List<Project> findByUser(String email) {
     TypedQuery<Users> query = em.createNamedQuery(
-            "Users.findByEmail", Users.class).setParameter(
-                    "email", email);
+        "Users.findByEmail", Users.class).setParameter(
+            "email", email);
     Users user = query.getSingleResult();
     return findByUser(user);
   }
@@ -89,10 +108,10 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public Project findByNameAndOwner(String projectname, Users user) {
     TypedQuery<Project> query = em.
-            createNamedQuery("Project.findByOwnerAndName",
-                    Project.class).setParameter("name", projectname).
-            setParameter("owner",
-                    user);
+        createNamedQuery("Project.findByOwnerAndName",
+            Project.class).setParameter("name", projectname).
+        setParameter("owner",
+            user);
     try {
       return query.getSingleResult();
     } catch (NoResultException e) {
@@ -111,52 +130,11 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public Project findByNameAndOwnerEmail(String projectname, String email) {
     TypedQuery<Users> query = em.createNamedQuery("Users.findByEmail",
-            Users.class).setParameter("email", email);
+        Users.class).setParameter("email", email);
     Users user = query.getSingleResult();
     return findByNameAndOwner(projectname, user);
   }
 
-  /**
-   * Count the number of studies for which the given user is owner.
-   * <p/>
-   * @param owner
-   * @return
-   */
-  public int countOwnedStudies(Users owner) {
-    TypedQuery<Long> query = em.createNamedQuery("Project.countProjectByOwner",
-            Long.class);
-    query.setParameter("owner", owner);
-    return query.getSingleResult().intValue();
-  }
-
-  /**
-   * Count the number of studies for which the owner has the given email.
-   * <p/>
-   * @param email
-   * @return The number of studies.
-   * @deprecated Use countOwnedStudies(User owner) instead.
-   */
-  public int countOwnedStudies(String email) {
-    TypedQuery<Users> query = em.createNamedQuery("Users.findByEmail",
-            Users.class);
-    query.setParameter("email", email);
-    //TODO: may throw an exception
-    Users user = query.getSingleResult();
-    return countOwnedStudies(user);
-  }
-
-  /**
-   * Find all the studies owned by the given user.
-   * <p/>
-   * @param user
-   * @return
-   */
-  public List<Project> findOwnedStudies(Users user) {
-    TypedQuery<Project> query = em.createNamedQuery("Project.findByOwner",
-            Project.class);
-    query.setParameter("owner", user);
-    return query.getResultList();
-  }
 
   /**
    * Get the owner of the given project.
@@ -177,8 +155,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public List<Project> findAllMemberStudies(Users user) {
     TypedQuery<Project> query = em.createNamedQuery(
-            "ProjectTeam.findAllMemberStudiesForUser",
-            Project.class);
+        "ProjectTeam.findAllMemberStudiesForUser",
+        Project.class);
     query.setParameter("user", user);
     return query.getResultList();
   }
@@ -191,7 +169,7 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public List<Project> findAllPersonalStudies(Users user) {
     TypedQuery<Project> query = em.createNamedQuery("Project.findByOwner",
-            Project.class);
+        Project.class);
     query.setParameter("owner", user);
     return query.getResultList();
   }
@@ -204,8 +182,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public List<Project> findAllJoinedStudies(Users user) {
     TypedQuery<Project> query = em.createNamedQuery(
-            "ProjectTeam.findAllJoinedStudiesForUser",
-            Project.class);
+        "ProjectTeam.findAllJoinedStudiesForUser",
+        Project.class);
     query.setParameter("user", user);
     return query.getResultList();
   }
@@ -236,7 +214,7 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public boolean projectExists(String name) {
     TypedQuery<Project> query = em.createNamedQuery("Project.findByName",
-            Project.class);
+        Project.class);
     query.setParameter("name", name);
     return !query.getResultList().isEmpty();
   }
@@ -250,8 +228,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
    */
   public boolean projectExistsForOwner(String name, Users owner) {
     TypedQuery<Project> query = em.
-            createNamedQuery("Project.findByOwnerAndName",
-                    Project.class);
+        createNamedQuery("Project.findByOwnerAndName",
+            Project.class);
     query.setParameter("owner", owner).setParameter("name", name);
     return !query.getResultList().isEmpty();
   }
@@ -265,11 +243,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
     em.merge(newProject);
   }
 
-  public void archiveProject(String projectname) {
-    Project project = findByName(projectname);
-    if (project != null) {
-      project.setArchived(true);
-    }
+  public void archiveProject(Project project) {
+    project.setArchived(true);
     em.merge(project);
   }
 
@@ -279,7 +254,7 @@ public class ProjectFacade extends AbstractFacade<Project> {
     }
     em.merge(project);
   }
-  
+
   public void enableLogs(Project project) {
     if (project != null) {
       project.setLogs(true);
@@ -287,11 +262,8 @@ public class ProjectFacade extends AbstractFacade<Project> {
     em.merge(project);
   }
 
-  public void unarchiveProject(String projectname) {
-    Project project = findByName(projectname);
-    if (project != null) {
-      project.setArchived(false);
-    }
+  public void unarchiveProject(Project project) {
+    project.setArchived(false);
     em.merge(project);
   }
 
@@ -315,7 +287,7 @@ public class ProjectFacade extends AbstractFacade<Project> {
 
   public Project findByName(String name) {
     TypedQuery<Project> query = em.createNamedQuery("Project.findByName",
-            Project.class);
+        Project.class);
     query.setParameter("name", name);
     try {
       return query.getSingleResult();
@@ -324,34 +296,16 @@ public class ProjectFacade extends AbstractFacade<Project> {
     }
   }
 
-  public List<Project> findAllExpiredStudies() {
-
-    Query q = em.createNativeQuery(
-            "SELECT * FROM hopsworks.project WHERE ethical_status='APPROVED' AND retention_period < NOW()",
-            Project.class);
-
-    List<Project> st = q.getResultList();
-    if (st == null) {
-      return null;
-    }
-    return st;
-  }
-
-  public boolean updateStudyStatus(Project st, String name) {
-
-    if (st != null) {
-      st.setEthicalStatus(name);
-      em.merge(st);
-      return true;
-    }
-    return false;
-  }
-
   public boolean numProjectsLimitReached(Users user) {
-    if (user.getMaxNumProjects() > 0 &&
-        user.getNumCreatedProjects() >= user.getMaxNumProjects()) {
+    if (user.getMaxNumProjects() > 0 && user.getNumCreatedProjects() >= user.getMaxNumProjects()) {
       return true;
     }
     return false;
+  }
+
+  public void setTimestampQuotaUpdate(Project project, Date timestamp) {
+    project.setLastQuotaUpdate(timestamp);
+    em.merge(project);
+    em.flush();
   }
 }

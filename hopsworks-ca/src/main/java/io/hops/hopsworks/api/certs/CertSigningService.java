@@ -1,10 +1,30 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.certs;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import io.hops.hopsworks.api.annotation.AllowCORS;
-import io.hops.hopsworks.common.dao.host.Host;
-import io.hops.hopsworks.common.dao.host.HostEJB;
+import io.hops.hopsworks.common.dao.host.Hosts;
+import io.hops.hopsworks.common.dao.host.HostsFacade;
 import io.hops.hopsworks.common.dao.kafka.CsrDTO;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
@@ -54,7 +74,7 @@ public class CertSigningService {
   @EJB
   private Settings settings;
   @EJB
-  private HostEJB hostEJB;
+  private HostsFacade hostsFacade;
   @EJB
   private UserFacade userBean;
   @EJB
@@ -88,13 +108,13 @@ public class CertSigningService {
 
     if (json.has("host-id") && json.has("agent-password")) {
       String hostId = json.getString("host-id");
-      Host host;
+      Hosts host;
       try {
-        host = hostEJB.findByHostId(hostId);
+        host = hostsFacade.findByHostname(hostId);
         String agentPassword = json.getString("agent-password");
         host.setAgentPassword(agentPassword);
         host.setRegistered(true);
-        hostEJB.storeHost(host, true);
+        hostsFacade.storeHost(host, true);
       } catch (Exception ex) {
         logger.log(Level.SEVERE, "Host storing error while Cert signing: {0}", ex.getMessage());
       }
