@@ -43,7 +43,7 @@
 </div>
 </div>-->
 
-            <div class="widget-body col-md-10 thin-scrollbar" style="height: 90%; overflow-y: auto; margin-left: 200px">
+            <div class="widget-body col-md-10 thin-scrollbar" style="height: 90%; overflow-y: auto; width: 100%">
 
               <div class="timeline clearfix">
 
@@ -52,16 +52,22 @@
                 <div dir-paginate="activity in projectCtrl.activities | itemsPerPage:projectCtrl.pageSize">
 
                   <div class="right">
-                    <div class="r-arrow"></div>
+                    <div class="r-circle"></div>
                     <div class="about-task">
-                      <div class="header">{{activity.user.fname}} {{activity.user.lname}} {{activity.activity}}
-                        <small class="muted">On {{activity.timestamp|
-                                                date:'medium'}}
+                      <div class="header">
+                          <span style="font-weight: bold; color: #00A2CA; font-size: 14px"> {{activity.user.fname}} </span>  
+                          <span style="font-weight: bold; color: #00A2CA; font-size: 14px"> {{activity.user.lname}} </span>
+                          <span style="font-weight: bold; color: #333333; font-size: 14px"> {{activity.activity}} </span>
+                          <small class="muted" style="color: #C8C8C8; font-size: 12px">On {{activity.timestamp|date:'medium'}}
                         </small>
                       </div>
                       <p class="no-margin">
-                        Project name: {{activity.project.name}} Owner: {{activity.project.owner.fname}}
-                        Created on: {{activity.project.created| date:'medium'}}
+                        <span style="font-weight: bold; text-transform: uppercase; color: #C8C8C8; font-size: 8px"> Project name: </span> 
+                        <span style="color: #333333; font-size: 11px; width: 300px; display: inline-block; padding-right: 10px">{{activity.project.name}} </span>
+                        <span style="font-weight: bold; text-transform: uppercase; color: #C8C8C8; font-size: 8px"> Owner: </span> 
+                        <span style="color: #333333; font-size: 11px; width: 150px; display: inline-block; padding-right: 10px">{{activity.project.owner.fname}} </span>
+                        <span style="font-weight: bold; text-transform: uppercase; color: #C8C8C8; font-size: 8px"> Created on: </span> 
+                        <span style="color: #333333; font-size: 11px; width: 300px; display: inline-block; padding-right: 10px">{{activity.project.created| date:'medium'}} </span>
                       </p>
                     </div>
                   </div>

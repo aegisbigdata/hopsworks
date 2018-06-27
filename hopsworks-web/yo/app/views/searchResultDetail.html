@@ -145,10 +145,10 @@
         <div id="readme" class="panel-collapse collapse"><br>
           <div style="margin-top: -20px;">
             <div class="row" style="margin: 0px;">
-              <div class="col-lg-12" style="border-style: solid; border-width: 1px; border-radius: 10px; border-color:#eee;">
+              <div class="col-lg-12" style="border-top: 1px solid #E6E6E6;">
                 <!-- README.md is displayed here -->
-                <div class="col-lg-12">                
-                  <div class ="row" ng-bind-html="readme" style="overflow-y: auto; top:60%">
+                <div class="col-lg-12" style="padding-top: 15px">                
+                  <div class ="readme-style row" ng-bind-html="readme" style="overflow-y: auto; top:60%">
                   </div>
                   <p ng-show="viewSearchResultCtrl.spinner" class="text-muted loading-dots">Loading</p>
                 </div>
@@ -159,7 +159,7 @@
       </div>
       <div ng-if="(viewSearchResultCtrl.type === 'Dataset' || viewSearchResultCtrl.type === 'Public Dataset') && viewSearchResultCtrl.content.type !== 'inode'" 
            class="col-xs-9" style="padding-left: 0px; margin-top: -10px; ">
-        <label class="text-muted control-label">Projects</label>
+        <label class="text-muted control-label" style="margin-right: 10px">Projects</label>
         <ui-select name="project_name" theme="select2" style="min-width: 300px;" title="Choose a project"
                    ng-model="viewSearchResultCtrl.request.projectId"required>
 
@@ -176,8 +176,9 @@
         <span ng-show="(dataSetForm.$submitted || dataSetForm.project_name.$dirty) &&
             dataSetForm.project_name.$error.required"
               class="text-danger ng-hide">
-          Choose a project this dataset will be shared with.
+          Choose a project this dataset will be shared with.  
         </span>
+        
       </div>
     </div>        
     <br ng-show="viewSearchResultCtrl.type !== 'Project'" style="margin:15px">

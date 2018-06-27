@@ -63,6 +63,11 @@ angular.module('hopsWorksApp', [
               console.log('catchAll', arguments);
             });
 
+            $(document).on('click', '.menu-dataset a', function(e) {
+              $(this).parents('h3').find('a').removeClass('active');
+              $(this).addClass('active');
+            });
+            
             $routeProvider
                     .when('/', {
                       templateUrl: 'views/home.html',

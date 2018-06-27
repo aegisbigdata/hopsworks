@@ -207,10 +207,9 @@ div.scroll {
 
 #readme{
   background: white;
-  height: 150px;
+  min-height: 150px;
   overflow: auto;
   width: auto;
-  resize: vertical;
 }
 
 #moreInfo {

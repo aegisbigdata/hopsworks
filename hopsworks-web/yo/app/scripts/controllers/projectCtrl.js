@@ -334,6 +334,11 @@ angular.module('hopsWorksApp')
               });
             };
 
+            
+            self.goToHome = function () {
+              self.goToUrl('home');
+            };
+
 
             self.goToWorklows = function () {
               self.goToUrl('workflows');
