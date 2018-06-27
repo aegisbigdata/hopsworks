@@ -248,3 +248,7 @@
 .icon-stack-3x {
   font-size: 2em;
 }
+
+.readme-style * {
+  font-size: 12px !important;
+}

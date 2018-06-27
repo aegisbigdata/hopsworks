@@ -157,24 +157,22 @@ ul.dropdown-messages .dropdown-header {
   transition: all 0.3s ease;
 }
 .ds-content.sidenav-open {
-  width: 79%;
+  width: 70%;
 }
 .ds-sidenav {
   width: 0;
   overflow: hidden;
   position: absolute;
-  right: 0;/*start from right*/
-  top: 110px;
+  right: 25px;/*start from right*/
+  top: 260px;
   bottom: 0;
   transition: all 0.3s ease;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,.2);
-  -webkit-box-shadow: 0 4px 8px rgba(0,0,0,.2);
-  background: rgb(250,250,250);
   z-index: 10;
   height: auto;
+  border: 1px solid #E6E6E6;
 }
 .ds-sidenav.open {
     width: 20%;
@@ -185,6 +183,16 @@ ul.dropdown-messages .dropdown-header {
   max-width: 230px;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.table-detail td {
+    display: block;
+}
+
+.table-detail > tbody > tr > td {
+    border-top: none;
+    font-size: 11px; color: #333333;
+    text-transform: lowercase;
 }
 
 .row-no-margin-left {
