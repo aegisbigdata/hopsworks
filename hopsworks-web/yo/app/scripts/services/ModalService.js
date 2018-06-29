@@ -1154,13 +1154,19 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
-              addExtendedMetadata: function (size, file, templateId) {
+              addExtendedMetadata: function (size, file) {
                 var templateUrl = '';
                 if (file.dir) { // file is a folder or dataset
                   templateUrl = 'views/metadata/metadataExtendedDataset.html';
                 } else { // file is not a folder or dataset
                   templateUrl = 'views/metadata/metadataExtendedDistribution.html';
                 }
+
+                /* ProjectService.getDatasetInfo(423305).$promise.then(function (success) {
+                  console.log("More info ", success);
+                }).catch(function (error) {
+                  console.log("Error occerued while getting more info", error);
+                }); */
 
                 var modalInstance = $uibModal.open({
                   templateUrl: templateUrl,
@@ -1179,14 +1185,12 @@ angular.module('hopsWorksApp')
                                   return $q.reject(err);
                                 });
                       }],
-                    templateId: function () {
-                      return templateId;
-                    },
                     file: function () {
                       return file;
                     }
                   }
                 });
+
                 return modalInstance.result;
               }
             };

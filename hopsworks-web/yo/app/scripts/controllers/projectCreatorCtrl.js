@@ -119,6 +119,7 @@ angular.module('hopsWorksApp')
                       function (success) {
                         self.working = false;
                         growl.success(success.successMessage, {title: 'Success', ttl: 2000});
+                        console.log('project created success', success);
 
                         $http({
                           url: 'http://aegis-metadata.fokus.fraunhofer.de/api/catalogs',

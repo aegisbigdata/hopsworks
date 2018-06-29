@@ -391,7 +391,7 @@
           <!--Side nave -->
           <div ng-if="!mainCtrl.showSearchPage">
             <div class="ds-sidenav" ng-class="{open: datasetsCtrl.tgState}">
-              <div class="ibox float-e-margins" style="margin-top: 100px; margin-bottom: 0px; height: 100%;">
+              <div class="ibox float-e-margins" style="margin-bottom: 0px; height: 100%;">
                 <div class="file-manager" style="height: 100%;">
                   <md-content class="md-padding" style="padding-top: 0px; height: 100%;">
                     <md-tabs md-dynamic-height md-border-bottom style="min-height: 100%;">
@@ -436,8 +436,12 @@
                         </table>
                         <!--METADATA PRESENTATION SECTION-->
                         <div id="board"  style="font-family: Times New Roman; overflow: hidden; height: 75%;"
-                             ng-include="'views/metadata/extendedMetadata.html'">                          
+                             ng-include="'views/metadata/extendedMetadata.html'">
                         </div>                       
+                      </md-tab>
+                      <md-tab label="Extended metadata">
+                        <div id="metadata-extended"
+                             ng-include="'views/metadata/metadataExtendedView.html'"></div>
                       </md-tab>
                     </md-tabs>
                     <!-- Add Metadata -->
