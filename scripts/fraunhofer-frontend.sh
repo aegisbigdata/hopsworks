@@ -2,7 +2,7 @@
 # Deploy the frontend to the glassfish home directory at fraunhofer test server
 export SERVER=aegis-hopsworks.fokus.fraunhofer.de
 echo USER=${whoami}
-export WEBPORT = 8080
+export WEBPORT=8080
 export DIR=/srv/hops/domains/domain1/docroot/${USER}
 
 echo "automatic dev frontend deployment to ${SERVER}"
