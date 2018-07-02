@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.dao.dataset;
 
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
@@ -103,7 +123,7 @@ public class Dataset implements Serializable {
   @Basic(optional = false)
   @NotNull
   @Column(name = "editable")
-  private boolean editable = true;
+  private int editable = 0;
   @Basic(optional = false)
   @NotNull
   @Column(name = "searchable")
@@ -161,7 +181,7 @@ public class Dataset implements Serializable {
     this.name = ds.getInode().getInodePK().getName();
     this.searchable = ds.isSearchable();
     this.description = ds.getDescription();
-    this.editable = ds.isEditable();
+    this.editable = ds.getPermissionsAsInt();
     this.publicDs = ds.getPublicDs();
     this.type = ds.getType();
   }
@@ -201,13 +221,41 @@ public class Dataset implements Serializable {
   public void setProject(Project project) {
     this.project = project;
   }
-
-  public boolean isEditable() {
+  
+  private int getPermissionsAsInt() {
     return editable;
   }
 
-  public void setEditable(boolean editable) {
-    this.editable = editable;
+  public DatasetPermissions getEditable() {
+    switch (this.editable) {
+      case 0:
+        return DatasetPermissions.OWNER_ONLY;
+      case 1:
+        return DatasetPermissions.GROUP_WRITABLE_SB;
+      case 2:
+        return DatasetPermissions.GROUP_WRITABLE;
+      default:
+        break;
+    }
+    return null;
+  }
+
+  public void setEditable(DatasetPermissions permissions) {
+    if (null != permissions) {
+      switch (permissions) {
+        case OWNER_ONLY:
+          this.editable = 0;
+          break;
+        case GROUP_WRITABLE_SB:
+          this.editable = 1;
+          break;
+        case GROUP_WRITABLE:
+          this.editable = 2;
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   public boolean isSearchable() {

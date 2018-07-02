@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.jobs;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
@@ -30,9 +50,10 @@ import io.hops.hopsworks.common.dao.kafka.TopicDTO;
 import io.hops.hopsworks.common.dao.kafka.TopicDefaultValueDTO;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
 import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.kafka.KafkaController;
 import io.hops.hopsworks.common.util.Settings;
 import javax.persistence.EntityExistsException;
 import javax.ws.rs.Consumes;
@@ -44,8 +65,7 @@ import javax.ws.rs.PUT;
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class KafkaService {
 
-  private final static Logger LOGGER = Logger.getLogger(KafkaService.class.
-          getName());
+  private final static Logger logger = Logger.getLogger(KafkaService.class.getName());
 
   @EJB
   private ProjectFacade projectFacade;
@@ -54,7 +74,9 @@ public class KafkaService {
   @EJB
   private KafkaFacade kafkaFacade;
   @EJB
-  private UserManager userManager;
+  private KafkaController kafkaController;
+  @EJB
+  private UserFacade userFacade;
 
   private Integer projectId;
   private Project project;
@@ -110,7 +132,7 @@ public class KafkaService {
               "Incomplete request!");
     }
 
-    List<TopicDTO> listTopics = kafkaFacade.findSharedTopicsByProject(projectId);
+    List<TopicDTO> listTopics = kafkaController.findSharedTopicsByProject(projectId);
     GenericEntity<List<TopicDTO>> topics
             = new GenericEntity<List<TopicDTO>>(listTopics) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
@@ -130,7 +152,7 @@ public class KafkaService {
     }
     List<TopicDTO> allTopics = kafkaFacade.findTopicsByProject(projectId);
 
-    allTopics.addAll(kafkaFacade.findSharedTopicsByProject(projectId));
+    allTopics.addAll(kafkaController.findSharedTopicsByProject(projectId));
     GenericEntity<List<TopicDTO>> topics
             = new GenericEntity<List<TopicDTO>>(allTopics) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
@@ -154,7 +176,7 @@ public class KafkaService {
     kafkaFacade.createTopicInProject(projectId, topicDto);
     //By default, all members of the project are granted full permissions 
     //on the topic
-    AclDTO aclDto = new AclDTO(null, project.getName(),
+    AclDTO aclDto = new AclDTO(project.getName(),
             Settings.KAFKA_ACL_WILDCARD,
             "allow", Settings.KAFKA_ACL_WILDCARD, Settings.KAFKA_ACL_WILDCARD,
             Settings.KAFKA_ACL_WILDCARD);
@@ -193,7 +215,7 @@ public class KafkaService {
           @Context SecurityContext sc,
           @Context HttpServletRequest req) throws AppException {
     String userEmail = sc.getUserPrincipal().getName();
-    Users user = userManager.getUserByEmail(userEmail);
+    Users user = userFacade.findByEmail(userEmail);
     if (projectId == null) {
       throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
               "Incomplete request!");
@@ -258,7 +280,7 @@ public class KafkaService {
       throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
               "Could not find project for topic");
     }
-    AclDTO aclDto = new AclDTO(null, projectShared.getName(),
+    AclDTO aclDto = new AclDTO(projectShared.getName(),
             Settings.KAFKA_ACL_WILDCARD,
             "allow", Settings.KAFKA_ACL_WILDCARD, Settings.KAFKA_ACL_WILDCARD,
             Settings.KAFKA_ACL_WILDCARD);
@@ -419,7 +441,8 @@ public class KafkaService {
     List<AclDTO> aclDto = null;
     try {
       aclDto = kafkaFacade.getTopicAcls(topicName, projectId);
-    } catch (Exception e) {
+    } catch (AppException e) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     GenericEntity<List<AclDTO>> aclDtos

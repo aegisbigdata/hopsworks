@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.zeppelin.rest;
 
 import io.hops.hopsworks.api.util.LivyController;
@@ -65,17 +85,19 @@ public class InterpreterService {
       logger.error("Could not find remote user in request.");
       throw new AppException(Response.Status.FORBIDDEN.getStatusCode(), "Could not find remote user.");
     }
-    String userRole = projectTeamBean.findCurrentRole(project, user);
-    if (userRole == null) {
-      logger.error("User with no role in this project.");
-      throw new AppException(Response.Status.FORBIDDEN.getStatusCode(), "You curently have no role in this project!");
+    if (!httpReq.isUserInRole("HOPS_ADMIN")) {
+      String userRole = projectTeamBean.findCurrentRole(project, user);
+      if (userRole == null) {
+        logger.error("User with no role in this project.");
+        throw new AppException(Response.Status.FORBIDDEN.getStatusCode(), "You curently have no role in this project!");
+      }
     }
     ZeppelinConfig zeppelinConf = zeppelinConfFactory.getProjectConf(project.getName());
     if (zeppelinConf == null) {
       logger.error("Could not connect to web socket.");
       throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Could not connect to web socket.");
     }
-    interpreterRestApi.setParms(project, user, userRole, zeppelinConf);
+    interpreterRestApi.setParms(project, user, zeppelinConf);
     return interpreterRestApi;
   }
 
@@ -95,10 +117,13 @@ public class InterpreterService {
       logger.error("Could not find remote user in request.");
       return new JsonResponse(Response.Status.NOT_FOUND, "").build();
     }
-    String userRole = projectTeamBean.findCurrentRole(project, user);
-    if (userRole == null) {
-      logger.error("User with no role in this project.");
-      return new JsonResponse(Response.Status.NOT_FOUND, "").build();
+    
+    if (!httpReq.isUserInRole("HOPS_ADMIN")) {
+      String userRole = projectTeamBean.findCurrentRole(project, user);
+      if (userRole == null) {
+        logger.error("User with no role in this project.");
+        return new JsonResponse(Response.Status.NOT_FOUND, "").build();
+      }
     }
     ZeppelinConfig zeppelinConf = zeppelinConfFactory.getProjectConf(project.getName());
     if (zeppelinConf == null) {
