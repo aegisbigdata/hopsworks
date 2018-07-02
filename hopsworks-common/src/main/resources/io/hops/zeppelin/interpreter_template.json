@@ -47,7 +47,7 @@
         "zeppelin.spark.importImplicit": "true",
         "zeppelin.spark.concurrentSQL": "false",
         "zeppelin.spark.unSupportedVersionCheck": "true",
-        "zeppelin.spark.useHiveContext": "true",
+        "zeppelin.spark.useHiveContext": "false",
         "zeppelin.dep.localrepo": "local-repo",
         "zeppelin.R.knitr": "true",
         "zeppelin.spark.maxResult": "1000",
