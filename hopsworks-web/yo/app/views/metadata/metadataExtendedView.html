@@ -1,5 +1,4 @@
 <div ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
-  <!--pre>showMetadata: {{ metadataExtendedCtrl.showMetadata | json }}</pre-->
   <div ng-show="datasetsCtrl.selected === null">
     <div class="file" style="text-align: center;">
       <div class="icon">
@@ -16,7 +15,7 @@
   </div>
 
   <table id="mytable1" ng-show="datasetsCtrl.selected !== null && datasetsCtrl.selected !== undefined" class="table table-bordred table-striped" style="margin-top: 16px;">
-    <tr style="background-color: #fafafa" ng-repeat="(key, value) in metadataExtendedCtrl.showMetadata">
+    <tr style="background-color: #fafafa" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay">
       <td style="color:lightgrey;">{{ key }}</td>
       <td style="color: grey;">{{ value }}</td>
     </tr>
