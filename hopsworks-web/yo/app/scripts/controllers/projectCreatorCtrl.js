@@ -121,20 +121,13 @@ angular.module('hopsWorksApp')
                         growl.success(success.successMessage, {title: 'Success', ttl: 2000});
                         console.log('project created success', success);
 
-                        $http({
-                          url: 'http://aegis-metadata.fokus.fraunhofer.de/api/catalogs',
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json;charset=utf-8'
-                          },
-                          data: {
-                            id: "3",
-                            title: self.projectName,
-                            description: self.projectDesc,
-                            publisher: {
-                              homepage: self.publisherHomepage,
-                              name: self.publisherName
-                            }
+                        ExtendedMetadataService.addCatalog({
+                          id: "3",
+                          title: self.projectName,
+                          description: self.projectDesc,
+                          publisher: {
+                            homepage: self.publisherHomepage,
+                            name: self.publisherName
                           }
                         }).then(function (result) {
                           console.log("successfully saved metadata", result);
