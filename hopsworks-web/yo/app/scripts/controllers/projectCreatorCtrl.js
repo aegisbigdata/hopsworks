@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('ProjectCreatorCtrl', ['$uibModalInstance', '$scope', '$rootScope', '$http', 'ProjectService', 'UserService', 'growl',
-          function ($uibModalInstance, $scope, $rootScope, $http, ProjectService, UserService, growl) {
+        .controller('ProjectCreatorCtrl', ['$uibModalInstance', '$scope', '$rootScope', '$http', 'ProjectService', 'UserService', 'ExtendedMetadataService', 'growl',
+          function ($uibModalInstance, $scope, $rootScope, $http, ProjectService, UserService, ExtendedMetadataService, growl) {
 
             var self = this;
 
