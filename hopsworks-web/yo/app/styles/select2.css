@@ -36,7 +36,7 @@ Version: 3.4.5 Timestamp: Mon Nov  4 08:22:42 PST 2013
     border: 1px solid #E6E6E6;
     white-space: nowrap;
     line-height: 26px;
-    color: #C8C8C8;
+    color: #B7B7B7;
     text-decoration: none;
 
     
@@ -449,7 +449,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-default {
-    color: #C8C8C8 !important;
+    color: #B7B7B7 !important;
 }
 
 .select2-container-multi .select2-choices .select2-search-choice {

@@ -599,6 +599,13 @@ angular.module('hopsWorksApp')
             self.isServiceEnabled = function(service) {
                 var idx = self.projectTypes.indexOf(service);
                 return idx === -1
-            }
+            };
+            
+            
+            
+            
+            
             
           }]);
+      
+      

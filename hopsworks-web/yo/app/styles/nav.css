@@ -11,7 +11,7 @@
 
 .nav-tabs > li {
     border-bottom: 1px solid #ddd;
-    width: 33%;
+    width: auto;
     font-weight: bold;
     text-align: center;
 }
@@ -157,7 +157,7 @@ ul.dropdown-messages .dropdown-header {
   transition: all 0.3s ease;
 }
 .ds-content.sidenav-open {
-  width: 70%;
+  width: 80%;
 }
 .ds-sidenav {
   width: 0;
@@ -171,7 +171,7 @@ ul.dropdown-messages .dropdown-header {
   -moz-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   z-index: 10;
-  height: auto;
+  height: 360px;
   border: 1px solid #E6E6E6;
 }
 .ds-sidenav.open {

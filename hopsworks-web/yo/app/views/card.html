@@ -7,7 +7,7 @@
         <i ng-if="content.type === 'ds' && content.public_ds && !content.localDataset" class="fa fa-folder-open-o fa-2" style="width: 20px; margin-left: 10px; margin-top: 10px; font-size: 11px;"     ></i>           
         
    
-      <label style="height: 40px; padding-top: 16px;">
+      <label style="height: 40px; padding-top: 16px;text-transform: uppercase">
         {{content.type === 'proj'? 'project': ''}}
         {{content.type === 'ds' && !content.public_ds ? 'dataset': ''}} 
         {{content.type === 'ds' && content.public_ds && content.localDataset ? 'public dataset in cluster': ''}}

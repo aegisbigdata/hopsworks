@@ -62,11 +62,54 @@ angular.module('hopsWorksApp', [
             flowFactoryProvider.on('catchAll', function (event) {
               console.log('catchAll', arguments);
             });
+            
+            // $(document).on('click', '.sidebar-nav li',function() {
+                
+            //    if($('.file').length > 0) {
+            //        setTimeout(function() {
+            //            $('.file .file-name > div ').matchHeight();
+            //        }, 3000);
+            //    }              
+             
+            //});
+            
+            $('.ds-content').bind('contentchanged', function() {
+                alert('fff');
+                console.log('fff');
+            })
 
             $(document).on('click', '.menu-dataset a', function(e) {
               $(this).parents('h3').find('a').removeClass('active');
               $(this).addClass('active');
             });
+            
+            $(document).on('click', '.open-position-fixed', function(e) {
+                var target_hamburger = $(this).data("target");
+                $('.position-fixed').find('.uib-dropdown-amore').hide();
+                var positiontop = $(this).parents('.file').offset().top + 40;
+                var positionleft = $(this).parents('.file').offset().left + 18;
+             
+                $('.position-fixed').each(function() {
+                    if($(this).attr("id") == target_hamburger) {
+                        $(this).css({'top': positiontop, 'left': positionleft });
+                        $(this).find('.uib-dropdown-amore').show();
+                    }
+                }); 
+                
+              
+                 if(!$(this).hasClass('fa-times')) {
+                    $('.open-position-fixed').removeClass('fa-times'); 
+                    $('.open-position-fixed').addClass('fa-bars'); 
+                    $(this).addClass('fa-times');
+                    $(this).removeClass('fa-bars');
+                    } else {
+                        $(this).addClass('fa-bars');
+                        $(this).removeClass('fa-times');
+                        $('.uib-dropdown-amore').hide();
+                    }
+                
+            });
+            
             
             $routeProvider
                     .when('/', {

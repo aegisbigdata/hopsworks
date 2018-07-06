@@ -78,7 +78,7 @@
                     <div  class="file" ng-click="zeppelinCtrl.createNewNote()">
                       <div class="icon">
                         <!--i class="glyphicon glyphicon-plus"></i MOD A11F-->
-                        <img src="images/aegis/queries_add_large.png"></img>
+                        <img src="images/aegis/queries_add_large.png" style="width: 20px"></img>
                       </div>
                       <div class="file-name">
                         <!--div style="text-align: center; color: green;"-->
@@ -95,9 +95,9 @@
                       <a><span class="corner"></span>
                         <!-- MOD A11F -->
                         <div class="icon">
-                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open_large.png"></img>
-                          <img ng-if="note.children == null " src="images/aegis/queries_open_large.png"></i>
-                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del_large.png"></img>
+                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open_large.png" style="width: 20px"></img>
+                          <img ng-if="note.children == null " src="images/aegis/queries_open_large.png" style="width: 20px"></i>
+                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del_large.png" style="width: 20px"></img>
                           <!--
                           <i ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" class="fa fa-folder"></i>
                           <i ng-if="note.children == null " class="fa fa-file-code-o"></i>
