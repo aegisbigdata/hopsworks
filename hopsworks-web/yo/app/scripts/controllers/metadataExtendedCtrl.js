@@ -95,6 +95,7 @@ angular.module('hopsWorksApp')
 
             self.saveFieldsDistribution = function () {
               self.metadataExtendedDistribution.id = $scope.$resolve.file.id.toString();
+              self.metadataExtendedDistribution.title = $scope.$resolve.file.name;
               self.metadataExtendedDistribution.access_url = "hdfs://" + $scope.$resolve.file.path;
 
               //  converts { primary: true } to primary_keys: ["nameOfField"]
