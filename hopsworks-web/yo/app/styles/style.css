@@ -31,11 +31,15 @@ button, html, input, select, textarea {
   padding: 0;
 }
 
+.button-page {
+  font-size: 1.5em;
+}
+
 a:hover, a:focus {
   outline: none;
   color: #00A2CA;
   text-decoration: none;
-  cursor: default;
+  cursor: pointer;
 }
 
 .form-validate .form-control.ng-dirty.ng-valid, .form-validate .form-control.ng-dirty.ng-valid:focus {
@@ -147,7 +151,7 @@ a:hover, a:focus {
 
 .pager li > a, .pager li > span {
   background-color: inherit;
-  /*color: #fff;*/
+  color: #00A2CA;
   border: 0px;
   border-radius: 0;
   display: inline-block;
@@ -156,7 +160,6 @@ a:hover, a:focus {
 
 .pager li > a:focus, .pager li > a:hover {
   background-color: inherit;
-  font-weight: bolder;
 }
 
 .datasetList {
@@ -529,6 +532,7 @@ md-input-container {
 .fields-in-table {
   border-style: solid;
   border-top: 0px; 
+  border-width: 1px;
   padding-left:10px;
   display: flex;
   flex-direction: column;
@@ -570,10 +574,28 @@ md-input-container {
   vertical-align: middle;
 }
 
+.menu-style {
+    font-size: 11px;
+    line-height: 13px;
+    border: 1px solid #E6E6E6;
+    box-shadow: none;
+    border-radius: none;
+    color: #333333;
+}
 
+.menu-style > li > a:hover {
+    color: #E6AD1E;
+    background-color: transparent;
+}
 
+.menu-icon-db {
+    position: absolute;
+    right: 15px;
+}
 
-
+.fa-check:before, .fa-times:before {
+    color: #B7B7B7;
+}
 
 .capbox {
 	background-color: #92D433;
@@ -607,4 +629,8 @@ md-input-container {
 	}
 
 #CaptchaInput { margin: 1px 0px 1px 0px; width: 135px; }
+
+.readme-style h1, .readme-style h2 {
+    font-size: 12px !important;
+}
 

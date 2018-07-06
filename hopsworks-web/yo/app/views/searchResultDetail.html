@@ -30,15 +30,15 @@
           
           <div class="row">
           <div class="col-sm-3 col-md-3" style="margin-bottom: 15px">
-            <label style="color: #C8C8C8; text-transform: uppercase; font-size: 8px">owner</label>
+            <label style="color: #B7B7B7; text-transform: uppercase; font-size: 9px">owner</label>
             <div class="value" style="font-size: 11px">{{viewSearchResultCtrl.content.details.user|| '--'}}</div>            
           </div>
           <div class="col-sm-7 col-md-7" style="margin-bottom: 15px">
-            <label style="color: #C8C8C8; text-transform: uppercase; font-size: 8px">Date</label>
+            <label style="color: #B7B7B7; text-transform: uppercase; font-size: 9px">Date</label>
             <div class="value" style="font-size: 11px">{{viewSearchResultCtrl.content.details.createDate| date:'short'}}</div>            
           </div>
           <div class="col-sm-2 col-md-2" style="margin-bottom: 15px; text-align: right;">
-            <label style="color: #C8C8C8; text-transform: uppercase; font-size: 8px" ng-show="viewSearchResultCtrl.content.type === 'ds'">Size</label>
+            <label style="color: #B7B7B7; text-transform: uppercase; font-size: 9px" ng-show="viewSearchResultCtrl.content.type === 'ds'">Size</label>
             <div class="value"  style="text-align: right; font-size: 11px" ng-show="viewSearchResultCtrl.content.type === 'ds'">{{viewSearchResultCtrl.sizeOnDisk(viewSearchResultCtrl.content.details.size)}}</div>            
           </div>
         </div>
@@ -91,11 +91,11 @@
                 <ul type="none" style="padding: 0px">
                   <li style=" border-bottom: 1px solid #e6e6e6;" ng-repeat="member in viewSearchResultCtrl.result.projectTeam">
                     <div ng-show="viewSearchResultCtrl.type === 'Project'">
-                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Name </span><span class="text-black"> {{member.user.fname}} {{member.user.lname}} </span><br>
-                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8">Role </span> <span class="text-black"> {{member.teamRole}}</span><br>
+                      <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7"><br>Name </span><span class="text-black"> {{member.user.fname}} {{member.user.lname}} </span><br>
+                      <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7">Role </span> <span class="text-black"> {{member.teamRole}}</span><br>
                       <br></div>
                     <div ng-show="viewSearchResultCtrl.type === 'Dataset' || viewSearchResultCtrl.type === 'Public Dataset'">
-                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Name </span><span class="text-black"> {{member.firstname}} {{member.lastname}} </span><br>
+                      <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7"><br>Name </span><span class="text-black"> {{member.firstname}} {{member.lastname}} </span><br>
                       <br></div>
                   </li>
                 </ul>
@@ -105,9 +105,9 @@
                 <label class="control-label">Datasets</label>
                   <ul type="none" style="padding: 0px">
                     <li style=" border-bottom: 1px solid #e6e6e6;" ng-repeat="dataset in viewSearchResultCtrl.result.datasets">
-                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Name</span> <span class="text-black"> {{dataset.name}}</span><br>
-                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8">Project</span> <span class="text-black"> {{dataset.owningProjectName}}</span><br>
-                      <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8">Description </span><span class="text-black"> {{dataset.description}}</span><br><br>
+                      <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7"><br>Name</span> <span class="text-black"> {{dataset.name}}</span><br>
+                      <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7">Project</span> <span class="text-black"> {{dataset.owningProjectName}}</span><br>
+                      <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7">Description </span><span class="text-black"> {{dataset.description}}</span><br><br>
                       </li>
                   </ul>
               <br></div>
@@ -115,7 +115,7 @@
                 <label class="control-label">Shared with </label>
                   <ul type="none" style="padding: 0px">
                     <li style=" border-bottom: 1px solid #e6e6e6;" ng-repeat="project in viewSearchResultCtrl.result.sharedWith">
-                        <span style="font-size: 8px; text-transform: uppercase; color: #C8C8C8"><br>Project</span> <span class="text-black"> {{project}}</span><br><br>
+                        <span style="font-size: 9px; text-transform: uppercase; color: #B7B7B7"><br>Project</span> <span class="text-black"> {{project}}</span><br><br>
                     </li>
                   </ul>
                 <br></div>

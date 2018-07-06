@@ -1,6 +1,16 @@
 .dropdown-submenu {
   position:relative;
 }
+
+.dropdown-menu > li > a {
+  font-size: 11px;
+}
+
+.dropdown-menu > li > a:hover {
+  color: #E6AD1E;
+  background-color: transparent;
+}
+
 .dropdown-submenu>.dropdown-menu {
   top:0;
   left:100%;
@@ -14,7 +24,7 @@
   display:block;
 }
 .dropdown-submenu>a:after{
-  display:block;
+  display:none;
   content:" ";
   float:right;
   width:0;

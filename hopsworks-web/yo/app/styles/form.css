@@ -153,13 +153,20 @@ textarea.form-control {
   /*margin-top: 50px; MOD A11F */
   
   padding: 20px;
-  margin-left: 200px;
+  margin-left: 220px;
+}
+
+.content-wrapper-login {
+  /*border-top: 1px solid rgba(0, 0, 0, 0.15);*/
+  /*margin-top: 50px; MOD A11F */
+  
+  padding: 20px;
 }
 
 .content-wrapper-home {
   /*border-top: 1px solid rgba(0, 0, 0, 0.15);*/
   /*margin-top: 50px; MOD A11F */
-  margin-top: 100px;
+  margin-top: 70px;
   padding: 20px;
 }
 

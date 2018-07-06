@@ -8,7 +8,7 @@
 .rg-right, .rg-left, .rg-top, .rg-bottom, .rg-bottom-datasets {
   display: block;
   width: 14px;
-  height: 14px;
+  height: 20px;
   line-height: 14px;
   position: absolute;
   z-index: 1;
@@ -35,11 +35,21 @@
 }
 
 .rg-top span, .rg-bottom span, rg-bottom-datasets span {
-  border-width: 1px 0;
+  font-family: "FontAwesome";
   left: 50%;
-  margin: 3.5px 0 0 -10px;
   width: 20px;
-  height: 7px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #00A2CA;
+  text-align: center;
+  padding-top: 3px;
+}
+
+.rg-bottom span:before {
+  content: "\f0c9";
+  font-size: 11px;
+  color: #FFFFFF;
+  margin-left: -1px;
 }
 
 .rg-top {
@@ -65,7 +75,8 @@
   left: 0;
   margin-bottom: -14px;
   z-index: 3;
-  background: #eee;
+  background-image: url("../images/quadratino.png");'           
+
 }
 
 .rg-left {
@@ -100,7 +111,6 @@
 }
 
 .rg-row-top-ds {
-    background:#fff;
     border-radius: 3px;
     border: 1px solid transparent; 
     height: 70%; 
@@ -112,7 +122,7 @@
 
 .rg-row-top-ds > div.rg-bottom {
   margin-bottom: 0px !important;
-  width: 96%;
+  width: 90%;
   margin-left: 14px;
 }
 
@@ -136,6 +146,7 @@
     border: 1px solid transparent;
     overflow: hidden;
     z-index: 3;
+    width: 96.5%;
 }
 
 .ds-box {
