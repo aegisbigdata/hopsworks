@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 'use strict';
 
 angular.module('hopsWorksApp')
@@ -819,24 +839,11 @@ angular.module('hopsWorksApp')
             /**
              * Opens a modal dialog to make dataset editable
              * @param {type} name
+             * @param {type} permissions
              * @returns {undefined}
              */
-            self.makeEditable = function (name) {
-              ModalService.makeEditable('md', name).then(
-                      function (success) {
-                        growl.success(success.data.successMessage, {title: 'Success', ttl: 5000});
-                        getDirContents();
-                      }, function (error) {
-              });
-            };
-
-            /**
-             * Opens a modal dialog to remove editable from the dataset 
-             * @param {type} name
-             * @returns {undefined}
-             */
-            self.removeEditable = function (name) {
-              ModalService.removeEditable('md', name).then(
+            self.permissions = function (name, permissions) {
+              ModalService.permissions('md', name, permissions).then(
                       function (success) {
                         growl.success(success.data.successMessage, {title: 'Success', ttl: 5000});
                         getDirContents();

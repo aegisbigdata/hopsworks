@@ -1,3 +1,23 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
 <div ng-controller="MainCtrl as mainCtrl">
   <!--div ng-include="'nav.html'"></div MOD A11F-->
   <div ng-include="'navBarProject.html'"></div>
@@ -10,8 +30,14 @@
   </div>
       
   <div class="container content-wrapper-home" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl"> 
-      <div class="pull-left" id="toursBox">
-      <div class="pull-left" style="min-width: 220px; max-width:220px">
+    <div class="alert alert-warning alert-dismissable" ng-if="mainCtrl.userNotification !== ''">
+      <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      <p align="center"><i class="fa fa-bullhorn"></i> <strong>Notification!</strong> {{mainCtrl.userNotification}}
+        <a class="alert-link" data-dismiss="alert" ng-click="mainCtrl.profileModal()" aria-label="Profile">Change now.</a>
+      </p>
+    </div>
+    <div class="pull-left" id="toursBox">
+      <div class="pull-left" style="min-width: 220px; max-width: 220px">
         <!--div class="list-group">
           <a href="" class="list-group-item active">Help</a>
           <a href=""
@@ -440,13 +466,15 @@
             </button>
           </span>
         </div>
-        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects">
+        
+        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
           <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
              href="#!/project/{{project.project.id}}"
              class="list-group-item"
              context-menu
              data-target="menu-{{$index}}"
-             id="{{project.project.name.substr(0, 5) === 'demo_'}}" style="border-top: none;">
+             id="{{project.project.name.substr(0, 5) === 'demo_'}}" style="border-top: none;"
+             title="{{project.project.name.length > 17 ? project.project.name:''}}">
             <div ng-if="project.teamRole === 'Data scientist'">
               <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-lock fa-2 pull-left"></i>
             </div>
