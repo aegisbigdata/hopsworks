@@ -1,6 +1,26 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.dao.pythonDeps;
 
-import io.hops.hopsworks.common.dao.host.Host;
+import io.hops.hopsworks.common.dao.host.Hosts;
 import io.hops.hopsworks.common.dao.project.Project;
 import java.io.Serializable;
 import java.util.Date;
@@ -43,7 +63,7 @@ import javax.xml.bind.annotation.XmlRootElement;
           = "SELECT c FROM CondaCommands c WHERE c.op = :op"),
   @NamedQuery(name = "CondaCommands.findByProj",
           query
-          = "SELECT c FROM CondaCommands c WHERE c.proj = :proj"),
+          = "SELECT c FROM CondaCommands c WHERE c.projectId = :projectId"),
   @NamedQuery(name = "CondaCommands.findByChannelUrl",
           query
           = "SELECT c FROM CondaCommands c WHERE c.channelUrl = :channelUrl"),
@@ -108,7 +128,20 @@ public class CondaCommands implements Serializable {
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
   private PythonDepsFacade.CondaStatus status;
-
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1,
+          max = 52)
+  @Column(name = "install_type")
+  @Enumerated(EnumType.STRING)
+  private PythonDepsFacade.CondaInstallType installType;
+  @Basic(optional = false)
+  @NotNull
+  @Size(min = 1,
+          max = 52)
+  @Column(name = "machine_type")
+  @Enumerated(EnumType.STRING)
+  private PythonDepsFacade.MachineType machineType;
   @Basic(optional = false)
   @NotNull
   @Column(name = "created")
@@ -121,14 +154,15 @@ public class CondaCommands implements Serializable {
   @JoinColumn(name = "host_id",
           referencedColumnName = "id")
   @ManyToOne(optional = false)
-  private Host hostId;
+  private Hosts hostId;
 
   public CondaCommands() {
   }
 
-  public CondaCommands(Host h, String user, PythonDepsFacade.CondaOp op,
-          PythonDepsFacade.CondaStatus status, Project project, String lib,
-          String version, String channelUrl,  Date created, String arg) {
+  public CondaCommands(Hosts h, String user, PythonDepsFacade.CondaOp op,
+          PythonDepsFacade.CondaStatus status, PythonDepsFacade.CondaInstallType installType,
+          PythonDepsFacade.MachineType machineType, Project project, String lib, String version, String channelUrl,
+                       Date created, String arg) {
     this.hostId = h;
     if (op  == null || user == null || project == null) { 
       throw new NullPointerException("Op/user/project cannot be null");
@@ -138,6 +172,8 @@ public class CondaCommands implements Serializable {
     this.proj = project.getName();
     this.projectId = project;
     this.status = status;
+    this.installType = installType;
+    this.machineType = machineType;
     this.created = created;
     this.channelUrl = channelUrl;
     this.lib = lib;
@@ -218,11 +254,11 @@ public class CondaCommands implements Serializable {
     this.projectId = projectId;
   }
 
-  public Host getHostId() {
+  public Hosts getHostId() {
     return hostId;
   }
 
-  public void setHostId(Host hostId) {
+  public void setHostId(Hosts hostId) {
     this.hostId = hostId;
   }
 
@@ -240,6 +276,22 @@ public class CondaCommands implements Serializable {
 
   public void setStatus(PythonDepsFacade.CondaStatus status) {
     this.status = status;
+  }
+
+  public PythonDepsFacade.CondaInstallType getInstallType() {
+    return installType;
+  }
+
+  public void setInstallType(PythonDepsFacade.CondaInstallType installType) {
+    this.installType = installType;
+  }
+
+  public PythonDepsFacade.MachineType getMachineType() {
+    return machineType;
+  }
+
+  public void setMachineType(PythonDepsFacade.MachineType machineType) {
+    this.machineType = machineType;
   }
 
   

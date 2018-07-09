@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.hops</groupId>
   <artifactId>hopsworks</artifactId>
-  <version>0.1.0</version>
+  <version>0.4.1</version>
   <packaging>pom</packaging>
   <name>hopsworks</name>
   <description>Hopsworks parent project</description>
@@ -15,12 +35,22 @@
     <module>hopsworks-kmon</module>
     <module>hopsworks-admin</module>
     <module>hopsworks-api</module>
+    <module>hopsworks-api-v2</module>
     <module>hopsworks-ear</module>
     <module>hopsworks-ca</module>
     <module>hopsworks-dela</module>
   </modules>
 
   <profiles>
+    <profile>
+      <id>cluster</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation> 
+      <modules>
+        <module>hopsworks-cluster</module>
+      </modules>
+    </profile>
     <profile>
       <id>web</id>
       <activation>
@@ -34,10 +64,11 @@
 
   <properties>
     <java.version>1.8</java.version>
+    <hops.version>2.8.2.3</hops.version>
     <dependency.plugin.version>2.8</dependency.plugin.version>
     <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+    
     <glassfish.hostname>localhost</glassfish.hostname>
     <glassfish.admin>adminuser</glassfish.admin>
     <glassfish.passwd>adminpw</glassfish.passwd>           
@@ -66,6 +97,13 @@
   </dependencies>
   <build>
     <finalName>hopsworks</finalName>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -155,4 +193,30 @@
       </releases>
     </repository>
   </repositories>
+  <!-- Spacer //-->
+  <scm>
+    <connection>scm:git:https://github.com/hopshadoop/hopsworks.git</connection>
+    <developerConnection>scm:git:git@github.com:hopshadoop/hopsworks.git</developerConnection>
+    <url>https://github.com/hopshadoop/hopsworks</url>
+    <tag>hopsworks-0.3.0-SNAPSHOT</tag>
+  </scm>
+  <!-- Spacer //-->
+  <distributionManagement>
+    <repository>
+      <id>sics-release-repository</id>
+      <name>SICS Repository</name>
+      <url>scpexe://kompics.i.sics.se/home/maven/repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>sics-snapshot-repository</id>
+      <name>SICS Snapshot Repository</name>
+      <url>scpexe://kompics.i.sics.se/home/maven/snapshotrepository</url>
+    </snapshotRepository>
+    <site>
+      <id>kompics-site</id>
+      <url>scpexe://kompics.i.sics.se/var/www/kompics/report/trunk</url>
+    </site>
+    <downloadUrl>http://kompics.i.sics.se/maven/repository</downloadUrl>
+  </distributionManagement>
+  
 </project>

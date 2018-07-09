@@ -1,63 +1,49 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.dao.user.security.audit;
 
 public enum AccountsAuditActions {
-
-  // for password change
-  PASSWORDCHANGE("PASSWORD CHANGE"),
-  // for security question change
-  SECQUESTIONCHANGE("SECURITY QUESTION CHANGE"),
-  // for profile update
-  PROFILEUPDATE("PROFILE UPDATE"),
-  // for approving/changing status of users
   USERMANAGEMENT("USER MANAGEMENT"),
-  // for mobile lost or yubikeyu lost devices
+  PROFILEUPDATE("PROFILE UPDATE"),
   LOSTDEVICE("LOST DEVICE REPORT"),
-  // for adminchange user account status
   CHANGEDSTATUS("CHANGED STATUS"),
-  // to get registration audit logs
   REGISTRATION("REGISTRATION"),
+  SECQUESTIONCHANGE("SECURITY QUESTION CHANGE"),
   UNREGISTRATION("UNREGISTRATION"),
   RECOVERY("RECOVERY"),
-
   QRCODE("QR CODE"),
-
+  PASSWORDCHANGE("PASSWORD CHANGE"),
   SECQUESTION("SECURTY QUESTION RESET"),
-
   PROFILE("PROFILE UPDATE"),
   PASSWORD("PASSWORD CHANGE"),
   TWO_FACTOR("TWO FACTOR CHANGE"),
-  // get all the logs
-  ALL("ALL"),
-
-  SUCCESS("SUCCESS"),
-
+  ABORTED("ABORTED"),
   FAILED("FAILED"),
-
-  ABORTED("ABORTED");
+  SUCCESS("SUCCESS"),
+  ALL("ALL");
 
   private final String value;
 
-  private AccountsAuditActions(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public static AccountsAuditActions getAccountsAuditActions(String text) {
-    if (text != null) {
-      for (AccountsAuditActions b : AccountsAuditActions.values()) {
-        if (text.equalsIgnoreCase(b.value)) {
-          return b;
-        }
-      }
-    }
-    return null;
-  }
+  AccountsAuditActions(String value) { this.value = value; }
 
   @Override
-  public String toString() {
-    return value;
-  }
+  public String toString() { return value; }
 }

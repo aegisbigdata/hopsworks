@@ -1,9 +1,29 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.admin.user.account;
 
 import com.google.zxing.WriterException;
 import io.hops.hopsworks.admin.lims.MessagesController;
 import io.hops.hopsworks.common.constants.auth.AccountStatusErrorMessages;
-import io.hops.hopsworks.common.constants.auth.AuthenticationConstants;
+import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.util.EmailBean;
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,17 +37,19 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import io.hops.hopsworks.common.util.Settings;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.primefaces.model.StreamedContent;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.security.audit.AccountsAuditActions;
-import io.hops.hopsworks.common.dao.user.security.audit.AuditManager;
-import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountStatus;
-import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountType;
+import io.hops.hopsworks.common.dao.user.security.audit.AccountAuditFacade;
+import io.hops.hopsworks.common.dao.user.security.ua.UserAccountStatus;
 import io.hops.hopsworks.common.dao.user.security.ua.SecurityUtils;
 import io.hops.hopsworks.common.dao.user.security.ua.UserAccountsEmailMessages;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
+import io.hops.hopsworks.common.user.UsersController;
 import io.hops.hopsworks.common.util.QRCodeGenerator;
 import org.primefaces.model.DefaultStreamedContent;
 
@@ -38,13 +60,15 @@ public class RecoverySelector implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @EJB
-  private UserManager um;
+  protected UsersController usersController;
+  @EJB
+  private UserFacade userFacade;
 
   @EJB
   private EmailBean email;
 
   @EJB
-  private AuditManager am;
+  private AccountAuditFacade am;
 
   private Users people;
 
@@ -58,7 +82,7 @@ public class RecoverySelector implements Serializable {
   private String tmpCode;
   private String passwd;
 
-  private final int passwordLength = AuthenticationConstants.PASSWORD_MIN_LENGTH;
+  private final int passwordLength = Settings.PASSWORD_MIN_LENGTH;
 
   private int qrEnabled = -1;
 
@@ -127,11 +151,7 @@ public class RecoverySelector implements Serializable {
     if (console.equals("Mobile")) {
       return "mobile_recovery";
     }
-
-    if (console.equals("Yubikey")) {
-      return "yubikey_recovery";
-    }
-
+    
     return "";
   }
 
@@ -143,63 +163,55 @@ public class RecoverySelector implements Serializable {
    */
   public String sendQrCode() throws SocketException {
 
-    people = um.getUserByEmail(this.uname);
-
+    people = userFacade.findByEmail(this.uname);
+    HttpServletRequest httpServletRequest = (HttpServletRequest) FacesContext.
+        getCurrentInstance().getExternalContext().getRequest();
     try {
 
       if (people != null && people.getPassword().equals(DigestUtils.sha256Hex(passwd))) {
 
         // Check the status to see if user is not blocked or deactivate
-        if (people.getStatus().equals(PeopleAccountStatus.BLOCKED_ACCOUNT)) {
+        if (people.getStatus().equals(UserAccountStatus.BLOCKED_ACCOUNT)) {
           MessagesController.addSecurityErrorMessage(
               AccountStatusErrorMessages.BLOCKED_ACCOUNT);
 
-          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
+          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(), AccountsAuditActions.FAILED.name(),
+              "", people, httpServletRequest);
 
           return "";
         }
 
-        if (people.getStatus().equals(PeopleAccountStatus.DEACTIVATED_ACCOUNT)) {
+        if (people.getStatus().equals(UserAccountStatus.DEACTIVATED_ACCOUNT)) {
           MessagesController.addSecurityErrorMessage(
               AccountStatusErrorMessages.DEACTIVATED_ACCOUNT);
-          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
-          return "";
-        }
-
-        if (people.getMode().equals(PeopleAccountType.Y_ACCOUNT_TYPE)) {
-          MessagesController.addSecurityErrorMessage(
-              AccountStatusErrorMessages.YUBIKEY);
-          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
-
+          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(), AccountsAuditActions.FAILED.name(),
+              "", people, httpServletRequest);
           return "";
         }
 
         // generate a randome secret of legth 6
         String random = SecurityUtils.getRandomPassword(passwordLength);
-        um.updateSecret(people.getUid(), random);
+        usersController.updateSecret(people.getUid(), random);
         String message = UserAccountsEmailMessages.buildTempResetMessage(random);
         email.sendEmail(people.getEmail(), RecipientType.TO,
             UserAccountsEmailMessages.ACCOUNT_PASSWORD_RESET, message);
 
-        am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-            AccountsAuditActions.SUCCESS.name(), "Reset QR code.", people);
+        am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(), AccountsAuditActions.SUCCESS.name(),
+            "Reset QR code.", people, httpServletRequest);
 
         return "validate_code";
       } else {
         MessagesController.addSecurityErrorMessage(
             AccountStatusErrorMessages.INCCORCT_CREDENTIALS);
         if (people != null) {
-          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
+          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(), AccountsAuditActions.FAILED.name(),
+              "", people, httpServletRequest);
         }
         return "";
       }
     } catch (MessagingException ex) {
-      am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-          AccountsAuditActions.FAILED.name(), "", people);
+      am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(), AccountsAuditActions.FAILED.name(),
+          "", people, httpServletRequest);
 
     }
 
@@ -215,7 +227,7 @@ public class RecoverySelector implements Serializable {
    */
   public String validateTmpCode() {
     qrCode = null;
-    people = um.getUserByEmail(this.uname);
+    people = userFacade.findByEmail(this.uname);
 
     if (people == null) {
       MessagesController.addSecurityErrorMessage(
@@ -224,50 +236,49 @@ public class RecoverySelector implements Serializable {
     }
 
     // Check the status to see if user is not blocked or deactivate
-    if (people.getStatus().equals(PeopleAccountStatus.BLOCKED_ACCOUNT)) {
+    if (people.getStatus().equals(UserAccountStatus.BLOCKED_ACCOUNT)) {
       MessagesController.addSecurityErrorMessage(
               AccountStatusErrorMessages.BLOCKED_ACCOUNT);
       return "";
     }
 
-    if (people.getStatus().equals(PeopleAccountStatus.DEACTIVATED_ACCOUNT)) {
+    if (people.getStatus().equals(UserAccountStatus.DEACTIVATED_ACCOUNT)) {
       MessagesController.addSecurityErrorMessage(
               AccountStatusErrorMessages.DEACTIVATED_ACCOUNT);
       return "";
     }
 
+    HttpServletRequest httpServletRequest = (HttpServletRequest) FacesContext.
+        getCurrentInstance().getExternalContext().getRequest();
     if (people.getSecret() == null ? tmpCode == null : people.getSecret().
             equals(this.tmpCode)) {
 
       try {
         String otpSecret = SecurityUtils.calculateSecretKey();
 
-        um.updateSecret(people.getUid(), otpSecret);
+        usersController.updateSecret(people.getUid(), otpSecret);
         qrCode = new DefaultStreamedContent(QRCodeGenerator.getQRCode(people.
-                getEmail(),
-                AuthenticationConstants.ISSUER, otpSecret), "image/png");
-
+                getEmail(), Settings.ISSUER, otpSecret), "image/png");
         qrEnabled = 1;
-        am.registerAccountChange(people, AccountsAuditActions.QRCODE.name(),
-                AccountsAuditActions.SUCCESS.name(), "QR code reset.", people);
-
+        am.registerAccountChange(people, AccountsAuditActions.QRCODE.name(), AccountsAuditActions.SUCCESS.name(),
+            "QR code reset.", people, httpServletRequest);
         return "qrcode";
 
-      } catch (IOException | WriterException | NoSuchAlgorithmException ex) {
+      } catch (IOException | WriterException | NoSuchAlgorithmException e) {
         Logger.getLogger(RecoverySelector.class.getName()).log(Level.SEVERE,
-                null, ex);
+                null, e);
       }
 
     } else {
       int val = people.getFalseLogin();
-      um.increaseLockNum(people.getUid(), val + 1);
-      if (val > AuthenticationConstants.ALLOWED_FALSE_LOGINS) {
-        um.changeAccountStatus(people.getUid(), "",
-                PeopleAccountStatus.BLOCKED_ACCOUNT);
+      usersController.increaseLockNum(people.getUid(), val + 1);
+      if (val > Settings.ALLOWED_FALSE_LOGINS) {
+        usersController.changeAccountStatus(people.getUid(), "",
+                UserAccountStatus.BLOCKED_ACCOUNT);
         try {
           am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
                   AccountsAuditActions.SUCCESS.name(),
-                  "Account bloecked due to many false attempts.", people);
+                  "Account bloecked due to many false attempts.", people, httpServletRequest);
 
           email.sendEmail(people.getEmail(), RecipientType.TO,
                   UserAccountsEmailMessages.ACCOUNT_BLOCKED__SUBJECT,
@@ -277,98 +288,9 @@ public class RecoverySelector implements Serializable {
         }
       }
 
-      MessagesController.addSecurityErrorMessage(
-              AccountStatusErrorMessages.INCCORCT_TMP_PIN);
+      MessagesController.addSecurityErrorMessage(AccountStatusErrorMessages.INCORRECT_TMP_PIN);
 
       return "";
-    }
-    return "";
-  }
-
-  /**
-   * Register lost Yubikey device.
-   * <p>
-   * @return
-   * @throws java.net.SocketException
-   */
-  public String sendYubiReq() throws SocketException {
-
-    people = um.getUserByEmail(this.uname);
-
-    if (people == null) {
-      MessagesController.addSecurityErrorMessage(
-              AccountStatusErrorMessages.USER_NOT_FOUND);
-
-      return "";
-    }
-
-    if (people.getStatus().equals(PeopleAccountStatus.BLOCKED_ACCOUNT)) {
-      MessagesController.addSecurityErrorMessage(
-              AccountStatusErrorMessages.BLOCKED_ACCOUNT);
-      am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
-      return "";
-    }
-
-    if (!people.getMode().equals(PeopleAccountType.Y_ACCOUNT_TYPE)) {
-      MessagesController.addSecurityErrorMessage(
-              AccountStatusErrorMessages.USER_NOT_FOUND);
-
-      am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
-
-      return "";
-    }
-
-    try {
-      if (people.getPassword().equals(DigestUtils.sha256Hex(passwd))) {
-
-        String message = UserAccountsEmailMessages.buildYubikeyResetMessage();
-        people.
-                setStatus(PeopleAccountStatus.NEW_YUBIKEY_ACCOUNT);
-        people.getYubikey().setStatus(PeopleAccountStatus.LOST_YUBIKEY);
-        um.updatePeople(people);
-        email.sendEmail(people.getEmail(), RecipientType.TO,
-                UserAccountsEmailMessages.DEVICE_LOST_SUBJECT, message);
-
-        am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-                AccountsAuditActions.SUCCESS.name(), "", people);
-        return "yubico_reset";
-      } else {
-
-        int val = people.getFalseLogin();
-        um.increaseLockNum(people.getUid(), val + 1);
-        if (val > AuthenticationConstants.ALLOWED_FALSE_LOGINS) {
-          um.changeAccountStatus(people.getUid(), "",
-                  PeopleAccountStatus.BLOCKED_ACCOUNT);
-          am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-                  AccountsAuditActions.SUCCESS.name(),
-                  "Account bloecked due to many false attempts.", people);
-
-          try {
-            email.sendEmail(people.getEmail(), RecipientType.TO,
-                    UserAccountsEmailMessages.ACCOUNT_BLOCKED__SUBJECT,
-                    UserAccountsEmailMessages.accountBlockedMessage());
-          } catch (MessagingException ex1) {
-
-            am.registerAccountChange(people, AccountsAuditActions.RECOVERY.
-                    name(),
-                    AccountsAuditActions.FAILED.name(), "", people);
-
-          }
-        }
-
-        MessagesController.addSecurityErrorMessage(
-                AccountStatusErrorMessages.INCCORCT_CREDENTIALS);
-
-        am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-                AccountsAuditActions.FAILED.name(), "", people);
-
-        return "";
-      }
-    } catch (MessagingException ex) {
-      am.registerAccountChange(people, AccountsAuditActions.RECOVERY.name(),
-              AccountsAuditActions.FAILED.name(), "", people);
     }
     return "";
   }

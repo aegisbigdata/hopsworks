@@ -1,9 +1,30 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.hopssite;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.hopssite.dto.CommentIssueReqDTO;
+import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
+import io.hops.hopsworks.common.user.UsersController;
 import io.hops.hopsworks.common.util.Settings;
 import io.hops.hopsworks.dela.dto.hopssite.CommentDTO;
 import io.hops.hopsworks.dela.dto.hopssite.CommentIssueDTO;
@@ -38,7 +59,9 @@ public class CommentService {
   @EJB
   private HopssiteController hopsSite;
   @EJB
-  private UserManager userBean;
+  protected UsersController usersController;
+  @EJB
+  private UserFacade userFacade;
   @EJB
   private Settings settings;
   @EJB
@@ -67,7 +90,7 @@ public class CommentService {
   public Response addComment(@Context SecurityContext sc, String content) throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "hops-site:comment:add {0}", publicDSId);
     String publicCId = SettingsHelper.clusterId(settings);
-    Users user = SettingsHelper.getUser(userBean, sc.getUserPrincipal().getName());
+    Users user = SettingsHelper.getUser(userFacade, sc.getUserPrincipal().getName());
     CommentDTO.Publish comment = new CommentDTO.Publish(user.getEmail(), content);
     hopsSite.performAsUser(user, new HopsSite.UserFunc<String>() {
       @Override
@@ -86,7 +109,7 @@ public class CommentService {
     throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "hops-site:comment:update {0}", publicDSId);
     String publicCId = SettingsHelper.clusterId(settings);
-    Users user = SettingsHelper.getUser(userBean, sc.getUserPrincipal().getName());
+    Users user = SettingsHelper.getUser(userFacade, sc.getUserPrincipal().getName());
     CommentDTO.Publish comment = new CommentDTO.Publish(user.getEmail(), content);
     hopsSite.performAsUser(user, new HopsSite.UserFunc<String>() {
       @Override
@@ -105,7 +128,7 @@ public class CommentService {
     throws ThirdPartyException, ThirdPartyException, ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "hops-site:comment:delete {0}", publicDSId);
     String publicCId = SettingsHelper.clusterId(settings);
-    Users user = SettingsHelper.getUser(userBean, sc.getUserPrincipal().getName());
+    Users user = SettingsHelper.getUser(userFacade, sc.getUserPrincipal().getName());
     hopsSite.performAsUser(user, new HopsSite.UserFunc<String>() {
       @Override
       public String perform() throws ThirdPartyException {
@@ -124,7 +147,7 @@ public class CommentService {
     CommentIssueReqDTO commentReqIssue) throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "hops-site:comment:report {0}", publicDSId);
     String publicCId = SettingsHelper.clusterId(settings);
-    Users user = SettingsHelper.getUser(userBean, sc.getUserPrincipal().getName());
+    Users user = SettingsHelper.getUser(userFacade, sc.getUserPrincipal().getName());
     LOG.log(Settings.DELA_DEBUG, "hops-site:comment:report issue:{0}", commentReqIssue);
 //    CommentIssueDTO commentIssue
 //      = new CommentIssueDTO(commentReqIssue.getType(), commentReqIssue.getMsg(), user.getEmail());
