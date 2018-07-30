@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
 
   <body>
     <ui:composition>
+<<<<<<< HEAD
       <h:form class="stylelayout" id="formToolbar">  
         <p:toolbar styleClass="MainToolbar">
           <p:toolbarGroup align="left">              
@@ -35,6 +52,21 @@ and open the template in the editor.
           </p:toolbarGroup>  
 
         </p:toolbar> 
+=======
+      <h:form id="toolbarForm"> 
+        <p:toolbar>
+          <f:facet name="left" rendered="#{roleEnforcementPoint.loggedIn}">
+            <p:commandButton value="Hopsworks" action="#{facesContext.externalContext.redirect('/hopsworks')}" ajax="false" process="@toolbarForm" icon="ui-icon-extlink"/>
+            <p:commandButton value="Admin Home" action="adminIndex" ajax="false" process="@toolbarForm" icon="ui-icon-arrowrefresh-1-w"/>
+          </f:facet>
+          <f:facet name="right" rendered="#{roleEnforcementPoint.loggedIn}">
+            <p:menuButton value=" #{userAdministration.loginName}" id="userBtn">
+              <p:menuitem value="My Account" action="#{userAdministration.showProfile()}" icon="ui-icon-person"/>
+              <p:menuitem value="Logout" action="#{roleEnforcementPoint.logOut()}" icon="ui-icon-extlink"/>           
+            </p:menuButton>
+          </f:facet>
+        </p:toolbar>        
+>>>>>>> hopshadoop/master
       </h:form>
     </ui:composition>
   </body>

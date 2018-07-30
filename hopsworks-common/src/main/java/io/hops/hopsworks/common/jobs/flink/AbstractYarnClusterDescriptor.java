@@ -1,19 +1,21 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 package io.hops.hopsworks.common.jobs.flink;
 
@@ -520,17 +522,20 @@ public abstract class AbstractYarnClusterDescriptor implements
     GetNewApplicationResponse appResponse = yarnApplication.
         getNewApplicationResponse();
   
-    Map<String, String> jobSystemProperties = new HashMap<>(2);
+    Map<String, String> jobSystemProperties = new HashMap<>(3);
   
+    // When Hops RPC TLS is enabled, Yarn will take care of application certificate
     // Certificates are materialized locally so DFSClient can be set to null
     // LocalResources are not used by Flink, so set it null
-    HopsUtils.copyUserKafkaCerts(services.getUserCerts(), project, username,
-        services.getSettings().getHopsworksTmpCertDir(),
-        services.getSettings().getHdfsTmpCertDir(), JobType.FLINK,
-        null, null, jobSystemProperties,
-        services.getSettings().getFlinkKafkaCertDir(),
-        appResponse.getApplicationId().toString(),
-        services.getCertificateMaterializer(), services.getSettings().getHopsRpcTls());
+    if (!services.getSettings().getHopsRpcTls()) {
+      HopsUtils.copyProjectUserCerts(project, username,
+          services.getSettings().getHopsworksTmpCertDir(),
+          services.getSettings().getHdfsTmpCertDir(), JobType.FLINK,
+          null, null, jobSystemProperties,
+          services.getSettings().getFlinkKafkaCertDir(),
+          appResponse.getApplicationId().toString(),
+          services.getCertificateMaterializer(), services.getSettings().getHopsRpcTls());
+    }
   
     StringBuilder tmpBuilder = new StringBuilder();
     for (Map.Entry<String, String> prop : jobSystemProperties.entrySet()) {

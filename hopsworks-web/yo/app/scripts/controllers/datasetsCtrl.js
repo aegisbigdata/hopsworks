@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 'use strict';
 
 angular.module('hopsWorksApp')
@@ -39,7 +59,7 @@ angular.module('hopsWorksApp')
             self.shared = undefined;
             self.status = undefined;
 
-            self.tgState = true;
+            self.tgState = false;
 
             self.onSuccess = function (e) {
               growl.success("Copied to clipboard", {title: '', ttl: 1000});
@@ -246,7 +266,7 @@ angular.module('hopsWorksApp')
               }
               getDirContents();
 
-              self.tgState = true;
+              self.tgState = false;
             };
 
             init();
@@ -442,9 +462,26 @@ angular.module('hopsWorksApp')
               });
             };
 
+            self.zip = function (filename) {
+              var pathArray = self.pathArray.slice(0);
+//              pathArray.push(self.selected);
+              pathArray.push(filename);
+              var filePath = getPath(pathArray);
+
+              growl.info("Started zipping...",
+                      {title: 'Zipping Started', ttl: 2000, referenceId: 4});
+              dataSetService.zip(filePath).then(
+                      function (success) {
+                        growl.success("Refresh your browser when finished",
+                                {title: 'Zipping in Background', ttl: 5000, referenceId: 4});
+                      }, function (error) {
+                growl.error(error.data.errorMsg, {title: 'Error zipping file', ttl: 5000, referenceId: 4});
+              });
+            };
+
             self.isZippedfile = function () {
 
-// https://stackoverflow.com/questions/680929/how-to-extract-extension-from-filename-string-in-javascript
+              // https://stackoverflow.com/questions/680929/how-to-extract-extension-from-filename-string-in-javascript
               var re = /(?:\.([^.]+))?$/;
               var ext = re.exec(self.selected)[1];
               switch (ext) {
@@ -467,6 +504,14 @@ angular.module('hopsWorksApp')
               return false;
             };
 
+            self.isDirectory = function () {
+                if (!(self.selected == null)) {
+                    return (self.selected).dir;
+                } else {
+                    return false;
+                }
+            };
+
             self.convertIPythonNotebook = function (filename) {
               var pathArray = self.pathArray.slice(0);
               pathArray.push(filename); //self.selected
@@ -483,6 +528,7 @@ angular.module('hopsWorksApp')
                 growl.error(error.data.errorMsg, {title: 'Error converting notebook', ttl: 5000, referenceId: 4});
               });
             };
+           
 
             self.isIPythonNotebook = function () {
               if (self.selected === null || self.selected === undefined) {
@@ -820,24 +866,11 @@ angular.module('hopsWorksApp')
             /**
              * Opens a modal dialog to make dataset editable
              * @param {type} name
+             * @param {type} permissions
              * @returns {undefined}
              */
-            self.makeEditable = function (name) {
-              ModalService.makeEditable('md', name).then(
-                      function (success) {
-                        growl.success(success.data.successMessage, {title: 'Success', ttl: 5000});
-                        getDirContents();
-                      }, function (error) {
-              });
-            };
-
-            /**
-             * Opens a modal dialog to remove editable from the dataset 
-             * @param {type} name
-             * @returns {undefined}
-             */
-            self.removeEditable = function (name) {
-              ModalService.removeEditable('md', name).then(
+            self.permissions = function (name, permissions) {
+              ModalService.permissions('md', name, permissions).then(
                       function (success) {
                         growl.success(success.data.successMessage, {title: 'Success', ttl: 5000});
                         getDirContents();
@@ -871,6 +904,7 @@ angular.module('hopsWorksApp')
                 var newPathArray = self.pathArray.slice(0);
                 newPathArray.push(file.name);
                 getDirContents(newPathArray);
+                self.tgState = false;
               } else if (!file.underConstruction) {
                 ModalService.confirm('sm', 'Confirm', 'Do you want to download this file?').then(
                         function (success) {
@@ -916,6 +950,7 @@ angular.module('hopsWorksApp')
               var newPathArray = self.pathArray.slice(0);
               newPathArray.splice(index, newPathArray.length - index);
               getDirContents(newPathArray);
+              self.tgState = false;
             };
 
             self.menustyle = {
@@ -942,6 +977,7 @@ angular.module('hopsWorksApp')
               if (self.isSelectedFiles() > 0) {
                 self.selected = null;
               } else {
+                self.tgState = true;
                 self.selected = file.name;
               }
               $rootScope.$broadcast('file-selected', file);
@@ -1034,6 +1070,7 @@ angular.module('hopsWorksApp')
                 self.selected = Object.keys(self.selectedFiles)[0];
               }
               self.all_selected = false;
+              self.tgState = false;
 
             };
 

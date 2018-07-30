@@ -1,13 +1,37 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.hive;
 
 import io.hops.hopsworks.common.dao.dataset.Dataset;
+import io.hops.hopsworks.common.dao.dataset.DatasetPermissions;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dao.dataset.DatasetType;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.hdfsUser.HdfsUsers;
+import io.hops.hopsworks.common.dao.log.operation.OperationType;
 import io.hops.hopsworks.common.dao.project.Project;
+import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.user.Users;
+import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.security.BaseHadoopClientsService;
@@ -16,7 +40,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -27,6 +50,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,16 +67,18 @@ public class HiveController {
   private DatasetFacade datasetFacade;
   @EJB
   private BaseHadoopClientsService bhcs;
-
-
+  @EJB
+  private ProjectFacade projectFacade;
+  @EJB
+  private DatasetController datasetController;
+  
   private final static String driver = "org.apache.hive.jdbc.HiveDriver";
   private final static Logger logger = Logger.getLogger(HiveController.class.getName());
 
   private Connection conn;
   private String jdbcString = null;
 
-  @PostConstruct
-  public void init() {
+  private void initConnection() throws SQLException{
     try {
       // Load Hive JDBC Driver
       Class.forName(driver);
@@ -66,16 +92,11 @@ public class HiveController {
           "sslKeyStore=" + bhcs.getSuperKeystorePath() + ";" +
           "keyStorePassword=" + bhcs.getSuperKeystorePassword();
 
-      // Create connection
-      initConnection();
-    } catch (ClassNotFoundException | SQLException e) {
+      conn = DriverManager.getConnection(jdbcString);
+    } catch (ClassNotFoundException e) {
       logger.log(Level.SEVERE, "Error opening Hive JDBC connection: " +
         e);
     }
-  }
-
-  private void initConnection() throws SQLException{
-    conn = DriverManager.getConnection(jdbcString);
   }
 
   @PreDestroy
@@ -118,10 +139,14 @@ public class HiveController {
     dbDataset.setType(DatasetType.HIVEDB);
     // As we are running Zeppelin as projectGenericUser, we have to make
     // the directory editable by default
-    dbDataset.setEditable(true);
+    dbDataset.setEditable(DatasetPermissions.GROUP_WRITABLE_SB);
     dbDataset.setDescription(buildDescription(project.getName()));
+    dbDataset.setSearchable(true);
     datasetFacade.persistDataset(dbDataset);
-
+    
+    dfso.setMetaEnabled(dbPath);
+    datasetController.logDataset(dbDataset, OperationType.Add);
+    
     try {
       // Assign database directory to the user and project group
       hdfsUsersBean.addDatasetUsersGroups(user, project, dbDataset, dfso);
@@ -133,6 +158,7 @@ public class HiveController {
 
       // Set the default quota
       dfso.setHdfsSpaceQuotaInMBs(dbPath, settings.getHiveDbDefaultQuota());
+      projectFacade.setTimestampQuotaUpdate(project, new Date());
     } catch (IOException e) {
       logger.log(Level.SEVERE, "Cannot assign Hive database directory " + dbPath.toString() +
           " to correct user/group. Trace: " + e);
@@ -150,11 +176,13 @@ public class HiveController {
     }
   }
 
-  public void dropDatabase(Project project, DistributedFileSystemOps dfso)
+  public void dropDatabase(Project project, DistributedFileSystemOps dfso, boolean forceCleanup)
       throws IOException {
     // To avoid case sensitive bugs, check if the project has a Hive database
     Dataset ds = datasetFacade.findByNameAndProjectId(project, project.getName().toLowerCase() + ".db");
-    if (ds == null || ds.getType() != DatasetType.HIVEDB)  {
+    
+    if ((ds == null || ds.getType() != DatasetType.HIVEDB)
+        && !forceCleanup)  {
       return;
     }
 

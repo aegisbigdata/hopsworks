@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.jobs.adam;
 
 import java.io.IOException;
@@ -25,29 +45,12 @@ public class AdamJob extends SparkJob {
 
   private final AdamJobConfiguration jobconfig;
   private final Jobs jobDescription;
-  private final String sparkDir;
   private final String adamJarPath;
-  private final String adamUser; //must be glassfish
-
-  /**
-   *
-   * @param job
-   * @param services
-   * @param user
-   * @param hadoopDir
-   * @param sparkDir
-   * @param adamUser
-   * @param jobUser
-   * @param adamJarPath
-   * @param jobsMonitor
-   * @param settings
-   */
+  
   public AdamJob(Jobs job,
       AsynchronousJobExecutor services, Users user, String hadoopDir,
-      String sparkDir, String adamUser, String jobUser,
-      String adamJarPath, YarnJobsMonitor jobsMonitor, Settings settings) {
-    super(job, services, user, hadoopDir, sparkDir, adamUser,
-        jobUser, jobsMonitor, settings);
+      String jobUser, String adamJarPath, YarnJobsMonitor jobsMonitor, Settings settings) {
+    super(job, services, user, hadoopDir, jobUser, jobsMonitor, settings);
     if (!(job.getJobConfig() instanceof AdamJobConfiguration)) {
       throw new IllegalArgumentException(
           "JobDescription must contain a AdamJobConfiguration object. Received: "
@@ -55,9 +58,7 @@ public class AdamJob extends SparkJob {
     }
     this.jobDescription = job;
     this.jobconfig = (AdamJobConfiguration) job.getJobConfig();
-    this.sparkDir = sparkDir;
     this.adamJarPath = adamJarPath;
-    this.adamUser = adamUser;
   }
 
   @Override
@@ -120,9 +121,7 @@ public class AdamJob extends SparkJob {
     try {
       runner = runnerbuilder.
               getYarnRunner(jobDescription.getProject().getName(),
-                      adamUser, jobUser, sparkDir, services, services
-                      .getFileOperations(hdfsUser.getUserName()), yarnClient,
-                  settings);
+                      jobUser, services, services.getFileOperations(hdfsUser.getUserName()), yarnClient, settings);
     } catch (IOException e) {
       LOG.log(Level.SEVERE,
           "Failed to create YarnRunner.", e);
@@ -185,24 +184,6 @@ public class AdamJob extends SparkJob {
       }
     }
     return adamargs;
-  }
-
-  /**
-   * Add all the ADAM jar to the local resources and to the classpath.
-   * <p/>
-   * @param builder
-   */
-  private void addAllAdamJarsToLocalResourcesAndClasspath(
-      SparkYarnRunnerBuilder builder) {
-    //Add all to local resources and to classpath
-    List<String> jars = this.services.getFsService().getChildNames(
-        Settings.ADAM_DEFAULT_HDFS_REPO);
-    for (String jarname : jars) {
-      String sourcePath = "hdfs://" + Settings.ADAM_DEFAULT_HDFS_REPO + jarname;
-      builder.addExtraFile(new LocalResourceDTO(jarname, sourcePath,
-          LocalResourceVisibility.PUBLIC.toString(),
-          LocalResourceType.FILE.toString(), null));
-    }
   }
 
   @Override

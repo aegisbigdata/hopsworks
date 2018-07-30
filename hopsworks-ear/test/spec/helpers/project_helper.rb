@@ -1,3 +1,21 @@
+=begin
+Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+=end
 module ProjectHelper
   def with_valid_project
     @project ||= create_project
@@ -9,20 +27,20 @@ module ProjectHelper
 
   def create_project
     with_valid_session
-    new_project = {projectName: "project_#{short_random_id}", description:"", status: 0, services: ["JOBS","ZEPPELIN"], projectTeam:[], retentionPeriod: ""}
+    new_project = {projectName: "project_#{short_random_id}", description:"", status: 0, services: ["JOBS","HIVE","SERVING"], projectTeam:[], retentionPeriod: ""}
     post "#{ENV['HOPSWORKS_API']}/project", new_project
     expect_json(errorMsg: ->(value){ expect(value).to be_empty})
-    expect_json(successMessage: "Project created successfully.")
+    expect_json(successMessage: regex("Project created successfully.*"))
     expect_status(201)
     get_project_by_name(new_project[:projectName])
   end
   
   def create_project_by_name(projectname)
     with_valid_session
-    new_project = {projectName: projectname, description:"", status: 0, services: ["JOBS","ZEPPELIN"], projectTeam:[], retentionPeriod: ""}
+    new_project = {projectName: projectname, description:"", status: 0, services: ["JOBS","HIVE","SERVING"], projectTeam:[], retentionPeriod: ""}
     post "#{ENV['HOPSWORKS_API']}/project", new_project
     expect_json(errorMsg: ->(value){ expect(value).to be_empty})
-    expect_json(successMessage: "Project created successfully.")
+    expect_json(successMessage: regex("Project created successfully.*"))
     expect_status(201)
     get_project_by_name(new_project[:projectName])
   end
@@ -55,22 +73,26 @@ module ProjectHelper
     Project.find_by(projectName: "#{name}")
   end
   
-  def check_project_limit
+  def check_project_limit(limit=0)
     get "#{ENV['HOPSWORKS_API']}/user/profile"
     max_num_projects = json_body[:maxNumProjects]
-    get "#{ENV['HOPSWORKS_API']}/project"
-    if json_body.length >= max_num_projects
-      delete_project(json_body[0][:project])
+    num_created_projects = json_body[:numCreatedProjects]
+    if (max_num_projects - num_created_projects) <= limit
+      reset_session
+      with_valid_project
     end
+    
   end
   
   def create_max_num_projects
     get "#{ENV['HOPSWORKS_API']}/user/profile"
     max_num_projects = json_body[:maxNumProjects]
-    get "#{ENV['HOPSWORKS_API']}/project"
-    while json_body.length < max_num_projects
+    num_created_projects = json_body[:numCreatedProjects]
+    while num_created_projects < max_num_projects
       post "#{ENV['HOPSWORKS_API']}/project", {projectName: "project_#{Time.now.to_i}"}
-      get "#{ENV['HOPSWORKS_API']}/project"
+      get "#{ENV['HOPSWORKS_API']}/user/profile"
+      max_num_projects = json_body[:maxNumProjects]
+      num_created_projects = json_body[:numCreatedProjects]
     end
   end
   

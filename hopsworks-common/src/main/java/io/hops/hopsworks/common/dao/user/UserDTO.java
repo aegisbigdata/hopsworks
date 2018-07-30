@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.dao.user;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,7 +46,11 @@ public class UserDTO {
   private String postCode;
   private String country;
   private int maxNumProjects;
+  private int numCreatedProjects;
   private boolean testUser;
+  private String userAccountType;
+  private int numActiveProjects;
+  private int numRemainingProjects;
 
   public UserDTO() {
   }
@@ -48,8 +72,12 @@ public class UserDTO {
       this.country = user.getAddress().getCountry();
     }
     this.maxNumProjects = user.getMaxNumProjects();
+    this.numCreatedProjects = user.getNumCreatedProjects();
     this.twoFactor = user.getTwoFactor();
     this.toursState = user.getToursState();
+    this.userAccountType = user.getMode().toString();
+    this.numActiveProjects = user.getNumActiveProjects();
+    numRemainingProjects = maxNumProjects-numCreatedProjects;
   }
 
   public String getUsername() { return username; }
@@ -214,6 +242,32 @@ public class UserDTO {
 
   public void setMaxNumProjects(int maxNumProjects) {
     this.maxNumProjects = maxNumProjects;
+    numRemainingProjects = maxNumProjects-numCreatedProjects;
+  }
+
+  public int getNumCreatedProjects() {
+    return numCreatedProjects;
+  }
+
+  public void setNumCreatedProjects(int numCreatedProjects) {
+    this.numCreatedProjects = numCreatedProjects;
+    numRemainingProjects = maxNumProjects-numCreatedProjects;
+  }
+
+  public int getNumRemainingProjects(){
+    return numRemainingProjects;
+  }
+  
+  public void setNumRemainingProjects(int numRemainingProjects){
+    this.numRemainingProjects = numRemainingProjects;
+  }
+  
+  public int getNumActiveProjects() {
+    return numActiveProjects;
+  }
+
+  public void setNumActiveProjects(int numActiveProjects) {
+    this.numActiveProjects = numActiveProjects;
   }
 
   public boolean isTestUser() {
@@ -222,6 +276,14 @@ public class UserDTO {
 
   public void setTestUser(boolean testUser) {
     this.testUser = testUser;
+  }
+
+  public String getUserAccountType() {
+    return userAccountType;
+  }
+
+  public void setUserAccountType(String userAccountType) {
+    this.userAccountType = userAccountType;
   }
 
   @Override

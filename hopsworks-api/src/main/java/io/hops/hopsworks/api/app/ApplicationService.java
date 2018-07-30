@@ -1,12 +1,37 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.app;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import io.hops.hopsworks.common.dao.app.ServingEndpointJsonDTO;
 import io.hops.hopsworks.common.dao.kafka.KafkaFacade;
 import io.hops.hopsworks.common.dao.kafka.SchemaDTO;
+
+import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,20 +49,24 @@ import io.hops.hopsworks.common.dao.jobs.description.JobFacade;
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dao.tfserving.TfServing;
+import io.hops.hopsworks.common.dao.tfserving.TfServingFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
 import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.jobs.execution.ExecutionController;
+import io.hops.hopsworks.common.security.CertificatesMgmService;
+import io.hops.hopsworks.common.user.UsersController;
 import io.hops.hopsworks.common.security.CertificatesController;
 import io.hops.hopsworks.common.util.EmailBean;
+import io.hops.hopsworks.common.util.HopsUtils;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.security.HopsUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -67,7 +96,7 @@ public class ApplicationService {
   @EJB
   private UserFacade userFacade;
   @EJB
-  protected UserManager userManager;
+  private UsersController usersController;
   @EJB
   private CertificatesController certificatesController;
   @EJB
@@ -76,6 +105,10 @@ public class ApplicationService {
   private JobFacade jobFacade;
   @EJB
   private ExecutionFacade executionFacade;
+  @EJB
+  private TfServingFacade tfServingFacade;
+  @EJB
+  private CertificatesMgmService certificatesMgmService;
 
   @POST
   @Path("mail")
@@ -102,7 +135,6 @@ public class ApplicationService {
     }
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
         build();
-
   }
 
   //when do we need this endpoint? It's used when the Kafka clients want to access
@@ -127,7 +159,51 @@ public class ApplicationService {
     SchemaDTO schemaDto = kafka.getSchemaForTopic(topicInfo.getTopicName());
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
         entity(schemaDto).build();
+  }
 
+  @POST
+  @Path("tfserving")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getServingEndpoint(@Context SecurityContext sc,
+                            @Context HttpServletRequest req, ServingEndpointJsonDTO servingEndpointJsonDTO) throws
+          AppException {
+
+    String projectUser = checkAndGetProjectUser(servingEndpointJsonDTO.
+            getKeyStoreBytes(), servingEndpointJsonDTO.getKeyStorePwd().toCharArray());
+
+    String projectName = servingEndpointJsonDTO.getProject();
+    String model = servingEndpointJsonDTO.getModel();
+
+    //check if user is member of project
+    Project project = projectFacade.findByName(hdfsUserBean.getProjectName(
+            projectUser));
+
+    if(project != null && project.getName().equals(projectName)) {
+
+      String host = null;
+      String port = null;
+      List <TfServing> tfServings = tfServingFacade.findForProject(project);
+      for(TfServing tfServing: tfServings) {
+        if(tfServing.getModelName().equals(model)) {
+          host = tfServing.getHostIp();
+          port = tfServing.getPort().toString();
+          break;
+        }
+      }
+
+      JsonObjectBuilder arrayObjectBuilder = Json.createObjectBuilder();
+      if(host != null && port != null) {
+        arrayObjectBuilder.add("host", host);
+        arrayObjectBuilder.add("port", port);
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(arrayObjectBuilder.build()).build();
+      } else {
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+      }
+    } else {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).
+              build();
+    }
   }
 
   /////////////////////////////////////////////////
@@ -187,28 +263,54 @@ public class ApplicationService {
   /**
    * Returns the project user from the keystore and verifies it.
    *
-   * @param keyStore
-   * @param keyStorePwd
-   * @return
-   * @throws AppException
+   * @param keyStore project-user keystore
+   * @param keyStorePwd project-user password
+   * @return CN of certificate
+   * @throws AppException When user is not authorized to access project.
    */
   private String checkAndGetProjectUser(byte[] keyStore, char[] keyStorePwd)
       throws AppException {
-    String commonName = certificatesController.extractCNFromCertificate(keyStore, keyStorePwd);
-
-    UserCerts userCert = certificateBean.findUserCert(hdfsUserBean.
-        getProjectName(commonName), hdfsUserBean.getUserName(commonName));
-
-    if (!Arrays.equals(userCert.getUserKey(), keyStore)) {
-      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
-          "Certificate error!");
+    
+    try {
+      String dn = certificatesController.validateCertificate(keyStore, keyStorePwd);
+      String commonName = HopsUtil.extractCNFromSubject(dn);
+  
+      UserCerts userCert = certificateBean.findUserCert(hdfsUserBean.
+          getProjectName(commonName), hdfsUserBean.getUserName(commonName));
+  
+      if (userCert.getUserKey() == null || userCert.getUserKey().length == 0) {
+        throw new GeneralSecurityException("Could not find certificates for user " + commonName);
+      }
+      
+      String username = hdfsUserBean.getUserName(commonName);
+      Users user = userFacade.findByUsername(username);
+      if (user == null) {
+        String errorMsg = "Could not find user " + commonName;
+        LOGGER.log(Level.WARNING, errorMsg);
+        throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(), errorMsg);
+      }
+      
+      String decryptedPassword = HopsUtils.decrypt(user.getPassword(), userCert.getUserKeyPwd(),
+          certificatesMgmService.getMasterEncryptionPassword());
+      
+      String storedCN = certificatesController.extractCNFromCertificate(userCert.getUserKey(),
+          decryptedPassword.toCharArray(), commonName);
+      if (!storedCN.equals(commonName)) {
+        throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(), "Could not authenticate user " +
+            commonName);
+      }
+      
+      return commonName;
+    } catch (Exception ex) {
+      LOGGER.log(Level.WARNING, "Could not authenticate user");
+      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(), "Could not authenticate user");
     }
-    return commonName;
   }
 
   private void assertAdmin(String projectUser) throws AppException {
-    String user = hdfsUserBean.getUserName(projectUser);
-    if (!userManager.findGroups(user).contains("HOPS_ADMIN")) {
+    String username = hdfsUserBean.getUserName(projectUser);
+    Users user = userFacade.findByUsername(username);
+    if (!usersController.isUserInRole(user, "HOPS_ADMIN")) {
       throw new AppException((Response.Status.UNAUTHORIZED.getStatusCode()),
           "only admins can call this function");
     }

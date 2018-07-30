@@ -1,7 +1,28 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.admin.user.profile;
 
-import io.hops.hopsworks.admin.lims.ClientSessionState;
-import io.hops.hopsworks.admin.lims.MessagesController;
+import io.hops.hopsworks.admin.maintenance.ClientSessionState;
+import io.hops.hopsworks.admin.maintenance.MessagesController;
+import io.hops.hopsworks.common.dao.user.UserFacade;
 import java.io.Serializable;
 import java.util.List;
 import javax.ejb.EJB;
@@ -10,28 +31,31 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+
 import io.hops.hopsworks.common.dao.user.security.Address;
 import io.hops.hopsworks.common.dao.user.security.Organization;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.security.audit.AccountsAuditActions;
-import io.hops.hopsworks.common.dao.user.security.audit.AuditManager;
+import io.hops.hopsworks.common.dao.user.security.audit.AccountAuditFacade;
 import io.hops.hopsworks.common.dao.user.security.audit.UserAuditActions;
 import io.hops.hopsworks.common.dao.user.security.audit.Userlogins;
-import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
+import io.hops.hopsworks.common.user.UsersController;
 
 @ManagedBean
 @ViewScoped
 public class ProfileManager implements Serializable {
 
-  public static final String DEFAULT_GRAVATAR
-          = "resources/images/icons/default-icon.jpg";
+  public static final String DEFAULT_GRAVATAR = "resources/images/icons/default-icon.jpg";
 
   private static final long serialVersionUID = 1L;
   @EJB
-  private UserManager userManager;
+  private UserFacade userFacade;
+  @EJB
+  protected UsersController usersController;
 
   @EJB
-  private AuditManager auditManager;
+  private AccountAuditFacade auditManager;
 
   @ManagedProperty(value = "#{clientSessionState}")
   private ClientSessionState sessionState;
@@ -85,36 +109,33 @@ public class ProfileManager implements Serializable {
 
   public Users getUser() {
     if (user == null) {
-      user = userManager.findByEmail(sessionState.getLoggedInUsername());
+      user = userFacade.findByEmail(sessionState.getLoggedInUsername());
       address = user.getAddress();
       organization = user.getOrganization();
-      login = auditManager.getLastUserLogin(user.getUid());
+      login = auditManager.getLastUserLogin(user);
     }
 
     return user;
   }
 
   public List<String> getCurrentGroups() {
-    List<String> list = userManager.findGroups(user.getUid());
+    List<String> list = usersController.getUserRoles(user);
     return list;
   }
 
   public void updateUserInfo() {
-
+    HttpServletRequest httpServletRequest = (HttpServletRequest) FacesContext.
+        getCurrentInstance().getExternalContext().getRequest();
     try {
-      userManager.updatePeople(user);
-      MessagesController.addInfoMessage("Success",
-              "Profile updated successfully.");
-      auditManager.registerAccountChange(sessionState.getLoggedInUser(),
-              AccountsAuditActions.PROFILEUPDATE.name(),
-              UserAuditActions.SUCCESS.name(), "", getUser());
+      userFacade.update(user);
+      MessagesController.addInfoMessage("Success", "Profile updated successfully.");
+      auditManager.registerAccountChange(sessionState.getLoggedInUser(), AccountsAuditActions.PROFILEUPDATE.name(),
+              UserAuditActions.SUCCESS.name(), "", getUser(), httpServletRequest);
     } catch (RuntimeException ex) {
-      FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-              "Failed to update", null);
+      FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to update", null);
       FacesContext.getCurrentInstance().addMessage(null, msg);
-      auditManager.registerAccountChange(sessionState.getLoggedInUser(),
-              AccountsAuditActions.PROFILEUPDATE.name(),
-              UserAuditActions.FAILED.name(), "", getUser());
+      auditManager.registerAccountChange(sessionState.getLoggedInUser(), AccountsAuditActions.PROFILEUPDATE.name(),
+              UserAuditActions.FAILED.name(), "", getUser(), httpServletRequest);
       return;
     }
   }
@@ -123,21 +144,19 @@ public class ProfileManager implements Serializable {
    * Update organization info.
    */
   public void updateUserOrg() {
-
+    HttpServletRequest httpServletRequest = (HttpServletRequest) FacesContext.
+        getCurrentInstance().getExternalContext().getRequest();
     try {
-      userManager.updateOrganization(organization);
-      MessagesController.addInfoMessage("Success",
-              "Profile updated successfully.");
-      auditManager.registerAccountChange(sessionState.getLoggedInUser(),
-              AccountsAuditActions.PROFILEUPDATE.name(),
-              UserAuditActions.SUCCESS.name(), "Update Organization", getUser());
+      user.setOrganization(organization);
+      userFacade.update(user);
+      MessagesController.addInfoMessage("Success", "Profile updated successfully.");
+      auditManager.registerAccountChange(sessionState.getLoggedInUser(), AccountsAuditActions.PROFILEUPDATE.name(),
+          UserAuditActions.SUCCESS.name(), "Update Organization", getUser(), httpServletRequest);
     } catch (RuntimeException ex) {
-      FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-              "Failed to update", null);
+      FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to update", null);
       FacesContext.getCurrentInstance().addMessage(null, msg);
-      auditManager.registerAccountChange(sessionState.getLoggedInUser(),
-              AccountsAuditActions.PROFILEUPDATE.name(),
-              UserAuditActions.FAILED.name(), "Update Organization", getUser());
+      auditManager.registerAccountChange(sessionState.getLoggedInUser(), AccountsAuditActions.PROFILEUPDATE.name(),
+          UserAuditActions.FAILED.name(), "Update Organization", getUser(), httpServletRequest);
     }
   }
 
@@ -145,20 +164,18 @@ public class ProfileManager implements Serializable {
    * Update the user address in the profile and register the audit logs.
    */
   public void updateAddress() {
-
+    HttpServletRequest httpServletRequest = (HttpServletRequest) FacesContext.
+        getCurrentInstance().getExternalContext().getRequest();
     try {
-      userManager.updateAddress(address);
-      MessagesController.addInfoMessage("Success",
-              "Address updated successfully.");
-      auditManager.registerAccountChange(sessionState.getLoggedInUser(),
-              AccountsAuditActions.PROFILEUPDATE.name(),
-              UserAuditActions.SUCCESS.name(), "Update Address", getUser());
+      user.setAddress(address);
+      userFacade.update(user);
+      MessagesController.addInfoMessage("Success", "Address updated successfully.");
+      auditManager.registerAccountChange(sessionState.getLoggedInUser(), AccountsAuditActions.PROFILEUPDATE.name(),
+          UserAuditActions.SUCCESS.name(), "Update Address", getUser(), httpServletRequest);
     } catch (RuntimeException ex) {
       MessagesController.addSecurityErrorMessage("Update failed.");
-      auditManager.registerAccountChange(sessionState.getLoggedInUser(),
-              AccountsAuditActions.PROFILEUPDATE.name(),
-              UserAuditActions.FAILED.name(), "Update Address", getUser());
-
+      auditManager.registerAccountChange(sessionState.getLoggedInUser(), AccountsAuditActions.PROFILEUPDATE.name(),
+          UserAuditActions.FAILED.name(), "Update Address", getUser(), httpServletRequest);
     }
   }
 

@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.dao.pythonDeps;
 
 import io.hops.hopsworks.common.dao.project.Project;
@@ -38,9 +58,10 @@ import org.codehaus.jackson.annotate.JsonIgnore;
   @NamedQuery(name = "PythonDep.findByDependency",
           query
           = "SELECT p FROM PythonDep p WHERE p.dependency = :dependency"),
-  @NamedQuery(name = "PythonDep.findByDependencyAndVersion",
+  @NamedQuery(name = "PythonDep.findUniqueDependency",
           query
-          = "SELECT p FROM PythonDep p WHERE p.dependency = :dependency AND p.version = :version"),
+          = "SELECT p FROM PythonDep p WHERE p.dependency = :dependency AND p.version = :version " +
+                  "AND p.installType = :installType AND p.repoUrl = :repoUrl AND p.machineType = :machineType"),
   @NamedQuery(name = "PythonDep.findByVersion",
           query
           = "SELECT p FROM PythonDep p WHERE p.version = :version")})
@@ -75,35 +96,24 @@ public class PythonDep implements Serializable {
   @ManyToOne(optional = false)
   private AnacondaRepo repoUrl;
 
+  @Column(name = "status")
   @Enumerated(EnumType.ORDINAL)
   private PythonDepsFacade.CondaStatus status
-          = PythonDepsFacade.CondaStatus.ONGOING;
+          = PythonDepsFacade.CondaStatus.NEW;
+
+  @Column(name = "install_type")
+  @Enumerated(EnumType.ORDINAL)
+  private PythonDepsFacade.CondaInstallType installType;
+
+  @Column(name = "machine_type")
+  @Enumerated(EnumType.ORDINAL)
+  private PythonDepsFacade.MachineType machineType;
 
   public PythonDep() {
   }
 
   public PythonDep(Integer id) {
     this.id = id;
-  }
-
-  public PythonDep(Integer id, String dependency, String version) {
-    this.id = id;
-    this.dependency = dependency;
-    this.version = version;
-  }
-
-  public PythonDep(AnacondaRepo repoUrl, String dependency, String version) {
-    this.dependency = dependency;
-    this.version = version;
-    this.repoUrl = repoUrl;
-  }
-
-  public PythonDep(AnacondaRepo repoUrl, String dependency, String version,
-          boolean preinstalled) {
-    this.dependency = dependency;
-    this.version = version;
-    this.repoUrl = repoUrl;
-    this.preinstalled = preinstalled;
   }
 
   public Integer getId() {
@@ -148,12 +158,28 @@ public class PythonDep implements Serializable {
     this.repoUrl = repoUrl;
   }
 
+  public void setInstallType(PythonDepsFacade.CondaInstallType installType) {
+    this.installType = installType;
+  }
+
+  public PythonDepsFacade.CondaInstallType getInstallType() {
+    return installType;
+  }
+
   public void setStatus(PythonDepsFacade.CondaStatus status) {
     this.status = status;
   }
 
   public PythonDepsFacade.CondaStatus getStatus() {
     return status;
+  }
+
+  public void setMachineType(PythonDepsFacade.MachineType machineType) {
+    this.machineType = machineType;
+  }
+
+  public PythonDepsFacade.MachineType getMachineType() {
+    return machineType;
   }
 
   public boolean isPreinstalled() {

@@ -1,3 +1,21 @@
+=begin
+Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+=end
 module SessionHelper
   def with_valid_session
     unless @cookies
@@ -9,6 +27,22 @@ module SessionHelper
     end
   end
   
+  def with_admin_session
+    user = create_user_without_role({})
+    create_admin_role(user)
+    create_session(user.email, "Pass123")
+  end
+
+  def with_agent_session
+    create_session("agent@hops.io", "admin")
+  end
+
+  def with_cluster_agent_session
+    create_role_type("CLUSTER_AGENT")
+    create_cluster_agent_role(User.find_by(email: "agent@hops.io"))
+    create_session("agent@hops.io", "admin")
+  end
+
   def reset_and_create_session()
     reset_session
     user = create_user
@@ -38,7 +72,7 @@ module SessionHelper
     user[:securityAnswer]   = params[:security_answer] ? params[:security_answer] : "example_answer"
     user[:ToS]              = params[:tos] ? params[:tos] :  true
     user[:authType]         = params[:auth_type] ? params[:auth_type] : "Mobile"
-    user[:twoFactor]        = params[:twoFactor] ? params[:twoFactor] : false
+    user[:twoFactor]        = params[:twoFactor] ? params[:twoFactor] : 0
     user[:testUser]         = true
     
     post "#{ENV['HOPSWORKS_API']}/auth/register", user
@@ -50,20 +84,6 @@ module SessionHelper
     user = User.find_by(email: params[:email])
     key = user.username + user.validation_key
     get "#{ENV['HOPSWORKS_ADMIN']}/security/validate_account.xhtml", {params: {key: key}}
-  end
-  
-  def set_two_factor(value)
-    variables = Variables.find_by(id: "twofactor_auth")
-    variables.value = value
-    variables.save
-    variables
-  end
-  
-  def set_two_factor_exclud(value)
-    variables = Variables.find_by(id: "twofactor-excluded-groups")
-    variables.value = value
-    variables.save
-    variables
   end
 
   def reset_session
@@ -92,12 +112,32 @@ module SessionHelper
 
   def create_role(user)
     group = BbcGroup.find_by(group_name: "HOPS_USER")
-    PeopleGroup.create(uid: user.uid, gid: group.gid)
+    UserGroup.create(uid: user.uid, gid: group.gid)
   end
-
+  
+  def create_admin_role(user)
+    group = BbcGroup.find_by(group_name: "HOPS_ADMIN")
+    UserGroup.create(uid: user.uid, gid: group.gid)
+  end
+  
   def create_agent_role(user)
     group = BbcGroup.find_by(group_name: "AGENT")
-    PeopleGroup.create(uid: user.uid, gid: group.gid)
+    UserGroup.create(uid: user.uid, gid: group.gid)
+  end
+
+  def create_cluster_agent_role(user)
+    group = BbcGroup.find_by(group_name: "CLUSTER_AGENT")
+    user_mapping = UserGroup.find_by(uid: user.uid, gid: group.gid)
+    if user_mapping.nil?
+      UserGroup.create(uid: user.uid, gid: group.gid)
+    end
+  end
+
+  def create_role_type(role_type)
+    type = BbcGroup.find_by(group_name: role_type)
+    if type.nil?
+      BbcGroup.create(group_name: role_type, gid: Random.rand(1000))
+    end
   end
   
   def create_user(params={})
@@ -105,7 +145,24 @@ module SessionHelper
     create_validated_user(params)
     user = User.find_by(email: params[:email])
     create_role(user)
-    user.status = 4
+    user.status = 2
+    user.save
+    user
+  end
+  
+  def create_unapproved_user(params={})
+    params[:email] = "#{random_id}@email.com" unless params[:email]
+    create_validated_user(params)
+    user = User.find_by(email: params[:email])
+    create_role(user)
+    user
+  end
+  
+  def create_user_without_role(params={})
+    params[:email] = "#{random_id}@email.com" unless params[:email]
+    create_validated_user(params)
+    user = User.find_by(email: params[:email])
+    user.status = 2
     user.save
     user
   end
@@ -113,9 +170,8 @@ module SessionHelper
   def create_2factor_user(params={})
     params[:email] = "#{random_id}@email.com" unless params[:email]
     params[:twoFactor] = 1
-    create_validated_user(params)
+    create_user(params)
     user = User.find_by(email: params[:email])
-    create_role(user)
     user
   end
   
@@ -125,6 +181,8 @@ module SessionHelper
     create_validated_user(params)
     user = User.find_by(email: params[:email])
     create_agent_role(user)
+    user.status = 2
+    user.save
     user
   end
   
@@ -133,7 +191,7 @@ module SessionHelper
     create_validated_user(params)
     user = User.find_by(email: params[:email])
     create_role(user)
-    user.status = 6
+    user.status = 4
     user.save
     user
   end
@@ -143,7 +201,7 @@ module SessionHelper
     create_validated_user(params)
     user = User.find_by(email: params[:email])
     create_role(user)
-    user.status = 5
+    user.status = 3
     user.save
     user
   end
@@ -153,7 +211,7 @@ module SessionHelper
     create_validated_user(params)
     user = User.find_by(email: params[:email])
     create_role(user)
-    user.status = 7
+    user.status = 5
     user.save
     user
   end

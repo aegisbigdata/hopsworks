@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.common.constants.message;
 
 public class ResponseMessages {
@@ -19,8 +39,8 @@ public class ResponseMessages {
   public final static String ACCOUNT_BLOCKED
           = "Your account hsd been blocked. Contact the administrator.";
   public final static String AUTHENTICATION_FAILURE = "Authentication failed";
-  public final static String LOGOUT_FAILURE
-          = "Logout failed due to server error";
+  public final static String NO_ROLE_FOUND = "No valid role found for this user";
+  public final static String LOGOUT_FAILURE = "Logout failed on backend.";
   public final static String EMAIL_EMPTY = "Email cannot be empty.";
   public final static String EMAIL_INVALID = "Not a valid email address.";
   public final static String EMAIL_SENDING_FAILURE
@@ -80,7 +100,8 @@ public class ResponseMessages {
   public final static String PROJECT_EXISTS
           = "Project with the same name already exists.";
   public final static String NUM_PROJECTS_LIMIT_REACHED
-          = "You have reached the maximum number of allowed projects.";
+          = "You have reached the maximum number of projects you could create." +
+            " Contact an administrator to increase your limit.";
   public final static String INVALID_PROJECT_NAME
           = "Invalid project name, valid characters: [a-z,0-9].";
   public final static String PROJECT_NOT_FOUND = "Project wasn't found.";
@@ -128,9 +149,10 @@ public class ResponseMessages {
   public final static String TEAM_MEMBER_NOT_FOUND
           = " The selected user is not a team member in this project.";
   public final static String ROLE_NOT_SET = "Role cannot be empty.";
-  public final static String CONSENT_ALREADY_EXISTS
-          = "Duplicate error. There is already a consent form in the Project with the same name";
   public final static String PROJECT_NOT_SELECTED = "No project selected";
+  public final static String QUOTA_NOT_FOUND = "Quota information not found.";
+  public final static String QUOTA_REQUEST_NOT_COMPLETE = "Please specify both namespace and space quota.";
+  public final static String QUOTA_ERROR = "Quota update error.";
 
   //project success messages
   public final static String PROJECT_CREATED = "Project created successfully.";
@@ -228,4 +250,10 @@ public class ResponseMessages {
       + "Jupyter will not work properly. "
       + "Try recreating the following dir manually:";
   public final static String HIVE_ADD_FAILURE = "Failed to create the Hive database";
+
+  // LLAP
+  public final static String LLAP_STATUS_INVALID = "Unrecognized new LLAP status";
+  public final static String LLAP_CLUSTER_ALREADY_UP = "LLAP cluster already up";
+  public final static String LLAP_CLUSTER_ALREADY_DOWN = "LLAP cluster already down";
+
 }

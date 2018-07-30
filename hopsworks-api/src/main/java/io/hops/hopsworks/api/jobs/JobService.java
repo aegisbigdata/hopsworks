@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.api.jobs;
 
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
@@ -159,6 +179,7 @@ public class JobService {
   @EJB
   private YarnApplicationstateFacade appStateBean;
 
+  // No @EJB annotation for Project, it's injected explicitly in ProjectService.
   private Project project;
   private static final String PROXY_USER_COOKIE_NAME = "proxy-user";
 
@@ -406,7 +427,7 @@ public class JobService {
 
   }
 
-  private List<YarnAppUrlsDTO> getTensorboardUrls(String hdfsUser, String appId) throws AppException {
+  private List<YarnAppUrlsDTO> getTensorBoardUrls(String hdfsUser, String appId) throws AppException {
     List<YarnAppUrlsDTO> urls = new ArrayList<>();
 
     DistributedFileSystemOps client = null;
@@ -414,10 +435,10 @@ public class JobService {
     try {
       client = dfs.getDfsOps(hdfsUser);
       FileStatus[] statuses = client.getFilesystem().globStatus(new org.apache.hadoop.fs.Path("/Projects/" + project.
-          getName() + "/Logs/TensorFlow/" + appId + "/tensorboard.exec*"));
+          getName() + "/Logs/TensorFlow/" + appId + "/TensorBoard.task*"));
       DistributedFileSystem fs = client.getFilesystem();
       for (FileStatus status : statuses) {
-        LOGGER.log(Level.INFO, "Reading tensorboard for: {0}", status.getPath());
+        //LOGGER.log(Level.INFO, "Reading tensorboard for: {0}", status.getPath());
         FSDataInputStream in = null;
         try {
           in = fs.open(new org.apache.hadoop.fs.Path(status.getPath().toString()));
@@ -450,7 +471,7 @@ public class JobService {
     return urls;
   }
 
-  
+
   /**
    * Get the Job UI url for the specified job
    * <p>
@@ -489,7 +510,7 @@ public class JobService {
         YarnApplicationstate appStates;
         appStates = appStateBean.findByAppId(appId);
         if (appStates != null && appStates.getAppname().toUpperCase().contains("TENSORFLOW")) {
-          urls.addAll(getTensorboardUrls(hdfsUser, appId));
+          urls.addAll(getTensorBoardUrls(hdfsUser, appId));
         }
       }
 
@@ -607,14 +628,21 @@ public class JobService {
 
         int nbExecutors = 0;
         HashMap<Integer, List<String>> executorInfo = new HashMap<>();
-
-        if (queryResult != null && queryResult.getResults() != null
-            && queryResult.getResults().get(0) != null && queryResult.
-            getResults().get(0).getSeries() != null) {
-          List<List<Object>> values = queryResult.getResults().get(0).getSeries().get(0).getValues();
-          nbExecutors = values.size();
-          for (int i = 0; i < nbExecutors; i++) {
-            executorInfo.put(i, Stream.of(Objects.toString(values.get(i).get(1))).collect(Collectors.toList()));
+        int index=0;
+        if (queryResult != null && queryResult.getResults() != null){
+          for(QueryResult.Result res: queryResult.getResults()){
+            if(res.getSeries()!=null){
+              for(QueryResult.Series series : res.getSeries()){
+                List<List<Object>> values = series.getValues();
+                if(values!=null){
+                  nbExecutors += values.size();
+                  for(List<Object> l: values){
+                    executorInfo.put(index,Stream.of(Objects.toString(l.get(1))).collect(Collectors.toList()));
+                    index++;
+                  }
+                }
+              }
+            }
           }
         }
 
@@ -711,7 +739,7 @@ public class JobService {
     }
     try {
       String trackingUrl;
-      if (param.matches("http([a-z,:,/,.,0-9,-])+:([0-9])+(.)+")) {
+      if (param.matches("http([a-zA-Z,:,/,.,0-9,-])+:([0-9])+(.)+")) {
         trackingUrl = param;
       } else {
         trackingUrl = "http://" + param;
@@ -835,11 +863,11 @@ public class JobService {
 
     ui = ui.replaceAll("(?<=(href|src)=.[^>]{0,200})\\?", "@hwqm");
 
-    ui = ui.replaceAll("(?<=(href|src)=\")/(?=[a-z])",
+    ui = ui.replaceAll("(?<=(href|src)=\")/(?=[a-zA-Z])",
         "/hopsworks-api/api/project/"
         + project.getId() + "/jobs/" + appId + "/prox/"
         + source + "/");
-    ui = ui.replaceAll("(?<=(href|src)=\')/(?=[a-z])",
+    ui = ui.replaceAll("(?<=(href|src)=\')/(?=[a-zA-Z])",
         "/hopsworks-api/api/project/"
         + project.getId() + "/jobs/" + appId + "/prox/"
         + source + "/");
@@ -853,10 +881,10 @@ public class JobService {
     ui = ui.replaceAll("(?<=(href|src)=\')(?=http)",
         "/hopsworks-api/api/project/"
         + project.getId() + "/jobs/" + appId + "/prox/");
-    ui = ui.replaceAll("(?<=(href|src)=\")(?=[a-z])",
+    ui = ui.replaceAll("(?<=(href|src)=\")(?=[a-zA-Z])",
         "/hopsworks-api/api/project/"
         + project.getId() + "/jobs/" + appId + "/prox/" + param);
-    ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-z])",
+    ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-zA-Z])",
         "/hopsworks-api/api/project/"
         + project.getId() + "/jobs/" + appId + "/prox/" + param);
     return ui;
@@ -1052,7 +1080,7 @@ public class JobService {
     boolean status = (type.equals("log") ? e.getFinalStatus().equals(JobFinalStatus.SUCCEEDED) : true);
     String hdfsPath = "hdfs://" + path;
     if (path != null && !path.isEmpty() && dfso.exists(hdfsPath)) {
-      if (dfso.listStatus(new org.apache.hadoop.fs.Path(hdfsPath))[0].getLen() > Settings.getJobLogsDisplaySize()) {
+      if (dfso.listStatus(new org.apache.hadoop.fs.Path(hdfsPath))[0].getLen() > settings.getJobLogsDisplaySize()) {
         stdPath = path.split(this.project.getName())[1];
         int fileIndex = stdPath.lastIndexOf("/");
         String stdDirPath = stdPath.substring(0, fileIndex);
@@ -1325,13 +1353,7 @@ public class JobService {
         LOGGER.log(Level.INFO, "Request to delete job name ={0} job id ={1}",
             new Object[]{job.getName(), job.getId()});
 
-//        for (Iterator<Execution> execsIter = job.getExecutionCollection().iterator(); execsIter.hasNext();) {
-//          if (execsIter.next().getState() == JobState.RUNNING) {
-//            throw new AppException(Response.Status.FORBIDDEN.getStatusCode(),
-//                "Job is still running, please stop it first by clicking the Stop button");
-//          }
-//        }
-        elasticController.deleteJobLogs(project.getName(), "logs", Settings.getJobLogsIdField(), job.getId());
+        elasticController.deleteJobLogs(project.getName(), "logs", settings.getJobLogsIdField(), job.getId());
         jobFacade.removeJob(job);
         LOGGER.log(Level.INFO, "Deleted job name ={0} job id ={1}",
             new Object[]{job.getName(), job.getId()});
