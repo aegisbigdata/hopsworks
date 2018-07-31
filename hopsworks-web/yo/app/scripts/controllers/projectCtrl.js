@@ -671,39 +671,10 @@ angular.module('hopsWorksApp')
                       });
             };
 
-            var download = function (text, fileName) {
-              var bytes = toByteArray(text);
-              var data = new Blob([bytes], {type: 'application/octet-binary'});
-              FileSaver.saveAs(data, fileName);
-            };
-
-            var toByteArray = function (text) {
-              var l = text.length;
-              var bytes = new Uint8Array(l);
-              for (var i = 0; i < l; i++) {
-                bytes[i] = text.charCodeAt(i);
-              }
-              return bytes;
-            };
-
-            self.isServiceEnabled = function (service) {
-              var idx = self.projectTypes.indexOf(service);
-              return idx === -1;
-            };
-
-            var getVersions = function () {
-              if (self.versions.length === 0) {
-
-                VariablesService.getVersions()
-                        .then(function (success) {
-                          self.versions = success.data;
-
-                        }, function (error) {
-                          console.log("Failed to get versions");
-                        });
-              }
-            };
-            getVersions();
+            self.isServiceEnabled = function(service) {
+                var idx = self.projectTypes.indexOf(service);
+                return idx === -1
+            }
 
             var download = function (text, fileName) {
               var bytes = toByteArray(text);

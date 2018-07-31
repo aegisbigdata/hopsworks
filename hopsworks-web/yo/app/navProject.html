@@ -1,71 +1,33 @@
-<!--
-  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
-  ~ software and associated documentation files (the "Software"), to deal in the Software
-  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
-  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all copies or
-  ~ substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
-  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  ~
-  -->
+<aside class="offsidebar">
+  <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:50px;"  ng-cloak>
+  <!-- MOD A11F  -->
+  <!--nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:150px;"  ng-cloak-->
 
-<aside class="offsidebar" style="height: 50px">
-    
-    <div style="margin-top: 50px; padding: 10px">
-      <a style="background-color: #fff; color: #E6AD1E; font-size: 26px; font-weight: bold" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
+    <ul class="nav sidebar-nav" ng-cloak ng-controller="ClusterUtilisationCtrl as clusterUtilCtrl">
+
+      <!--li style="background: #1a1a1a;" MOD A11F -->
+      <li style="background: #757575;">
+        <a style="background-color: #757575;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
         <!--a style="background-color: #757575;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"--> 
           {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17
           ? '...' : ''}}
         </a>
-    </div>
-  <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:120px;"  ng-cloak>
-  <!-- MOD A11F  -->
-  <!--nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:150px;"  ng-cloak-->
-
-   
-  
-    <ul class="nav sidebar-nav" ng-cloak ng-controller="ClusterUtilisationCtrl as clusterUtilCtrl">
-
-      <!--li style="background: #1a1a1a;" MOD A11F -->
-      
-      
-      
-       <li ng-click="" ng-show="projectCtrl.cloak">
-        <a>Get Started         
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/power.png"/>
-          <i class=" pull-left fa " 
-             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
+      </li>
+      <li ng-click="projectCtrl.goToJupyter()" ng-show="projectCtrl.showJupyter()">
+        <a>
+          Jupyter <img class="pull-right" style="margin-right:5px" width="30" src="images/jupyter-200x200-bw.png"
+                       id="jupyterTab"/>
+          <i class="pull-left fa"  
+             uib-tooltip="Orange tria<!--ngle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
-             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>          
         </a>
       </li>
-      
-      <li ng-click="mainCtrl.searchAssetsMenu('*')">
-        <a>Assets         
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/assets.png"/>
-          <i class=" pull-left fa " 
-             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
-             tooltip-placement="auto right"
-             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
-        </a>
-      </li>
-      
-      
-     
 
       <!--li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
         <a>
           Zeppelin 
-          <img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/>
+          <img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
@@ -97,9 +59,19 @@
         <a>
           Forms<span class="sub_icon fa fa-medkit fa-lg pull-right"></span>
         </a>
-      </li-->
+      </li>
 
-      <!--li ng-click="projectCtrl.goToService('DELA')" ng-show="projectCtrl.showDela()">
+      <li ng-click="projectCtrl.goToKafka()"
+          ng-show="projectCtrl.showKafka()">
+        <a>
+          Kafka <img class="pull-right" style="margin-right:15px" height="25" src="images/kafka_logo.png" id="kafkaTab"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: Kafka is encountering problems. Red means Kafka is down."             
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.KafkaBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.KafkaWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        </a>
+      </li>
+      <li ng-click="projectCtrl.goToService('DELA')" ng-show="projectCtrl.showDela()">
         <a>
           Dela<img class="pull-right" style="margin-right:15px" height="25" src="images/dela-green.png">
         </a>
@@ -117,20 +89,12 @@
         <a>
           Oozie<span class="sub_icon fa fa-code-fork fa-lg pull-right"></span>
         </a>
-      </li>
-
-      <li ng-click="projectCtrl.goToTfServing()" ng-show="projectCtrl.showTfServing()">
-        <a class="left-right" id="servingTab">
-          Model Serving
-          <img class="pull-right" style="margin-right:10px" height="25" src="images/tf-175x200_bw.png"/>
-        </a>
-      </li--> <!-- MOD A11F -->
-
+      </li--><!-- MOD A11F -->
       <!--li ng-click="projectCtrl.goToDatasets()" style="margin-top:40px;" ng-show="projectCtrl.cloak"-->
       <li ng-click="projectCtrl.goToDatasets()"ng-show="projectCtrl.cloak">
-        <a>Project Datasets 
+        <a>Data Sets 
           <!--span class="sub_icon fa fa-folder-open fa-lg pull-right"></span  MOD A11F -->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/dataset.png"/>
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/dataset.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: the filesystem is encountering problems. Red means the filesystem is down."                          
              tooltip-placement="auto right"
@@ -145,9 +109,9 @@
       </li-->
       
       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
-        <a>Query Builder
-          <!--img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/ MOD A11F -->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/queries.png"/>
+        <a>Queries 
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F -->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/queries.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
@@ -155,10 +119,11 @@
         </a>
       </li>
       
-      <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
-        <a>Analytics 
-          <!--img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/ MOD A11F -->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/analytics.png"/>
+      
+       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
+        <a>Visualizations 
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F -->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/visualization.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
@@ -166,83 +131,38 @@
         </a>
       </li>
        <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
-        <a>Visualiser
-          <!--img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/ MOD A11F -->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/visualization.png"/>
+        <a>Analytics 
+          <!--img class="pull-right" style="margin-right:5px" width="30" src="images/zeppelin_logo.png"/ MOD A11F -->
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/analytics.png"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
              tooltip-placement="auto right"
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
         </a>
       </li>
-       <li ng-click="projectCtrl.goToJupyter()" ng-show="projectCtrl.showJupyter()">
-        <a>
-          Jupyter <img class="pull-right" style="margin-right:5px" width="24" src="images/jupyter-200x200-bw.png"
-                       id="jupyterTab"/>
-          <i class="pull-left fa"  
-             uib-tooltip="Orange tria<!--ngle: jobs are encountering problems. Red means Jobs cannot be run just now." 
-             tooltip-placement="auto right"
-             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>          
-        </a>
-      </li>
-       
-      <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
-        <a>
-          Zeppelin 
-          <img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/>
-          <i class=" pull-left fa " 
-             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now." 
-             tooltip-placement="auto right"
-             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
-        </a>
-      </li>
-      <li ng-click="projectCtrl.goToKafka()"
-          ng-show="projectCtrl.showKafka()">
-        <a>
-          Kafka <img class="pull-right" style="margin-right:15px" height="25" src="images/kafka_logo.png" id="kafkaTab"/>
-          <i class=" pull-left fa " 
-             uib-tooltip="Orange triangle: Kafka is encountering problems. Red means Kafka is down."             
-             tooltip-placement="auto right"
-             ng-class="{'fa-ban text-danger': clusterUtilCtrl.KafkaBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.KafkaWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
-        </a>
-      </li>
       
-      <li ng-click="projectCtrl.goToJobs()" ng-show="projectCtrl.showJobs()" id="jobsTab">
-        <a>
-          Jobs <span class="sub_icon fa fa-cogs fa-lg pull-right"></span>
-          <i class=" pull-left fa " 
-             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now."              
-             tooltip-placement="auto right"
-             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
-        </a>
-      </li>
       
-            <!--li ng-click="projectCtrl.goToHistory()" style="margin-top:40px;"  ng-show="projectCtrl.showJobs()">
-              <a>
-                Jobs History<span class="sub_icon fa fa-history fa-lg pull-right"></span>
-              </a>
-            </li-->
-     
+      
       
       <li ng-click="projectCtrl.goToMetadataDesigner()" ng-show="projectCtrl.role === 'Data owner'" ng-show="projectCtrl.cloak">
         <a>
           Metadata Designer
           <!--span class="sub_icon fa fa-edit fa-lg pull-right"></span-->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/metadata_designer.png"/>
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/metadata_designer.png"/>
         </a>
       </li>
       <li ng-click="projectCtrl.goToSettings()" ng-show="projectCtrl.cloak">
       <!--li ng-click="projectCtrl.goToSettings()" style="margin-top:40px;" ng-show="projectCtrl.cloak" MOD A11F-->
         <a>Settings 
           <!--span class="sub_icon fa fa-dashboard fa-lg pull-right" id="settingsTab"></span MOD A11F -->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/settings.png"/>
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/settings.png"/>
         </a>
       </li>
 
       <li ng-click="projectCtrl.membersModal()" ng-show="projectCtrl.cloak">
         <a>Members 
           <!--span class="sub_icon fa fa-users fa-lg pull-right"></spanMOD A11F -->
-          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/users.png"/>
+          <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="30" src="images/aegis/users.png"/>
         </a>
       </li>
       
@@ -250,16 +170,16 @@
       <br>
       <div>
         <div class="sidebar-nav-static">
-            <small ng-show="clusterUtilCtrl.utilisation >= 0"><em style="color: #00A2CA; font-size: 10px; font-weight: bold; text-transform: uppercase; font-style: normal">Cluster Utilization: {{clusterUtilCtrl.utilisation}}%</em></small>
-          <small ng-show="clusterUtilCtrl.utilisation < 0"><em style="color: #00A2CA; font-size: 10px; font-weight: bold">Cluster Utilization is unknown</em></small>
+          <small ng-show="clusterUtilCtrl.utilisation >= 0" style="color: #ddd; font-size: 80%;"><em>Cluster Utilization: {{clusterUtilCtrl.utilisation}}%</em></small>
+          <small ng-show="clusterUtilCtrl.utilisation < 0" style="color: #ddd;"><em>Cluster Utilization is unknown</em></small>
           <div class="progress" style="height: 10px;margin-bottom: 1px"
                uib-tooltip="Orange (> 50%): consider allocating less resources for your application.
                Red (> 80%): the cluster is fully loaded. Consider scheduling your jobs to run at a later time. "
                tooltip-placement="bottom">
-            <div class="progress-bar" style="opacity: 0.7; font-style: normal;"
+            <div class="progress-bar" style="opacity: 0.7;"
                  ng-class="clusterUtilCtrl.progressBarClass"
                  role="progressbar"
-                 ng-style="{'width' : clusterUtilCtrl.utilisationBar + '%'}">
+                 ng-style="{'width' : clusterUtilCtrl.utilisation + '%'}">
             </div>
           </div>
           <br>
@@ -267,13 +187,13 @@
         <div class="sidebar-nav-static">
           <div ng-if="clusterUtilCtrl.allocatedGPUs !== 0 || clusterUtilCtrl.availableGPUs !== 0">
             <small style="color: #ddd; font-size: 80%;">
-              <em style="color: #00A2CA; font-size: 10px; font-weight: bold; text-transform: uppercase; font-style: normal">Allocated GPUs: {{clusterUtilCtrl.allocatedGPUs}}<br>Available GPUs: {{clusterUtilCtrl.availableGPUs}}
+              <em>Allocated GPUs: {{clusterUtilCtrl.allocatedGPUs}}<br>Available GPUs: {{clusterUtilCtrl.availableGPUs}}
                 <br>Queued GPU Requests: {{clusterUtilCtrl.reservedGPUs}}</em></small>
             <div class="progress" style="height: 10px;"
                  uib-tooltip="If this bar is orange, a job requesting a small number of GPUs may succeed.
                  If this bar is red, there are no GPUs available currently for running jobs."
                  tooltip-placement="bottom">
-              <div class="progress-bar" style="opacity: 0.7; background-color: #00A2CA;"
+              <div class="progress-bar" style="opacity: 0.7;"
                    ng-class="clusterUtilCtrl.gpuBarClass"
                    role="progressbar"
                    ng-style="{'width' : clusterUtilCtrl.gpusPercent + '%'}">
