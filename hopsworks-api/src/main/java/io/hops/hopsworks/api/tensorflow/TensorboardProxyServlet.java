@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.api.tensorflow;
 
 import io.hops.hopsworks.api.kibana.ProxyServlet;
@@ -25,8 +5,8 @@ import io.hops.hopsworks.common.dao.jobhistory.YarnApplicationAttemptStateFacade
 import io.hops.hopsworks.common.dao.jobhistory.YarnApplicationstate;
 import io.hops.hopsworks.common.dao.jobhistory.YarnApplicationstateFacade;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeam;
-import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
+import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
 import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.project.ProjectController;
@@ -59,12 +39,12 @@ public class TensorboardProxyServlet extends ProxyServlet {
   @EJB
   private YarnApplicationAttemptStateFacade yarnApplicationAttemptStateFacade;
   @EJB
-  private UserFacade userFacade;
+  private UserManager userManager;
   @EJB
   private HdfsUsersController hdfsUsersBean;
   @EJB
   private ProjectController projectController;
- 
+  
   private AtomicInteger barrier = new AtomicInteger(1);
   
   private final static Logger LOGGER = Logger.getLogger(TensorboardProxyServlet.class.getName());
@@ -117,7 +97,7 @@ public class TensorboardProxyServlet extends ProxyServlet {
         throw new ServletException(ex);
       }
 
-      Users user = userFacade.findByEmail(email);
+      Users user = userManager.getUserByEmail(email);
 
       boolean inTeam = false;
       for (ProjectTeam pt : project.getProjectTeam()) {
@@ -133,7 +113,7 @@ public class TensorboardProxyServlet extends ProxyServlet {
       }
       if (appState.getAppsmstate() != null && (appState.getAppsmstate().equalsIgnoreCase(YarnApplicationState.FINISHED.
           toString()) || appState.getAppsmstate().equalsIgnoreCase(YarnApplicationState.KILLED.toString()))) {
-        sendErrorResponse(servletResponse, "This TensorBoard has finished running");
+        sendErrorResponse(servletResponse, "This tensorboard has finished running");
         return;
       }
       targetUri = uriToFinish;
@@ -156,7 +136,7 @@ public class TensorboardProxyServlet extends ProxyServlet {
       try {
         super.service(servletRequest, servletResponse);
       } catch (IOException ex) {
-        sendErrorResponse(servletResponse, "This TensorBoard is not running right now");
+        sendErrorResponse(servletResponse, "This tensorboard is not running right now");
         return;
       }
     } else {

@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.api.user;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
@@ -41,10 +21,10 @@ import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
-import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.activity.Activity;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
+import io.hops.hopsworks.common.dao.user.security.ua.UserManager;
 import io.swagger.annotations.Api;
 
 @Path("/activity")
@@ -58,7 +38,7 @@ public class ActivityService {
   @EJB
   private ActivityFacade activityFacade;
   @EJB
-  private UserFacade userFacade;
+  private UserManager userBean;
   @EJB
   private ProjectFacade projectFacade;
   @EJB
@@ -68,7 +48,7 @@ public class ActivityService {
   @Produces(MediaType.APPLICATION_JSON)
   public Response findAllByUser(@Context SecurityContext sc,
           @Context HttpServletRequest req) {
-    Users user = userFacade.findByEmail(sc.getUserPrincipal().getName());
+    Users user = userBean.getUserByEmail(sc.getUserPrincipal().getName());
     List<Activity> activityDetails = activityFacade.getAllActivityByUser(user);
     GenericEntity<List<Activity>> projectActivities
             = new GenericEntity<List<Activity>>(activityDetails) {};
@@ -87,7 +67,7 @@ public class ActivityService {
           @QueryParam("to") int to,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) {
-    Users user = userFacade.findByEmail(sc.getUserPrincipal().getName());
+    Users user = userBean.getUserByEmail(sc.getUserPrincipal().getName());
     List<Activity> activityDetails = activityFacade.getAllActivityByUser(user);
     GenericEntity<List<Activity>> projectActivities
             = new GenericEntity<List<Activity>>(activityDetails) {};
@@ -105,7 +85,7 @@ public class ActivityService {
           @QueryParam("to") int to,
           @Context SecurityContext sc,
           @Context HttpServletRequest req) {
-    Users user = userFacade.findByEmail(sc.getUserPrincipal().getName());
+    Users user = userBean.getUserByEmail(sc.getUserPrincipal().getName());
     List<Activity> activityDetails = activityFacade.
             getPaginatedActivityByUser(from, to, user);
     GenericEntity<List<Activity>> projectActivities

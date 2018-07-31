@@ -1,3 +1,5 @@
+package io.hops.hopsworks.api.kibana;
+
 /**
  * Copyright MITRE
  * <p>
@@ -13,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.hops.hopsworks.api.kibana;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;

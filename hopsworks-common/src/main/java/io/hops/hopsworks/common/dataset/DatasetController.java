@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.dataset;
 
 import io.hops.common.Pair;
@@ -46,10 +26,10 @@ import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.metadata.exception.DatabaseException;
 import io.hops.hopsworks.common.util.HopsUtils;
 import io.hops.hopsworks.common.util.Settings;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -300,8 +280,8 @@ public class DatasetController {
   public boolean deleteDatasetDir(Dataset dataset, Path location,
       DistributedFileSystemOps udfso) throws IOException {
     OperationsLog log = new OperationsLog(dataset, OperationType.Delete);
-    udfso.unsetMetaEnabled(location);
-    boolean success = udfso.rm(location, true);
+    boolean success;
+    success = udfso.rm(location, true);
     if (success) {
       operationsLogFacade.persist(log);
     }
@@ -313,11 +293,12 @@ public class DatasetController {
    * original dataset
    *
    * @param orgDs the dataset to be make editable
+   * @param editable whether the dataset should be editable
    */
   //TODO: Add a reference in each dataset entry to the original dataset
-  public void changePermissions(Dataset orgDs) {
+  public void changeEditable(Dataset orgDs, boolean editable) {
     for (Dataset ds : datasetFacade.findByInode(orgDs.getInode())) {
-      ds.setEditable(orgDs.getEditable());
+      ds.setEditable(editable);
       datasetFacade.merge(ds);
     }
   }
@@ -478,9 +459,9 @@ public class DatasetController {
       dis = new DataInputStream(is);
       long fileSize = dfso.getFileStatus(new org.apache.hadoop.fs.Path(
           path)).getLen();
-      if (fileSize > Settings.FILE_PREVIEW_TXT_SIZE_BYTES) {
+      if (fileSize > Settings.FILE_PREVIEW_TXT_SIZE_BYTES_README) {
         throw new IllegalArgumentException("README.md must be smaller than"
-            + Settings.FILE_PREVIEW_TXT_SIZE_BYTES
+            + Settings.FILE_PREVIEW_TXT_SIZE_BYTES_README
             + " to be previewd");
       }
       byte[] headContent = new byte[(int) fileSize];
@@ -509,7 +490,7 @@ public class DatasetController {
     switch (ds.getType()) {
       case DATASET:
         Project owningProject = getOwningProject(ds);
-        path = new Path(settings.getProjectPath(owningProject.getName()),
+        path = new Path(Settings.getProjectPath(owningProject.getName()),
             ds.getInode().getInodePK().getName());
         break;
       case HIVEDB:
@@ -577,15 +558,4 @@ public class DatasetController {
     }
     return false;
   }
-  
-  public void unsetMetaEnabledForAllDatasets(DistributedFileSystemOps dfso, Project project) throws IOException {
-    Collection<Dataset> datasets = project.getDatasetCollection();
-    for (Dataset dataset : datasets) {
-      if (dataset.isSearchable() && !dataset.isShared()) {
-        Path dspath = getDatasetPath(dataset);
-        dfso.unsetMetaEnabled(dspath);
-      }
-    }
-  }
-  
 }

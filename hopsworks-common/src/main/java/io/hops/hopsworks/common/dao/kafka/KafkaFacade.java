@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
 package io.hops.hopsworks.common.dao.kafka;
 
 import io.hops.hopsworks.common.dao.project.team.ProjectTeam;
@@ -42,8 +23,8 @@ import javax.persistence.TypedQuery;
 import javax.ws.rs.core.Response;
 
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
-import io.hops.hopsworks.common.security.BaseHadoopClientsService;
 import io.hops.hopsworks.common.security.CertificateMaterializer;
+import io.hops.hopsworks.common.security.BaseHadoopClientsService;
 import io.hops.hopsworks.common.util.Settings;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
@@ -68,12 +49,12 @@ import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.util.HopsUtils;
-import java.util.Collections;
 
 @Stateless
 public class KafkaFacade {
 
-  private final static Logger LOG = Logger.getLogger(KafkaFacade.class.getName());
+  private final static Logger LOG = Logger.getLogger(KafkaFacade.class.
+      getName());
 
   @PersistenceContext(unitName = "kthfsPU")
   private EntityManager em;
@@ -135,12 +116,17 @@ public class KafkaFacade {
    * @param projectId
    * @return
    */
-  public List<SharedTopics> findSharedTopicsByProject(Integer projectId) {
+  public List<TopicDTO> findSharedTopicsByProject(Integer projectId) {
     TypedQuery<SharedTopics> query = em.createNamedQuery(
         "SharedTopics.findByProjectId",
         SharedTopics.class);
     query.setParameter("projectId", projectId);
-    return query.getResultList();
+    List<SharedTopics> res = query.getResultList();
+    List<TopicDTO> topics = new ArrayList<>();
+    for (SharedTopics pt : res) {
+      topics.add(new TopicDTO(pt.getSharedTopicsPK().getTopicName()));
+    }
+    return topics;
   }
 
   public List<PartitionDetailsDTO> getTopicDetails(Project project, Users user,
@@ -227,17 +213,6 @@ public class KafkaFacade {
     if (!res.isEmpty()) {
       throw new AppException(Response.Status.NOT_FOUND.getStatusCode(),
           "Kafka topic already exists in database. Pick a different topic name.");
-    }
-
-    TypedQuery<ProjectTopics> projQuery = em.createNamedQuery(
-        "ProjectTopics.findByProjectId", ProjectTopics.class);
-    projQuery.setParameter("projectId", project.getId());
-    List<ProjectTopics> topicsInProject = projQuery.getResultList();
-
-    if (topicsInProject != null && (topicsInProject.size() >= project.getKafkaMaxNumTopics())) {
-      throw new AppException(Response.Status.NOT_FOUND.getStatusCode(),
-          "Topic limit reached. Contact your administrator to increase the number "
-          + "of topics that can be created for this project.");
     }
 
     //check if the replication factor is not greater than the 
@@ -396,13 +371,6 @@ public class KafkaFacade {
         zkConnection.close();
       }
     }
-  }
-
-  public void removeAclsForUser(Users user, Integer projectId) {
-    em.createNamedQuery("TopicAcls.deleteByUser", TopicAcls.class)
-        .setParameter("user", user)
-        .setParameter("projectId", projectId)
-        .executeUpdate();
   }
 
   public TopicDefaultValueDTO topicDefaultValues() throws AppException {
@@ -886,6 +854,8 @@ public class KafkaFacade {
     }
   }
 
+  
+
   private List<PartitionDetailsDTO> getTopicDetailsfromKafkaCluster(
       Project project, Users user, String topicName) throws Exception {
 
@@ -894,7 +864,7 @@ public class KafkaFacade {
     Map<Integer, List<String>> replicas = new HashMap<>();
     Map<Integer, List<String>> inSyncReplicas = new HashMap<>();
     Map<Integer, String> leaders = new HashMap<>();
-    List<PartitionDetailsDTO> partitionDetails = new ArrayList<>();
+    List<PartitionDetailsDTO> partitionDetailsDto = new ArrayList<>();
 
     //Keep only INTERNAL protocol brokers
     Iterator<String> iter = brokers.iterator();
@@ -905,71 +875,79 @@ public class KafkaFacade {
       }
     }
     try {
-      HopsUtils.copyProjectUserCerts(project, user.getUsername(),
+      HopsUtils.copyUserKafkaCerts(userCerts, project, user.getUsername(),
           settings.getHopsworksTmpCertDir(), null,
           certificateMaterializer, settings.getHopsRpcTls());
       String projectSpecificUser = hdfsUsersController.getHdfsUserName(project,
           user);
       String certPassword = baseHadoopService.getProjectSpecificUserCertPassword(projectSpecificUser);
-      //Get information from first broker, all of them will have the same information once they are synced
-      String brokerAddress = brokers.iterator().next().split("://")[1];
-      Properties props = new Properties();
-      props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-          "org.apache.kafka.common.serialization.IntegerDeserializer");
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-          "org.apache.kafka.common.serialization.StringDeserializer");
 
-      //configure the ssl parameters
-      props.setProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, KAFKA_SECURITY_PROTOCOL);
-      props.setProperty(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG,
-          settings.getHopsworksTmpCertDir() + File.separator + HopsUtils.getProjectTruststoreName(project.getName(),
-          user.getUsername()));
-      props.setProperty(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, certPassword);
-      props.setProperty(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, settings.getHopsworksTmpCertDir() + File.separator
-          + HopsUtils.getProjectKeystoreName(project.getName(), user.getUsername()));
-      props.setProperty(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, certPassword);
-      props.setProperty(SslConfigs.SSL_KEY_PASSWORD_CONFIG, certPassword);
-      try (KafkaConsumer<Integer, String> consumer = new KafkaConsumer<>(props)) {
-        List<PartitionInfo> partitions = consumer.partitionsFor(topicName);
-        for (PartitionInfo partition : partitions) {
-          int id = partition.partition();
-          //list the leaders of each parition
-          leaders.put(id, partition.leader().host());
+      for (String brokerAddress : brokers) {
+        brokerAddress = brokerAddress.split("://")[1];
+        Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerAddress);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+            "org.apache.kafka.common.serialization.IntegerDeserializer");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+            "org.apache.kafka.common.serialization.StringDeserializer");
 
-          //list the replicas of the partition
-          replicas.put(id, new ArrayList<>());
-          for (Node node : partition.replicas()) {
-            replicas.get(id).add(node.host());
+        //configure the ssl parameters
+        props.setProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, KAFKA_SECURITY_PROTOCOL);
+        props.setProperty(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG,
+            settings.getHopsworksTmpCertDir() + File.separator + HopsUtils.
+            getProjectTruststoreName(project.getName(), user.
+                getUsername()));
+        props.setProperty(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG,
+            certPassword);
+        props.setProperty(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG,
+            settings.getHopsworksTmpCertDir() + File.separator + HopsUtils.
+            getProjectKeystoreName(project.getName(), user.
+                getUsername()));
+        props.setProperty(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG,
+            certPassword);
+        props.setProperty(SslConfigs.SSL_KEY_PASSWORD_CONFIG,
+            certPassword);
+        KafkaConsumer<Integer, String> consumer = null;
+        try {
+          consumer = new KafkaConsumer<>(props);
+          List<PartitionInfo> partitions = consumer.partitionsFor(topicName);
+          for (PartitionInfo partition : partitions) {
+            int id = partition.partition();
+            //list the leaders of each parition
+            leaders.put(id, partition.leader().host());
+
+            //list the replicas of the partition
+            replicas.put(id, new ArrayList<>());
+            for (Node node : partition.replicas()) {
+              replicas.get(id).add(node.host());
+            }
+
+            //list the insync replicas of the parition
+            inSyncReplicas.put(id, new ArrayList<>());
+            for (Node node : partition.inSyncReplicas()) {
+              inSyncReplicas.get(id).add(node.host());
+            }
+
+            partitionDetailsDto.add(new PartitionDetailsDTO(id, leaders.get(id),
+                replicas.get(id), replicas.get(id)));
           }
-
-          //list the insync replicas of the parition
-          inSyncReplicas.put(id, new ArrayList<>());
-          for (Node node : partition.inSyncReplicas()) {
-            inSyncReplicas.get(id).add(node.host());
+        } catch (Exception ex) {
+          LOG.log(Level.SEVERE, null, ex);
+          throw new Exception(
+              "Error while retrieving topic metadata from broker: "
+              + brokerAddress, ex);
+        } finally {
+          if (consumer != null) {
+            consumer.close();
           }
-
-          partitionDetails.add(new PartitionDetailsDTO(id, leaders.get(id), replicas.get(id), replicas.get(id)));
         }
-      } catch (Exception ex) {
-        LOG.log(Level.SEVERE, null, ex);
-        throw new Exception(
-            "Error while retrieving topic metadata from broker: "
-            + brokerAddress, ex);
       }
     } finally {
-      certificateMaterializer.removeCertificatesLocal(user.getUsername(), project.getName());
+      certificateMaterializer.removeCertificate(user.getUsername(), project.getName());
     }
-    Collections.sort(partitionDetails, (PartitionDetailsDTO c1, PartitionDetailsDTO c2) -> {
-      if (c1.getId() < c2.getId()) {
-        return -1;
-      }
-      if (c1.getId() > c2.getId()) {
-        return 1;
-      }
-      return 0;
-    });
-    return partitionDetails;
+
+    return partitionDetailsDto;
   }
 
+  
 }

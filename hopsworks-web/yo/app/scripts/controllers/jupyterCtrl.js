@@ -1,29 +1,9 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 'use strict';
 
 angular.module('hopsWorksApp')
         .controller('JupyterCtrl', ['$scope', '$routeParams', '$route',
-          'growl', 'ModalService', '$interval', 'JupyterService', 'TensorFlowService', 'SparkService', 'StorageService', '$location', '$timeout', '$window', '$sce', 'PythonDepsService', 'TourService',
-          function ($scope, $routeParams, $route, growl, ModalService, $interval, JupyterService, TensorFlowService, SparkService, StorageService,
+          'growl', 'ModalService', 'JupyterService', 'TensorFlowService', 'SparkService', 'StorageService', '$location', '$timeout', '$window', '$sce', 'PythonDepsService', 'TourService',
+          function ($scope, $routeParams, $route, growl, ModalService, JupyterService, TensorFlowService, SparkService, StorageService,
                   $location, $timeout, $window, $sce, PythonDepsService, TourService) {
 
             var self = this;
@@ -42,13 +22,10 @@ angular.module('hopsWorksApp')
             self.sparkStatic = false;
             self.sparkDynamic = false;
             self.tensorflow = false;
-            self.condaEnabled = true;
             $scope.sessions = null;
             self.val = {};
             $scope.tgState = true;
             self.config = {};
-            self.numNotEnabledEnvs = 0;
-            self.opsStatus = {};
             self.dirs = [
               {id: 1, name: '/'},
               {id: 2, name: '/Jupyter/'}
@@ -64,31 +41,6 @@ angular.module('hopsWorksApp')
             ];
             self.logLevelSelected;
 
-            self.shutdown_levels = [
-              {id: 1, name: '1'},
-              {id: 2, name: '6'},
-              {id: 3, name: '12'},
-              {id: 4, name: '24'},
-              {id: 4, name: '72'},
-              {id: 5, name: '168'},
-              {id: 5, name: '1000'}
-            ];
-            self.shutdownLevelSelected;
-            self.timeLeftInMinutes = 0;
-            self.addShutdownHours;
-
-
-//  (Group/World readable, not writable)
-//  (Group readable and writable)
-//  (Not Group readable or writable)
-            self.umasks = [
-              {id: 1, name: '022'},
-              {id: 2, name: '007'},
-              {id: 3, name: '077'}
-            ];
-            self.umask = self.umasks[1];
-
-
             self.job = {'type': '',
               'name': '',
               'id': '',
@@ -98,55 +50,11 @@ angular.module('hopsWorksApp')
                       }
             };
 
+
+
+
             self.changeLogLevel = function () {
               self.val.logLevel = self.logLevelSelected.name;
-            };
-
-            self.changeShutdownLevel = function () {
-              self.val.shutdownLevel = self.shutdownLevelSelected.name;
-            };
-
-            self.updateShutdownLevel = function () {
-              var currentHours = self.val.shutdownLevel;
-
-              self.val.shutdownLevel = Number(currentHours) + Number(self.shutdownLevelSelected.name);
-
-              self.loadingText = "Updating Jupyter Shutdown Time";
-              JupyterService.update(self.projectId, self.val).then(
-                      function (success) {
-                        self.val.shutdownLevel = success.data.shutdownLevel;
-                        growl.info("Updated... notebook will close automatically in " + self.val.shutdownLevel + " hours.",
-                                {title: 'Info', ttl: 3000});
-                        timeToShutdown();
-                      }, function (error) {
-                growl.error("Could not update shutdown time for Jupyter notebook. If this problem persists please contact your system administrator.");
-              }
-              );
-            };
-
-            var timeToShutdown = function () {
-              if ('lastAccessed' in self.config) {
-                if ('shutdownLevel' in self.val) {
-                  var d = new Date();
-                  var currentTimeMs = d.getTime();
-                  var lastTimeMs = new Date(self.config.lastAccessed)
-                  var timeSinceLastAccess = currentTimeMs - lastTimeMs.valueOf();
-                  if (timeSinceLastAccess < 0) {
-                    timeSinceLastAccess = 0;
-                  }
-                  console.log("lastAccessed " + self.config.lastAccessed);
-                  console.log("lastAccessed " + lastTimeMs);
-                  console.log("timeSinceLast " + timeSinceLastAccess);
-                  console.log("currentTimeMs " + currentTimeMs);
-                  console.log("shutdownLevel " + self.val.shutdownLevel);
-                  self.timeLeftInMinutes = (((self.val.shutdownLevel * 60 * 60 * 1000) - timeSinceLastAccess) / (60 * 1000)).toFixed(1);
-                }
-              }
-            };
-
-
-            self.changeUmask = function () {
-              self.val.umask = self.umask.name;
             };
 
             self.changeBaseDir = function () {
@@ -189,45 +97,6 @@ angular.module('hopsWorksApp')
               $location.path('project/' + self.projectId + '/jobMonitor-app/' + appId + "/true/jupyter");
 
             };
-
-            self.checkCondaEnabled = function () {
-              PythonDepsService.enabled(self.projectId).then(
-                      function (success) {
-                        self.condaEnabled = true;
-                      },
-                      function (error) {
-                        self.condaEnabled = false;
-                      });
-            };
-
-            var getCondaCommands = function () {
-              PythonDepsService.status(self.projectId).then(
-                      function (success) {
-                        self.opsStatus = success.data;
-                        self.tempEnvs = 0;
-                        for (var i = 0; i < self.opsStatus.length; i++) {
-                          if (self.opsStatus[i].op === "CREATE" && (self.opsStatus[i].status === "NEW" || self.opsStatus[i].status === "ONGOING")) {
-                            self.tempEnvs += 1;
-                            break;
-                          }
-                        }
-                        self.checkCondaEnabled()
-                        self.numNotEnabledEnvs = self.tempEnvs;
-
-                      }, function (error) {
-
-              }
-              );
-            };
-
-            getCondaCommands();
-
-            var startPolling = function () {
-              self.poller = $interval(function () {
-                getCondaCommands();
-              }, 5000);
-            };
-            startPolling();
 
             self.sliderVisible = false;
 
@@ -316,9 +185,9 @@ angular.module('hopsWorksApp')
                           extension.toUpperCase() === "ZIP" ||
                           extension.toUpperCase() === "EGG") {
                     if (self.val.pyFiles === "") {
-                      self.val.pyFiles = path;
+                      self.val.pyFiles = "\"" + path + "\"";
                     } else {
-                      self.val.pyFiles = self.val.pyFiles.concat(",").concat(path);
+                      self.val.pyFiles = self.val.pyFiles.concat(",").concat(" \"" + path + "\"");
                     }
                   } else {
                     growl.error("Invalid file type selected. Expecting .py, .zip or .egg - Found: " + extension, {ttl: 10000});
@@ -327,9 +196,9 @@ angular.module('hopsWorksApp')
                 case "JARS":
                   if (extension.toUpperCase() === "JAR") {
                     if (self.val.jars === "") {
-                      self.val.jars = path;
+                      self.val.jars = "\"" + path + "\"";
                     } else {
-                      self.val.jars = self.val.jars.concat(",").concat(path);
+                      self.val.jars = self.val.jars.concat(",").concat(" \"" + path + "\"");
                     }
                   } else {
                     growl.error("Invalid file type selected. Expecting .jar - Found: " + extension, {ttl: 10000});
@@ -339,9 +208,9 @@ angular.module('hopsWorksApp')
                   if (extension.toUpperCase() === "ZIP" || extension.toUpperCase() === "TGZ") {
                     path = path + "#" + fileName
                     if (self.val.archives === "") {
-                      self.val.archives = path;
+                      self.val.archives = "\"" + path + "\"";
                     } else {
-                      self.val.archives = self.val.archives.concat(",").concat(path);
+                      self.val.archives = self.val.archives.concat(",").concat(" \"" + path + "\"");
                     }
                   } else {
                     growl.error("Invalid file type selected. Expecting .zip Found: " + extension, {ttl: 10000});
@@ -350,9 +219,9 @@ angular.module('hopsWorksApp')
                 case "FILES":
                   path = path + "#" + file
                   if (self.val.files === "") {
-                    self.val.files = path;
+                    self.val.files = " \"" + path + "\"";
                   } else {
-                    self.val.files = self.val.files.concat(",").concat(path);
+                    self.val.files = self.val.files.concat(",").concat(" \"" + path + "\"");
                   }
                   break;
                 default:
@@ -381,15 +250,25 @@ angular.module('hopsWorksApp')
               $location.path('/#!/project/' + self.projectId + '/jupyter');
             };
 
+
+            var installTourLibs = function () {
+              //Install numpy
+              var data = {"channelUrl": "default", "lib": "numpy", "version": "1.13.1"};
+              PythonDepsService.install(self.projectId, data).then(
+                      function (success) {
+                        console.log("success numpy");
+                        growl.info("Preparing Python Anaconda environment, please wait...", {ttl: 10000});
+                      }, function (error) {
+                console.log("failure numpy");
+              });
+            };
             var init = function () {
               JupyterService.running(self.projectId).then(
                       function (success) {
                         self.config = success.data;
                         self.ui = "/hopsworks-api/jupyter/" + self.config.port + "/?token=" + self.config.token;
                         self.toggleValue = true;
-                        timeToShutdown();
                       }, function (error) {
-                        self.val.shutdownLevel = 4;
                 // nothing to do
               }
               );
@@ -414,6 +293,7 @@ angular.module('hopsWorksApp')
                             growl.info("Preparing Python Anaconda environment, please wait...", {ttl: 20000});
                             PythonDepsService.enable(self.projectId, "2.7", "true").then(
                                     function (success) {
+                                      setTimeout(installTourLibs, 20000);
 
                                     }, function (error) {
                               growl.error("Could not enable Anaconda", {title: 'Error', ttl: 5000});
@@ -436,35 +316,6 @@ angular.module('hopsWorksApp')
                         } else {
                           self.logLevelSelected = self.log_levels[2];
                         }
-                        
-                        if (self.val.shutdownLevel <= "1") {
-                          self.shutdownLevelSelected = self.shutdown_levels[0];
-                          } else if (self.val.shutdownLevel <= "6") {
-                          self.shutdownLevelSelected = self.shutdown_levels[1];
-                        } else if (self.val.shutdownLevel <= "12") {
-                          self.shutdownLevelSelected = self.shutdown_levels[2];
-                        } else if (self.val.shutdownLevel <= "24") {
-                          self.shutdownLevelSelected = self.shutdown_levels[3];
-                        } else if (self.val.shutdownLevel <= "72") {
-                          self.shutdownLevelSelected = self.shutdown_levels[4];
-                        } else if (self.val.shutdownLevel <= "168") {
-                          self.shutdownLevelSelected = self.shutdown_levels[5];
-                        } else {
-                          self.shutdownLevelSelected = self.shutdown_levels[6];
-                        }
-
-                        if (self.val.umask === "022") {
-                          self.umask = self.umasks[0];
-                        } else if (self.val.umask === "007") {
-                          self.umask = self.umasks[1];
-                        } else if (self.val.umask === "077") {
-                          self.umask = self.umasks[2];
-                        } else {
-                          self.umask = self.umasks[0];
-                        }
-
-                        timeToShutdown();
-
                       }, function (error) {
                 growl.error("Could not get Jupyter Notebook Server Settings.");
               }
@@ -473,11 +324,8 @@ angular.module('hopsWorksApp')
 
             };
 
-
-
             self.openWindow = function () {
               $window.open(self.ui, '_blank');
-              timeToShutdown();
             }
 
 
@@ -508,6 +356,9 @@ angular.module('hopsWorksApp')
                 stopLoading();
               }
               );
+
+
+
             };
 
             self.stopDataOwner = function (hdfsUsername) {
@@ -542,9 +393,7 @@ angular.module('hopsWorksApp')
 
             init();
 
-            var navigateToPython = function () {
-              $location.path('/#!/project/' + self.projectId + '/python');
-            };
+
 
             self.start = function () {
               startLoading("Connecting to Jupyter...");
@@ -555,22 +404,18 @@ angular.module('hopsWorksApp')
                       function (success) {
                         self.toggleValue = true;
                         self.config = success.data;
-                        growl.info("Starting... notebook will close automatically in " + self.val.shutdownLevel + " hours.", {title: 'Info', ttl: 3000});
+
                         self.ui = "/hopsworks-api/jupyter/" + self.config.port + "/?token=" + self.config.token;
                         $window.open(self.ui, '_blank');
                         $timeout(stopLoading(), 5000);
-                        timeToShutdown();
+
                       }, function (error) {
                 if (error.data !== undefined && error.status === 404) {
                   growl.error("Anaconda not enabled yet - retry starting Jupyter again in a few seconds.");
                 } else if (error.data !== undefined && error.status === 400) {
                   growl.error("Anaconda not enabled yet - retry starting Jupyter again in a few seconds.");
-                } else if (error.data !== undefined && error.status === 401) {
-                  growl.error("Cannot start Jupyter - your project has run out of credits. Please contact your system administrator.");
-                } else if (error.data !== undefined && error.status === 403) {
-                  growl.error("Cannot start Jupyter - your project has run out of credits. Please contact your system administrator.");
                 } else {
-                  growl.error("Could not start Jupyter. If this problem persists please contact your system administrator.");
+                  growl.error("Could not start Jupyter.");
                 }
                 stopLoading();
                 self.toggleValue = true;
@@ -578,5 +423,7 @@ angular.module('hopsWorksApp')
               );
 
             };
+
+
 
           }]);

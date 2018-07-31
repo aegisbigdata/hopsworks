@@ -1,28 +1,8 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('ModalCtrl', ['$uibModalInstance', 'title', 'msg', 'projectId',
-          function ($uibModalInstance, title, msg, projectId) {
+        .controller('ModalCtrl', ['$uibModalInstance', 'AuthService', 'DataSetService', 'growl', 'title', 'msg', 'projectId',
+          function ($uibModalInstance, AuthService, DataSetService, growl, title, msg, projectId) {
 
             var self = this;
             self.title = title;
@@ -44,7 +24,24 @@ angular.module('hopsWorksApp')
             };
 
             self.certs = function () {
-              $uibModalInstance.close(self.password);
+              var user = {password: self.password};
+
+              //To avoid displaying the password in the URL if it is wrong
+              //We validate the password first and display a proper growl
+              AuthService.validatePassword(user).then(
+                      function (success) {
+                        var dataSetService = DataSetService(self.projectId);
+                        dataSetService.getCerts(self.password).then(
+                                function (success) {
+                                   self.password = "";
+                                }, function (error) {
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+                      }, function (error) {
+                self.password = "";
+                growl.error("Wrong password", {title: 'Error', ttl: 5000});
+              });
+              $uibModalInstance.close(self.content);
             };
 
           }]);

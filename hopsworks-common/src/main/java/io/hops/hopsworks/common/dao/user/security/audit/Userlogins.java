@@ -1,26 +1,4 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.dao.user.security.audit;
-
-import io.hops.hopsworks.common.dao.user.Users;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -30,8 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -50,18 +26,22 @@ import javax.xml.bind.annotation.XmlRootElement;
           query = "SELECT u FROM Userlogins u WHERE u.loginId = :loginId"),
   @NamedQuery(name = "Userlogins.findByIp",
           query = "SELECT u FROM Userlogins u WHERE u.ip = :ip"),
-  @NamedQuery(name = "Userlogins.findByUserAgent",
-          query = "SELECT u FROM Userlogins u WHERE u.userAgent = :userAgent"),
+  @NamedQuery(name = "Userlogins.findByOs",
+          query = "SELECT u FROM Userlogins u WHERE u.os = :os"),
+  @NamedQuery(name = "Userlogins.findByBrowser",
+          query = "SELECT u FROM Userlogins u WHERE u.browser = :browser"),
   @NamedQuery(name = "Userlogins.findByAction",
           query = "SELECT u FROM Userlogins u WHERE u.action = :action"),
   @NamedQuery(name = "Userlogins.findByOutcome",
           query = "SELECT u FROM Userlogins u WHERE u.outcome = :outcome"),
-  @NamedQuery(name = "Userlogins.findByUser",
-          query = "SELECT u FROM Userlogins u WHERE u.user = :user"),
+  @NamedQuery(name = "Userlogins.findByUid",
+          query = "SELECT u FROM Userlogins u WHERE u.uid = :uid"),
+  @NamedQuery(name = "Userlogins.findByEmail",
+          query = "SELECT u FROM Userlogins u WHERE u.email = :email"),
+  @NamedQuery(name = "Userlogins.findByMac",
+          query = "SELECT u FROM Userlogins u WHERE u.mac = :mac"),
   @NamedQuery(name = "Userlogins.findByLoginDate",
-          query = "SELECT u FROM Userlogins u WHERE u.loginDate = :loginDate"),
-  @NamedQuery(name = "Userlogins.findUserLast",
-    query = "SELECT u FROM Userlogins u WHERE u.user = :user ORDER BY u.loginDate DESC")})
+          query = "SELECT u FROM Userlogins u WHERE u.loginDate = :loginDate")})
 public class Userlogins implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -73,19 +53,26 @@ public class Userlogins implements Serializable {
   @Size(max = 16)
   @Column(name = "ip")
   private String ip;
-  @Size(max = 255)
-  @Column(name = "useragent")
-  private String userAgent;
+  @Size(max = 30)
+  @Column(name = "os")
+  private String os;
+  @Size(max = 40)
+  @Column(name = "browser")
+  private String browser;
+  @Size(max = 45)
+  @Column(name = "mac")
+  private String mac;
+  @Size(max = 254)
+  @Column(name = "email")
+  private String email;
   @Size(max = 80)
   @Column(name = "action")
   private String action;
   @Size(max = 20)
   @Column(name = "outcome")
   private String outcome;
-  @JoinColumn(name = "uid",
-          referencedColumnName = "uid")
-  @ManyToOne
-  private Users user;
+  @Column(name = "uid")
+  private Integer uid;
   @Column(name = "login_date")
   @Temporal(TemporalType.TIMESTAMP)
   private Date loginDate;
@@ -93,46 +80,93 @@ public class Userlogins implements Serializable {
   public Userlogins() {
   }
 
-  public Userlogins(String ip, String userAgent, Users user,
-                    String action, String outcome, Date loginDate) {
+  public Userlogins(Long loginId) {
+    this.loginId = loginId;
+  }
+
+  public Long getLoginId() {
+    return loginId;
+  }
+
+  public void setLoginId(Long loginId) {
+    this.loginId = loginId;
+  }
+
+  public String getIp() {
+    return ip;
+  }
+
+  public void setIp(String ip) {
     this.ip = ip;
-    this.userAgent = userAgent;
+  }
+
+  public String getOs() {
+    return os;
+  }
+
+  public void setOs(String os) {
+    this.os = os;
+  }
+
+  public String getBrowser() {
+    return browser;
+  }
+
+  public void setBrowser(String browser) {
+    this.browser = browser;
+  }
+
+  public String getAction() {
+    return action;
+  }
+
+  public void setAction(String action) {
     this.action = action;
+  }
+
+  public String getOutcome() {
+    return outcome;
+  }
+
+  public void setOutcome(String outcome) {
     this.outcome = outcome;
-    this.user = user;
+  }
+
+  public Integer getLastUserLoginUid() {
+    return uid;
+  }
+
+  public void setUid(Integer uid) {
+    this.uid = uid;
+  }
+
+  public Date getLoginDate() {
+    return loginDate;
+  }
+
+  public void setLoginDate(Date loginDate) {
     this.loginDate = loginDate;
   }
 
-  public Userlogins(Long loginId) { this.loginId = loginId; }
+  public Integer getUid() {
+    return uid;
+  }
 
-  public Long getLoginId() { return loginId; }
+  public String getMac() {
+    return mac;
+  }
 
-  public void setLoginId(Long loginId) { this.loginId = loginId; }
+  public void setMac(String mac) {
+    this.mac = mac;
+  }
 
-  public String getIp() { return ip; }
+  public String getEmail() {
+    return email;
+  }
 
-  public void setIp(String ip) { this.ip = ip; }
-
-  public String getUserAgent() { return userAgent; }
-
-  public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
-
-  public String getAction() { return action; }
-
-  public void setAction(String action) { this.action = action; }
-
-  public String getOutcome() { return outcome; }
-
-  public void setOutcome(String outcome) { this.outcome = outcome; }
-
-  public Users getUser() { return user; }
-
-  public void setUser(Users user) { this.user = user; }
-
-  public Date getLoginDate() { return loginDate; }
-
-  public void setLoginDate(Date loginDate) { this.loginDate = loginDate; }
-
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
   @Override
   public int hashCode() {
@@ -157,14 +191,7 @@ public class Userlogins implements Serializable {
 
   @Override
   public String toString() {
-    return "Userlogins{" +
-        "loginId=" + loginId +
-        ", ip='" + ip + '\'' +
-        ", userAgent='" + userAgent + '\'' +
-        ", action='" + action + '\'' +
-        ", outcome='" + outcome + '\'' +
-        ", user=" + user +
-        ", loginDate=" + loginDate +
-        '}';
+    return "se.kth.bbc.security.ua.model.Userlogins[ loginId=" + loginId + " ]";
   }
+
 }

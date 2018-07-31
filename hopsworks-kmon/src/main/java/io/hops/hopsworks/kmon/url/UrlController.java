@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.kmon.url;
 
 import java.util.logging.Logger;
@@ -31,23 +11,31 @@ import javax.faces.context.FacesContext;
 @RequestScoped
 public class UrlController {
 
-  @ManagedProperty("#{param.hostname}")
-  private String hostname;
+  @ManagedProperty("#{param.hostid}")
+  private String hostId;
+  @ManagedProperty("#{param.role}")
+  private String role;
   @ManagedProperty("#{param.service}")
   private String service;
-  @ManagedProperty("#{param.group}")
-  private String group;
   @ManagedProperty("#{param.cluster}")
   private String cluster;
   @ManagedProperty("#{param.status}")
   private String status;
   @ManagedProperty("#{param.target}")
   private String target;
-  private static final Logger logger = Logger.getLogger(UrlController.class.getName());
+  private static final Logger logger = Logger.getLogger(UrlController.class.
+          getName());
 
   public UrlController() {
-    logger.info("UrlController - hostname: " + hostname + " ; cluster: " + cluster + "; group: " + group
-        + " ; service: " + service + " ; status: " + status + " ; target: " + target);
+    logger.info("UrlController");
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 
   public String getService() {
@@ -58,20 +46,12 @@ public class UrlController {
     this.service = service;
   }
 
-  public String getGroup() {
-    return group;
+  public String getHostId() {
+    return hostId;
   }
 
-  public void setGroup(String group) {
-    this.group = group;
-  }
-
-  public String getHostname() {
-    return hostname;
-  }
-
-  public void setHostname(String hostname) {
-    this.hostname = hostname;
+  public void setHostId(String hostId) {
+    this.hostId = hostId;
   }
 
   public void setCluster(String cluster) {
@@ -99,7 +79,7 @@ public class UrlController {
   }
 
   public String host() {
-    return "host?faces-redirect=true&hostname=" + hostname;
+    return "host?faces-redirect=true&hostid=" + hostId;
   }
 
   public String clustersStatus(){
@@ -114,55 +94,60 @@ public class UrlController {
     return "cluster-status?faces-redirect=true&cluster=" + cluster;
   }
   
-  public String groupInstance() {
-    return "services-instances-status?faces-redirect=true&hostname=" 
-        + hostname + "&cluster=" + cluster + "&group=" + group;
+  public String serviceInstance() {
+    return "services-instances-status?faces-redirect=true&hostid="
+            + hostId + "&cluster=" + cluster + "&role=" + role;
   }
 
   public String clusterActionHistory() {
     return "cluster-actionhistory?faces-redirect=true&cluster=" + cluster;
   }
 
-  public String groupStatus() {
-    return "group-status?faces-redirect=true&cluster=" + cluster + "&group=" + group;
+  public String serviceStatus() {
+    return "service-status?faces-redirect=true&cluster=" + cluster + "&service="
+            + service;
   }
 
-  public String groupInstances() {
+  public String serviceInstances() {
     String url = "service-instances?faces-redirect=true";
-    if (hostname != null) {
-      url += "&hostname=" + hostname;
+    if (hostId != null) {
+      url += "&hostid=" + hostId;
     }
     if (cluster != null) {
       url += "&cluster=" + cluster;
     }
-    if (group != null) {
-      url += "&group=" + group;
-    }
     if (service != null) {
       url += "&service=" + service;
     }
+    if (role != null) {
+      url += "&r=" + role;
+    }
     if (status != null) {
-      url += "&status=" + status;
+      url += "&s=" + status;
     }
     return url;
   }
 
-  public String groupActionHistory() {
-    return "group-actionhistory?faces-redirect=true&cluster=" + cluster + "&group=" + group;
-  }
-
-  public String groupTerminal() {
-    return "group-terminal?faces-redirect=true&cluster=" + cluster + "&group=" + group;
-  }
-
-  public String serviceStatus() {
-    return "service-status?faces-redirect=true&hostname=" + hostname + "&cluster="
-            + cluster + "&group=" + group + "&service=" + service;
-  }
-
   public String serviceActionHistory() {
-    return "service-actionhistory?faces-redirect=true&hostname=" + hostname
-            + "&cluster=" + cluster + "&group=" + group + "&service=" + service;
+    return "service-actionhistory?faces-redirect=true&cluster=" + cluster
+            + "&service=" + service;
+  }
+
+  public String serviceTerminal() {
+    return "service-terminal?faces-redirect=true&cluster=" + cluster
+            + "&service=" + service;
+  }
+
+  public String roleStatus() {
+    return "role-status?faces-redirect=true&hostid=" + hostId + "&cluster="
+            + cluster
+            + "&service=" + service + "&role=" + role;
+  }
+
+  public String roleActionHistory() {
+    return "role-actionhistory?faces-redirect=true&hostid=" + hostId
+            + "&cluster=" + cluster
+            + "&service=" + service + "&role=" + role;
   }
 
   public void redirectToEditGraphs() {

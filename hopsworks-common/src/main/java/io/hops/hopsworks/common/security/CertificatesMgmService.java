@@ -1,33 +1,27 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.hops.hopsworks.common.security;
 
 import io.hops.hopsworks.common.dao.certificates.CertsFacade;
 import io.hops.hopsworks.common.dao.certificates.ProjectGenericUserCerts;
 import io.hops.hopsworks.common.dao.certificates.UserCerts;
-import io.hops.hopsworks.common.dao.command.SystemCommand;
-import io.hops.hopsworks.common.dao.command.SystemCommandFacade;
 import io.hops.hopsworks.common.dao.dela.certs.ClusterCertificate;
 import io.hops.hopsworks.common.dao.dela.certs.ClusterCertificateFacade;
-import io.hops.hopsworks.common.dao.host.Hosts;
-import io.hops.hopsworks.common.dao.host.HostsFacade;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
@@ -47,8 +41,6 @@ import javax.ejb.EJB;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,7 +54,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,8 +61,6 @@ import java.util.logging.Logger;
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class CertificatesMgmService {
   private final Logger LOG = Logger.getLogger(CertificatesMgmService.class.getName());
-  
-  public static final String CERTIFICATE_SUFFIX = ".cert.pem";
   
   @EJB
   private Settings settings;
@@ -85,18 +74,9 @@ public class CertificatesMgmService {
   private ClusterCertificateFacade clusterCertificateFacade;
   @EJB
   private MessageController messageController;
-  @EJB
-  private SystemCommandFacade systemCommandFacade;
-  @EJB
-  private HostsFacade hostsFacade;
-  @EJB
-  private OpensslOperations opensslOperations;
-  @EJB
-  private ServiceCertificateRotationTimer serviceCertificateRotationTimer;
   
   private File masterPasswordFile;
   private final Map<Class, MasterPasswordChangeHandler> handlersMap = new ConcurrentHashMap<>();
-  private final ReentrantLock opensslLock = new ReentrantLock(true);
   
   public CertificatesMgmService() {
   
@@ -170,10 +150,6 @@ public class CertificatesMgmService {
     registerMasterPasswordChangeHandler(ClusterCertificate.class, delaClusterCertsHandler);
   }
   
-  public ReentrantLock getOpensslLock() {
-    return opensslLock;
-  }
-  
   @Lock(LockType.READ)
   @AccessTimeout(value = 3, unit = TimeUnit.SECONDS)
   public String getMasterEncryptionPassword() throws IOException {
@@ -232,26 +208,6 @@ public class CertificatesMgmService {
       LOG.log(Level.SEVERE, errorMsg, ex);
       callRollbackHandlers();
       sendUnsuccessfulMessage(errorMsg + "\n" + ex.getMessage(), userRequested);
-    }
-  }
-  
-  @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-  public void issueServiceKeyRotationCommand() {
-    List<Hosts> allHosts = hostsFacade.find();
-    for (Hosts host : allHosts) {
-      SystemCommand rotateCommand = new SystemCommand(host, SystemCommandFacade.OP.SERVICE_KEY_ROTATION);
-      systemCommandFacade.persist(rotateCommand);
-    }
-  }
-  
-  @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-  public void deleteServiceCertificate(Hosts host, Integer commandId) throws IOException, CAException {
-    String suffix = serviceCertificateRotationTimer.getToBeRevokedSuffix(Integer.toString(commandId));
-    try {
-      opensslOperations.revokeCertificate(host.getHostname(), suffix, CertificateType.HOST,
-          true, true);
-    } catch (IllegalArgumentException e) {
-      // Do nothing
     }
   }
   

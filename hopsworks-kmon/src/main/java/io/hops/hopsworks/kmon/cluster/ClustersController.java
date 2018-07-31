@@ -1,27 +1,6 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.kmon.cluster;
 
-import io.hops.hopsworks.common.dao.kagent.HostServices;
-import io.hops.hopsworks.common.dao.kagent.HostServicesFacade;
+import io.hops.hopsworks.common.dao.role.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -29,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import io.hops.hopsworks.common.dao.role.RoleEJB;
 import io.hops.hopsworks.kmon.struct.ClusterInfo;
 
 @ManagedBean
@@ -36,8 +16,9 @@ import io.hops.hopsworks.kmon.struct.ClusterInfo;
 public class ClustersController {
 
   @EJB
-  private HostServicesFacade hostServicesFacade;
-  private static final Logger LOGGER = Logger.getLogger(ClustersController.class.getName());
+  private RoleEJB roleEjb;
+  private static final Logger logger = Logger.getLogger(
+          ClustersController.class.getName());
   private List<ClusterInfo> clusters;
 
   public ClustersController() {
@@ -45,7 +26,7 @@ public class ClustersController {
 
   @PostConstruct
   public void init() {
-    LOGGER.info("init ClustersController");
+    logger.info("init ClustersController");
     clusters = new ArrayList<>();
     loadClusters();
   }
@@ -55,27 +36,26 @@ public class ClustersController {
   }
 
   private void loadClusters() {
-    for (String cluster : hostServicesFacade.findClusters()) {
+    for (String cluster : roleEjb.findClusters()) {
       ClusterInfo clusterInfo = new ClusterInfo(cluster);
-      clusterInfo.setNumberOfHosts(hostServicesFacade.countHosts(cluster));
-      clusterInfo.setTotalCores(hostServicesFacade.totalCores(cluster));
-      clusterInfo.setTotalGPUs(hostServicesFacade.totalGPUs(cluster));
-      clusterInfo.setTotalMemoryCapacity(hostServicesFacade.totalMemoryCapacity(cluster));
-      clusterInfo.setTotalDiskCapacity(hostServicesFacade.totalDiskCapacity(cluster));
-      clusterInfo.addServices(hostServicesFacade.findHostServicesByCluster(cluster));
+      clusterInfo.setNumberOfHost(roleEjb.countHosts(cluster));
+      clusterInfo.setTotalCores(roleEjb.totalCores(cluster));
+      clusterInfo.setTotalMemoryCapacity(roleEjb.totalMemoryCapacity(cluster));
+      clusterInfo.setTotalDiskCapacity(roleEjb.totalDiskCapacity(cluster));
+      clusterInfo.addRoles(roleEjb.findRoleHost(cluster));
       clusters.add(clusterInfo);
     }
   }
  
   public String getNameNodesString() {
-    StringBuilder hosts = new StringBuilder();
-    List<HostServices> hostServices = hostServicesFacade.findServices("namenode");
-    if (hostServices != null && !hostServices.isEmpty()) {
-      hosts.append(hostServices.get(0).getHost().getHostname());
-      for (int i = 1; i < hostServices.size(); i++) {
-        hosts.append(",").append(hostServices.get(i).getHost().getHostname());
+    String hosts = "";
+    List<Role> roles = roleEjb.findRoles("namenode");
+    if (roles != null && !roles.isEmpty()) {
+      hosts = hosts + roles.get(0).getHostId();
+      for (int i = 1; i < roles.size(); i++) {
+        hosts = hosts + "," + roles.get(i).getHostId();
       }
     }
-    return hosts.toString();
+    return hosts;
   }
 }

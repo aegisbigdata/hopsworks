@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.hdfs;
 
 import io.hops.hopsworks.common.util.Settings;
@@ -43,7 +23,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
-import org.apache.hadoop.hdfs.protocol.LastUpdatedContentSummary;
 import org.apache.hadoop.security.UserGroupInformation;
 
 public class DistributedFileSystemOps {
@@ -343,10 +322,6 @@ public class DistributedFileSystemOps {
     Path location = new Path(path);
     return dfs.exists(location);
   }
-  
-  public boolean exists(Path path) throws IOException {
-    return dfs.exists(path);
-  }
 
   /**
    * Copy a file within HDFS. Largely taken from Hadoop code.
@@ -382,10 +357,6 @@ public class DistributedFileSystemOps {
       dfs.mkdirs(dirsPath);
     }
     return dfs.create(dstPath);
-  }
-  
-  public FSDataOutputStream create(Path path) throws IOException {
-    return create(path.toString());
   }
 
   /**
@@ -435,21 +406,21 @@ public class DistributedFileSystemOps {
    */
   public void setHdfsSpaceQuotaInMBs(Path src, long diskspaceQuotaInMB) throws
           IOException {
-    setHdfsQuotaBytes(src, HdfsConstants.QUOTA_DONT_SET,
-        DistributedFileSystemOps.MB * diskspaceQuotaInMB);
+    setHdfsQuota(src, HdfsConstants.QUOTA_DONT_SET, diskspaceQuotaInMB);
   }
 
   /**
    *
    * @param src
    * @param numberOfFiles
-   * @param diskspaceQuotaInBytes
+   * @param diskspaceQuotaInMB
    * @throws IOException
    */
-  public void setHdfsQuotaBytes(Path src, long numberOfFiles, long diskspaceQuotaInBytes)
+  public void setHdfsQuota(Path src, long numberOfFiles, long diskspaceQuotaInMB)
           throws
           IOException {
-    dfs.setQuota(src, numberOfFiles, diskspaceQuotaInBytes);
+    dfs.setQuota(src, numberOfFiles, DistributedFileSystemOps.MB
+            * diskspaceQuotaInMB);
   }
 
   /**
@@ -587,29 +558,9 @@ public class DistributedFileSystemOps {
    */
   public void setMetaEnabled(String location) throws IOException {
     Path path = new Path(location);
-    setMetaEnabled(path);
-  }
-  
-  /**
-   * Marks a file/folder in location as metadata enabled
-   * <p/>
-   * @param path
-   * @throws IOException
-   */
-  public void setMetaEnabled(Path path) throws IOException {
     this.dfs.setMetaEnabled(path, true);
   }
 
-  /**
-   * Unset Metadata enabled flag on a given path
-   * <p/>
-   * @param path
-   * @throws IOException
-   */
-  public void unsetMetaEnabled(Path path) throws IOException {
-    this.dfs.setMetaEnabled(path, false);
-  }
-  
   /**
    * Returns the number of blocks of a file in the given path.
    * The path has to resolve to a file.
@@ -683,17 +634,8 @@ public class DistributedFileSystemOps {
     return -1;
   }
 
-  public long getLength(Path path) throws IOException {
-    return dfs.getLength(path);
-  }
-  
   public long getDatasetSize(Path datasetPath) throws IOException {
     ContentSummary cs = dfs.getContentSummary(datasetPath);
     return cs.getLength();
-  }
-  
-  public long getLastUpdatedDatasetSize(Path datasetPath) throws IOException {
-    LastUpdatedContentSummary cs = dfs.getLastUpdatedContentSummary(datasetPath);
-    return cs.getSpaceConsumed();
   }
 }

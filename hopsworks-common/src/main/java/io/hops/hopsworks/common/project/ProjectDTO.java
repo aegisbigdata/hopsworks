@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.project;
 
 import java.util.Date;
@@ -36,13 +16,13 @@ public class ProjectDTO {
   private String description;
   private Date retentionPeriod;
   private Date created;
+  private String ethicalStatus;
   private boolean archived;
   private List<String> services;
   private List<ProjectTeam> projectTeam;
   private List<InodeView> datasets;
   private Integer inodeid;
   private QuotasDTO quotas;
-  private String hopsExamples;
 
   public ProjectDTO() {
   }
@@ -54,23 +34,24 @@ public class ProjectDTO {
   }
 
   public ProjectDTO(Project project, Integer inodeid, List<String> services,
-      List<ProjectTeam> projectTeam, QuotasDTO quotas, String hopsExamples) {
+      List<ProjectTeam> projectTeam, QuotasDTO quotas) {
     this.projectId = project.getId();
     this.inodeid = inodeid;
     this.projectName = project.getName();
     this.owner = project.getOwner().getEmail();
     this.retentionPeriod = project.getRetentionPeriod();
     this.created = project.getCreated();
+    this.ethicalStatus = project.getEthicalStatus();
     this.archived = project.getArchived();
     this.description = project.getDescription();
     this.services = services;
     this.projectTeam = projectTeam;
     this.quotas = quotas;
-    this.hopsExamples = hopsExamples;
   }
 
   public ProjectDTO(Project project, Integer inodeid, List<String> services,
-      List<ProjectTeam> projectTeam, List<InodeView> datasets) {
+      List<ProjectTeam> projectTeam, List<InodeView> datasets,
+      String yarnQuotaInMins) {
     this.projectId = project.getId();
     //the inodeid of the current project comes from hops database
     this.inodeid = inodeid;
@@ -78,6 +59,7 @@ public class ProjectDTO {
     this.owner = project.getOwner().getEmail();
     this.retentionPeriod = project.getRetentionPeriod();
     this.created = project.getCreated();
+    this.ethicalStatus = project.getEthicalStatus();
     this.archived = project.getArchived();
     this.description = project.getDescription();
     this.services = services;
@@ -86,13 +68,15 @@ public class ProjectDTO {
   }
 
   public ProjectDTO(Integer projectId, String projectName, String owner,
-      Date retentionPeriod, Date created, boolean archived, String description,
+      Date retentionPeriod, Date created, String ethicalStatus,
+      boolean archived, String description,
       List<String> services, List<ProjectTeam> projectTeam) {
     this.projectId = projectId;
     this.projectName = projectName;
     this.owner = owner;
     this.retentionPeriod = retentionPeriod;
     this.created = created;
+    this.ethicalStatus = ethicalStatus;
     this.archived = archived;
     this.description = description;
     this.services = services;
@@ -147,6 +131,14 @@ public class ProjectDTO {
     this.created = created;
   }
 
+  public String getEthicalStatus() {
+    return ethicalStatus;
+  }
+
+  public void setEthicalStatus(String ethicalStatus) {
+    this.ethicalStatus = ethicalStatus;
+  }
+
   public boolean isArchived() {
     return archived;
   }
@@ -195,20 +187,12 @@ public class ProjectDTO {
     this.quotas = quotas;
   }
 
-  public String getHopsExamples() {
-    return hopsExamples;
-  }
-
-  public void setHopsExamples(String hopsExamples) {
-    this.hopsExamples = hopsExamples;
-  }
-
   @Override
   public String toString() {
     return "ProjectDTO{" + "projectName=" + projectName + ", owner=" + owner
         + ", description=" + description + ", retentionPeriod="
-        + retentionPeriod + ", created=" + created + ", archived="
-        + archived + ", services="
+        + retentionPeriod + ", created=" + created + ", ethicalStatus="
+        + ethicalStatus + ", archived=" + archived + ", services="
         + services + ", projectTeam=" + projectTeam + '}';
   }
 

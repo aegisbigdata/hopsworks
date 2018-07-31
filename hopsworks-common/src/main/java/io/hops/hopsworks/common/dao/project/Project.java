@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
 package io.hops.hopsworks.common.dao.project;
 
 import java.io.Serializable;
@@ -45,7 +26,6 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import io.hops.hopsworks.common.dao.tfserving.TfServing;
 import io.hops.hopsworks.common.util.Settings;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
@@ -68,33 +48,29 @@ import javax.persistence.ManyToMany;
 @XmlRootElement
 @NamedQueries({
   @NamedQuery(name = "Project.findAll",
-      query = "SELECT t FROM Project t")
-  ,
+          query = "SELECT t FROM Project t"),
   @NamedQuery(name = "Project.findByName",
-      query = "SELECT t FROM Project t WHERE t.name = :name")
-  ,
+          query = "SELECT t FROM Project t WHERE t.name = :name"),
   @NamedQuery(name = "Project.findByOwner",
-      query = "SELECT t FROM Project t WHERE t.owner = :owner")
-  ,
+          query = "SELECT t FROM Project t WHERE t.owner = :owner"),
   @NamedQuery(name = "Project.findByCreated",
-      query = "SELECT t FROM Project t WHERE t.created = :created")
-  ,
+          query = "SELECT t FROM Project t WHERE t.created = :created"),
+  @NamedQuery(name = "Project.findByEthicalStatus",
+          query
+          = "SELECT t FROM Project t WHERE t.ethicalStatus = :ethicalStatus"),
   @NamedQuery(name = "Project.findByRetentionPeriod",
-      query
-      = "SELECT t FROM Project t WHERE t.retentionPeriod = :retentionPeriod")
-  ,
+          query
+          = "SELECT t FROM Project t WHERE t.retentionPeriod = :retentionPeriod"),
   @NamedQuery(name = "Project.countProjectByOwner",
-      query
-      = "SELECT count(t) FROM Project t WHERE t.owner = :owner")
-  ,
+          query
+          = "SELECT count(t) FROM Project t WHERE t.owner = :owner"),
   @NamedQuery(name = "Project.findByOwnerAndName",
-      query
-      = "SELECT t FROM Project t WHERE t.owner = :owner AND t.name = :name")
-  ,
+          query
+          = "SELECT t FROM Project t WHERE t.owner = :owner AND t.name = :name"),
   @NamedQuery(name = "Project.findByInodeId",
-      query
-      = "SELECT t FROM Project t WHERE t.inode.inodePK.parentId = :parentid "
-      + "AND t.inode.inodePK.name = :name")})
+          query
+          = "SELECT t FROM Project t WHERE t.inode.inodePK.parentId = :parentid "
+          + "AND t.inode.inodePK.name = :name")})
 public class Project implements Serializable {
 
   @Column(name = "conda")
@@ -104,31 +80,25 @@ public class Project implements Serializable {
   @Column(name = "logs")
   private Boolean logs = false;
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "project")
+          mappedBy = "project")
   private Collection<ProjectTeam> projectTeamCollection;
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "project")
+          mappedBy = "project")
   private Collection<Activity> activityCollection;
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "project")
+          mappedBy = "project")
   private Collection<ProjectServices> projectServicesCollection;
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "project")
+          mappedBy = "project")
   private Collection<Dataset> datasetCollection;
 
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "projectId")
+          mappedBy = "projectId")
   private Collection<CondaCommands> condaCommandsCollection;
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "project")
+          mappedBy = "project")
   private Collection<JupyterSettings> jupyterSettingsCollection;
-  @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "project")
-  private Collection<TfServing> tfServingCollection;
 
-//  @OneToMany(cascade = CascadeType.ALL,
-//      mappedBy = "projectId")
-//  private Collection<Pia> piaCollection;
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -140,13 +110,13 @@ public class Project implements Serializable {
   @Basic(optional = false)
   @NotNull
   @Size(min = 1,
-      max = 88)
+          max = 88)
   @Column(name = "projectname")
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "username",
-      referencedColumnName = "email")
+          referencedColumnName = "email")
   private Users owner;
 
   @Basic(optional = false)
@@ -159,6 +129,12 @@ public class Project implements Serializable {
   @Temporal(TemporalType.DATE)
   private Date retentionPeriod;
 
+  @NotNull
+  @Size(min = 1,
+          max = 30)
+  @Column(name = "ethical_status")
+  private String ethicalStatus;
+
   @Column(name = "deleted")
   private Boolean deleted;
 
@@ -166,53 +142,40 @@ public class Project implements Serializable {
   @Column(name = "payment_type")
   @Enumerated(EnumType.STRING)
   private PaymentType paymentType;
-
+  
   @Column(name = "python_version")
   private String pythonVersion;
-
+  
   @Size(max = 2000)
   @Column(name = "description")
   private String description;
 
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "kafka_max_num_topics")
-  private Integer kafkaMaxNumTopics = 10;
-
-  @Basic(optional = false)
-  @NotNull
-  @Column(name = "last_quota_update")
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date lastQuotaUpdate;
-
   @JoinColumns({
     @JoinColumn(name = "inode_pid",
-        referencedColumnName = "parent_id")
-    ,
+            referencedColumnName = "parent_id"),
     @JoinColumn(name = "inode_name",
-        referencedColumnName = "name")
-    ,
+            referencedColumnName = "name"),
     @JoinColumn(name = "partition_id",
-        referencedColumnName = "partition_id")})
+            referencedColumnName = "partition_id")})
   @OneToOne(optional = false)
   private Inode inode;
 
   @JoinTable(name = "hopsworks.project_pythondeps",
-      joinColumns
-      = {
-        @JoinColumn(name = "project_id",
-            referencedColumnName = "id")},
-      inverseJoinColumns
-      = {
-        @JoinColumn(name = "dep_id",
-            referencedColumnName = "id")})
+          joinColumns
+          = {
+            @JoinColumn(name = "project_id",
+                    referencedColumnName = "id")},
+          inverseJoinColumns
+          = {
+            @JoinColumn(name = "dep_id",
+                    referencedColumnName = "id")})
   @ManyToMany
   private Collection<PythonDep> pythonDepCollection;
 
   @OneToMany(cascade = CascadeType.ALL,
-      mappedBy = "projectId")
+          mappedBy = "projectId")
   private Collection<JupyterProject> jupyterProjectCollection;
-
+  
   public Project() {
   }
 
@@ -240,6 +203,14 @@ public class Project implements Serializable {
 
   public void setCreated(Date created) {
     this.created = created;
+  }
+
+  public String getEthicalStatus() {
+    return ethicalStatus;
+  }
+
+  public void setEthicalStatus(String ethicalStatus) {
+    this.ethicalStatus = ethicalStatus;
   }
 
   public String getName() {
@@ -281,7 +252,7 @@ public class Project implements Serializable {
   public void setPythonVersion(String pythonVersion) {
     this.pythonVersion = pythonVersion;
   }
-
+  
   public String getDescription() {
     return description;
   }
@@ -342,7 +313,7 @@ public class Project implements Serializable {
     }
     Project other = (Project) object;
     if ((this.id == null && other.id != null) || (this.id != null && !this.id.
-        equals(other.id))) {
+            equals(other.id))) {
       return false;
     }
     return true;
@@ -379,7 +350,7 @@ public class Project implements Serializable {
   }
 
   public void setProjectTeamCollection(
-      Collection<ProjectTeam> projectTeamCollection) {
+          Collection<ProjectTeam> projectTeamCollection) {
     this.projectTeamCollection = projectTeamCollection;
   }
 
@@ -400,7 +371,7 @@ public class Project implements Serializable {
   }
 
   public void setProjectServicesCollection(
-      Collection<ProjectServices> projectServicesCollection) {
+          Collection<ProjectServices> projectServicesCollection) {
     this.projectServicesCollection = projectServicesCollection;
   }
 
@@ -427,7 +398,7 @@ public class Project implements Serializable {
   }
 
   public void setCondaCommandsCollection(
-      Collection<CondaCommands> condaCommandsCollection) {
+          Collection<CondaCommands> condaCommandsCollection) {
     this.condaCommandsCollection = condaCommandsCollection;
   }
 
@@ -442,10 +413,10 @@ public class Project implements Serializable {
   }
 
   public void setJupyterProjectCollection(
-      Collection<JupyterProject> jupyterProjectCollection) {
+          Collection<JupyterProject> jupyterProjectCollection) {
     this.jupyterProjectCollection = jupyterProjectCollection;
   }
-
+  
   @XmlTransient
   @JsonIgnore
   public Collection<JupyterSettings> getJupyterSettingsCollection() {
@@ -453,50 +424,17 @@ public class Project implements Serializable {
   }
 
   public void setJupyterSettingsCollection(
-      Collection<JupyterSettings> jupyterSettingsCollection) {
+          Collection<JupyterSettings> jupyterSettingsCollection) {
     this.jupyterSettingsCollection = jupyterSettingsCollection;
   }
-
-  @XmlTransient
-  @JsonIgnore
-  public Collection<TfServing> getTfServingCollection() {
-    return tfServingCollection;
-  }
-
-  public void setTfServingCollection(Collection<TfServing> tfServingCollection) {
-    this.tfServingCollection = tfServingCollection;
-  }
-
+  
   public String getProjectGenericUser() {
     return name + Settings.PROJECT_GENERIC_USER_SUFFIX;
   }
-
-  public Date getLastQuotaUpdate() {
-    return lastQuotaUpdate;
-  }
-
-  public void setLastQuotaUpdate(Date lastQuotaUpdate) {
-    this.lastQuotaUpdate = lastQuotaUpdate;
-  }
-
-//  public Collection<Pia> getPiaCollection() {
-//    return piaCollection;
-//  }
-//
-//  public void setPiaCollection(Collection<Pia> piaCollection) {
-//    this.piaCollection = piaCollection;
-//  }
-  public Integer getKafkaMaxNumTopics() {
-    return kafkaMaxNumTopics;
-  }
-
-  public void setKafkaMaxNumTopics(Integer kafkaMaxNumTopics) {
-    this.kafkaMaxNumTopics = kafkaMaxNumTopics;
-  }
-
+  
   @Override
   public String toString() {
     return "se.kth.bbc.project.Project[ name=" + this.name + ", id=" + this.id
-        + ", parentId=" + this.inode.getInodePK().getParentId() + " ]";
+            + ", parentId=" + this.inode.getInodePK().getParentId() + " ]";
   }
 }

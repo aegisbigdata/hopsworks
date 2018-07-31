@@ -1,25 +1,6 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
 package io.hops.hopsworks.cluster.controller;
 
 import io.hops.hopsworks.cluster.ClusterDTO;
-import io.hops.hopsworks.cluster.ClusterYmlDTO;
 import io.hops.hopsworks.common.dao.user.BbcGroup;
 import io.hops.hopsworks.common.dao.user.BbcGroupFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
@@ -28,24 +9,25 @@ import io.hops.hopsworks.common.dao.user.cluster.ClusterCert;
 import io.hops.hopsworks.common.dao.user.cluster.ClusterCertFacade;
 import io.hops.hopsworks.common.dao.user.cluster.RegistrationStatusEnum;
 import io.hops.hopsworks.common.dao.user.security.audit.AccountsAuditActions;
+import io.hops.hopsworks.common.dao.user.security.audit.AuditManager;
+import io.hops.hopsworks.common.dao.user.security.audit.UserAuditActions;
+import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountStatus;
+import io.hops.hopsworks.common.dao.user.security.ua.PeopleAccountType;
 import io.hops.hopsworks.common.dao.user.security.ua.SecurityUtils;
-import io.hops.hopsworks.common.dao.user.security.ua.UserAccountStatus;
 import io.hops.hopsworks.common.dao.user.security.ua.UserAccountsEmailMessages;
 import io.hops.hopsworks.common.exception.AppException;
-import io.hops.hopsworks.common.security.CAException;
-import io.hops.hopsworks.common.security.CertificateType;
-import io.hops.hopsworks.common.security.OpensslOperations;
-import io.hops.hopsworks.common.user.AuthController;
+import io.hops.hopsworks.common.user.UserStatusValidator;
 import io.hops.hopsworks.common.user.UsersController;
+import io.hops.hopsworks.common.util.AuditUtil;
 import io.hops.hopsworks.common.util.EmailBean;
-import io.hops.hopsworks.common.util.FormatUtils;
+import io.hops.hopsworks.common.security.PKIUtils;
 import io.hops.hopsworks.common.util.Settings;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +39,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.security.cert.CertificateException;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.digest.DigestUtils;
 
 @Stateless
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -70,7 +53,6 @@ public class ClusterController {
   private final static int VALIDATION_KEY_LEN = 64;
 
   public static enum OP_TYPE {
-
     REGISTER,
     UNREGISTER
   }
@@ -85,85 +67,36 @@ public class ClusterController {
   @EJB
   private Settings settings;
   @EJB
-  private AuthController authController;
+  private AuditManager am;
   @EJB
-  private UsersController usersCtrl;
+  private UsersController userController;
   @EJB
-  private OpensslOperations opensslOperations;
+  private UserStatusValidator statusValidator;
 
-  public void registerClusterNewUser(ClusterDTO cluster, HttpServletRequest req, boolean autoValidate) 
-    throws MessagingException, AppException {
+  public void register(ClusterDTO cluster, HttpServletRequest req) throws MessagingException {
     isValidNewCluster(cluster);
-    Users clusterAgent = createClusterAgent(cluster, req);
-    ClusterCert clusterCert = createClusterCert(cluster, clusterAgent);
-
-    if (autoValidate) {
-      activateClusterAgent(cluster);
-      autoActivateCluster(clusterCert);
-    } else {
-      sendEmail(cluster, req, clusterCert.getId() + clusterCert.getValidationKey(), clusterAgent,
-        AccountsAuditActions.REGISTRATION.name());
+    ClusterCert clusterCert = clusterCertFacade.getByOrgUnitNameAndOrgName(cluster.getOrganizationName(), cluster.
+        getOrganizationalUnitName());
+    if (clusterCert != null) {
+      throw new IllegalArgumentException(
+          "Cluster with the same Organization and Organization unit name alrady registerd.");
     }
-    LOGGER.log(Level.INFO, "New cluster added with email: {0}, and username: {1}", new Object[]{clusterAgent.getEmail(),
-      clusterAgent.getUsername()});
-  }
-
-  public void registerClusterWithUser(ClusterDTO cluster, HttpServletRequest req, boolean autoValidate)
-    throws MessagingException, AppException {
-    isValidCluster(cluster);
-    Optional<Users> clusterAgent = verifyClusterAgent(cluster, req);
-    if (!clusterAgent.isPresent()) {
-      throw new IllegalArgumentException("User not registerd.");
-    }
-    ClusterCert clusterCert = createClusterCert(cluster, clusterAgent.get());
-    if (autoValidate) {
-      autoActivateCluster(clusterCert);
-    } else {
-      sendEmail(cluster, req, clusterCert.getId() + clusterCert.getValidationKey(), clusterAgent.get(),
-        AccountsAuditActions.REGISTRATION.name());
-    }
-    LOGGER.log(Level.INFO, "New cluster added with email: {0}, and username: {1}", 
-      new Object[]{clusterAgent.get().getEmail(), clusterAgent.get().getUsername()});
-  }
-
-  private Optional<Users> verifyClusterAgent(ClusterDTO cluster, HttpServletRequest req) throws AppException {
     Users clusterAgent = userBean.findByEmail(cluster.getEmail());
-    if (clusterAgent == null) {
-      return Optional.empty();
+    if (clusterAgent != null) {
+      throw new IllegalArgumentException("User email already registerd.");
     }
-    checkUserPasswordAndStatus(cluster, clusterAgent, req);
-    return Optional.of(clusterAgent);
-  }
+    String agentName = getAgentName();
+    clusterAgent = new Users();
+    clusterAgent.setUsername(agentName);
+    clusterAgent.setEmail(cluster.getEmail());
+    clusterAgent.setFname(cluster.getCommonName());
+    clusterAgent.setLname(CLUSTER_NAME_PREFIX);
+    clusterAgent.setTitle("Mrs");
+    clusterAgent.setStatus(PeopleAccountStatus.NEW_MOBILE_ACCOUNT);
+    clusterAgent.setMode(PeopleAccountType.M_ACCOUNT_TYPE);
+    clusterAgent.setPassword(DigestUtils.sha256Hex(cluster.getChosenPassword()));
+    clusterAgent.setMaxNumProjects(0);
 
-  private Users createClusterAgent(ClusterDTO cluster, HttpServletRequest req) throws AppException {
-    Optional<Users> clusterAgentAux = verifyClusterAgent(cluster, req);
-    if (clusterAgentAux.isPresent()) {
-      return clusterAgentAux.get();
-    }
-    Users clusterAgent = usersCtrl.createNewAgent(cluster.getEmail(), CLUSTER_NAME_PREFIX, "007",
-      cluster.getChosenPassword(), "Mrs");
-    clusterAgent.setBbcGroupCollection(bbcGroups());
-    userBean.persist(clusterAgent);
-    return clusterAgent;
-  }
-
-  private void activateClusterAgent(ClusterDTO cluster) {
-    Users clusterAgent = userBean.findByEmail(cluster.getEmail());
-    if (clusterAgent == null) {
-      throw new IllegalArgumentException("Cluster not registerd.");
-    }
-    if (clusterAgent.getStatus().equals(UserAccountStatus.ACTIVATED_ACCOUNT)) {
-      return;
-    }
-    if (clusterAgent.getStatus().equals(UserAccountStatus.NEW_MOBILE_ACCOUNT)) {
-      clusterAgent.setStatus(UserAccountStatus.ACTIVATED_ACCOUNT);
-      userBean.update(clusterAgent);
-      return;
-    }
-    throw new IllegalStateException("Trying to activate account in state:" + clusterAgent.getStatus());
-  }
-
-  private List<BbcGroup> bbcGroups() {
     BbcGroup group = groupFacade.findByGroupName(CLUSTER_GROUP);
     Integer gid = groupFacade.lastGroupID() + 1;
     if (group == null) {
@@ -171,49 +104,62 @@ public class ClusterController {
       group.setGroupDesc("Clusters outside the system");
       groupFacade.save(group);
     }
+
     List<BbcGroup> groups = new ArrayList<>();
     groups.add(group);
-    return groups;
-  }
+    clusterAgent.setBbcGroupCollection(groups);
+    userBean.persist(clusterAgent);
 
-  private ClusterCert createClusterCert(ClusterDTO cluster, Users clusterAgent) {
-    ClusterCert clusterCert = clusterCertFacade.getByOrgUnitNameAndOrgName(cluster.getOrganizationName(), cluster.
-      getOrganizationalUnitName());
-    if (clusterCert != null) {
-      throw new IllegalArgumentException(
-        "Cluster with the same Organization and Organization unit name already registered.");
-    }
-    String commonName = cluster.getOrganizationName() + "_" + cluster.getOrganizationalUnitName();
-    clusterCert = new ClusterCert(commonName, cluster.getOrganizationName(), cluster.getOrganizationalUnitName(),
-      RegistrationStatusEnum.REGISTRATION_PENDING, clusterAgent);
+    clusterCert = new ClusterCert(cluster.getCommonName(), cluster.getOrganizationName(), cluster.
+        getOrganizationalUnitName(), RegistrationStatusEnum.REGISTRATION_PENDING, clusterAgent);
     clusterCert.setValidationKey(SecurityUtils.getRandomPassword(VALIDATION_KEY_LEN));
     clusterCert.setValidationKeyDate(new Date());
     clusterCertFacade.save(clusterCert);
-    return clusterCert;
+    sendEmail(cluster, req, clusterCert.getId() + clusterCert.getValidationKey(), clusterAgent,
+        AccountsAuditActions.REGISTRATION.name());
+    LOGGER.log(Level.INFO, "New cluster added with email: {0}, and username: {1}", new Object[]{clusterAgent.getEmail(),
+      clusterAgent.getUsername()});
   }
 
-  private void autoActivateCluster(ClusterCert clusterCert) {
-    clusterCert.setRegistrationStatus(RegistrationStatusEnum.REGISTERED);
-    clusterCert.setValidationKey(null);
-    clusterCert.setValidationKeyDate(null);
-    clusterCertFacade.update(clusterCert);
+  public void registerCluster(ClusterDTO cluster, HttpServletRequest req) throws MessagingException {
+    isValidCluster(cluster);
+    ClusterCert clusterCert = clusterCertFacade.getByOrgUnitNameAndOrgName(cluster.getOrganizationName(), cluster.
+        getOrganizationalUnitName());
+    if (clusterCert != null) {
+      throw new IllegalArgumentException(
+          "Cluster with the same Organization and Organization unit name alrady registerd.");
+    }
+    Users clusterAgent = userBean.findByEmail(cluster.getEmail());
+    if (clusterAgent == null) {
+      throw new IllegalArgumentException("User not registerd.");
+    }
+    checkUserPasswordAndStatus(cluster, clusterAgent, req);
+    clusterCert = new ClusterCert(cluster.getCommonName(), cluster.getOrganizationName(), cluster.
+        getOrganizationalUnitName(), RegistrationStatusEnum.REGISTRATION_PENDING, clusterAgent);
+    clusterCert.setValidationKey(SecurityUtils.getRandomPassword(VALIDATION_KEY_LEN));
+    clusterCert.setValidationKeyDate(new Date());
+    clusterCertFacade.save(clusterCert);
+    sendEmail(cluster, req, clusterCert.getId() + clusterCert.getValidationKey(), clusterAgent,
+        AccountsAuditActions.REGISTRATION.name());
+    LOGGER.log(Level.INFO, "New cluster added with email: {0}, and username: {1}", new Object[]{clusterAgent.getEmail(),
+      clusterAgent.getUsername()});
   }
 
-  public void unregister(ClusterDTO cluster, HttpServletRequest req) throws MessagingException, AppException {
+  public void unregister(ClusterDTO cluster, HttpServletRequest req) throws MessagingException {
     isValidCluster(cluster);
     Users clusterAgent = userBean.findByEmail(cluster.getEmail());
     if (clusterAgent == null) {
       throw new IllegalArgumentException("Cluster not registerd.");
     }
     ClusterCert clusterCert = clusterCertFacade.getByOrgUnitNameAndOrgName(cluster.getOrganizationName(), cluster.
-      getOrganizationalUnitName());
+        getOrganizationalUnitName());
     if (clusterCert == null) {
       throw new IllegalArgumentException("Cluster not registerd.");
     }
     if (clusterCert.getRegistrationStatus().equals(RegistrationStatusEnum.UNREGISTRATION_PENDING) && getDateDiffHours(
-      clusterCert.getValidationKeyDate()) < VALIDATION_KEY_EXPIRY_DATE) {
+        clusterCert.getValidationKeyDate()) < VALIDATION_KEY_EXPIRY_DATE) {
       throw new IllegalArgumentException(
-        "Cluster unregisterd use the validation key sent to you via email to complete unregistration.");
+          "Cluster unregisterd use the validation key sent to you via email to complete unregistration.");
     }
     if (!isOnlyClusterAgent(clusterAgent)) {
       throw new IllegalArgumentException("Not a cluster agent.");
@@ -225,12 +171,12 @@ public class ClusterController {
     clusterCert.setValidationKeyDate(new Date());
     clusterCertFacade.update(clusterCert);
     sendEmail(cluster, req, clusterCert.getId() + clusterCert.getValidationKey(), clusterAgent,
-      AccountsAuditActions.UNREGISTRATION.name());
+        AccountsAuditActions.UNREGISTRATION.name());
     LOGGER.log(Level.INFO, "Unregistering cluster with email: {0}", clusterAgent.getEmail());
   }
 
   public void validateRequest(String key, HttpServletRequest req, OP_TYPE type) throws IOException,
-    FileNotFoundException, InterruptedException, CertificateException {
+      FileNotFoundException, InterruptedException, CertificateException {
     Integer clusterCertId = extractClusterCertId(key);
     ClusterCert clusterCert = clusterCertFacade.find(clusterCertId);
     if (clusterCert == null) {
@@ -250,9 +196,9 @@ public class ClusterController {
       throw new IllegalStateException("Expired valdation key.");
     }
     if (type.equals(OP_TYPE.REGISTER) && clusterCert.getRegistrationStatus().equals(
-      RegistrationStatusEnum.REGISTRATION_PENDING)) {
-      if (agent.getStatus() == UserAccountStatus.NEW_MOBILE_ACCOUNT) {
-        agent.setStatus(UserAccountStatus.ACTIVATED_ACCOUNT);
+        RegistrationStatusEnum.REGISTRATION_PENDING)) {
+      if (agent.getStatus() == PeopleAccountStatus.NEW_MOBILE_ACCOUNT) {
+        agent.setStatus(PeopleAccountStatus.ACTIVATED_ACCOUNT);
         userBean.update(agent);
       }
       clusterCert.setValidationKey(null);
@@ -260,7 +206,7 @@ public class ClusterController {
       clusterCert.setRegistrationStatus(RegistrationStatusEnum.REGISTERED);
       clusterCertFacade.update(clusterCert);
     } else if (clusterCert.getRegistrationStatus().equals(RegistrationStatusEnum.UNREGISTRATION_PENDING)) {
-      revokeCert(clusterCert);
+      revokeCert(clusterCert, true);
       removeClusterCert(clusterCert);
     }
   }
@@ -290,8 +236,7 @@ public class ClusterController {
     }
   }
 
-  public List<ClusterCert> getAllClusters(ClusterDTO cluster, HttpServletRequest req) throws MessagingException,
-    AppException {
+  public List<ClusterCert> getAllClusters(ClusterDTO cluster, HttpServletRequest req) throws MessagingException {
     if (cluster == null) {
       throw new NullPointerException("Cluster not assigned.");
     }
@@ -309,38 +254,7 @@ public class ClusterController {
     return clusterCertFacade.getByAgent(clusterAgent);
   }
 
-  public List<ClusterYmlDTO> getAllClusterYml(ClusterDTO cluster, HttpServletRequest req) throws MessagingException,
-    AppException {
-    if (cluster == null) {
-      throw new NullPointerException("Cluster not assigned.");
-    }
-    if (cluster.getEmail() == null || cluster.getEmail().isEmpty()) {
-      throw new IllegalArgumentException("Cluster email not set.");
-    }
-    if (cluster.getChosenPassword() == null || cluster.getChosenPassword().isEmpty()) {
-      throw new IllegalArgumentException("Cluster password not set.");
-    }
-    Users clusterAgent = userBean.findByEmail(cluster.getEmail());
-    if (clusterAgent == null) {
-      throw new IllegalArgumentException("No registerd cluster found for user.");
-    }
-    checkUserPasswordAndStatus(cluster, clusterAgent, req);
-    List<ClusterCert> clusterCerts = clusterCertFacade.getByAgent(clusterAgent);
-    List<ClusterYmlDTO> clusterYmlDTOs = new ArrayList<>();
-    for (ClusterCert cCert : clusterCerts) {
-      clusterYmlDTOs.add(new ClusterYmlDTO(cCert.getAgentId().getEmail(),
-        cCert.getCommonName(),
-        cCert.getOrganizationName(),
-        cCert.getOrganizationalUnitName(),
-        cCert.getRegistrationStatus(),
-        cCert.getRegistrationDate(),
-        cCert.getSerialNumber()));
-    }
-    return clusterYmlDTOs;
-  }
-
-  public ClusterCert getCluster(ClusterDTO cluster, HttpServletRequest req) throws MessagingException, AppException {
-
+  public ClusterCert getCluster(ClusterDTO cluster, HttpServletRequest req) throws MessagingException {
     isValidCluster(cluster);
     Users clusterAgent = userBean.findByEmail(cluster.getEmail());
     if (clusterAgent == null) {
@@ -348,20 +262,33 @@ public class ClusterController {
     }
     checkUserPasswordAndStatus(cluster, clusterAgent, req);
     ClusterCert clusterCert = clusterCertFacade.getByOrgUnitNameAndOrgName(cluster.getOrganizationName(), cluster.
-      getOrganizationalUnitName());
+        getOrganizationalUnitName());
     if (clusterCert == null) {
       throw new IllegalArgumentException("Cluster not registerd.");
     }
     return clusterCert;
   }
 
-  private void checkUserPasswordAndStatus(ClusterDTO cluster, Users clusterAgent, HttpServletRequest req)
-    throws AppException {
-    authController.checkPasswordAndStatus(clusterAgent, cluster.getChosenPassword(), req);
+  private void checkUserPasswordAndStatus(ClusterDTO cluster, Users clusterAgent, HttpServletRequest req) throws
+      MessagingException {
+    String password = DigestUtils.sha256Hex(cluster.getChosenPassword());
+    if (!password.equals(clusterAgent.getPassword())) {
+      userController.registerFalseLogin(clusterAgent);//will set status if false login > allowed
+      am.registerLoginInfo(clusterAgent, UserAuditActions.LOGIN.name(), UserAuditActions.FAILED.name(), req);
+      throw new SecurityException("Incorrect password.");
+    }
+    try {
+      statusValidator.checkStatus(clusterAgent.getStatus());
+    } catch (AppException ex) {
+      LOGGER.log(Level.WARNING, "User {0} with state {1} trying to login.", new Object[]{clusterAgent.getEmail(),
+        clusterAgent.getStatus()});
+      throw new SecurityException(ex.getMessage());
+    }
     BbcGroup group = groupFacade.findByGroupName(CLUSTER_GROUP);
     if (!clusterAgent.getBbcGroupCollection().contains(group)) {
       throw new SecurityException("User not allowed to register clusters.");
     }
+    userController.resetFalseLogin(clusterAgent);
   }
 
   private void removeUserIfNotValidated(Users u) {
@@ -376,16 +303,16 @@ public class ClusterController {
     int countExpired = 0;
     for (ClusterCert clusterCert : clusterCerts) {
       Date validationKeyDate = clusterCert.getValidationKeyDate();
-      if (validationKeyDate == null) {
+      if(validationKeyDate == null) {
         continue;
       }
       diff = getDateDiffHours(validationKeyDate);
       if (diff > VALIDATION_KEY_EXPIRY_DATE && clusterCert.getRegistrationStatus().equals(
-        RegistrationStatusEnum.REGISTRATION_PENDING)) {
+          RegistrationStatusEnum.REGISTRATION_PENDING)) {
         countExpired++;
         clusterCertFacade.remove(clusterCert);
       } else if (diff > VALIDATION_KEY_EXPIRY_DATE && clusterCert.getRegistrationStatus().equals(
-        RegistrationStatusEnum.UNREGISTRATION_PENDING)) {
+          RegistrationStatusEnum.UNREGISTRATION_PENDING)) {
         clusterCert.setRegistrationStatus(RegistrationStatusEnum.REGISTERED);
         clusterCert.setValidationKeyDate(null);
         clusterCertFacade.update(clusterCert);
@@ -404,6 +331,12 @@ public class ClusterController {
 
   private void isValidNewCluster(ClusterDTO cluster) {
     isValidCluster(cluster);
+    if (cluster.getCommonName() == null || cluster.getCommonName().isEmpty()) {
+      throw new IllegalArgumentException("Cluster Common Name not set.");
+    }
+    if (cluster.getCommonName().contains(Settings.DOUBLE_UNDERSCORE)) {
+      throw new IllegalArgumentException("Cluster Common Name can not contain " + Settings.DOUBLE_UNDERSCORE);
+    }
     if (!cluster.getChosenPassword().equals(cluster.getRepeatedPassword())) {
       throw new IllegalArgumentException("Cluster password does not match.");
     }
@@ -431,19 +364,19 @@ public class ClusterController {
   }
 
   private void sendEmail(ClusterDTO cluster, HttpServletRequest req, String validationKey, Users u, String type) throws
-    MessagingException {
+      MessagingException {
     if (type == null || type.isEmpty()) {
       throw new IllegalArgumentException("No type set.");
     }
     try {
       if (type.equals(AccountsAuditActions.REGISTRATION.name())) {
         emailBean.sendEmail(cluster.getEmail(), Message.RecipientType.TO,
-          UserAccountsEmailMessages.CLUSTER_REQUEST_SUBJECT, UserAccountsEmailMessages.
-          buildClusterRegisterRequestMessage(FormatUtils.getUserURL(req), validationKey));
+            UserAccountsEmailMessages.CLUSTER_REQUEST_SUBJECT, UserAccountsEmailMessages.
+                buildClusterRegisterRequestMessage(AuditUtil.getUserURL(req), validationKey));
       } else {
         emailBean.sendEmail(cluster.getEmail(), Message.RecipientType.TO,
-          UserAccountsEmailMessages.CLUSTER_REQUEST_SUBJECT, UserAccountsEmailMessages.
-          buildClusterUnregisterRequestMessage(FormatUtils.getUserURL(req), validationKey));
+            UserAccountsEmailMessages.CLUSTER_REQUEST_SUBJECT, UserAccountsEmailMessages.
+                buildClusterUnregisterRequestMessage(AuditUtil.getUserURL(req), validationKey));
       }
     } catch (MessagingException ex) {
       LOGGER.log(Level.SEVERE, "Could not send email to ", u.getEmail());
@@ -486,19 +419,17 @@ public class ClusterController {
     return TimeUnit.MILLISECONDS.toHours(diff);
   }
 
-  private void revokeCert(ClusterCert clusterCert) throws IOException {
+  private void revokeCert(ClusterCert clusterCert, boolean intermediate) throws FileNotFoundException, IOException,
+      InterruptedException, CertificateException {
     if (clusterCert == null || clusterCert.getSerialNumber() == null) {
       return;
     }
-
-    try {
-      opensslOperations.revokeCertificate(clusterCert.getCommonName(), CertificateType.DELA,
-          true, true);
-    } catch (CAException cae){
-      if (cae.getError() == CAException.CAExceptionErrors.CERTNOTFOUND) {
-        LOGGER.log(Level.WARNING, "Could not find certificate with CN: " +
-            clusterCert.getCommonName() + " to be revoked");
-      }
+    String agentP = intermediate ? settings.getIntermediateCaDir() : settings.getCertsDir();
+    File agentPem = new File(agentP + "/newcerts/" + clusterCert.getSerialNumber() + ".pem");
+    if (!agentPem.exists()) {
+      LOGGER.log(Level.WARNING, "Could not find cert to be revoked at path: {0}", agentPem.getPath());
     }
+    PKIUtils.revokeCert(settings, agentPem.getPath(), intermediate);
   }
+
 }

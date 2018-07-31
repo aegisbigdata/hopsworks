@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 'use strict';
 
 angular.module('hopsWorksApp')
@@ -26,25 +6,6 @@ angular.module('hopsWorksApp')
               confirm: function (size, title, msg, projectId) {
                 var modalInstance = $uibModal.open({
                   templateUrl: 'views/confirmModal.html',
-                  controller: 'ModalCtrl as modalCtrl',
-                  size: size,
-                  resolve: {
-                    title: function () {
-                      return title;
-                    },
-                    msg: function () {
-                      return msg;
-                    },
-                    projectId: function () {
-                      return projectId;
-                    }
-                  }
-                });
-                return modalInstance.result;
-              },
-              viewJson: function (size, title, msg, projectId) {
-                var modalInstance = $uibModal.open({
-                  templateUrl: 'views/jsonModal.html',
                   controller: 'ModalCtrl as modalCtrl',
                   size: size,
                   resolve: {
@@ -176,7 +137,7 @@ angular.module('hopsWorksApp')
               },
               createProject: function (size) {
                 var modalInstance = $uibModal.open({
-                  templateUrl: 'views/projectCreateModal.html',
+                  templateUrl: 'views/newProject.html',
                   controller: 'ProjectCreatorCtrl as projectCreatorCtrl',
                   size: size,
                   resolve: {
@@ -261,7 +222,7 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
-              shareDataset: function (size, dsName, permissions) {
+              shareDataset: function (size, dsName) {
                 var modalInstance = $uibModal.open({
                   templateUrl: 'views/shareDataset.html',
                   controller: 'ShareDatasetCtrl as shareDatasetCtrl',
@@ -280,17 +241,14 @@ angular.module('hopsWorksApp')
                       }],
                     dsName: function () {
                       return dsName;
-                    }, 
-                    permissions: function () {
-                      return permissions;
                     }
                   }
                 });
                 return modalInstance.result;
               },
-              permissions: function (size, dsName, permissions) {
+              makeEditable: function (size, dsName) {
                 var modalInstance = $uibModal.open({
-                  templateUrl: 'views/datasetPermissions.html',
+                  templateUrl: 'views/makeEditable.html',
                   controller: 'ShareDatasetCtrl as shareDatasetCtrl',
                   size: size,
                   resolve: {
@@ -307,9 +265,30 @@ angular.module('hopsWorksApp')
                       }],
                     dsName: function () {
                       return dsName;
-                    },
-                    permissions: function () {
-                      return permissions;
+                    }
+                  }
+                });
+                return modalInstance.result;
+              },
+              removeEditable: function (size, dsName) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'views/removeEditable.html',
+                  controller: 'ShareDatasetCtrl as shareDatasetCtrl',
+                  size: size,
+                  resolve: {
+                    auth: ['$q', '$location', 'AuthService',
+                      function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                                function (success) {
+                                },
+                                function (err) {
+                                  $location.path('/login');
+                                  $location.replace();
+                                  return $q.reject(err);
+                                });
+                      }],
+                    dsName: function () {
+                      return dsName;
                     }
                   }
                 });
@@ -334,9 +313,6 @@ angular.module('hopsWorksApp')
                       }],
                     dsName: function () {
                       return dsName;
-                    }, 
-                    permissions: function () {
-                      return permissions;
                     }
                   }
                 });
@@ -527,33 +503,6 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
-              selectEnvironmentYml: function (size, regex, errorMsg) {
-                              var modalInstance = $uibModal.open({
-                                templateUrl: 'views/selectEnvYml.html',
-                                controller: 'SelectEnvYmlCtrl as selectEnvYmlCtrl',
-                                size: size,
-                                resolve: {
-                                  auth: ['$q', '$location', 'AuthService',
-                                    function ($q, $location, AuthService) {
-                                      return AuthService.session().then(
-                                              function (success) {
-                                              },
-                                              function (err) {
-                                                $location.path('/login');
-                                                $location.replace();
-                                                return $q.reject(err);
-                                              });
-                                    }],
-                                  regex: function () {
-                                    return regex;
-                                  },
-                                  errorMsg: function () {
-                                    return errorMsg;
-                                  }
-                                }
-                              });
-                              return modalInstance.result;
-                            },
               selectDir: function (size, regex, errorMsg) {
                 var modalInstance = $uibModal.open({
                   templateUrl: 'views/selectDir.html',
@@ -1139,21 +1088,44 @@ angular.module('hopsWorksApp')
 //                });
 //                return modalInstance.result;
 //              },
-              transformGraph: function (size, servingId, inGraph, outGraph) {
+              allocateTensorflowCluster: function (size) {
                 var modalInstance = $uibModal.open({
-                  templateUrl: 'views/transformGraphModal.html',
-                  controller: 'TransformGraphCtrl as transformGraphCtrl',
+                  templateUrl: 'views/tensorflowModal.html',
+                  controller: 'TensorflowCtrl as tensorflowCtrl',
                   size: size,
                   resolve: {
-                    servingId: function () {
-                      return servingId;
-                    },
-                    inGraph: function () {
-                      return inGraph;
-                    },
-                    outGraph: function () {
-                      return outGraph;
-                    }
+                    auth: ['$q', '$location', 'AuthService',
+                     function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                          function (success) {
+                          },
+                          function (err) {
+                            $location.path('/login');
+                            $location.replace();
+                            return $q.reject(err);
+                          });
+                      }]
+                  }
+                });
+                return modalInstance.result;
+              },
+              newWorkflow: function (size) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'views/newWorkflow.html',
+                  controller: 'WorkflowCreatorCtrl as workflowCreatorCtrl',
+                  size: size,
+                  resolve: {
+                    auth: ['$q', '$location', 'AuthService',
+                      function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                            function (success) {
+                            },
+                            function (err) {
+                              $location.path('/login');
+                              $location.replace();
+                              return $q.reject(err);
+                            });
+                      }]
                   }
                 });
                 return modalInstance.result;
@@ -1182,7 +1154,6 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
-
               addExtendedMetadata: function (size, file) {
                 var templateUrl = '';
                 if (file.dir) { // file is a folder or dataset
@@ -1219,23 +1190,7 @@ angular.module('hopsWorksApp')
                     }
                   }
                 });
-                return modalInstance.result;
-              },
 
-              ldapUserConsent: function (size, data, val) {
-                var modalInstance = $uibModal.open({
-                  templateUrl: 'views/ldapUserConsentModal.html',
-                  controller: 'LdapUserConsentModalCtrl as ldapUserConsentModalCtrl',
-                  size: size,
-                  resolve: {
-                    data: function () {
-                      return data;
-                    },
-                    val: function () {
-                      return val;
-                    }
-                  }
-                });
                 return modalInstance.result;
               }
             };

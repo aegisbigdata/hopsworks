@@ -11,8 +11,8 @@ buildNumber.properties
 scripts/private_key
 scripts/insecure_private_key
 
-hopsworks-web/yo/app/index.html
-hopsworks-web/yo/app/karma.conf.js
+yo/app/index.html
+yo/app/karma.conf.js
 
 glassfish-resources.xml
 

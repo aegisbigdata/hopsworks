@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.util;
 
 import io.hops.hopsworks.common.dao.pythonDeps.PythonDepsFacade;
@@ -111,38 +91,38 @@ public class WebCommunication {
    * @param agentPassword
    * @param cluster
    * @param service
-   * @param service
+   * @param role
    * @return
    */
-  public String serviceOp(String operation, String hostAddress,
-      String agentPassword, String cluster, String group, String service) throws AppException {
-    String url = createUrl(operation, hostAddress, cluster, group, service);
+  public String roleOp(String operation, String hostAddress,
+      String agentPassword, String cluster, String service, String role) throws AppException {
+    String url = createUrl(operation, hostAddress, cluster, service, role);
     return fetchContent(url, agentPassword);
   }
 
   @Asynchronous
-  public Future<String> asyncServiceOp(String operation, String hostAddress,
-      String agentPassword, String cluster, String group, String service) throws AppException {
-    String url = createUrl(operation, hostAddress, cluster, group, service);
+  public Future<String> asyncRoleOp(String operation, String hostAddress,
+      String agentPassword, String cluster, String service, String role) throws AppException {
+    String url = createUrl(operation, hostAddress, cluster, service, role);
     return new AsyncResult<String>(fetchContent(url, agentPassword));
   }
   
   public String getConfig(String hostAddress, String agentPassword,
-      String cluster, String group, String service) throws AppException {
-    String url = createUrl("config", hostAddress, cluster, group, service);
+      String cluster, String service, String role) throws AppException {
+    String url = createUrl("config", hostAddress, cluster, service, role);
     return fetchContent(url, agentPassword);
   }
 
-  public String getServiceLog(String hostAddress, String agentPassword,
-      String cluster, String group, String service, int lines) throws AppException {
-    String url = createUrl("log", hostAddress, cluster, group, service, String.
+  public String getRoleLog(String hostAddress, String agentPassword,
+      String cluster, String service, String role, int lines) throws AppException {
+    String url = createUrl("log", hostAddress, cluster, service, role, String.
             valueOf(lines));
     return fetchLog(url, agentPassword);
   }
 
-  public String getGroupLog(String hostAddress, String agentPassword,
-      String cluster, String group, int lines) throws AppException {
-    String url = createUrl("log", hostAddress, cluster, group, String.valueOf(
+  public String getServiceLog(String hostAddress, String agentPassword,
+      String cluster, String service, int lines) throws AppException {
+    String url = createUrl("log", hostAddress, cluster, service, String.valueOf(
             lines));
     return fetchLog(url, agentPassword);
   }
@@ -184,30 +164,30 @@ public class WebCommunication {
   }
 
   public String executeRun(String hostAddress, String agentPassword,
-          String cluster, String group, String service, String command,
+          String cluster, String service, String role, String command,
           String[] params) throws Exception {
-    return execute("execute/run", hostAddress, agentPassword, cluster, group,
-            service, command, params);
+    return execute("execute/run", hostAddress, agentPassword, cluster, service,
+            role, command, params);
   }
 
   public String executeStart(String hostAddress, String agentPassword,
-          String cluster, String group, String service, String command,
+          String cluster, String service, String role, String command,
           String[] params) throws Exception {
-    return execute("execute/start", hostAddress, agentPassword, cluster, group,
-            service, command, params);
+    return execute("execute/start", hostAddress, agentPassword, cluster, service,
+            role, command, params);
   }
 
   public String executeContinue(String hostAddress, String agentPassword,
-          String cluster, String group, String service, String command,
+          String cluster, String service, String role, String command,
           String[] params) throws Exception {
     return execute("execute/continue", hostAddress, agentPassword, cluster,
-            group, service, command, params);
+            service, role, command, params);
   }
 
   private String execute(String path, String hostAddress, String agentPassword,
-          String cluster, String group, String service, String command,
+          String cluster, String service, String role, String command,
           String[] params) throws Exception {
-    String url = createUrl(path, hostAddress, cluster, group, service, command);
+    String url = createUrl(path, hostAddress, cluster, service, role, command);
     String optionsAndParams = "";
     for (String param : params) {
       optionsAndParams += optionsAndParams.isEmpty() ? param : " " + param;
@@ -229,10 +209,10 @@ public class WebCommunication {
   }
 
   public Response doCommand(String hostAddress, String agentPassword,
-          String cluster, String group, String service, String command) throws
+          String cluster, String service, String role, String command) throws
           Exception {
-    String url = createUrl("do", hostAddress, agentPassword, cluster, group,
-            service, command);
+    String url = createUrl("do", hostAddress, agentPassword, cluster, service,
+            role, command);
     return getWebResource(url, agentPassword);
   }
 
@@ -371,7 +351,7 @@ public class WebCommunication {
     return response;
   }
 
-  public Object anaconda(String hostAddress, String agentPassword, String op,
+  public int anaconda(String hostAddress, String agentPassword, String op,
           String project, String arg) throws Exception {
 
     String path = "anaconda/" + settings.getAnacondaUser() + '/' + op.toLowerCase()
@@ -393,13 +373,13 @@ public class WebCommunication {
     int code = response.getStatus();
     Family res = Response.Status.Family.familyOf(code);
     if (res == Response.Status.Family.SUCCESSFUL) {
-      return response.getEntity();
+      return response.getStatus();
     }
     throw new RuntimeException("Error. Failed to execute anaconda command " + op
             + " on " + project + ". Result was: " + res);
   }
 
-  public Object conda(String hostAddress, String agentPassword, String op,
+  public int conda(String hostAddress, String agentPassword, String op,
           String project, String channel, String lib, String version) throws
           Exception {
 
@@ -423,7 +403,7 @@ public class WebCommunication {
     int code = response.getStatus();
     Family res = Response.Status.Family.familyOf(code);
     if (res == Response.Status.Family.SUCCESSFUL) {
-      return response.getEntity();
+      return response.getStatus();
     }
     throw new RuntimeException("Error. Failed to execute conda command " + op
             + " on " + project + ". Result was: " + res);

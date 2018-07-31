@@ -1,23 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
-  ~ software and associated documentation files (the "Software"), to deal in the Software
-  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
-  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all copies or
-  ~ substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
-  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  ~
-  -->
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="kthfsPU" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
@@ -49,6 +30,7 @@
     <class>io.hops.hopsworks.common.dao.hdfs.inode.Inode</class>
     <class>io.hops.hopsworks.common.dao.hdfs.inode.InodeEncodingStatus</class>
     <class>io.hops.hopsworks.common.dao.hdfs.inode.InodeOps</class>
+    <class>io.hops.hopsworks.common.dao.host.Host</class>
     <class>io.hops.hopsworks.common.dao.kafka.ProjectTopics</class>
     <class>io.hops.hopsworks.common.dao.kafka.SchemaTopics</class>
     <class>io.hops.hopsworks.common.dao.kafka.SharedTopics</class>
@@ -67,56 +49,55 @@
     <class>io.hops.hopsworks.common.dao.metadata.Template</class>
     <class>io.hops.hopsworks.common.dao.metadata.TupleToFile</class>
     <class>io.hops.hopsworks.common.dao.project.Project</class>
+    <class>io.hops.hopsworks.common.dao.project.management.ProjectsManagement</class>
+    <class>io.hops.hopsworks.common.dao.project.payment.ProjectPaymentsHistory</class>
+    <class>io.hops.hopsworks.common.dao.project.payment.LastPayment</class>
     <class>io.hops.hopsworks.common.dao.project.service.ProjectServices</class>
     <class>io.hops.hopsworks.common.dao.project.team.ProjectTeam</class>
+    <class>io.hops.hopsworks.common.dao.role.Role</class>
+    <class>io.hops.hopsworks.common.dao.tensorflow.TfClusters</class>
+    <class>io.hops.hopsworks.common.dao.tensorflow.TfExecutions</class>
+    <class>io.hops.hopsworks.common.dao.tensorflow.TfFifoQueue</class>
+    <class>io.hops.hopsworks.common.dao.tensorflow.TfJobs</class>
+    <class>io.hops.hopsworks.common.dao.tensorflow.TfResources</class>
+    <class>io.hops.hopsworks.common.dao.tensorflow.TfTasks</class>
     <class>io.hops.hopsworks.common.dao.user.BbcGroup</class>
     <class>io.hops.hopsworks.common.dao.user.Users</class>
     <class>io.hops.hopsworks.common.dao.user.cluster.ClusterCert</class>
     <class>io.hops.hopsworks.common.dao.user.activity.Activity</class>
     <class>io.hops.hopsworks.common.dao.user.activity.ActivityDetail</class>
+    <class>io.hops.hopsworks.common.dao.user.consent.Consents</class>
     <class>io.hops.hopsworks.common.dao.user.security.Address</class>
     <class>io.hops.hopsworks.common.dao.user.security.Organization</class>
+    <class>io.hops.hopsworks.common.dao.user.security.PeopleGroup</class>
+    <class>io.hops.hopsworks.common.dao.user.security.Yubikey</class>
     <class>io.hops.hopsworks.common.dao.user.security.audit.AccountAudit</class>
+    <class>io.hops.hopsworks.common.dao.user.security.audit.ConsentsAudit</class>
     <class>io.hops.hopsworks.common.dao.user.security.audit.RolesAudit</class>
     <class>io.hops.hopsworks.common.dao.user.security.audit.Userlogins</class>
     <class>io.hops.hopsworks.common.dao.user.sshkey.AuthorizedSshkeys</class>
     <class>io.hops.hopsworks.common.dao.user.sshkey.SshKeys</class>
-    <class>io.hops.hopsworks.common.dao.user.ldap.LdapUser</class>
     <class>io.hops.hopsworks.common.dao.zeppelin.ZeppelinInterpreterConfs</class>
     <class>io.hops.hopsworks.common.dao.pythonDeps.PythonDep</class>
     <class>io.hops.hopsworks.common.dao.pythonDeps.AnacondaRepo</class>
     <class>io.hops.hopsworks.common.dao.pythonDeps.CondaCommands</class>
-    <class>io.hops.hopsworks.common.dao.tfserving.TfServing</class>
     <class>io.hops.hopsworks.common.dao.jupyter.JupyterProject</class>
     <class>io.hops.hopsworks.common.dao.jupyter.JupyterSettings</class>
     <class>io.hops.hopsworks.common.dao.ndb.NdbBackup</class>
     <class>io.hops.hopsworks.common.dao.jupyter.config.JupyterInterpreter</class>
+    <!-- Converters -->
+    <class>io.hops.hopsworks.common.dao.user.cluster.RegistrationStatusConverter</class>
+    <class>io.hops.hopsworks.common.jobs.configuration.JsonReduceableConverter</class>
+    <class>io.hops.hopsworks.common.dao.workflow.NodeDataConverter</class>
     <class>io.hops.hopsworks.common.dao.jobs.description.Jobs</class>
     <class>io.hops.hopsworks.common.dao.dela.certs.ClusterCertificate</class>
-    <class>io.hops.hopsworks.common.dao.host.Hosts</class>
-    <class>io.hops.hopsworks.common.dao.kagent.HostServices</class>
-    <class>io.hops.hopsworks.common.dao.user.security.UserGroup</class>
-    <class>io.hops.hopsworks.common.security.dao.RemoteMaterialReferences</class>
-    <class>io.hops.hopsworks.common.dao.command.SystemCommand</class>
-    <class>io.hops.hopsworks.common.dao.project.pia.Pia</class>
-    <!-- Converters -->
-    <class>io.hops.hopsworks.common.dao.tfserving.TfServingStatusConverter</class>
-    <class>io.hops.hopsworks.common.dao.user.cluster.RegistrationStatusConverter</class>
-    <class>io.hops.hopsworks.common.jobs.configuration.JsonReduceableConverter</class>
-    <class>io.hops.hopsworks.common.dao.user.cluster.RegistrationStatusConverter</class>
-    <class>io.hops.hopsworks.common.jobs.configuration.JsonReduceableConverter</class>
-    <class>io.hops.hopsworks.common.dao.rstudio.RStudioProject</class>
-    <class>io.hops.hopsworks.common.dao.rstudio.RStudioSettings</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
     <properties>
       <property name="eclipselink.target-database" value="MYSQL"/>
-      <!--      <property name="eclipselink.logging.level" value="FINE"/>
-      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.level" value="SEVERE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <property name="eclipselink.logging.logger" value="ServerLogger"/>
-      -->
     </properties>
   </persistence-unit>
 </persistence>

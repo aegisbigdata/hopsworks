@@ -1,31 +1,8 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.api.admin;
 
 import io.hops.hopsworks.api.kibana.ProxyServlet;
-import io.hops.hopsworks.api.util.CustomSSLProtocolSocketFactory;
-import io.hops.hopsworks.common.security.BaseHadoopClientsService;
 import io.hops.hopsworks.common.util.Settings;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,7 +26,6 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -60,8 +36,6 @@ public class HDFSUIProxyServlet extends ProxyServlet {
 
   @EJB
   private Settings settings;
-  @EJB
-  private BaseHadoopClientsService baseHadoopClientsService;
 
   private static final HashSet<String> PASS_THROUGH_HEADERS
       = new HashSet<String>(
@@ -76,21 +50,12 @@ public class HDFSUIProxyServlet extends ProxyServlet {
     // TODO - should get the Kibana URI from Settings.java
 //    targetUri = Settings.getKibanaUri();
     targetUri = settings.getHDFSWebUIAddress();
-  
+    if (!targetUri.contains("http://")) {
+      targetUri = "http://" + targetUri;
+    }
     if (targetUri == null) {
       throw new ServletException(P_TARGET_URI + " is required.");
     }
-    
-    if (settings.getHopsRpcTls()) {
-      if (!targetUri.contains("https://")) {
-        targetUri = "https://" + targetUri;
-      }
-    } else {
-      if (!targetUri.contains("http://")) {
-        targetUri = "http://" + targetUri;
-      }
-    }
-    
     //test it's valid
     try {
       targetUriObj = new URI(targetUri);
@@ -128,15 +93,8 @@ public class HDFSUIProxyServlet extends ProxyServlet {
     String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
 
     try {
-      String[] targetHost_port = settings.getHDFSWebUIAddress().split(":");
-      File keyStore = new File(baseHadoopClientsService.getSuperKeystorePath());
-      File trustStore = new File(baseHadoopClientsService.getSuperTrustStorePath());
-      // Assume that KeyStore password and Key password are the same
-      Protocol httpsProto = new Protocol("https", new CustomSSLProtocolSocketFactory(keyStore,
-          baseHadoopClientsService.getSuperKeystorePassword(), baseHadoopClientsService.getSuperKeystorePassword(),
-          trustStore, baseHadoopClientsService.getSuperTrustStorePassword()), Integer.parseInt(targetHost_port[1]));
-      Protocol.registerProtocol("https", httpsProto);
       // Execute the request
+
       HttpClientParams params = new HttpClientParams();
       params.setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
       params.setBooleanParameter(HttpClientParams.ALLOW_CIRCULAR_REDIRECTS,
@@ -200,7 +158,7 @@ public class HDFSUIProxyServlet extends ProxyServlet {
 
     }
   }
-  
+
   protected void copyResponseEntity(HttpMethod method,
       HttpServletResponse servletResponse) throws IOException {
     InputStream entity = method.getResponseBodyAsStream();
@@ -213,8 +171,9 @@ public class HDFSUIProxyServlet extends ProxyServlet {
 
         try {
           int contentSize = 0;
+          String source = "http://" + method.getURI().getHost() + ":" + method.getURI().getPort();
           while ((inputLine = br.readLine()) != null)  {
-            String outputLine = hopify(inputLine, targetUri) + "\n";
+            String outputLine = hopify(inputLine, source) + "\n";
             byte[] output = outputLine.getBytes(Charset.forName("UTF-8"));
             servletOutputStream.write(output);
             contentSize += output.length;
@@ -253,23 +212,21 @@ public class HDFSUIProxyServlet extends ProxyServlet {
 
   private String hopify(String ui, String source) {
 
-    ui = ui.replaceAll("<a href='http://hadoop.apache.org/core'>Hadoop</a>, 2018.", "");
-    ui = ui.replaceAll("(?<=(url=))(?=[a-zA-Z])", "/hopsworks-api/hdfsui/");
-    ui = ui.replaceAll("(?<=(href|src)=\")/(?=[a-zA-Z])",
+    ui = ui.replaceAll("<a href='http://hadoop.apache.org/core'>Hadoop</a>, 2017.", "");
+    ui = ui.replaceAll("(?<=(url=))(?=[a-z])", "/hopsworks-api/hdfsui/");
+    ui = ui.replaceAll("(?<=(href|src)=\")/(?=[a-z])",
         "/hopsworks-api/hdfsui/" + source + "/");
-    ui = ui.replaceAll("(?<=(href|src)=\')/(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\')/(?=[a-z])",
         "/hopsworks-api/hdfsui/" + source + "/");
     ui = ui.replaceAll("(?<=(href|src)=\")//", "/hopsworks-api/hdfsui/");
     ui = ui.replaceAll("(?<=(href|src)=\')//", "/hopsworks-api/hdfsui/");
-    ui = ui.replaceAll("(?<=(href|src)=\")(?=(http|https))",
+    ui = ui.replaceAll("(?<=(href|src)=\")(?=http)",
         "/hopsworks-api/hdfsui/");
-    ui = ui.replaceAll("(?<=(href|src)=\')(?=(http|https))",
+    ui = ui.replaceAll("(?<=(href|src)=\')(?=http)",
         "/hopsworks-api/hdfsui/");
-    ui = ui.replaceAll("(?<=(href|src)=\")(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\")(?=[a-z])",
         "/hopsworks-api/hdfsui/" + source + "/");
-    ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-zA-Z])",
-        "/hopsworks-api/hdfsui/" + source + "/");
-    ui = ui.replaceAll("(?<=(href|src)=)/(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-z])",
         "/hopsworks-api/hdfsui/" + source + "/");
     ui = ui.replaceAll("(?<=(action)=\")(?=[a-zA-Z/]*.jsp)", "/hopsworks-api/hdfsui/" + source + "/");
     return ui;
@@ -304,15 +261,8 @@ public class HDFSUIProxyServlet extends ProxyServlet {
   protected String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
     StringBuilder uri = new StringBuilder(500);
     if (servletRequest.getPathInfo() != null && servletRequest.getPathInfo().matches(
-        "/http([a-zA-Z,:,/,.,0-9,-])+:([0-9])+(.)+")) {
-      
-      // Remove '/' from the beginning of the path
-      String target = servletRequest.getPathInfo().substring(1);
-      if (target.startsWith("https")) {
-        target = "https:/" + target.substring(6);
-      } else {
-        target = "http:/" + target.substring(5);
-      }
+        "/http([a-z,:,/,.,0-9,-])+:([0-9])+(.)+")) {
+      String target = "http://" + servletRequest.getPathInfo().substring(7);
       servletRequest.setAttribute(ATTR_TARGET_URI, target);
       uri.append(target);
     } else {

@@ -1,26 +1,5 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.dao.alert;
 
-import io.hops.hopsworks.common.dao.host.Hosts;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -34,8 +13,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import java.math.BigInteger;
 import javax.persistence.Basic;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -107,17 +84,15 @@ public class Alert implements Serializable {
   @Size(max = 128)
   @Column(name = "data_source")
   private String dataSource;
-  @JoinColumn(name = "host_id",
-      referencedColumnName = "id")
-  @ManyToOne
-  private Hosts host;
+  @Size(max = 256)
+  @Column(name = "hostid")
+  private String hostid;
   @Basic(optional = false)
   @NotNull
   @Size(min = 1,
           max = 1024)
   @Column(name = "message")
   private String message;
-    
   @Size(max = 128)
   @Column(name = "plugin")
   private String plugin;
@@ -138,9 +113,9 @@ public class Alert implements Serializable {
   public Alert() {
   }
 
-  public Alert(Hosts host, String message, String plugin,
+  public Alert(String hostId, String message, String plugin,
           String pluginInstance, String type, String typeInstance) {
-    this.host = host;
+    this.hostid = hostId;
     this.message = message;
     this.plugin = plugin;
     this.pluginInstance = pluginInstance;
@@ -229,12 +204,12 @@ public class Alert implements Serializable {
     this.dataSource = dataSource;
   }
 
-  public Hosts getHost() {
-    return host;
+  public String getHostid() {
+    return hostid;
   }
 
-  public void setHost(Hosts host) {
-    this.host = host;
+  public void setHostid(String hostid) {
+    this.hostid = hostid;
   }
 
   public String getMessage() {
@@ -316,13 +291,7 @@ public class Alert implements Serializable {
 
   @Override
   public String toString() {
-    return "Alert: " + message + "\r"
-         + "Host : " + host.getHostname() + "\r"
-         + "Type: " + type +  "\r"
-         + "Type Instance: " + typeInstance +  "\r"
-         + "Current Value: " + currentValue +  "\r"
-         + "Time: " + alertTime + "\r"
-        ;
+    return "io.hops.kmon.cluster.Alerts[ id=" + id + " ]";
   }
 
 }

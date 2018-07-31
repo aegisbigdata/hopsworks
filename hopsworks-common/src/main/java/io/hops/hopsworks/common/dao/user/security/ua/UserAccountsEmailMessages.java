@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.dao.user.security.ua;
 
 public class UserAccountsEmailMessages {
@@ -38,9 +18,6 @@ public class UserAccountsEmailMessages {
   public final static String ACCOUNT_CONFIRMATION_SUBJECT
           = "Welcome to HopsWorks!";
 
-  public final static String ALERT_SERVICE_DOWN
-          = "A Hopsworks service has stopped ";
-
   /*
    * Subject of device lost
    */
@@ -54,7 +31,8 @@ public class UserAccountsEmailMessages {
   /*
    * Subject of blocked acouunt
    */
-  public static String HOPSWORKS_SUPPORT_EMAIL = "support@hops.io";
+  public final static String HOPSWORKS_SUPPORT_EMAIL
+          = "support@hops.io";
 
   /*
    * Subject of profile update
@@ -92,6 +70,36 @@ public class UserAccountsEmailMessages {
    */
   public final static String ACCOUNT_DEACTIVATED
           = "Your HopsWorks account has expired";
+
+  /**
+   * Build an email message for Yubikey users upon registration.
+   *
+   * @param path
+   * @param key
+   * @return
+   */
+  public static String buildYubikeyRequestMessage(String path, String key) {
+
+    String message;
+
+    String l1 = GREETINGS_HEADER + ",\n\n"
+            + "We receieved your Yubikey account request for HopsWorks.\n\n";
+    String l2
+            = "Please click on the following link to verify your email address. "
+            + "Afterwards we will activate your account within 48 hours and send "
+            + "you a Yubikey stick to your address.\n\n\n";
+
+    String url = path + "/hopsworks-admin/security/validate_account.xhtml?key=" + key;
+
+    String l3 = "To confirm your email click " + url + " \n\n";
+
+    String l4 = "If you have any questions please contact "
+            + HOPSWORKS_SUPPORT_EMAIL;
+
+    message = l1 + l2 + l3 + l4;
+
+    return message;
+  }
 
   /**
    * Build an email message for mobile users upon registration.
@@ -297,6 +305,21 @@ public class UserAccountsEmailMessages {
     return message;
   }
 
+  public static String yubikeyAccountActivatedMessage(String username) {
+    String message;
+
+    String l1 = GREETINGS_HEADER + ",\n\n"
+            + "Your account request to access HopsWorks has been approved.\n\n";
+    String l2
+            = "We sent a Yubikey device to your postal address. You can use that "
+            + "device in addition to usename/password to login to the platform. \n\n\n";
+    String l3 = "If you have any questions please contact "
+            + HOPSWORKS_SUPPORT_EMAIL;
+    message = l1 + l2 + l3;
+
+    return message;
+  }
+
   public static String accountRejectedMessage() {
     String message;
 
@@ -326,6 +349,22 @@ public class UserAccountsEmailMessages {
 
     return message;
 
+  }
+
+  public static String buildYubikeyResetMessage() {
+    String message;
+
+    String l1 = GREETINGS_HEADER + ",\n\n"
+            + "We received an Yubikey request reset for HopsWorks in your behalf.\n\n";
+    String l2 = "Your account will be reset within "
+            + ACCOUNT_ACITVATION_PERIOD
+            + " hours and a new device will be sent to your postal address.\n\n\n";
+    String l3 = "If you have any questions please contact "
+            + HOPSWORKS_SUPPORT_EMAIL;
+
+    message = l1 + l2 + l3;
+
+    return message;
   }
   
   public static String buildClusterRegisterRequestMessage(String path, String key) {

@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.kmon.command;
 
 import io.hops.hopsworks.common.dao.command.CommandEJB;
@@ -36,12 +16,12 @@ public class CommandController {
 
   @EJB
   private CommandEJB commandEJB;
-  @ManagedProperty("#{param.hostname}")
-  private String hostname;
+  @ManagedProperty("#{param.hostid}")
+  private String hostId;
+  @ManagedProperty("#{param.role}")
+  private String role;
   @ManagedProperty("#{param.service}")
   private String service;
-  @ManagedProperty("#{param.group}")
-  private String group;
   @ManagedProperty("#{param.cluster}")
   private String cluster;
   private static final Logger logger = Logger.getLogger(CommandController.class.
@@ -55,6 +35,14 @@ public class CommandController {
     logger.info("init CommandController");
   }
 
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
+  }
+
   public String getService() {
     return service;
   }
@@ -63,20 +51,12 @@ public class CommandController {
     this.service = service;
   }
 
-  public String getGroup() {
-    return group;
+  public String getHostId() {
+    return hostId;
   }
 
-  public void setGroup(String group) {
-    this.group = group;
-  }
-
-  public String getHostname() {
-    return hostname;
-  }
-
-  public void setHostname(String hostname) {
-    this.hostname = hostname;
+  public void setHostId(String hostId) {
+    this.hostId = hostId;
   }
 
   public void setCluster(String cluster) {
@@ -99,19 +79,19 @@ public class CommandController {
 
   public List<Command> getRecentCommandsByClusterService() {
     List<Command> commands = commandEJB.findRecentByClusterService(cluster,
-            group);
+            service);
     return commands;
   }
 
   public List<Command> getRunningCommandsByClusterService() {
     List<Command> commands = commandEJB.findRunningByClusterService(cluster,
-            group);
+            service);
     return commands;
   }
 
   public List<Command> getRecentCommandsByInstance() {
     List<Command> commands = commandEJB.findRecentByClusterService(cluster,
-            group);
+            service);
     return commands;
   }
 }

@@ -1,38 +1,20 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
 package io.hops.hopsworks.dela;
 
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.project.Project;
+import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.dataset.FilePreviewDTO;
+import io.hops.hopsworks.dela.exception.ThirdPartyException;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.util.Settings;
-import io.hops.hopsworks.dela.exception.ThirdPartyException;
 import io.hops.hopsworks.dela.old_dto.FileInfo;
 import io.hops.hopsworks.dela.old_dto.ManifestJSON;
+import io.hops.hopsworks.dela.util.DatasetHelper;
 import io.hops.hopsworks.dela.util.ManifestHelper;
 import java.io.File;
 import java.io.IOException;
@@ -61,26 +43,22 @@ public class DelaHdfsController {
   private Logger LOG = Logger.getLogger(DelaHdfsController.class.getName());
 
   @EJB
-  private DatasetController datasetCtrl;
-  @EJB
   private InodeFacade inodeFacade;
+  @EJB
+  private ProjectFacade projectFacade;
   @EJB
   private HdfsUsersController hdfsUsersBean;
   @EJB
   private DistributedFsService dfs;
 
   public long datasetSize(Project project, Dataset dataset, Users user) throws ThirdPartyException {
-    return length(project, user, datasetCtrl.getDatasetPath(dataset));
-  }
-
-  private Path manifestPath(Dataset dataset) {
-    Path datasetPath = datasetCtrl.getDatasetPath(dataset);
-    Path manifestPath = new Path(datasetPath, Settings.MANIFEST_FILE);
-    return manifestPath;
+    return length(project, user, DatasetHelper.getDatasetPath(project, dataset));
   }
 
   public ManifestJSON readManifest(Project project, Dataset dataset, Users user) throws ThirdPartyException {
-    byte[] manifestBytes = read(project, user, manifestPath(dataset));
+    String datasetPath = DatasetHelper.getOwningDatasetPath(dataset, inodeFacade, projectFacade);
+    String manifestPath = datasetPath + File.separator + Settings.MANIFEST_FILE;
+    byte[] manifestBytes = read(project, user, manifestPath);
     ManifestJSON manifest = ManifestHelper.unmarshall(manifestBytes);
     return manifest;
   }
@@ -92,33 +70,31 @@ public class DelaHdfsController {
     }
     LOG.log(Settings.DELA_DEBUG, "{0} - writing manifest", dataset.getPublicDsId());
     ManifestJSON manifest = createManifest(project, dataset, user);
-    Path manifestPath = manifestPath(dataset);
+    String manifestPath = DatasetHelper.getDatasetPath(project, dataset) + File.separator + Settings.MANIFEST_FILE;
     delete(project, user, manifestPath);
     write(project, user, manifestPath, ManifestHelper.marshall(manifest));
     return manifest;
   }
 
   public void deleteManifest(Project project, Dataset dataset, Users user) throws ThirdPartyException {
-    delete(project, user, manifestPath(dataset));
+    String manifestPath = DatasetHelper.getDatasetPath(project, dataset) + File.separator + Settings.MANIFEST_FILE;
+    delete(project, user, manifestPath);
   }
 
-  private Path readmePath(Dataset dataset) {
-    Path datasetPath = datasetCtrl.getDatasetPath(dataset);
-    Path readmePath = new Path(datasetPath, Settings.README_FILE);
-    return readmePath;
-  }
-  
   public String getReadme(Project project, Dataset dataset, Users user) throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "dela:hdfs:readme");
-    String result = new String(read(project, user, readmePath(dataset)));
+    String readmePath = DatasetHelper.getDatasetPath(project, dataset) + File.separator + Settings.README_FILE;
+    String result = new String(read(project, user, readmePath));
     LOG.log(Settings.DELA_DEBUG, "dela:hdfs:readme:done");
     return result;
   }
-
+  
   public FilePreviewDTO getPublicReadme(Dataset dataset) throws ThirdPartyException {
     LOG.log(Settings.DELA_DEBUG, "dela:hdfs:readme");
+    Project ownerProject = DatasetHelper.getOwningProject(dataset, inodeFacade, projectFacade);
+    String readmePath = DatasetHelper.getDatasetPath(ownerProject, dataset) + File.separator + Settings.README_FILE;
     DistributedFileSystemOps dfso = dfs.getDfsOps();
-    FilePreviewDTO result = new FilePreviewDTO("text", "md", new String(read(dfso, readmePath(dataset))));
+    FilePreviewDTO result = new FilePreviewDTO("text", "md", new String(read(dfso, readmePath)));
     LOG.log(Settings.DELA_DEBUG, "dela:hdfs:readme");
     return result;
   }
@@ -126,7 +102,7 @@ public class DelaHdfsController {
   private ManifestJSON createManifest(Project project, Dataset dataset, Users user) throws ThirdPartyException {
     String hdfsUser = hdfsUsersBean.getHdfsUserName(project, user);
     DistributedFileSystemOps dfso = dfs.getDfsOps(hdfsUser);
-    Path datasetPath = datasetCtrl.getDatasetPath(dataset);
+    String datasetPath = DatasetHelper.getDatasetPath(project, dataset);
 
     ManifestJSON manifest = new ManifestJSON();
     manifest.setDatasetName(dataset.getName());
@@ -152,16 +128,10 @@ public class DelaHdfsController {
       String fileName = i.getInodePK().getName();
       FileInfo fileInfo = new FileInfo();
       fileInfo.setFileName(fileName);
-      Path filePath = new Path(datasetPath, fileName);
-      try {
-        fileInfo.setLength(dfso.getLength(filePath));
-      } catch (IOException ex) {
-        throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(), "file:" + filePath.toString(),
-          ThirdPartyException.Source.HDFS, "access error");
-      }
+      String filePath = datasetPath + File.separator + fileName;
+      fileInfo.setLength(dfso.getlength(filePath));
       if (avroFiles.containsKey(fileName + ".avro")) {
-        Path avroSchemaPath = new Path(datasetPath, filePath + ".avro");
-        fileInfo.setSchema(new String(read(project, user, avroSchemaPath)));
+        fileInfo.setSchema(new String(read(project, user, filePath + ".avro")));
         manifest.setKafkaSupport(true);
       } else {
         fileInfo.setSchema("");
@@ -188,7 +158,7 @@ public class DelaHdfsController {
     return manifest;
   }
 
-  public void write(Project project, Users user, Path filePath, byte[] fileContent) throws ThirdPartyException {
+  public void write(Project project, Users user, String filePath, byte[] fileContent) throws ThirdPartyException {
 
     String hdfsUser = hdfsUsersBean.getHdfsUserName(project, user);
     DistributedFileSystemOps dfso = dfs.getDfsOps(hdfsUser);
@@ -222,14 +192,14 @@ public class DelaHdfsController {
     }
   }
 
-  public byte[] read(Project project, Users user, Path filePath) throws ThirdPartyException {
+  public byte[] read(Project project, Users user, String filePath) throws ThirdPartyException {
     String hdfsUser = hdfsUsersBean.getHdfsUserName(project, user);
     DistributedFileSystemOps dfso = dfs.getDfsOps(hdfsUser);
     byte[] result = read(dfso, filePath);
     return result;
   }
-
-  public byte[] read(DistributedFileSystemOps dfso, Path filePath) throws ThirdPartyException {
+  
+  public byte[] read(DistributedFileSystemOps dfso, String filePath) throws ThirdPartyException {
     try {
       if (!dfso.exists(filePath)) {
         throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(), "file does not exist",
@@ -242,8 +212,8 @@ public class DelaHdfsController {
 
     FSDataInputStream fdi = null;
     try {
-      fdi = dfso.open(filePath);
-      long fileLength = dfso.getLength(filePath);
+      fdi = dfso.open(new Path(filePath));
+      long fileLength = dfso.getlength(filePath);
       byte[] fileContent = new byte[(int) fileLength];
       fdi.readFully(fileContent);
       return fileContent;
@@ -262,7 +232,7 @@ public class DelaHdfsController {
     }
   }
 
-  public void delete(Project project, Users user, Path filePath) throws ThirdPartyException {
+  public void delete(Project project, Users user, String filePath) throws ThirdPartyException {
 
     String hdfsUser = hdfsUsersBean.getHdfsUserName(project, user);
     DistributedFileSystemOps dfso = dfs.getDfsOps(hdfsUser);
@@ -270,14 +240,14 @@ public class DelaHdfsController {
       if (!dfso.exists(filePath)) {
         return;
       }
-      dfso.rm(filePath, true);
+      dfso.rm(new Path(filePath), true);
     } catch (IOException ex) {
       throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(), "cannot delete",
         ThirdPartyException.Source.HDFS, "access error");
     }
   }
 
-  public long length(Project project, Users user, Path filePath) throws ThirdPartyException {
+  public long length(Project project, Users user, String filePath) throws ThirdPartyException {
     String hdfsUser = hdfsUsersBean.getHdfsUserName(project, user);
     DistributedFileSystemOps dfso = dfs.getDfsOps(hdfsUser);
     try {
@@ -290,11 +260,12 @@ public class DelaHdfsController {
         ThirdPartyException.Source.HDFS, "access error");
     }
 
+    
     try {
-      long fileLength = dfso.getDatasetSize(filePath);
+      long fileLength = dfso.getDatasetSize(new Path(filePath));
       return fileLength;
     } catch (IOException ex) {
-      throw new ThirdPartyException(Response.Status.EXPECTATION_FAILED.getStatusCode(), "cannot read dataset",
+      throw new ThirdPartyException(Response.Status.EXPECTATION_FAILED.getStatusCode(), "cannot read dataset", 
         ThirdPartyException.Source.HDFS, "access error");
     }
   }
@@ -307,5 +278,9 @@ public class DelaHdfsController {
     } else {
       return false;
     }
+  }
+
+  private long getLength(String pathToFile) {
+    return dfs.getDfsOps().getlength(pathToFile);
   }
 }

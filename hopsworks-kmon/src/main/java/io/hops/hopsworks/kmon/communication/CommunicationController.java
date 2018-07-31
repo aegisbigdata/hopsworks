@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.kmon.communication;
 
 import io.hops.hopsworks.common.util.WebCommunication;
@@ -29,11 +9,11 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import io.hops.hopsworks.common.dao.host.Hosts;
-import io.hops.hopsworks.common.dao.host.HostsFacade;
-import io.hops.hopsworks.common.dao.kagent.HostServicesFacade;
+import io.hops.hopsworks.common.dao.host.Host;
+import io.hops.hopsworks.common.dao.host.HostEJB;
+import io.hops.hopsworks.common.dao.role.RoleEJB;
 import io.hops.hopsworks.common.util.NodesTableItem;
-import io.hops.hopsworks.kmon.group.ServiceInstancesController;
+import io.hops.hopsworks.kmon.service.ServiceInstancesController;
 import io.hops.hopsworks.kmon.struct.InstanceInfo;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -45,35 +25,43 @@ import javax.faces.context.FacesContext;
 public class CommunicationController {
 
   @EJB
-  private HostsFacade hostEJB;
+  private HostEJB hostEJB;
   @EJB
-  private HostServicesFacade hostServicesFacade;
+  private RoleEJB roleEjb;
   @EJB
   private WebCommunication web;
-
-  @ManagedProperty(value = "#{serviceInstancesController}")
+  
+  @ManagedProperty(value="#{serviceInstancesController}")
   private ServiceInstancesController serviceInstancesController;
-
-  @ManagedProperty("#{param.cluster}")
-  private String cluster;
-  @ManagedProperty("#{param.group}")
-  private String group; 
+  
+  @ManagedProperty("#{param.hostid}")
+  private String hostId;
+  @ManagedProperty("#{param.role}")
+  private String role;
   @ManagedProperty("#{param.service}")
   private String service;
-  @ManagedProperty("#{param.hostname}")
-  private String hostname;
+  @ManagedProperty("#{param.cluster}")
+  private String cluster;
 
   private List<InstanceInfo> instances;
-
-  private static final Logger logger = Logger.getLogger(CommunicationController.class.getName());
+  
+  private static final Logger logger = Logger.getLogger(
+          CommunicationController.class.getName());
 
   public CommunicationController() {
-    logger.info("CommunicationController: hostname: " + hostname + " ; cluster: " + cluster + "; group: " + group
-        + " ; service: " + service);
+    logger.info("CommunicationController");
   }
 
   @PostConstruct
   public void init() {
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 
   public String getService() {
@@ -84,14 +72,6 @@ public class CommunicationController {
     this.service = service;
   }
 
-  public String getGroup() {
-    return group;
-  }
-
-  public void setGroup(String group) {
-    this.group = group;
-  }
-
   public void setCluster(String cluster) {
     this.cluster = cluster;
   }
@@ -100,52 +80,50 @@ public class CommunicationController {
     return cluster;
   }
 
-  public String getHostname() {
-    return hostname;
+  public String getHostId() {
+    return hostId;
   }
 
-  public void setHostname(String hostname) {
-    if (hostname == null || hostname.compareTo("null")==0) {
-      return;
-    }
-    this.hostname = hostname;
+  public void setHostId(String hostId) {
+    this.hostId = hostId;
   }
 
   public void setServiceInstancesController(ServiceInstancesController serviceInstancesController) {
     this.serviceInstancesController = serviceInstancesController;
   }
 
-  private Hosts findHostByName(String hostname) throws Exception {
+  private Host findHostById(String hostId) throws Exception {
     try {
-      Hosts host = hostEJB.findByHostname(hostname);
+      Host host = hostEJB.findByHostId(hostId);
       return host;
     } catch (Exception ex) {
-      throw new RuntimeException("Hostname " + hostname + " not found.");
+      throw new RuntimeException("HostId " + hostId + " not found.");
     }
   }
 
-  private Hosts findHostByService(String cluster, String group, String service)
-      throws Exception {
-    String id = hostServicesFacade.findServices(cluster, group, service).get(0).getHost().getHostname();
-    return findHostByName(id);
+  private Host findHostByRole(String cluster, String service, String role)
+          throws Exception {
+    String id = roleEjb.findRoles(cluster, service, role).get(0).getHostId();
+    return findHostById(id);
   }
+
 
   public String mySqlClusterConfig() throws Exception {
-    // Finds hostname of mgmserver
+    // Finds hostId of mgmserver
     // Role=mgmserver , Service=MySQLCluster, Cluster=cluster
     String mgmserverRole = "ndb_mgmd";
-    Hosts h = findHostByService(cluster, group, mgmserverRole);
+    Host h = findHostByRole(cluster, service, mgmserverRole);
     String ip = h.getPublicOrPrivateIp();
     String agentPassword = h.getAgentPassword();
-    return web.getConfig(ip, agentPassword, cluster, group, mgmserverRole);
+    return web.getConfig(ip, agentPassword, cluster, service, mgmserverRole);
   }
 
-  public String getServiceLog(int lines) {
+  public String getRoleLog(int lines) {
     try {
-      Hosts h = findHostByName(hostname);
+      Host h = findHostById(hostId);
       String ip = h.getPublicOrPrivateIp();
       String agentPassword = h.getAgentPassword();
-      return web.getServiceLog(ip, agentPassword, cluster, group, service, lines);
+      return web.getRoleLog(ip, agentPassword, cluster, service, role, lines);
     } catch (Exception ex) {
       return ex.getMessage();
     }
@@ -156,57 +134,57 @@ public class CommunicationController {
     FacesMessage msg = null;
     if (res.contains("Error")) {
       msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, res,
-          "There was a problem when executing the operation.");
+              "There was a problem when executing the operation.");
     } else {
       msg = new FacesMessage(FacesMessage.SEVERITY_INFO, res,
-          "Successfully executed the operation.");
+              "Successfully executed the operation.");
     }
     context.addMessage(null, msg);
   }
 
-  public void serviceStart() {
-    uiMsg(serviceOperation("startService"));
+  public void roleStart() {
+    uiMsg(roleOperation("startRole"));
 
   }
 
-  public void serviceStartAll() {
-    uiMsg(serviceOperationAll("startService"));
+  public void roleStartAll() {
+    uiMsg(roleOperationAll("startRole"));
+  }
+  
+  public void roleRestart() {
+    uiMsg(roleOperation("restartRole"));
   }
 
-  public void serviceRestart() {
-    uiMsg(serviceOperation("restartService"));
+  public void roleRestartAll() {
+    uiMsg(roleOperationAll("restartRole"));
+  }
+  
+  public void roleStop() {
+    uiMsg(roleOperation("stopRole"));
   }
 
-  public void serviceRestartAll() {
-    uiMsg(serviceOperationAll("restartService"));
+  public void roleStopAll() {
+    logger.log(Level.SEVERE, "roleStopAll 1");
+    uiMsg(roleOperationAll("stopRole"));
   }
-
-  public void serviceStop() {
-    uiMsg(serviceOperation("stopService"));
-  }
-
-  public void serviceStopAll() {
-    logger.log(Level.SEVERE, "serviceStopAll 1");
-    uiMsg(serviceOperationAll("stopService"));
-  }
-
-  private String serviceOperationAll(String operation) {
+  
+  private String roleOperationAll(String operation) {
     instances = serviceInstancesController.getInstances();
     List<Future<String>> results = new ArrayList<>();
     String result = "";
     for (InstanceInfo instance : instances) {
-      if (instance.getService().equals(service)) {
+      if (instance.getRole().equals(role)) {
         try {
-          Hosts h = findHostByName(instance.getHost());
+          Host h = findHostById(instance.getHost());
           String ip = h.getPublicOrPrivateIp();
           String agentPassword = h.getAgentPassword();
-          results.add(web.asyncServiceOp(operation, ip, agentPassword, cluster, group, service));
+          results.add(web.asyncRoleOp(operation, ip, agentPassword, cluster, service, role));
         } catch (Exception ex) {
           result = result + ex.getMessage() + "\n";
         }
       }
     }
-    for (Future<String> r : results) {
+    for(Future<String> r: results){
       try {
         result = result + r.get() + "\n";
       } catch (Exception ex) {
@@ -215,13 +193,13 @@ public class CommunicationController {
     }
     return result;
   }
-
-  private String serviceOperation(String operation) {
+  
+  private String roleOperation(String operation) {
     try {
-      Hosts h = findHostByName(hostname);
+      Host h = findHostById(hostId);
       String ip = h.getPublicOrPrivateIp();
       String agentPassword = h.getAgentPassword();
-      return web.serviceOp(operation, ip, agentPassword, cluster, group, service);
+      return web.roleOp(operation, ip, agentPassword, cluster, service, role);
     } catch (Exception ex) {
       return ex.getMessage();
     }
@@ -229,7 +207,7 @@ public class CommunicationController {
 
   public String getAgentLog(int lines) {
     try {
-      Hosts h = findHostByName(hostname);
+      Host h = findHostById(hostId);
       String ip = h.getPublicOrPrivateIp();
       String agentPassword = h.getAgentPassword();
       return web.getAgentLog(ip, agentPassword, lines);
@@ -245,8 +223,8 @@ public class CommunicationController {
     final String ROLE = "mysqld";
     List<NodesTableItem> results;
     try {
-      String id = hostServicesFacade.findServices(cluster, group, ROLE).get(0).getHost().getHostname();
-      Hosts h = findHostByName(hostname);
+      String id = roleEjb.findRoles(cluster, service, ROLE).get(0).getHostId();
+      Host h = findHostById(hostId);
       String ip = h.getPublicOrPrivateIp();
       String agentPassword = h.getAgentPassword();
       results = web.getNdbinfoNodesTable(ip, agentPassword);

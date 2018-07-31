@@ -1,27 +1,8 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.api.jobs;
 
 import com.google.common.base.Strings;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
@@ -34,17 +15,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
+import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
+import io.hops.hopsworks.common.dao.kafka.TopicDTO;
 import io.hops.hopsworks.common.dao.project.Project;
+import io.hops.hopsworks.common.dao.tensorflow.TfResourceCluster;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
 import io.hops.hopsworks.common.exception.AppException;
-import io.hops.hopsworks.common.exception.JobCreationException;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
@@ -56,6 +40,7 @@ import io.hops.hopsworks.common.util.Settings;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import org.apache.hadoop.security.AccessControlException;
 
 @RequestScoped
@@ -96,6 +81,68 @@ public class TensorFlowService {
     return projectId;
   }
 
+  /**
+   * Gets the list of topics for this project
+   *
+   * @param sc
+   * @param req
+   * @return
+   * @throws AppException
+   */
+  @GET
+  @Path("/programs")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  public Response getPrograms(@Context SecurityContext sc,
+      @Context HttpServletRequest req) throws AppException, Exception {
+
+    if (projectId == null) {
+      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
+          "Incomplete request!");
+    }
+
+    GenericEntity<List<TopicDTO>> programs
+        = new GenericEntity<List<TopicDTO>>(null) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
+        programs).build();
+  }
+
+  @POST
+  @Path("/cpu/allocate")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  public Response allocateResources(TfResourceCluster resourceReq,
+      @Context SecurityContext sc,
+      @Context HttpServletRequest req) throws AppException {
+    JsonResponse json = new JsonResponse();
+    if (projectId == null) {
+      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
+          "Incomplete request!");
+    }
+
+    json.setSuccessMessage("The Topic has been created.");
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
+        json).build();
+  }
+
+  @DELETE
+  @Path("/cpu/{program}/remove")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  public Response freeResources(@PathParam("program") String topicName,
+      @Context SecurityContext sc,
+      @Context HttpServletRequest req) throws AppException {
+    JsonResponse json = new JsonResponse();
+    if (projectId == null) {
+      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
+          "Incomplete request!");
+    }
+
+    json.setSuccessMessage("The topic has been removed.");
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
+        json).build();
+  }
 
   /**
    * Inspect a python in HDFS prior to running a job. Returns a
@@ -181,13 +228,10 @@ public class TensorFlowService {
       if (Strings.isNullOrEmpty(config.getAnacondaDir())) {
         config.setAnacondaDir(settings.getAnacondaProjectDir(project.getName()));
       }
-      try{
-        Jobs created = jobController.createJob(user, project, config);
-        activityFacade.persistActivity(ActivityFacade.CREATED_JOB + created.getName(), project, email);
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(created).build();
-      } catch (JobCreationException e) {
-        throw new AppException(Response.Status.CONFLICT.getStatusCode(), e.getMessage());
-      }
+      Jobs created = jobController.createJob(user, project, config);
+      activityFacade.persistActivity(ActivityFacade.CREATED_JOB + created.getName(), project, email);
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
+          entity(created).build();
     }
   }
 

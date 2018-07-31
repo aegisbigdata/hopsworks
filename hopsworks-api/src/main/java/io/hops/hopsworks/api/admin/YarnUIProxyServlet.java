@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.api.admin;
 
 import io.hops.hopsworks.api.kibana.ProxyServlet;
@@ -244,9 +224,9 @@ public class YarnUIProxyServlet extends ProxyServlet {
 
   private String hopify(String ui, String source) {
 
-    ui = ui.replaceAll("(?<=(href|src)=\")/(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\")/(?=[a-z])",
         "/hopsworks-api/yarnui/" + source + "/");
-    ui = ui.replaceAll("(?<=(href|src)=\')/(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\')/(?=[a-z])",
         "/hopsworks-api/yarnui/" + source + "/");
     ui = ui.replaceAll("(?<=(href|src)=\")//", "/hopsworks-api/yarnui/");
     ui = ui.replaceAll("(?<=(href|src)=\')//", "/hopsworks-api/yarnui/");
@@ -254,12 +234,12 @@ public class YarnUIProxyServlet extends ProxyServlet {
         "/hopsworks-api/yarnui/");
     ui = ui.replaceAll("(?<=(href|src)=\')(?=http)",
         "/hopsworks-api/yarnui/");
-    ui = ui.replaceAll("(?<=(href|src)=\")(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\")(?=[a-z])",
         "/hopsworks-api/yarnui/" + source + "/" );
-    ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-zA-Z])",
+    ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-z])",
         "/hopsworks-api/yarnui/" + source + "/" );
-    ui = ui.replaceAll("(?<=(url: '))/(?=[a-zA-Z])", "/hopsworks-api/yarnui/");
-    ui = ui.replaceAll("(?<=(location\\.href = '))/(?=[a-zA-Z])", "/hopsworks-api/yarnui/");
+    ui = ui.replaceAll("(?<=(url: '))/(?=[a-z])", "/hopsworks-api/yarnui/");
+    ui = ui.replaceAll("(?<=(location\\.href = '))/(?=[a-z])", "/hopsworks-api/yarnui/");
     return ui;
 
   }
@@ -267,7 +247,7 @@ public class YarnUIProxyServlet extends ProxyServlet {
   protected String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
     StringBuilder uri = new StringBuilder(500);
     if (servletRequest.getPathInfo() != null && servletRequest.getPathInfo().matches(
-        "/http([a-zA-Z,:,/,.,0-9,-])+:([0-9])+(.)+")) {
+        "/http([a-z,:,/,.,0-9,-])+:([0-9])+(.)+")) {
       String target = "http://" + servletRequest.getPathInfo().substring(7);
       servletRequest.setAttribute(ATTR_TARGET_URI, target);
       uri.append(target);

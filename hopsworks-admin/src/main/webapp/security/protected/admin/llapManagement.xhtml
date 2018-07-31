@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
-  ~ software and associated documentation files (the "Software"), to deal in the Software
-  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
-  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all copies or
-  ~ substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
-  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  ~
-  -->
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
@@ -31,9 +11,12 @@
 
     <h:head>
         <title><ui:insert name="title">LLAP Management</ui:insert></title>
-        <link rel="icon" type="image/png" href="#{resource['images/hops-black.png']}" />
-        <link rel="stylesheet" type="text/css" href="#{resource['/css/main.css']}" />
-        <link rel="stylesheet" type="text/css" href="#{resource['/css/theme.css']}" />
+            <link rel="icon" type="image/png" href="#{resource['images/hops-black.png']}" />
+            <link rel="stylesheet" type="text/css" href="#{resource['/css/layout.css']}" />
+            <link rel="stylesheet" type="text/css" href="#{resource['/css/component.css']}" />
+            <link rel="stylesheet" type="text/css" href="#{resource['/css/lims.css']}" />
+            <link rel="stylesheet" type="text/css" href="#{resource['/css/userMgmt.css']}" />
+            <link rel="stylesheet" type="text/css" href="#{resource['/css/customized.css']}" />
         <meta http-equiv="refresh" content="#{facesContext.externalContext.sessionMaxInactiveInterval};url=/hopsworks/#!/login"/>
     </h:head>
 
@@ -51,7 +34,7 @@
             </h:panelGrid>
         </pe:blockUI>
 
-        <ui:insert name="titleBar">
+        <ui:insert name="titleBar" style="width=100%">
             <ui:include src="/security/protected/admin/admintitleBar.xhtml" />
         </ui:insert>
 
@@ -73,7 +56,7 @@
             }
         </script>
 
-        <h:form style="width: 700px; margin: auto" >
+        <h:form style="width: 500px; margin: auto" >
             <h:panelGrid columns="2">
                 <f:facet name="header">
                     <p:column colspan="3">Settings</p:column>
@@ -83,22 +66,22 @@
                     <p:spinner id="nInstances" min="0" value="#{LlapBean.nInstances}" />
                 </p:column>
 
-                <p:column colspan="2">Executors Memory [mb per daemon]</p:column>
+                <p:column colspan="2">Executor Memory [mb]</p:column>
                 <p:column colspan="1">
                     <p:spinner id="execMemory" min="0" value="#{LlapBean.execMemory}"/>
                 </p:column>
 
-                <p:column colspan="2">Number of executors [per daemon]</p:column>
-                <p:column colspan="1">
-                    <p:spinner id="nExecutors" min="0" value="#{LlapBean.nExecutors}"/>
-                </p:column>
-
-                <p:column colspan="2">Cache Memory [mb per daemon]</p:column>
+                <p:column colspan="2">Cache Memory [mb]</p:column>
                 <p:column colspan="1">
                     <p:spinner id="cacheMemory" min="0" value="#{LlapBean.cacheMemory}"/>
                 </p:column>
 
-                <p:column colspan="2">Number of IO Threads [per daemon]</p:column>
+                <p:column colspan="2">Number of Executors per daemon</p:column>
+                <p:column colspan="1">
+                    <p:spinner id="nExecutors" min="0" value="#{LlapBean.nExecutors}"/>
+                </p:column>
+
+                <p:column colspan="2">Number of IO Threads per daemon</p:column>
                 <p:column colspan="1">
                     <p:spinner id="nIOThreads" min="0" value="#{LlapBean.nIOThreads}"/>
                 </p:column>
@@ -115,7 +98,7 @@
                                      actionListener="#{LlapBean.stopLLAP()}"
                                      disabled="#{!LlapBean.isClusterUp()}"
                                      onstart="PF('blockUIWidget').block()"
-                                     oncomplete="location.reload(true)"
+                                     oncomplete="unblockOrReload(xhr, status, args)"
                                      value="Stop LLAP cluster"/>
                 </p:row>
             </h:panelGrid>

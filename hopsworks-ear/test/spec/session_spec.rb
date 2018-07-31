@@ -1,21 +1,3 @@
-=begin
-Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this
-software and associated documentation files (the "Software"), to deal in the Software
-without restriction, including without limitation the rights to use, copy, modify, merge,
-publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or
-substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
-BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-=end
 describe "session" do
   before(:each) do
     reset_session
@@ -76,13 +58,13 @@ describe "session" do
     end
     
     it "should fail to login without two factor" do
-      set_two_factor("true")
       email = "#{random_id}@email.com"
       create_2factor_user(email: email)
+      set_two_factor("true")
       create_session(email, "Pass123")
       expect_json(successMessage: ->(value){ expect(value).to be_nil})
       expect_json(errorMsg: "Second factor required.")
-      expect_status(417)
+      expect_status(400)
     end
     
   end
@@ -120,16 +102,16 @@ describe "session" do
       expect_status(200)
     end
 
-    it "should fail to signin if not confirmed and no role" do
+    it "should fail to signup if not confirmed and no role" do
       email = "#{random_id}@email.com"
-      create_unapproved_user(email: email)
+      create_validated_user(email: email)
       create_session(email, "Pass123")
       expect_json(successMessage: ->(value){ expect(value).to be_nil})
-      expect_json(errorMsg: ->(value){ expect(value).to include("This account has not yet been approved.")})
+      expect_json(errorMsg: ->(value){ expect(value).to include("No valid role found for this user")})
       expect_status(401)
     end
 
-    it "should fail to signin with role and new account (status 1)" do
+    it "should fail to signup with role and new account (status 1)" do
       email = "#{random_id}@email.com"
       register_user(email: email)
       create_role(User.find_by(email: email))
@@ -141,7 +123,10 @@ describe "session" do
 
     it "should fail with status 4 and no role" do
       email = "#{random_id}@email.com"
-      create_user_without_role(email: email)
+      create_validated_user(email: email)
+      user = User.find_by(email: email)
+      user.status = 4
+      user.save
       create_session(email, "Pass123")
       expect_json(successMessage: ->(value){ expect(value).to be_nil})
       expect_json(errorMsg: ->(value){ expect(value).to include("No valid role found for this user")})

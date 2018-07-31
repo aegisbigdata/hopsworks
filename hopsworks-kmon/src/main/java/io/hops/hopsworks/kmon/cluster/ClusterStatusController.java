@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.kmon.cluster;
 
 import java.util.ArrayList;
@@ -28,21 +8,22 @@ import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import io.hops.hopsworks.common.dao.kagent.HostServicesFacade;
-import io.hops.hopsworks.kmon.struct.ClusterInfo; 
+import io.hops.hopsworks.common.dao.role.RoleEJB;
+import io.hops.hopsworks.kmon.struct.ClusterInfo;
 import io.hops.hopsworks.common.dao.host.Health;
-import io.hops.hopsworks.kmon.struct.GroupInfo;
+import io.hops.hopsworks.kmon.struct.ServiceInfo;
 
 @ManagedBean
 @RequestScoped
 public class ClusterStatusController {
 
   @EJB
-  private HostServicesFacade hostServicesFacade;
+  private RoleEJB roleEjb;
   @ManagedProperty("#{param.cluster}")
   private String cluster;
-  private static final Logger logger = Logger.getLogger(ClusterStatusController.class.getName());
-  private List<GroupInfo> group = new ArrayList<>();
+  private static final Logger logger = Logger.getLogger(
+          ClusterStatusController.class.getName());
+  private List<ServiceInfo> services = new ArrayList<>();
   private Health clusterHealth;
   private boolean found;
   private ClusterInfo clusterInfo;
@@ -73,8 +54,8 @@ public class ClusterStatusController {
     this.found = found;
   }
 
-  public List<GroupInfo> getGroup() {
-    return group;
+  public List<ServiceInfo> getServices() {
+    return services;
   }
 
   public Health getClusterHealth() {
@@ -84,17 +65,17 @@ public class ClusterStatusController {
 
   public void loadServices() {
     clusterHealth = Health.Good;
-    List<String> groupList = hostServicesFacade.findGroups(cluster);
-    if (!groupList.isEmpty()) {
+    List<String> servicesList = roleEjb.findServices(cluster);
+    if (!servicesList.isEmpty()) {
       found = true;
     }
-    for (String s : groupList) {
-      GroupInfo groupInfo = new GroupInfo(s);
-      Health health = groupInfo.addServices(hostServicesFacade.findHostServicesByGroup(cluster, s));
+    for (String s : servicesList) {
+      ServiceInfo serviceInfo = new ServiceInfo(s);
+      Health health = serviceInfo.addRoles(roleEjb.findRoleHost(cluster, s));
       if (health == Health.Bad) {
         clusterHealth = Health.Bad;
       }
-      group.add(groupInfo);
+      services.add(serviceInfo);
     }
   }
 
@@ -103,12 +84,11 @@ public class ClusterStatusController {
       return;
     }
     clusterInfo = new ClusterInfo(cluster);
-    clusterInfo.setNumberOfHosts(hostServicesFacade.countHosts(cluster));
-    clusterInfo.setTotalCores(hostServicesFacade.totalCores(cluster));
-    clusterInfo.setTotalGPUs(hostServicesFacade.totalGPUs(cluster));
-    clusterInfo.setTotalMemoryCapacity(hostServicesFacade.totalMemoryCapacity(cluster));
-    clusterInfo.setTotalDiskCapacity(hostServicesFacade.totalDiskCapacity(cluster));
-    clusterInfo.addServices(hostServicesFacade.findHostServicesByCluster(cluster));
+    clusterInfo.setNumberOfHost(roleEjb.countHosts(cluster));
+    clusterInfo.setTotalCores(roleEjb.totalCores(cluster));
+    clusterInfo.setTotalMemoryCapacity(roleEjb.totalMemoryCapacity(cluster));
+    clusterInfo.setTotalDiskCapacity(roleEjb.totalDiskCapacity(cluster));
+    clusterInfo.addRoles(roleEjb.findRoleHost(cluster));
     found = true;
   }
 

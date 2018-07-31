@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
 package io.hops.hopsworks.common.jobs.spark;
 
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
@@ -43,10 +23,25 @@ import org.elasticsearch.common.Strings;
 public class SparkJob extends YarnJob {
 
   private static final Logger LOG = Logger.getLogger(SparkJob.class.getName());
+  private final String sparkDir;
+  private final String sparkUser;
   protected SparkYarnRunnerBuilder runnerbuilder;
 
+  /**
+   *
+   * @param job
+   * @param user
+   * @param services
+   * @param hadoopDir
+   * @param sparkDir
+   * @param sparkUser
+   * @param jobUser
+   * @param jobsMonitor
+   * @param settings
+   */
   public SparkJob(Jobs job, AsynchronousJobExecutor services,
       Users user, final String hadoopDir,
+      final String sparkDir, String sparkUser,
       String jobUser, YarnJobsMonitor jobsMonitor, Settings settings) {
     super(job, services, user, jobUser, hadoopDir, jobsMonitor, settings);
     if (!(job.getJobConfig() instanceof SparkJobConfiguration)) {
@@ -54,6 +49,8 @@ public class SparkJob extends YarnJob {
           "JobDescription must contain a SparkJobConfiguration object. Received: "
           + job.getJobConfig().getClass());
     }
+    this.sparkDir = sparkDir;
+    this.sparkUser = sparkUser;
   }
 
   @Override
@@ -121,7 +118,9 @@ public class SparkJob extends YarnJob {
     try {
       runner = runnerbuilder.
           getYarnRunner(jobs.getProject().getName(),
-              jobUser, services, services.getFileOperations(hdfsUser.getUserName()), yarnClient, settings);
+              sparkUser, jobUser, sparkDir, services, services
+                  .getFileOperations(hdfsUser.getUserName()), yarnClient,
+              settings);
 
     } catch (IOException e) {
       LOG.log(Level.WARNING,
