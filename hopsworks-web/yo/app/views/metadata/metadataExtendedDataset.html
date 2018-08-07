@@ -1,0 +1,95 @@
+<div ng-controller="MetadataExtendedCtrl">
+  <span>
+    <div class="controls">
+      <div class="modal-header" align="center">
+        <button type="button" class="close" ng-click="metadataExtendedCtrl.close()">&times;</button>
+        <h3 class="modal-title">Add extended metadata for DataSet</h3>
+      </div>
+
+      <div class="modal-body">
+        <pre style="height: 200px; overflow: scroll">metadataExtendedCtrl: {{ metadataExtendedCtrl | json }}</pre>
+
+        <form class="form-horizontal">
+
+          <div class="form-group">
+            <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputTitle" class="form-control" placeholder="Title" ng-model="metadataExtendedCtrl.metadataExtendedDataset.title">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputDescription" class="form-control" placeholder="Description" ng-model="metadataExtendedCtrl.metadataExtendedDataset.description">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputContact_pointName" class="col-sm-2 control-label">Contact point Name</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputContact_pointName" class="form-control" placeholder="Contact_pointName" ng-model="metadataExtendedCtrl.metadataExtendedDataset.contact_point.name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputEmail" class="col-sm-2 control-label">Email</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputEmail" class="form-control" placeholder="Email" ng-model="metadataExtendedCtrl.metadataExtendedDataset.contact_point.email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputKeywords" class="col-sm-2 control-label">Keywords</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputKeywords" class="form-control" placeholder="Keywords (comma separated)" ng-model="metadataExtendedCtrl.metadataExtendedDataset.keywords">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputPublisherHomepage" class="col-sm-2 control-label">PublisherHomepage</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputPublisherHomepage" class="form-control" placeholder="PublisherHomepage" ng-model="metadataExtendedCtrl.metadataExtendedDataset.publisher.homepage">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputPublisherName" class="col-sm-2 control-label">PublisherName</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputPublisherName" class="form-control" placeholder="PublisherName" ng-model="metadataExtendedCtrl.metadataExtendedDataset.publisher.name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputTheme" class="col-sm-2 control-label">Theme</label>
+            <div class="col-sm-10">
+              <select multiple id="inputTheme" class="form-control" ng-model="metadataExtendedCtrl.metadataExtendedDataset.themes">
+                <option value="AGRI">Agriculture, fisheries, forestry and food</option>
+                <option value="ECON">Economy and finance</option>
+                <option value="EDUC">Education, culture and sport</option>
+                <option value="ENER">Energy</option>
+                <option value="ENVI">Environment</option>
+                <option value="GOVE">Government and public sector</option>
+                <option value="HEAL">Health</option>
+                <option value="INTR">International issues</option>
+                <option value="JUST">Justice, legal system and public safety</option>
+                <option value="REGI">Regions and cities</option>
+                <option value="SOCI">Population and society</option>
+                <option value="TECH">Science and technology</option>
+                <option value="TRAN">Transport</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="metadataExtendedCtrl.close()">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-disabled="attachTemplateCtrl.noTemplates" ng-click="metadataExtendedCtrl.saveFieldsDataset()">Save</button>
+      </div>
+
+    </div>
+  </span>
+
+</div>

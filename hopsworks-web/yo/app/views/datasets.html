@@ -301,6 +301,16 @@
                               </span>
                             </a>
                           </li>
+                          <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="4"
+                               ng-click="metadataExtendedCtrl.attachTemplate(dataset); $event.stopPropagation();">
+                              <span>
+                                Add extended metadata
+                              </span>
+                            </a>
+                          </li>
                           <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
                             <a class="pointer"
                                role="menuitem"
@@ -407,7 +417,8 @@
                 <div class="file-manager" style="height: 100%;">
                   <md-content class="md-padding" style="height: 100%; background-color: #FFFFFF">
                     <md-info style="min-height: 100%;">
-                      
+                      <div id="metadata-extended"
+                             ng-include="'views/metadata/metadataExtendedView.html'"></div>
                         <div ng-show="datasetsCtrl.selected === null">
                           <div class="file-details" style="text-align: left;">
                             Select a DataSet to view its details.

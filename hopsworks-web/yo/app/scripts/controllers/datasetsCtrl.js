@@ -541,6 +541,7 @@ angular.module('hopsWorksApp')
                 }
               } else {
                 fileName = dataset;
+                $rootScope.$broadcast('file-selected', file);
               }
 
               var previewPathArray = self.pathArray.slice(0);
@@ -950,6 +951,7 @@ angular.module('hopsWorksApp')
               } else {
                 self.selected = file.name;
               }
+              $rootScope.$broadcast('file-selected', file);
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;
