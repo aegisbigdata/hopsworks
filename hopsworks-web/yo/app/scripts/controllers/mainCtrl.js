@@ -180,7 +180,7 @@ angular.module('hopsWorksApp')
             self.resultItems = 0;
             self.resultItemsPublicSearch = 0;
             self.currentPage = 1;
-            self.pageSize = 9;
+            self.pageSize = 10;
 
             self.hitEnter = function (event) {
               var code = event.which || event.keyCode || event.charCode;
@@ -218,7 +218,7 @@ angular.module('hopsWorksApp')
             self.search = function () {             
               self.showSearchPage = true;
               self.currentPage = 1;
-              self.pageSize = 9;
+              self.pageSize = 10;
               self.searchResult = [];
 
               if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
@@ -326,7 +326,7 @@ angular.module('hopsWorksApp')
               self.showSearchPage = false;
               //self.showSearchAssets = true;
               self.currentPage = 1;
-              self.pageSize = 9;
+              self.pageSize = 10;
               self.searchResult = [];
 
               //if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
@@ -432,13 +432,14 @@ angular.module('hopsWorksApp')
             };
 
 
+
 self.searchAssetsMenu = function (param) {
                 
               self.searchTerm = "*";
                 
               self.showSearchPage = true;
               self.currentPage = 1;
-              self.pageSize = 9;
+              self.pageSize = 10;
               self.searchResult = [];
 
               if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
@@ -570,9 +571,9 @@ self.searchAssetsMenu = function (param) {
 
             self.viewType = function (listView) {
               if (listView) {
-                self.pageSize = 4;
+                self.pageSize = 10;
               } else {
-                self.pageSize = 6;
+                self.pageSize = 10;
               }
             };
 
@@ -602,21 +603,28 @@ self.searchAssetsMenu = function (param) {
 
             self.viewType = function (listView) {
               if (listView) {
-                self.pageSize = 4;
+                self.pageSize = 10;
               } else {
-                self.pageSize = 9;
+                self.pageSize = 10;
               }
             };
 
             self.incrementPage = function () {
-              self.pageSize = self.pageSize + 1;
+              if (self.pageSize == 1) {
+                  self.pageSize = self.pageSize + 9;
+                
+              } else {
+              self.pageSize = self.pageSize + 10;
+              }
             };
 
             self.decrementPage = function () {
-              if (self.pageSize < 2) {
-                return;
+              if (self.pageSize == 10) {
+                  self.pageSize = self.pageSize - 9;
+                
+              } else {
+              self.pageSize = self.pageSize - 10;
               }
-              self.pageSize = self.pageSize - 1;
             };
 
             self.viewDetail = function (result) {

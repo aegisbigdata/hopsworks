@@ -93,10 +93,9 @@
   width: 100%;
   bottom: 0;
   left: 0;
-  margin-bottom: -14px;
+  margin-bottom: -20px;
   z-index: 3;
-  background-image: url("../images/quadratino.png");'           
-
+  background-image: url("../images/quadratino.png");
 }
 
 .rg-left {
@@ -170,13 +169,13 @@
 }
 
 .ds-box {
-    width: 98%;
+    width: 86%;
     height: 95%;
 }
 
 .ds-box-bottom {
     width: 98%;
-    overflow: auto;
+    
     max-height: 55%;
 }
 

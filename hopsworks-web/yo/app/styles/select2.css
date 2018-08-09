@@ -53,7 +53,7 @@ Version: 3.4.5 Timestamp: Mon Nov  4 08:22:42 PST 2013
     overflow: hidden;
     position: relative;
 
-    border: 1px solid #E6E6E6;
+    
     white-space: nowrap;
     line-height: 26px;
     color: #B7B7B7;
@@ -167,7 +167,7 @@ Version: 3.4.5 Timestamp: Mon Nov  4 08:22:42 PST 2013
     margin-top: 1px;
     border-top: 1px solid #aaa;
     border-bottom: 0;
-
+    box-shadow: none;
     
 }
 

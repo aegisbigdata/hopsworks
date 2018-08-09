@@ -104,6 +104,17 @@ angular.module('hopsWorksApp', [
               $(this).addClass('active');
             });
             
+            $(document).on('click', '.show-querybuilder', function(e) {
+              $('.step-querybuilder').show();
+              $('.step-visualiser').hide();
+            });
+            
+            $(document).on('click', '.show-visualiser', function(e) {
+              $('.step-querybuilder').hide();
+              $('.step-visualiser').show();
+            });
+            
+            
             $(document).on('click', '.open-position-fixed', function(e) {
                 var target_hamburger = $(this).data("target");
                 $('.position-fixed').find('.uib-dropdown-amore').hide();

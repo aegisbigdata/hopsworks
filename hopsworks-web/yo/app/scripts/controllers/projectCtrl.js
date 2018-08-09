@@ -289,6 +289,7 @@ angular.module('hopsWorksApp')
             self.goToDatasets = function () {
               self.goToUrl('datasets');
             };
+            
 
             self.goToJobs = function () {
               ProjectService.enableLogs({id: self.currentProject.projectId}).$promise.then(
