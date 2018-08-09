@@ -549,6 +549,7 @@ md-input-container {
   display: flex;
 }
 
+
 .fields-in-table {
   border-style: solid;
   border-top: 0px; 
@@ -560,13 +561,16 @@ md-input-container {
 }
 
 .form-control > a.select2-choice {
-  margin-top: -4px;
+  margin-top: -10px;
   margin-right: -10px;
   margin-left: -10px;
+  background-color: transparent;
+  border: none;
 }
 
 .form-control > div.ui-select-dropdown {
-  margin-left: -10px;
+  margin-left: -13px;
+  margin-top: 2px;
 }
 
 .form-control > span.multiSelect > button {
@@ -610,7 +614,7 @@ md-input-container {
 
 .menu-icon-db {
     position: absolute;
-    right: 15px;
+    right: 10px;
 }
 
 .fa-check:before, .fa-times:before {
@@ -636,6 +640,31 @@ md-input-container {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	}
+        
+.message-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  background-color: #ddd;
+}
+
+.footer-info {
+      font-size: 14px;
+      line-height: 17px;
+      margin-top: 10px !important;
+}
+  
+.footer-image {
+      width: 30px;
+      height: 20px;
+      position: absolute;
+      left: 22%;
+      top: 25%;
+  }
+
+
 
 #CaptchaDiv {
 	font: bold 17px verdana, arial, sans-serif;

@@ -20,6 +20,7 @@
 
 .search-result {
   width: 100%;
+  margin-top: 50px;
 }
 
 .search-result-header > div > h3 {
@@ -110,7 +111,7 @@
 .search-result-body {
   margin: 2rem 0;
   height:650px;
-  overflow:auto;
+  /*overflow:auto;*/
 }
 
 .filter-menu-uppercase {

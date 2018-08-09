@@ -118,18 +118,18 @@
   background-color: #ffffff;
 }
 .file .icon {
-  padding: 13px;
+  padding: 10px;
   text-align: left;
   background-color: #00A2CA;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 15px;
 }
 .file .icon-light{
-  padding: 13px;
+  padding: 10px;
   text-align: left;
   background-color: #6ACAE2;
   color: #ffffff;
-  font-size: 9px;
+  font-size: 15px;
   height: 40px;
 }
 .file-control {

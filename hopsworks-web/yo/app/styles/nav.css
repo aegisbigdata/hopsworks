@@ -184,7 +184,7 @@ ul.dropdown-messages .dropdown-header {
   overflow: hidden;
   position: absolute;
   right: 25px;/*start from right*/
-  top: 260px;
+  top: 290px;
   bottom: 0;
   transition: all 0.3s ease;
   -webkit-transition: all 0.3s ease;
@@ -197,6 +197,7 @@ ul.dropdown-messages .dropdown-header {
 .ds-sidenav.open {
     width: 20%;
     min-width: 380px;
+    height: 100%;
 }
 
 .ds-sidenav-table > tbody > tr > td {
