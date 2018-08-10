@@ -27,7 +27,7 @@
     <div ng-controller="MetadataCtrl as metadataCtrl">
       <div class="overlay" ></div>
       <div ng-include="'navProject.html'"></div>
-      <section>
+      <section ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
         <div>
           <div ng-if="mainCtrl.showSearchPage" class="content-wrapper">
             <div id="projectSearchResults">
@@ -301,7 +301,7 @@
                               </span>
                             </a>
                           </li>
-                          <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
+                          <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
                             <a class="pointer"
                                role="menuitem"
                                tabindex="4"
@@ -473,6 +473,8 @@
                         <div id="board"  style="font-family: Lato; height: 76%;"
                              ng-include="'views/metadata/extendedMetadata.html'">
                         </div>
+                        <div id="metadata-extended"
+                           ng-include="'views/metadata/metadataExtendedView.html'"></div>
                     </md-info>
                   </md-content>
                 </div>
