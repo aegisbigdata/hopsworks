@@ -1,42 +1,40 @@
 <div>
 
   <span>
-    <pre>file: {{ file }} metadataExtendedCtrl: {{ metadataExtendedCtrl }}</pre>
     <div class="controls">
       <div class="modal-header" align="center">
-        <button type="button" class="close" ng-click="metadataExtendedCtrl.close()">&times;</button>
+        <button type="button" class="close" ng-click="vm.close()">&times;</button>
         <h3 class="modal-title">Add extended metadata for Distribution</h3>
       </div>
 
       <div class="modal-body">
-
         <form class="form-horizontal">
 
           <div class="form-group">
             <label for="inputTitle" class="col-sm-2 control-label">Title</label>
             <div class="col-sm-10">
-              <input type="text" id="inputTitle" class="form-control" placeholder="Title" ng-model="metadataExtendedCtrl.metadataExtendedDistribution.title">
+              <input type="text" id="inputTitle" class="form-control" placeholder="Title" ng-model="vm.metadataExtendedDistribution.title">
             </div>
           </div>
 
           <div class="form-group">
             <label for="inputDescription" class="col-sm-2 control-label">Description</label>
             <div class="col-sm-10">
-              <input type="text" id="inputDescription" class="form-control" placeholder="Description" ng-model="metadataExtendedCtrl.metadataExtendedDistribution.description">
+              <input type="text" id="inputDescription" class="form-control" placeholder="Description" ng-model="vm.metadataExtendedDistribution.description">
             </div>
           </div>
 
           <div class="form-group">
             <label for="inputFormat" class="col-sm-2 control-label">Format</label>
             <div class="col-sm-10">
-              <input type="text" id="inputFormat" class="form-control" placeholder="Format" ng-model="metadataExtendedCtrl.metadataExtendedDistribution.format">
+              <input type="text" id="inputFormat" class="form-control" placeholder="Format" ng-model="vm.metadataExtendedDistribution.format">
             </div>
           </div>
 
           <div class="form-group">
             <label for="inputLicense" class="col-sm-2 control-label">License</label>
             <div class="col-sm-10">
-              <select required id="inputLicense" class="form-control" ng-model="metadataExtendedCtrl.metadataExtendedDistribution.license">
+              <select required id="inputLicense" class="form-control" ng-model="vm.metadataExtendedDistribution.license">
                 <option value="" disabled selected>Select license...</option>
                 <option>CC BY 3.0 Austria</option>
                 <option>CC-BY 4.0</option>
@@ -79,7 +77,7 @@
           <div class="form-group">
             <label for="inputPricingScheme" class="col-sm-2 control-label">Pricing scheme</label>
             <div class="col-sm-10">
-              <select required id="inputPricingScheme" class="form-control" ng-model="metadataExtendedCtrl.metadataExtendedDistribution.pricing_scheme">
+              <select required id="inputPricingScheme" class="form-control" ng-model="vm.metadataExtendedDistribution.pricing_scheme">
                 <option value="" disabled selected>Select pricing scheme...</option>
                 <option>Free</option>
                 <option>PAYG</option>
@@ -90,11 +88,23 @@
 
           <hr>
 
-          <div class="row">
+          <div class="form-group">
+            <label for="inputTypeOfData" class="col-sm-2 control-label">Type of data</label>
+            <div class="col-sm-10">
+              <select required id="inputTypeOfData" class="form-control" ng-model="vm.metadataExtendedDistribution.typeOfData">
+                <option value="" disabled selected>Select type of data...</option>
+                <option value="tabular">Tabular data</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row" ng-if="vm.metadataExtendedDistribution.typeOfData == 'tabular'">
             <div class=col-sm-12>
-              <h3 style="margin-bottom: 15px;">Fields
-                <button type="button" class="btn btn-default" ng-click="metadataExtendedCtrl.metadataExtendedDistribution.fields.push({})" style="float: right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
-              </h3>
+              <h4 style="margin-bottom: 15px;">Fields
+                <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.push({})" style="float: right">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
+              </h4>
 
               <div class="table-responsive">
                 <table class="table table-bordred table-hover">
@@ -110,13 +120,9 @@
                   </thead>
 
                   <tbody>
-                    <tr ng-repeat="field in metadataExtendedCtrl.metadataExtendedDistribution.fields">
+                    <tr ng-repeat="field in vm.metadataExtendedDistribution.fields">
                       <td>
-                        <md-checkbox
-                        class="md-primary"
-                        ng-checked="field.primary"
-                        ng-click="field.primary = !field.primary"
-                        aria-label="Select as primary"></md-checkbox>
+                        <md-checkbox class="md-primary" ng-checked="field.primary" ng-click="field.primary = !field.primary" aria-label="Select as primary"></md-checkbox>
                       </td>
                       <td>
                         <input type="text" class="form-control col-sm-3" placeholder="Name" ng-model="field.name">
@@ -148,7 +154,9 @@
                         </select>
                       </td>
                       <td>
-                        <button type="button" class="btn btn-default" ng-click="metadataExtendedCtrl.metadataExtendedDistribution.fields.splice($index, 1)" ng-disabled="$index == 0"><i class="fa fa-trash"></i></button>
+                        <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.splice($index, 1)" ng-disabled="$index == 0">
+                          <i class="fa fa-trash"></i>
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -161,8 +169,8 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" ng-click="metadataExtendedCtrl.close()">Cancel</button>
-        <button type="button" class="btn btn-primary" ng-disabled="attachTemplateCtrl.noTemplates" ng-click="metadataExtendedCtrl.saveFieldsDistribution()">Save</button>
+        <button type="button" class="btn btn-default" ng-click="vm.close()">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-click="vm.saveFieldsDistribution()">Save</button>
       </div>
 
     </div>
