@@ -52,6 +52,30 @@ angular.module('hopsWorksApp')
                 };
 
                 return $http(regReq);
+              },
+              updateCatalog: function (catalog) {
+                var regReq = {
+                  method: 'PUT',
+                  url: metadataBackend + '/api/catalogs/' + catalog.id,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  data: catalog
+                };
+
+                return $http(regReq);
+              },
+              updateDataset: function (dataset) {
+                var regReq = {
+                  method: 'PUT',
+                  url: metadataBackend + '/api/datasets/' + dataset.id,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  data: dataset
+                };
+
+                return $http(regReq);
               }
             };
             return service;
