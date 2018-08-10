@@ -20,14 +20,14 @@
 
 <aside class="offsidebar" style="height: 50px">
     
-    <div style="margin-top: 50px; padding: 10px">
+    <div style="margin-top: 40px; padding: 30px 0px 0px 10px; position: fixed">
       <a style="background-color: #fff; color: #E6AD1E; font-size: 26px; font-weight: bold" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center">
         <!--a style="background-color: #757575;" href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"--> 
           {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17
           ? '...' : ''}}
         </a>
     </div>
-  <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:120px;"  ng-cloak>
+  <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:110px;"  ng-cloak>
   <!-- MOD A11F  -->
   <!--nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top:150px;"  ng-cloak-->
 
@@ -37,8 +37,7 @@
 
       <!--li style="background: #1a1a1a;" MOD A11F -->
       
-      
-      
+            
        <li ng-click="" ng-show="projectCtrl.cloak">
         <a>Get Started         
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/power.png"/>
@@ -127,7 +126,7 @@
       </li--> <!-- MOD A11F -->
 
       <!--li ng-click="projectCtrl.goToDatasets()" style="margin-top:40px;" ng-show="projectCtrl.cloak"-->
-      <li ng-click="projectCtrl.goToDatasets()"ng-show="projectCtrl.cloak">
+      <li ng-click="projectCtrl.goToDatasets()" ng-show="projectCtrl.cloak">
         <a>Project Datasets 
           <!--span class="sub_icon fa fa-folder-open fa-lg pull-right"></span  MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/dataset.png"/>
@@ -199,7 +198,7 @@
       <li ng-click="projectCtrl.goToKafka()"
           ng-show="projectCtrl.showKafka()">
         <a>
-          Kafka <img class="pull-right" style="margin-right:15px" height="25" src="images/kafka_logo.png" id="kafkaTab"/>
+          Kafka <img class="pull-right" style="margin-right:10px" height="25" src="images/kafka_logo.png" id="kafkaTab"/>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: Kafka is encountering problems. Red means Kafka is down."             
              tooltip-placement="auto right"
@@ -209,7 +208,7 @@
       
       <li ng-click="projectCtrl.goToJobs()" ng-show="projectCtrl.showJobs()" id="jobsTab">
         <a>
-          Jobs <span class="sub_icon fa fa-cogs fa-lg pull-right"></span>
+          Jobs <span class="sub_icon fa fa-cogs fa-lg pull-right" style="margin-right:-8px;"></span>
           <i class=" pull-left fa " 
              uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now."              
              tooltip-placement="auto right"
@@ -229,6 +228,11 @@
           Metadata Designer
           <!--span class="sub_icon fa fa-edit fa-lg pull-right"></span-->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/metadata_designer.png"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now."              
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        
         </a>
       </li>
       <li ng-click="projectCtrl.goToSettings()" ng-show="projectCtrl.cloak">
@@ -236,6 +240,11 @@
         <a>Settings 
           <!--span class="sub_icon fa fa-dashboard fa-lg pull-right" id="settingsTab"></span MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/settings.png"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now."              
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        
         </a>
       </li>
 
@@ -243,6 +252,11 @@
         <a>Members 
           <!--span class="sub_icon fa fa-users fa-lg pull-right"></spanMOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/users.png"/>
+          <i class=" pull-left fa " 
+             uib-tooltip="Orange triangle: jobs are encountering problems. Red means Jobs cannot be run just now."              
+             tooltip-placement="auto right"
+             ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
+        
         </a>
       </li>
       

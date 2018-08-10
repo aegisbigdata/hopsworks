@@ -68,7 +68,7 @@
                    theme="select2" class="form-control" 
                    style="min-width: 300px;">
 
-          <ui-select-match placeholder="Select member..."  style="height:24px;">{{$select.selected.email}}</ui-select-match>
+          <ui-select-match placeholder="Select member..."  style="box-shadow: none; height:24px;">{{$select.selected.email}}</ui-select-match>
           <!--A07F 11-03-2018 -->
           <!--ui-select-choices repeat="card in memberCtrl.cards | cardFilter: {email: $select.search, firstname: $select.search, lastname: $select.search}"-->
           <ui-select-choices repeat="card in memberCtrl.cards | cardFilter: {firstname: $select.search, lastname: $select.search}">
@@ -128,7 +128,7 @@
                 </td>
                 <td>
                   <button type="button"
-                          style="width:32px; height: 32px; border-radius: 16px;"
+                          style="padding-left:0; padding-right:0; text-align: center; width:32px; height: 32px; border-radius: 16px;"
                           ng-click="memberCtrl.removeMember(newMember.projectTeamPK.teamMember)"
                           class="btn btn-danger pull-right">
                     <em class="fa fa-trash"></em>
@@ -210,7 +210,7 @@
           </td>
           <td>
             <button type="button"
-                    style="width:32px; height: 32px; border-radius: 16px;"
+                    style="padding-left:0; padding-right:0; text-align: center; width:32px; height: 32px; border-radius: 16px;"
                     ng-disabled="member.user.email === memberCtrl.projectOwner.email ||
                       (memberCtrl.teamRole !== 'Data owner' && member.user.email !== mainCtrl.email)"
                     ng-click="memberCtrl.deleteMemberFromBackend(member.user.email)"
