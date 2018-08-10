@@ -21,8 +21,8 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('CardCtrl', ['$scope', 'ProjectService', 'DelaService', '$routeParams', '$rootScope', '$location',
-          function ($scope, ProjectService, DelaService, $routeParams, $rootScope, $location) {
+        .controller('CardCtrl', ['$scope', 'ProjectService', 'DelaService', 'ExtendedMetadataService', '$routeParams', '$rootScope', '$location',
+          function ($scope, ProjectService, DelaService, ExtendedMetadataService, $routeParams, $rootScope, $location) {
             var self = this;
             self.detail = [];
             var init = function (content) {
@@ -92,6 +92,13 @@ angular.module('hopsWorksApp')
                   console.log("Dataset details error ", error);
                 });
               }
+
+              ExtendedMetadataService.getDataset(content.id).then(function (result) {
+                console.log('showing metadata', result.data);
+                content.extendedMetadata = result.data;
+              }, function (err) {
+              });
+              
               content.details = self.detail;
               console.log("Controller init: ", content);
             };
