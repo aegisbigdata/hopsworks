@@ -1194,7 +1194,31 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
-              addExtendedMetadata: function (size, file) {
+              projectMetadata: function (size, projectId) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'views/metadata/metadataExtendedProject.html',
+                  controller: 'MemberCtrl as memberCtrl',
+                  size: size,
+                  resolve: {
+                    auth: ['$q', '$location', 'AuthService',
+                      function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                                function (success) {
+                                },
+                                function (err) {
+                                  $location.path('/login');
+                                  $location.replace();
+                                  return $q.reject(err);
+                                });
+                      }],
+                    projectId: function () {
+                      return projectId;
+                    }
+                  }
+                });
+                return modalInstance.result;
+              },
+              addExtendedMetadata: function (size, file, detailData) {
                 var templateUrl = '';
                 if (file.dir) { // file is a folder or dataset
                   templateUrl = 'views/metadata/metadataExtendedDataset.html';

@@ -237,6 +237,13 @@ angular.module('hopsWorksApp')
               });
             };
 
+            self.projectMetadata = function () {
+              ModalService.projectMetadata('lg', self.projectId).then(
+                      function (success) {
+                      }, function (error) {
+              });
+            };
+
 
             self.saveProject = function () {
               self.working = true;
