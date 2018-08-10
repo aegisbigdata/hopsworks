@@ -41,16 +41,27 @@
        {{content.type === 'ds' && !content.public_ds ? 'green': ''}} 
        {{content.type === 'ds' && content.public_ds && content.localDataset ? 'blue': ''}}
        {{content.type === 'ds' && content.public_ds && !content.localDataset ? 'darkblue': ''}}"> -->
-    <div class="header">
+    <div class="header" style="color: #000">
       <h3>{{content.name}}
         <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
       </h3>
     </div>
     
       <div class="details">
+          <div class="row">
+              <div class="col-sm-6 col-md-6">
+                <label>metadata title</label>
+                <div class="value">{{content.extendedMetadata.title || '--'}}</div>            
+              </div>
+              <div class="col-sm-4 col-md-4">
+                <label>keywords</label>
+                <div class="value">{{content.extendedMetadata.keywords || '--'}}</div>            
+              </div>
+            </div>
         <div class="desc">{{content.description | limitTo: limit}}
-          {{content.description.length > limit ? '...':''}}</div>
-        
+          {{content.description.length > limit ? '...':''}}
+        </div>
+
         <div class="row">
           <div class="col-sm-6 col-md-6" style="margin-bottom: 15px">
             <label>owner</label>
