@@ -9,22 +9,13 @@ angular.module('hopsWorksApp')
             var service = {
                 
               getCatalog: function (catalogId) {
-                return $http.get(metadataBackend + '/api/catalogs/byid/' + catalogId);
+                return $http.get(metadataBackend + '/api/catalogs/' + catalogId);
               },
               getDataset: function (datasetId) {
-                return $http.get(metadataBackend + '/api/datasets/byid/' + datasetId);
+                return $http.get(metadataBackend + '/api/datasets/' + datasetId);
               },
               getDistribution: function (datasetId, distributionId) {
-                return $http.get(metadataBackend + '/api/datasets/byid/' + datasetId + '/distributions/byId/' + distributionId);
-              },
-              getCatalogByName: function (catalogName) {
-                return $http.get(metadataBackend + '/api/catalogs/' + catalogName);
-              },
-              getDatasetByName: function (datasetName) {
-                return $http.get(metadataBackend + '/api/datasets/' + datasetName);
-              },
-              getDistributionByName: function (datasetName, distributionName) {
-                return $http.get(metadataBackend + '/api/datasets/' + datasetName + '/distributions/' + distributionName);
+                return $http.get(metadataBackend + '/api/datasets/' + datasetId + '/distributions/' + distributionId);
               },
               addCatalog: function (catalog) {
                 var regReq = {
