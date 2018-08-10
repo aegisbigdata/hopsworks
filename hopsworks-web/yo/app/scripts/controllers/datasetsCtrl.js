@@ -541,7 +541,6 @@ angular.module('hopsWorksApp')
                 }
               } else {
                 fileName = dataset;
-                $rootScope.$broadcast('file-selected', file);
               }
 
               var previewPathArray = self.pathArray.slice(0);
