@@ -1234,7 +1234,8 @@ angular.module('hopsWorksApp')
 
                 var modalInstance = $uibModal.open({
                   templateUrl: templateUrl,
-                  controller: 'MetadataExtendedCtrl as metadataExtendedCtrl',
+                  controller: 'MetadataExtendedModalCtrl',
+                  controllerAs: 'vm',
                   size: size,
                   backdrop: 'static',
                   resolve: {
@@ -1251,6 +1252,9 @@ angular.module('hopsWorksApp')
                       }],
                     file: function () {
                       return file;
+                    },
+                    detailData: function () {
+                      return detailData;
                     }
                   }
                 });
