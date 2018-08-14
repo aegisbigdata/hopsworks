@@ -39,8 +39,14 @@
 
           <div class="form-group">
             <label for="inputKeywords" class="col-sm-2 control-label">Keywords</label>
-            <div class="col-sm-10">
-              <input type="text" id="inputKeywords" class="form-control" placeholder="Keywords (comma separated)" ng-model="vm.metadataExtendedDataset.keywords">
+            <div class="col-sm-8 form-inline">
+              <div class="input-group" ng-repeat="keyword in vm.metadataExtendedDataset.keywords track by $index" style=" margin-right: 10px; margin-bottom: 10px">
+                <input type="text" class="form-control" placeholder="Keyword" style="width: 143px;" ng-model="vm.metadataExtendedDataset.keywords[$index]">
+                <div class="input-group-addon" ng-click="vm.metadataExtendedDataset.keywords.splice($index, 1);"><i class="fa fa-trash"></i></div>
+              </div>
+            </div>
+            <div class="col-sm-2">
+              <button type="button" class="btn btn-default pull-right" ng-click="vm.metadataExtendedDataset.keywords.push('')"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
             </div>
           </div>
 
@@ -83,6 +89,7 @@
       </div>
 
       <div class="modal-footer">
+        <button type="button" class="btn btn-danger pull-left" ng-click="vm.deleteMetadata()"><i class="fa fa-trash"></i>&nbsp;Delete metadata</button>
         <button type="button" class="btn btn-default" ng-click="vm.close()">Cancel</button>
         <button type="button" class="btn btn-primary" ng-click="vm.saveFieldsDataset()">Save</button>
       </div>
