@@ -72,6 +72,7 @@ import org.elasticsearch.search.SearchHit;
 import org.json.JSONObject;
 import static org.elasticsearch.index.query.QueryBuilders.fuzzyQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import org.elasticsearch.search.sort.SortOrder;
 
 /**
  *
@@ -114,7 +115,8 @@ public class ElasticController {
     srb = srb.setTypes(Settings.META_PROJECT_TYPE,
         Settings.META_DATASET_TYPE);
     srb = srb.setQuery(this.globalSearchQuery(searchTerm.toLowerCase()));
-    srb = srb.addHighlightedField("name");
+    srb = srb.addHighlightedField("name").setSize(3000).addSort("name", SortOrder.ASC);
+    
     LOG.log(Level.INFO, "Global search Elastic query is: {0}", srb.toString());
     ListenableActionFuture<SearchResponse> futureResponse = srb.execute();
     SearchResponse response = futureResponse.actionGet();
