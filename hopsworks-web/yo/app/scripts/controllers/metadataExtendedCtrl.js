@@ -7,8 +7,6 @@ angular.module('hopsWorksApp')
 
             var self = this;
 
-            console.log('metadataExtendedCtrl called', self.metadataExtendedDataset);
-
             self.initDistribution = function () {
               return {
                 id: "",
@@ -17,7 +15,6 @@ angular.module('hopsWorksApp')
                 description: "",
                 format: "",
                 license: "",
-                pricing_scheme: "",
                 fields: [
                   {
                     name: "",
@@ -66,14 +63,9 @@ angular.module('hopsWorksApp')
             self.attachTemplate = function (file) {
               self.metadataExtendedDistribution = self.initDistribution();
               self.metadataExtendedDataset = self.initDataset();
-              
-
-              console.log('called attachTemplate', file, $routeParams);
-
 
               // Check if metadata for parent dataset exists
               if (!file.dir) {
-                console.log('file is not directory');
                 ExtendedMetadataService.getDataset(file.parentId)
                 .then(function () {
                   // Parent dataset has metadata
@@ -82,17 +74,15 @@ angular.module('hopsWorksApp')
                   .then(function (success) {
                     self.metadataExtendedDistribution = success.data;
 
-                    console.log('existing metadata loaded from server and assigned', self.metadataExtendedDistribution);
                     ModalService.addExtendedMetadata('lg', file, success.data);
+
                   }, function (error) {
                     // File does not have metadata
-                    console.log('file does not have metadata');
                     ModalService.addExtendedMetadata('lg', file, self.metadataExtendedDistribution);
                   })
                  
                 }, function (err) {
                   // Parent dataset has no metadata
-                  console.log('Metadata for distribution can not be added');
                   growl.error("Metadata for distribution can not be added. Parent dataset has no metadata.", {title: 'Info', ttl: 5000});
                 });
               } else {
@@ -100,10 +90,8 @@ angular.module('hopsWorksApp')
                 .then(function (success) {
                   ModalService.addExtendedMetadata('lg', file, success.data);
                   self.metadataExtendedDataset = success.data;
-                  console.log('existing metadata loaded from server and assigned', self.metadataExtendedDataset);         
                 }, function (error) {
                   // Dataset does not have metadata
-                  console.log('dataset does not have metadata');
                   ModalService.addExtendedMetadata('lg', file, self.metadataExtendedDataset);
                 })
               }
@@ -126,13 +114,9 @@ angular.module('hopsWorksApp')
             });
 
             self.getMetadata = function (file) {
-              console.log('hmmmmn called getMetadata', file);
-              /* $routeParams.projectID */
-
               if (file.type == "ds" || file.dir) {
                 ExtendedMetadataService.getDataset(file.id)
                 .then(function (result) {
-                  console.log('showing metadata', result.data);
                   self.showMetadata(result.data);
                 }, function (err) {
                   self.metadataDisplay = false;
