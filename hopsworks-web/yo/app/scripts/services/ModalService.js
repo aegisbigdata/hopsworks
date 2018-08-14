@@ -1197,7 +1197,8 @@ angular.module('hopsWorksApp')
               projectMetadata: function (size, projectId) {
                 var modalInstance = $uibModal.open({
                   templateUrl: 'views/metadata/metadataExtendedProject.html',
-                  controller: 'MemberCtrl as memberCtrl',
+                  controller: 'MetadataExtendedModalCtrl',
+                  controllerAs: 'vm',
                   size: size,
                   resolve: {
                     auth: ['$q', '$location', 'AuthService',

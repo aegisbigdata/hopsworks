@@ -19,41 +19,45 @@
   -->
 
 <div class="modal-header">
-    <button class="close" ng-click="memberCtrl.close()" type="button">&times;</button>
+    <button class="close" ng-click="vm.close()" type="button">&times;</button>
     <h2 class="modal-title">Project metadata</h2>
 </div>
 <div growl reference="2" class="pull-right"></div>
 <div class="modal-body">
+    <div class="alert alert-danger" ng-if="vm.errorMessage">
+        <strong>Errors occured</strong><br>
+        <div ng-repeat="message in vm.errorMessage">{{ message.error }}</div>
+    </div>
     <p>Add or edit metadata</p>
     <hr>
     <form class="form-horizontal">
         <div class="form-group">
             <label for="inputProjectTitle" class="col-sm-3 control-label">Project title</label>
             <div class="col-sm-7">
-                <input type="text" class="form-control" id="inputProjectTitle" placeholder="Project title">
+                <input type="text" class="form-control" id="inputProjectTitle" placeholder="Project title" ng-model="vm.metadataExtendedCatalog.title">
             </div>
         </div>
         <div class="form-group">
             <label for="inputProjectDescription" class="col-sm-3 control-label">Project description</label>
             <div class="col-sm-7">
-                <input type="text" class="form-control" id="inputProjectDescription" placeholder="Project description">
+                <input type="text" class="form-control" id="inputProjectDescription" placeholder="Project description" ng-model="vm.metadataExtendedCatalog.description">
             </div>
         </div>
         <div class="form-group">
             <label for="inputProjectPublisherName" class="col-sm-3 control-label">Project publisher name</label>
             <div class="col-sm-7">
-                <input type="text" class="form-control" id="inputProjectPublisherName" placeholder="Project publisher name">
+                <input type="text" class="form-control" id="inputProjectPublisherName" placeholder="Project publisher name" ng-model="vm.metadataExtendedCatalog.publisher.name">
             </div>
         </div>
         <div class="form-group">
             <label for="inputProjectPublisherHomepage" class="col-sm-3 control-label">Project publisher homepage</label>
             <div class="col-sm-7">
-                <input type="text" class="form-control" id="inputProjectPublisherHomepage" placeholder="Project publisher homepage">
+                <input type="text" class="form-control" id="inputProjectPublisherHomepage" placeholder="Project publisher homepage" ng-model="vm.metadataExtendedCatalog.publisher.homepage">
             </div>
         </div>
     </form>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="vm.close()">Cancel</button>
-    <button type="button" class="btn btn-primary" ng-click="vm.saveFieldsDataset()">Save</button>
+    <button type="button" class="btn btn-primary" ng-click="vm.saveFieldsCatalog()">Save</button>
 </div>
