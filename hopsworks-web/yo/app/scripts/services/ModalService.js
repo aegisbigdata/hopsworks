@@ -1214,6 +1214,9 @@ angular.module('hopsWorksApp')
                       }],
                     projectId: function () {
                       return projectId;
+                    },
+                    detailData: function () {
+                      return null
                     }
                   }
                 });
@@ -1256,6 +1259,9 @@ angular.module('hopsWorksApp')
                     },
                     detailData: function () {
                       return detailData;
+                    },
+                    projectId: function () {
+                      return null;
                     }
                   }
                 });
