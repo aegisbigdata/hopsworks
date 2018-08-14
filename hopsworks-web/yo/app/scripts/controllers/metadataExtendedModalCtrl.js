@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-  .controller('MetadataExtendedModalCtrl', ['$http', '$uibModalInstance', '$scope', '$rootScope', '$routeParams', 'ModalService', 'ExtendedMetadataService', 'growl', 'detailData',
+  .controller('MetadataExtendedModalCtrl', ['$http', '$uibModalInstance', '$scope', '$rootScope', '$routeParams', 'ModalService', 'ExtendedMetadataService', 'growl', 'detailData', 'projectId',
     function ($http, $uibModalInstance, $scope, $rootScope, $routeParams,
-      ModalService, ExtendedMetadataService, growl, detailData) {
+      ModalService, ExtendedMetadataService, growl, detailData, projectId) {
 
       var self = this;
 
@@ -168,7 +168,29 @@ angular.module('hopsWorksApp')
               growl.success("Metadata has been added successfully", { title: 'Success', ttl: 2000 });
               $scope.$close();
             }, function (err) {
-              console.log("error while saving", err);
+              rowl.error("Error while adding metadata", { title: 'Success', ttl: 2000 });
+            });
+        })
+      };
+
+      self.saveFieldsCatalog = function () {
+        ExtendedMetadataService.getCatalog(projectId).then(function () {
+          ExtendedMetadataService.updateCatalog(self.metadataExtendedCatalog).then(function (result) {
+            growl.success("Metadata has been updated successfully", { title: 'Success', ttl: 2000 });
+            $scope.$close();
+          }, function (err) {
+            self.errorMessage = err.data.message;
+            growl.error("Error while updating metadata", { title: 'Success', ttl: 2000 });
+          });
+        }, function (err) {
+          // Catalog doesn't exist
+          self.metadataExtendedCatalog.id = projectId;
+          ExtendedMetadataService.addCatalog(self.metadataExtendedCatalog).then(function (result) {
+              growl.success("Metadata has been added successfully", { title: 'Success', ttl: 2000 });
+              $scope.$close();
+            }, function (err) {
+              self.errorMessage = err.data.message;
+              growl.error("Error while adding metadata", { title: 'Success', ttl: 2000 });
             });
         })
       };
