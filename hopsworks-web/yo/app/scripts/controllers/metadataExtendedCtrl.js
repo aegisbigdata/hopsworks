@@ -74,6 +74,13 @@ angular.module('hopsWorksApp')
                   .then(function (success) {
                     self.metadataExtendedDistribution = success.data;
 
+                    // set primary fields
+                    for (var i = 0; i < self.metadataExtendedDistribution.fields.length; i++) {
+                      if (self.metadataExtendedDistribution.primary_keys.includes(self.metadataExtendedDistribution.fields[i].name)) {
+                        self.metadataExtendedDistribution.fields[i].primary = true;
+                      }
+                    }
+
                     ModalService.addExtendedMetadata('lg', file, success.data);
 
                   }, function (error) {
@@ -90,6 +97,10 @@ angular.module('hopsWorksApp')
                 .then(function (success) {
                   ModalService.addExtendedMetadata('lg', file, success.data);
                   self.metadataExtendedDataset = success.data;
+
+                  for (var i = 0; i < self.metadataExtendedDataset.themes.length; i++) {
+                    self.metadataExtendedDataset.themes[i] = self.metadataExtendedDataset.themes[i].replace('http://publications.europa.eu/resource/authority/data-theme/', '');
+                  }
                 }, function (error) {
                   // Dataset does not have metadata
                   ModalService.addExtendedMetadata('lg', file, self.metadataExtendedDataset);
