@@ -76,6 +76,40 @@ angular.module('hopsWorksApp')
                 };
 
                 return $http(regReq);
+              },
+              updateDistribution: function (datasetId, distribution) {
+                var regReq = {
+                  method: 'PUT',
+                  url: metadataBackend + '/api/datasets/' + datasetId + '/distributions/' + distribution.id,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  data: distribution
+                };
+
+                return $http(regReq);
+              },
+              deleteDataset: function (datasetId) {
+                var regReq = {
+                  method: 'DELETE',
+                  url: metadataBackend + '/api/datasets/' + datasetId,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                };
+
+                return $http(regReq);
+              },
+              deleteDistribution: function (datasetId, distributionId) {
+                var regReq = {
+                  method: 'DELETE',
+                  url: metadataBackend + '/api/datasets/' + datasetId + '/distributions/' + distributionId,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                };
+
+                return $http(regReq);
               }
             };
             return service;
