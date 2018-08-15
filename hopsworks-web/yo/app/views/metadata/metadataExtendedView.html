@@ -14,10 +14,24 @@
     </div>
   </div>
 
-  <table id="mytable1" ng-show="datasetsCtrl.selected !== null && datasetsCtrl.selected !== undefined" class="table table-bordred table-striped" style="margin-top: 16px;">
-    <tr style="background-color: #fafafa" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay">
-      <td style="color:lightgrey;">{{ key }}</td>
-      <td style="color: grey;">{{ value }}</td>
+  <table ng-show="datasetsCtrl.selected &&  metadataExtendedCtrl.metadataDisplay.rdf" class="table table-detail">
+    <tr style="border-top: none;">
+      <td style="font-size: 11px; color: #00A2CA; text-transform: capitalize; padding: 0px 0px 10px 0px !important; min-width: 122px;">RDF</td>
+    </tr>
+        
+    <tr style="border-top: none;">
+      <td style="padding: 0px !important; word-break: break-word"><a ng-href="{{ metadataExtendedCtrl.metadataDisplay.rdf }}" target="_blank">{{ metadataExtendedCtrl.metadataDisplay.rdf }}</a></td>
+    </tr>
+  </table>
+
+  <table ng-show="datasetsCtrl.selected" class="table table-detail">
+    <tr style="border-top: none;">
+      <td style="font-size: 11px; color: #00A2CA; text-transform: capitalize; padding: 0px 0px 10px 0px !important; min-width: 122px;">Extended metadata</td>
+    </tr>
+      
+    <tr style="border-top: none;" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay">
+      <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">{{ key }}</td>
+      <td style="padding: 0px 0px 10px 0px !important; text-transform: none">{{ value }}</td>
     </tr>
   </table>
 </div>
