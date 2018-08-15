@@ -46,10 +46,6 @@ angular.module('hopsWorksApp')
               };
             };
 
-            self.metaData = {};
-            // self.metadataExtendedDistribution = self.initDistribution();
-            // self.metadataExtendedDataset = self.initDataset();
-
             self.metadataAvailable = false;
             self.metadataDisplay = {};
 
@@ -137,7 +133,10 @@ angular.module('hopsWorksApp')
               } else {
                 ExtendedMetadataService.getDistribution(file.parentId, file.id)
                 .then(function (result) {
-                  self.showMetadata(result.data);
+                  var distribution = result.data;
+                  distribution.rdf = distribution.uri.replace('http://www.aegis-bigdata.eu/md/dataset/', 'http://aegis-metadata.fokus.fraunhofer.de/api/datasets/') + '.rdf';
+                  distribution.rdf = distribution.rdf.replace('distribution', 'distributions');
+                  self.showMetadata(distribution);
                 }, function (err) {
                   self.metadataDisplay = false;
                   self.metadataAvailable = false;
@@ -148,7 +147,27 @@ angular.module('hopsWorksApp')
 
             self.showMetadata = function (data) {
               self.metadataAvailable = true;
-              self.metadataDisplay = data;
+              self.metadataDisplay = flattenObject(data);
+            };
+
+            var flattenObject = function(ob) {
+              var toReturn = {};
+              
+              for (var i in ob) {
+                if (!ob.hasOwnProperty(i)) continue;
+                
+                if ((typeof ob[i]) == 'object' && !Array.isArray(ob[i])) {
+                  var flatObject = flattenObject(ob[i]);
+                  for (var x in flatObject) {
+                    if (!flatObject.hasOwnProperty(x)) continue;
+                    
+                    toReturn[i + '.' + x] = flatObject[x];
+                  }
+                } else {
+                  toReturn[i] = ob[i];
+                }
+              }
+              return toReturn;
             };
           }
         ]);
