@@ -161,7 +161,7 @@ angular.module('hopsWorksApp')
                   for (var x in flatObject) {
                     if (!flatObject.hasOwnProperty(x)) continue;
                     
-                    toReturn[i + '.' + x] = flatObject[x];
+                    toReturn[i + ' ' + x] = flatObject[x];
                   }
                 } else {
                   toReturn[i] = ob[i];

@@ -26,6 +26,13 @@
       <td ng-if="key == 'keywords'" style="padding-left: 0px !important; text-transform: none">
         <span ng-repeat="keyword in value" style="background-color: #dedede; padding: 2px 5px; margin-right: 5px; border-radius: 2px;">{{ keyword }}</span>
       </td>
+
+      <td ng-if="key == 'themes'" style="padding-left: 0px !important; text-transform: none">
+        <ul style="padding-left: 20px; margin-bottom: 0">
+          <li ng-repeat="theme in value" style="padding-left: 0px !important; text-transform: none">{{ theme }}</li>
+        </ul>
+      </td>
+
       <td ng-else style="padding-left: 0px !important; text-transform: none">{{ value }}</td>
     </tr>
   </table>
