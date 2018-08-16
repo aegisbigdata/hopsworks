@@ -148,6 +148,7 @@ angular.module('hopsWorksApp')
             self.showMetadata = function (data) {
               self.metadataAvailable = true;
               self.metadataDisplay = flattenObject(data);
+              delete self.metadataDisplay['fields'];
             };
 
             var flattenObject = function(ob) {
