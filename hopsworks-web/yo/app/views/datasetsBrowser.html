@@ -308,15 +308,6 @@
                                 Add metadata</span>
                             </a>
                           </li>
-                          <li ng-show="datasetsCtrl.isSelectedFiles() <= 1" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
-                            <a class="pointer"
-                               role="menuitem"
-                               tabindex="6"
-                               ng-click="metadataExtendedCtrl.attachTemplate(file); $event.stopPropagation();">
-                              <span><i class="fa fa-upload"></i>
-                                Add or edit extended metadata</span>
-                            </a>
-                          </li>
                           <li ng-show="datasetsCtrl.isSelectedFiles() <= 1">
                             <a class="pointer"
                                role="menuitem"
@@ -324,6 +315,16 @@
                                ng-click="metadataCtrl.detachTemplate(file); $event.stopPropagation();">
                               <span><i class="fa fa-download"></i>
                                 Remove metadata</span>
+                            </a>
+                          </li>
+                          <li class="divider" ng-if="datasetsCtrl.isSelectedFiles() <= 1"></li>
+                          <li ng-show="datasetsCtrl.isSelectedFiles() <= 1" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl" style="margin-bottom: 10px">
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="6"
+                               ng-click="metadataExtendedCtrl.attachTemplate(file); $event.stopPropagation();">
+                              <span><i class="fa fa-upload"></i>
+                                Add or edit extended metadata</span>
                             </a>
                           </li>
                         </ul>

@@ -309,21 +309,22 @@
                           <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
                             <a class="pointer"
                                role="menuitem"
-                               tabindex="4"
-                               ng-click="metadataExtendedCtrl.attachTemplate(dataset); $event.stopPropagation();">
-                              <span>
-                                Edit extended metadata
-                              </span>
-                            </a>
-                          </li>
-                          <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
-                            <a class="pointer"
-                               role="menuitem"
                                tabindex="5"
                                ng-click="metadataCtrl.detachTemplate(dataset); $event.stopPropagation();">
                               <span>
                                 Remove metadata
                                 <i class="fa fa-minus menu-icon-db"></i>
+                              </span>
+                            </a>
+                          </li>
+                          <li ng-if="dataset.name.indexOf('::') === -1 && projectCtrl.role === 'Data owner'" class="divider"></li>
+                          <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="4"
+                               ng-click="metadataExtendedCtrl.attachTemplate(dataset); $event.stopPropagation();">
+                              <span>
+                                Add or edit extended metadata
                               </span>
                             </a>
                           </li>
@@ -422,8 +423,6 @@
                 <div class="file-manager" style="height: 100%;">
                   <md-content class="md-padding" style="height: 100%; background-color: #FFFFFF">
                     <md-info style="min-height: 100%;">
-                      <div id="metadata-extended"
-                             ng-include="'views/metadata/metadataExtendedView.html'"></div>
                         <div ng-show="datasetsCtrl.selected === null">
                           <div class="file-details" style="text-align: left;">
                             Select a DataSet to view its details.
@@ -475,11 +474,11 @@
                           </tr>
                         </table>
                         <!--METADATA PRESENTATION SECTION-->
+                        <div id="metadata-extended"
+                           ng-include="'views/metadata/metadataExtendedView.html'"></div>
                         <div id="board"  style="font-family: Lato; height: 76%;"
                              ng-include="'views/metadata/extendedMetadata.html'">
                         </div>
-                        <div id="metadata-extended"
-                           ng-include="'views/metadata/metadataExtendedView.html'"></div>
                     </md-info>
                   </md-content>
                 </div>
