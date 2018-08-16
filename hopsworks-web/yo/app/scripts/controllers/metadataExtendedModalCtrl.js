@@ -45,6 +45,7 @@ angular.module('hopsWorksApp')
                   .then(function (result) {
                     growl.success("Metadata has been updated successfully", { title: 'Success', ttl: 2000 });
                     $scope.$close();
+                    $rootScope.$broadcast('file-selected', $scope.$resolve.file);
                   }, function (err) {
                     growl.error("Error while updating metadata", { title: 'Success', ttl: 2000 });
                   })
@@ -54,6 +55,7 @@ angular.module('hopsWorksApp')
                   .then(function (result) {
                     growl.success("Metadata has been added successfully", { title: 'Success', ttl: 2000 });
                     $scope.$close();
+                    $rootScope.$broadcast('file-selected', $scope.$resolve.file);
                   }, function (err) {
                       growl.error("Error while adding metadata", { title: 'Success', ttl: 2000 });
                   })
@@ -72,6 +74,7 @@ angular.module('hopsWorksApp')
           ExtendedMetadataService.updateDataset(self.metadataExtendedDataset).then(function (result) {
             growl.success("Metadata has been updated successfully", { title: 'Success', ttl: 2000 });
             $scope.$close();
+            $rootScope.$broadcast('file-selected', $scope.$resolve.file);
           }, function (err) {
             growl.error("Error while updating metadata", { title: 'Success', ttl: 2000 });
           });
@@ -80,6 +83,7 @@ angular.module('hopsWorksApp')
           ExtendedMetadataService.addDataset(self.metadataExtendedDataset).then(function (result) {
               growl.success("Metadata has been added successfully", { title: 'Success', ttl: 2000 });
               $scope.$close();
+              $rootScope.$broadcast('file-selected', $scope.$resolve.file);
             }, function (err) {
               rowl.error("Error while adding metadata", { title: 'Success', ttl: 2000 });
             });
