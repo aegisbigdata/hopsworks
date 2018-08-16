@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-  .controller('MetadataExtendedModalCtrl', ['$http', '$uibModalInstance', '$scope', '$rootScope', '$routeParams', 'ModalService', 'ExtendedMetadataService', 'growl', 'detailData', 'projectId',
+  .controller('MetadataExtendedModalCtrl', ['$http', '$uibModalInstance', '$scope', '$rootScope', '$routeParams', 'ModalService', 'ExtendedMetadataService', 'ProjectService', 'growl', 'detailData', 'projectId',
     function ($http, $uibModalInstance, $scope, $rootScope, $routeParams,
-      ModalService, ExtendedMetadataService, growl, detailData, projectId) {
+      ModalService, ExtendedMetadataService, ProjectService, growl, detailData, projectId) {
 
       var self = this;
 
@@ -11,11 +11,17 @@ angular.module('hopsWorksApp')
 
       self.metadataExtendedDistribution = detailData;
       self.metadataExtendedDataset = detailData;
+      self.metadataExtendedCatalog = {}
 
       if (projectId != null) {
         ExtendedMetadataService.getCatalog(projectId).then(function (result) {
           self.metadataExtendedCatalog = result.data
-        }, function (err) {})
+        }, function (err) {
+          ProjectService.get({}, {'id': projectId}).$promise.then(function (success) {
+            console.log('success', success);
+            self.metadataExtendedCatalog.title = success.projectName
+          });
+        })
       }
 
       self.saveFieldsDistribution = function () {
