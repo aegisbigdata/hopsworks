@@ -22,7 +22,11 @@
       
     <tr style="border-top: none;" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay">
       <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">{{ key }}</td>
-      <td style="padding: 0px 0px 10px 0px !important; text-transform: none">{{ value }}</td>
+
+      <td ng-if="key == 'keywords'" style="padding-left: 0px !important; text-transform: none">
+        <span ng-repeat="keyword in value" style="background-color: #dedede; padding: 2px 5px; margin-right: 5px; border-radius: 2px;">{{ keyword }}</span>
+      </td>
+      <td ng-else style="padding-left: 0px !important; text-transform: none">{{ value }}</td>
     </tr>
   </table>
 </div>
