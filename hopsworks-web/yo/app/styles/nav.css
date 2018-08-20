@@ -23,6 +23,10 @@
     border-color: #337ab7;
 }
 
+.nav-tabs {
+    border-bottom: none;
+}
+
 .nav-tabs > li > a {
     border-radius: 0px;
     margin-right: -1px;
