@@ -69,8 +69,7 @@
 
               <div>
                   <ul>
-                      <li><a class="show-querybuilder" style="font-size: 16px">User guide Query builder </a></li>
-                      <li><a class="show-visualiser" style="font-size: 16px">User guide Visualiser </a></li>
+                      <li><a class="show-querybuilder" style="font-size: 16px">User guide Query builder </a></li>                      
                   </ul>
               </div>
 
@@ -164,65 +163,7 @@
         </div>
             </div>
 
-              <div class="step-visualiser" style="display: none">
-                    <div class="markdown-body" style="width: 70%">
-                        <h1>Deployment</h1>
-                            <p>Visualizer is implemented with python as a Jupyter notebook. Here, we describe how the tool can be utilized from the AEGIS platform.</p>
-                            <h2>STEP 1(Optional) - Install the notebook</h2>
-                                <p>If the Jupyter notebook does not already exist in a specific project, one should first 
-                                    <a href="https://github.com/aegisbigdata/query-builder/archive/master.zip">download</a> it. Then, upload the 
-                                    Visualizer.ipynb file into Jupyter from the corresponding menu, as seen in figure below</p>
-                                <p><img src="images/9.png" style="width: 100%" alt="Upload Notebook"></p>
-                            <h2>STEP 2 - Open the notebook</h2>
-                                <p>Once the notebook is present, click on it to open. You will see the following:</p>
-                                <p><img src="images/1.png" style="width: 100%" alt="Visualizer Initial State"></p>
-                                <p>This is the initial state. All code cells are hidden by using the <a href="https://github.com/kirbs-/hide_code">
-                                        hide code plugin</a> and also all output has been cleared.</p>
-                            <h2>STEP 3 - Initialize the notebook</h2>
-                                <p>Disable code hidding in the first cell by unchecking "Hide Code" box. When the code unfolds, you will see something 
-                                    like this:</p>
-                                <p><img src="images/0.png" style="width: 100%" alt="First Cell Code"></p>
-                                <p>Then, you should edit the variables <strong>project_user</strong> and <strong>project_name</strong> accordingly. 
-                                    <strong>project_name</strong> is the name of the project currently working with. For the <strong>project_user</strong> variable the rule is a little bit more complex. Username is a string that consists of a total of 8 characters and involves the user's first part of the email (before the @). If this part contains more than 8 characters, the first 8 are used and the rest are truncated. On the contrary, if it less than 8 characters, we fill any remaining empty positions with zeros. Finally, any dot (.) characters are being replaced by underscores (_).
-                                For instance, a user with email <a href="mailto:testuser@domain.com">testuser@domain.com</a> would have a username 
-                                "testuser". One with email <a href="mailto:test.user@domain.com">test.user@domain.com</a> would have a username "test_use" and finally, one with email <a href="mailto:user@domain.com">user@domain.com</a> would have "user0000".</p>
-                                <p>After editing those two variables, hide again the code in the first cell, make sure the cell is selected and 
-                                    either click on the "Run" button from the top Jupyter menu, or press ctrl+enter.</p>
-                            <h2>STEP 4 - Working with the visualiser</h2>
-                                <p>Now that everyhting is set, the first widget that appears is something like a file picker, where a user can 
-                                    navigate between the files stored in the current project and open a desired one. Note that currently only CSV 
-                                    files are supported.</p>
-                                <p><img src="images/2.png" style="width: 100%" alt="File Picker"></p>
-                                <p>Once a file is open, a small preview in tabular format will be shown</p>
-                                <p><img src="images/3.png" style="width: 100%" alt="File Preview"></p>
-                                <p>Afterwards, a list with the available visualization types will be displayed. Pick a desired type and click on 
-                                    the <strong>Apply</strong> button.</p>
-                                <p><img src="images/4.png" style="width: 100%" alt="Visualization Types"></p>
-
-                                <p>For every visualization type, a widget with various options depending on the type will be opened. Fill mandatory 
-                                    fields with the desired values and then click on the <strong>Visualize</strong> button.</p>
-                                <p><img src="images/5.png" style="width: 100%" alt="Parameters"></p>
-                                <p><img src="images/6.png" style="width: 100%" alt="Parameters Filled"></p>
-                                <p>Pay attention to the parameter called <strong>Position</strong>. This actually refers to the position on the 
-                                    dashboard that we would like to place the chart to. If you notice in the previous picture, there are five empty 
-                                    cells in the end of the notebook. Those act as placeholders for the dashboard. Currently only up to five different charts at the same time are supported, but this can be easily extended. The dashboard can contain several charts from the same dataset or even from different ones. When a new dataset is openned, previous charts are not deleted.</p>
-                                <p>A sample chart that appers after filling the necessary options can be seen below.</p>
-                                <p><img src="images/7.png" style="width: 100%" alt="Sample Scatter Plot"></p>
-                            <h2>STEP 5 - Cleaning up</h2>
-                                <p>When you have completed your work with the visualiser, it is highly recommended to clear all the output, so you 
-                                    can do a fresh start without any leftovers the next time. This can be achieved from Jupyter's top menu. Choose 
-                                    <strong>Cell -&gt; All Output -&gt; Clear</strong></p>
-                                <p><img src="images/8.png" style="width: 100%" alt="Clear Output"></p>
-                    <h1>Important Notes</h1>
-                        <p>All the instructions above refer to the Visualizer as a standalone notebook. In future work step 1 will be dropped, 
-                            since the notebook would we automatically available in every newly created project. Furthermore, when the integration 
-                            with the other two notebooks takes place(Query Builder, Algorithm Execution Container), step 3 will also be dropped, 
-                            and the file reading part from step 4 will be utilized from the Query Builder.</p>
-                    
-
-            </div>
-
-        </div>
+             
               
               <!--div class="markdown-body">
                 <h1>A. Quick Introduction to the AEGIS tools</h1>

@@ -24,7 +24,7 @@
   <div id="wrapper"
        class="toggled"
        ng-controller="DatasetsCtrl as datasetsCtrl">
-    <div ng-controller="MetadataCtrl as metadataCtrl">
+    <!--div ng-controller="MetadataCtrl as metadataCtrl"-->
       <div class="overlay" ></div>
       <div ng-include="'navProject.html'"></div>
       <section>
@@ -48,8 +48,9 @@
               </div>
               <div style="margin-left: 1155px; max-width: 100%" flex="20">
                 <div class="input-group" style="margin-top:-25px;">
-                  <input type="text" class="form-control"
+                  <input type="text" class="form-control" style="width: 100%;"
                          ng-model="search" placeholder="Filter...">
+                                    
                   <span class="input-group-btn">
                     <button class="btn btn-default fa fa-filter icon-resize-small" type="button" title="Filter"></button>
                   </span>
@@ -478,3 +479,4 @@
     </div>
   </div>
 </div>
+  
