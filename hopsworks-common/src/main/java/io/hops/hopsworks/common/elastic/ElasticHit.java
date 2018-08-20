@@ -59,7 +59,8 @@ public class ElasticHit implements Comparator<ElasticHit> {
     //the source of the retrieved record (i.e. all the indexed information)
     this.map = hit.getSource();
     this.type = hit.getType();
-    this.score = hit.getScore();
+    
+    this.score = Float.isNaN(hit.getScore()) ? 0 : hit.getScore();
     //export the name of the retrieved record from the list
     for (Entry<String, Object> entry : map.entrySet()) {
       //set the name explicitly so that it's easily accessible in the frontend

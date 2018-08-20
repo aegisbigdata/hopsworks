@@ -950,6 +950,7 @@ angular.module('hopsWorksApp')
               } else {
                 self.selected = file.name;
               }
+              $rootScope.$broadcast('file-selected', file);
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;

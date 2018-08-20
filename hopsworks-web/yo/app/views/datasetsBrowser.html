@@ -317,6 +317,16 @@
                                 Remove metadata</span>
                             </a>
                           </li>
+                          <li class="divider" ng-if="datasetsCtrl.isSelectedFiles() <= 1"></li>
+                          <li ng-show="datasetsCtrl.isSelectedFiles() <= 1" ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl" style="margin-bottom: 10px">
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="6"
+                               ng-click="metadataExtendedCtrl.attachTemplate(file); $event.stopPropagation();">
+                              <span><i class="fa fa-upload"></i>
+                                Add or edit extended metadata</span>
+                            </a>
+                          </li>
                         </ul>
                       </td>
                       </td>
@@ -461,6 +471,8 @@
                           </tr>
                         </table>
                         <!--METADATA PRESENTATION SECTION-->
+                        <div id="metadata-extended"
+                           ng-include="'views/metadata/metadataExtendedView.html'"></div>
                         <div id="board"  style="font-family: Lato; overflow: hidden; height: 75%;"
                              ng-include="'views/metadata/extendedMetadata.html'">                          
                         </div>                       
