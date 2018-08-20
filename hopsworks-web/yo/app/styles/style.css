@@ -648,12 +648,18 @@ md-input-container {
   bottom: 0;
   text-align: center;
   background-color: #ddd;
+  z-index: 9999;
 }
 
 .footer-info {
       font-size: 14px;
       line-height: 17px;
       margin-top: 10px !important;
+}
+
+
+ .footer-info a {
+    color: #000000;
 }
   
 .footer-image {

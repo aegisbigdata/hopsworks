@@ -38,7 +38,7 @@
       <!--li style="background: #1a1a1a;" MOD A11F -->
       
             
-       <li ng-click="" ng-show="projectCtrl.cloak">
+       <li ng-click="projectCtrl.goToGetStarted()" ng-show="projectCtrl.cloak">
         <a>Get Started         
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/power.png"/>
           <i class=" pull-left fa " 
@@ -143,7 +143,7 @@
         </a>
       </li-->
       
-      <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
+      <li ng-click="projectCtrl.goToQueryBuilder()" ng-show="projectCtrl.showJupyter()">
         <a>Query Builder
           <!--img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/ MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/queries.png"/>
@@ -164,7 +164,7 @@
              ng-class="{'fa-ban text-danger': clusterUtilCtrl.YarnBan, 'fa-exclamation-triangle text-warning': clusterUtilCtrl.YarnWarn }" aria-hidden="true" style="margin-top: 3px"></i>                    
         </a>
       </li>
-       <li ng-click="projectCtrl.goToZeppelin()" ng-show="projectCtrl.showZeppelin()">
+       <li ng-click="projectCtrl.goToVisualiser()" ng-show="projectCtrl.showJupyter()">
         <a>Visualiser
           <!--img class="pull-right" style="margin-right:5px" width="24" src="images/zeppelin_logo.png"/ MOD A11F -->
           <img class="pull-right" style="margin-right:5px; margin-bottom:5px;" width="24" src="images/aegis/visualization.png"/>

@@ -85,7 +85,7 @@
     <div class="pull-left">
         <div  ng-init="indextab = 1">
             <uib-tabset active="indextab">
-              <uib-tab index="1" heading="Assets" ng-click="mainCtrl.searchAssets('*')">
+              <uib-tab index="1" heading="Assets" ng-init="mainCtrl.searchAssets('*')" ng-click="mainCtrl.searchAssets('*')">
                   <!--A07F 15-03-2018 -->
                   <form role="form" name="Assets" >
                       <!--div ng-if="mainCtrl.showSearchAssets" class="row">
@@ -95,7 +95,8 @@
                       </div-->
                   </form>
                 </uib-tab>
-                <uib-tab index="0" disable="true" heading="Popular Assets" ng-init="mainCtrl.searchAssets('test')" ng-click="mainCtrl.searchAssets('test')">
+                <uib-tab index="0" disable="true"  heading="Public Assets" ng-init="mainCtrl.searchAssets('_')" ng-click="mainCtrl.searchAssets('_')">
+                  
                   <form role="form" name="popularAssets">       
                       
                   </form>
