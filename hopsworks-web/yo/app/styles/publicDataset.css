@@ -19,7 +19,7 @@
  */
 
 .publicdataset-nav {
-  background: #f7f7f7;
+  background: #ffffff;
   float: left;
   margin-right: 40px;
   overflow-x: hidden;
@@ -108,7 +108,8 @@
 }
 
 .publicdataset-view {
-  margin-left: 295px;
+  width: 640px;
+  margin-left: 155px;
   position: relative;
 }
 

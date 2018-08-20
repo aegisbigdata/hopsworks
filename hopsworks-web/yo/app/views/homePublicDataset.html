@@ -18,75 +18,18 @@
   ~
   -->
 
-<div  ng-controller="MainCtrl as mainCtrl">
-    <!--div ng-controller="ClusterDatasetCtrl as delaclusterDatasetCtrl"-->
+<div class="container content-wrapper" ng-controller="MainCtrl as mainCtrl" id="publicdatasetWrapper" style="width: 1500px; margin-left: 330px !important">
   <!--div ng-include="'nav.html'"></div MOD A11F-->
   <div ng-include="'navBarProject.html'"></div>
-  <div id="wrapper" class="toggled" >
-     
-  <div ng-if="mainCtrl.showSearchPage" class="row">
+  <div ng-if="mainCtrl.showSearchPage" class="row" ng-init="publicDataset.overflowYAuto()">
     <div id="projectSearchResults">
       <div ng-include="'views/search.html'"></div>
     </div>
   </div>
-      
-  <div class="container content-wrapper-home" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl"> 
-    <div class="alert alert-warning alert-dismissable" ng-if="mainCtrl.userNotification !== ''">
-      <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      <p align="center"><i class="fa fa-bullhorn"></i> <strong>Notification!</strong> {{mainCtrl.userNotification}}
-        <a class="alert-link" data-dismiss="alert" ng-click="mainCtrl.profileModal()" aria-label="Profile">Change now.</a>
-      </p>
-    </div>
-    <div class="pull-left" id="toursBox">
-      <div class="pull-left" style="min-width: 220px; max-width: 220px">
-        <!--div class="list-group">
-          <a href="" class="list-group-item active">Help</a>
-          <a href=""
-             ng-click="homeCtrl.showTours = !homeCtrl.showTours; homeCtrl.getTours();" class="list-group-item"
-             ng-class="{'tour-highlight': homeCtrl.showGettingStarted()}">
-            <span class="glyphicon" ng-class="{'glyphicon-triangle-right':!homeCtrl.showTours, 'glyphicon-triangle-bottom':homeCtrl.showTours}"></span>
-            Tours
-
-            <span class="glyphicon glyphicon-expand pull-right"></span>
-
-            <div ng-show="homeCtrl.showTours" ng-init="homeCtrl.initCheckBox()" style="margin-top: 10px">
-              <md-checkbox md-no-ink aria-label="Tour tips" class="md-primary"
-                ng-model="homeCtrl.showTourTips" ng-change="homeCtrl.toggleTourTips()"
-                ng-click="homeCtrl.showTours = !homeCtrl.showTours">
-                        Tour tips
-              </md-checkbox>
-            </div>
-            <div ng-show="homeCtrl.showTours" ng-repeat="tour in homeCtrl.tours">
-              <button style="margin: 0px; padding-bottom: 5px; padding-top: 5px; padding-left: 0px; padding-right: 0px;" uib-popover="Take a tour of Hopsworks by creating a project and running a Spark job!"
-                      type="button" class="btn btn-default btn-block" ng-click="homeCtrl.showTours = !homeCtrl.showTours; homeCtrl.createExampleProject(tour.name)">
-                <span style="margin-right: 5px" class="glyphicon glyphicon-play-circle pull-right" ng-hide="isCreating(tour.name) === true"></span>
-                <span style="margin-right: 5px" class="fa fa-spinner fa-spin pull-right" ng-hide="isCreating(tour.name) === false"></span>
-                <span class="button-text">{{tour.name}}</span>
-              </button>
-            </div>
-
-          </a>
-          <a ng-if="isDelaEnabled" href="#!/delahopsDataset" class="list-group-item">
-            <span class="fa fa-globe"></span>
-            Hops Datasets</a>
-          <a href="#!/delaclusterDataset" class="list-group-item">
-            <span class="fa fa-server"></span>
-            Cluster Datasets</a>
-          <a class="list-group-item">
-          <a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item">
-            <span class="glyphicon glyphicon-user"></span>
-            Need support?
-            <span class="glyphicon glyphicon-earphone pull-right" style="margin-right: 1px;"></span>
-          </a>
-            </div>-->
-        </div>
-    </div>
-    <!-- **************** -->                  
-    <!-- Section Assets --> 
-    <div class="pull-left">
-        <div  ng-init="indextab = 1">
-            <uib-tabset active="indextab">
-              <uib-tab index="1" heading="Assets" ng-init="mainCtrl.searchAssets('*')" ng-click="mainCtrl.searchAssets('*')">
+  <div class="pull-left">
+        <div  ng-init="indextab = 0">
+            <uib-tabset active="indextab" >
+              <uib-tab index="1" heading="Assets"  ng-click="mainCtrl.searchAssetsFromPublicAssets()" >
                   <!--A07F 15-03-2018 -->
                   <form role="form" name="Assets" >
                       <!--div ng-if="mainCtrl.showSearchAssets" class="row">
@@ -98,14 +41,6 @@
                 </uib-tab>
                 <uib-tab index="0"  heading="Public Datasets" ng-click="mainCtrl.searchPublicDatasets()">
                   
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                   <form role="form" name="popularAssets">       
                       
                   </form>
@@ -117,180 +52,93 @@
                 </form>
               </uib-tab-->
                 
-                
-                <div style="width: 750px;">
-                            <!--nav class="navbar navbar-default">
-    <div class="container-fluid">
-      
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#search-navbar" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" >Search results</a>
-      </div>
-      <div class="collapse navbar-collapse" id="search-navbar">
-        <ul class="nav navbar-nav navbar-right search-result-menu">
-          <li>
-            <a data-toggle="collapse" data-target="#filterdropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</a>         
-          </li>
-          <li>
-            <a ng-click="listView =! listView; mainCtrl.viewType(listView)"
-               data-toggle="view-type" role="button" aria-haspopup="true" aria-expanded="false">
-              <span class="glyphicon" ng-class="{'glyphicon-th-list' : !listView, 'glyphicon-th': listView}" 
-                    aria-hidden="true" style="font-size: 20px;"></span></a>
-          </li>
-          <li>
-            <a ng-click="mainCtrl.clearSearch()"
-               data-toggle="view-type" role="button" aria-haspopup="true" aria-expanded="false">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true" style="font-size: 20px;"></span></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  <section id="filterdropdown" class="collapse search-result-filter">
-    <div class="row result-filter-body">
-      <li class="col-md-4">
-        <ul>
-          <li class="dropdown-header">Type</li>
-          <li><a class="filter-menu-uppercase"
-                 data-toggle="collapse" data-target="#filterdropdown"
-                 ng-click="searchTypePub=undefined; searchType=undefined;">all</a></li>
-          <li><a class="filter-menu-uppercase"
-                 data-toggle="collapse" data-target="#filterdropdown"
-                 style="color: #FC5120;"
-                 ng-click="searchType=undefined; searchTypePub='true'">public</a></li>
-          <li><a class="filter-menu-uppercase" 
-                 data-toggle="collapse" data-target="#filterdropdown"
-                 style="color: #4178BE;"
-                 ng-click="searchTypePub=undefined; searchType='proj';">project</a></li>
-          <li><a class="filter-menu-uppercase" 
-                 data-toggle="collapse" data-target="#filterdropdown"
-                 style="color: #5DA51D; "ah 
-                 ng-click="searchTypePub=undefined; searchType='ds';">dataset</a></li>
-        </ul>
-      </li>
-      <li class="col-md-4">
-        <ul>
-          <li class="dropdown-header">Size</li>
-          <li>
-            <div class="input-group">
-              <label class="sr-only" for="from">From</label>
-              <input type="number" class="form-control" id="from" placeholder="From">
-                 <span class="input-group-addon">-</span>
-              <label class="sr-only" for="to">To</label>
-              <input type="number" class="form-control" id="to" placeholder="To">
-            </div>
-          </li>
-          <li class="divider"></li>
-          <li class="dropdown-header">Date</li>
-          <li> <a>Created</a>
-            <div class="input-group">
-              <label class="sr-only" for="from">From</label>
-              <input type="datepicker" class="form-control" id="datepicker1" placeholder="From">
-              <span  class="input-group-addon">-</span>
-              <label class="sr-only" for="to">To</label>
-              <input type="datepicker" class="form-control" id="datepicker2" placeholder="To">
-            </div>
-          </li>
-        </ul>
-      </li>
-       <li class="col-sm-4">
-        <ul>
-          <li class="dropdown-header">Owner</li> 
-          <li>
-            <div>
-              <label class="sr-only" for="email">Email address</label>
-              <input type="email" class="form-control" id="email" placeholder="Enter name" ng-model="searchOwner">
-            </div>
-          </li>
-          <li class="dropdown-header">Name</li> 
-          <li>
-            <div>
-              <label class="sr-only" for="filter">Filter</label>
-              <input type="text" class="form-control" id="filter" placeholder="Filter result..." ng-model="searchName">
-            </div>
-          </li>
-          <li class="divider"></li>
-          <li class="dropdown-header">Sort by</li>
-          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='name'">Name</a></li>
-          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='user'">Owner</a></li>
-          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='createDate'">Date</a></li>
-          <li><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='size'">Size</a></li>
-        </ul>
-      </li>
-    </div>
-    <div class="row result-filter-body">
-      <div class="pull-right">
-        <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-primary btn-block"
-              ng-click="searchTypePub=undefined; 
-                        searchType=undefined; 
-                        sortKey=undefined;
-                        searchName=undefined; 
-                        searchOwner=undefined;">Clear</button>
-      </div>
-    </div>
-  </section--> 
-                               <section class="search-result">
-    
-                                        <div class="row search-result-header">
-                                            <div class="col-md-10" style="text-align:right">
-                                              <p style="margin-top: 20px; color: #ddd">Number of assets for page</p>
-                                            <!--h3>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
-                                                {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h3-->
-                                          </div>
-                                          <div class="col-xs-2 col-sm-2 col-md-2 pull-right">
-                                               
-                                            <div class="input-group spinner">                                               
-                                              <!--b>Number of assets for page</b--><input type="text" class="form-control" ng-model="mainCtrl.pageSize">
-                                              <div class="input-group-btn-vertical">
-                                                  
-                                                <button class="btn btn-default" ng-click="mainCtrl.incrementPage()" type="button"><i class="fa fa-caret-up"></i></button>
-                                                <button class="btn btn-default" ng-click="mainCtrl.decrementPage()" type="button"><i class="fa fa-caret-down"></i></button>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="search-result-body row thin-scrollbar" ng-controller="SearchResultCtrl as searchResultCtrl">
-                                          <div class="loader loader-md" ng-show="mainCtrl.searching"></div>
-                                          <div ng-if="!mainCtrl.searching" ng-init="searchResultCtrl.init(mainCtrl.searchResult)"></div>
-                                          <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: searchType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize">
-                                            <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12" ng-class="{'col-sm-6 col-md-6': !listView, 'col-sm-12 col-md-12': listView}">
-                                              <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
-                                                       details-fn="mainCtrl.viewDetail(result)" 
-                                                       download-fn="mainCtrl.downloadPublicDataset(result)"
-                                                       page-no="mainCtrl.currentPage" 
-                                                       card-index="$index"
-                                                       dela-enabled="mainCtrl.isDelaEnabled"> 
-                                              </hw-card>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <!--div class="row divider" style="margin-bottom: 0px;"></div-->
-                                        <div class="row" style="margin-top: -20px">
-                                            <dir-pagination-controls ng-show="(mainCtrl.searchResult.length /mainCtrl.pageSize) > 1 "
-                                                max-size="15"
-                                                direction-links="true"
-                                                boundary-links="true"
-                                                class="no-margin-pagination pull-right">
-                                            </dir-pagination-controls>
-                                        </div>
-                                      </section>
-                      </div>
-                
-                
             </uib-tabset>
 
     </div>
    
   </div>
-    <!-- **************** -->                  
-    <!-- Section Projects -->
-    <div class="pull-right" style="margin-top: 130px">
+  <div growl reference="13" class="pull-right"></div>
+  <div ng-if="!mainCtrl.showSearchPage" class="row" ng-init="publicDataset.setupStyle()" style="margin-top: 100px;">
+    <nav class="publicdataset-nav" id="publicdataset">
+      <ul class=" keep-open">
+        <li class="publicdataset-heading">Public Datasets</li>
+        <div ng-if="publicDataset.loadingDisplayCategories" class="text-muted loading-dots"></div>
+        <li class="dropdown" ng-repeat="displayCategory in publicDataset.displayCategories track by $index">
+          <a id="dLabel" class="publicdataset-nav-item dropdown-toggle"
+             ng-click="publicDataset.selectDisplayCategory(displayCategory)"
+             ng-class="{'publicdataset-nav-selectedItem': isSelected(displayCategory.displayName)}"
+             data-toggle="dropdown"> {{displayCategory.displayName}}</a>
+          <ul class="dropdown-menu" role="menu">
+            <form>
+              <li ng-repeat="selectedItem in publicDataset.selectedCategoryMap[displayCategory.categoryName].selectedList">
+                <span class="publicdataset-nav-text">
+                  <a ng-click="publicDataset.selectItem(selectedItem)">{{selectedItem.name}}</a>
+                </span>
+              </li>
+            </form>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <article class="publicdataset-view" id="publicdataset-article">
+      <div ng-if="publicDataset.selectedDataset !== undefined">
+        <div><h4 class="publicdataset-view-heading">{{publicDataset.selectedDataset.name}}</h4></div>
+        <br>
+        <div class="publicdataset-view-rating"></div>
+        <br>
+        <div class="panel panel-default">
+          <div class="panel-heading">README.md
+            <div class="pull-right text-muted">
+              <span data-placement="bottom" data-toggle="tooltip" title="Add to project" style="padding: 10px;"
+                    ng-click="publicDataset.addPublicDatasetModal(publicDataset.selectedDataset)">
+                <i class="fa fa-download fa-lg text-primary" aria-hidden="true"></i>
+              </span>           
+            </div>   
+          </div>            
+          <div ng-if="publicDataset.readme === undefined && !publicDataset.loadingReadme" class="panel-body text-muted">No readme file.</div>
+          <div ng-if="publicDataset.readme !== undefined && !publicDataset.loadingReadme" class="panel-body" ng-bind-html="publicDataset.readme"></div>
+          <div ng-if="publicDataset.loadingReadme" class="panel-body text-muted" style="text-align: center;">
+            <span class="loading-dots">Loading</span>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="publicDataset.selectedDataset === undefined">
+        <div><h4 class="publicdataset-view-heading">{{publicDataset.selectedCategory.displayName}}</h4></div>
+        <br>
+        <div class="publicdataset-view-content">
+          <div ng-if="publicDataset.loadingSelectedCategory" class="text-muted loading-dots">Loading</div>
+          <div ng-repeat="ds in publicDataset.selectedCategoryMap[publicDataset.selectedCategory.categoryName].selectedList">
+            <div class="panel panel-default">
+              <div class="panel-heading ds-panel-heading">
+                <a ng-click="publicDataset.selectDataset(ds)">{{ds.name | limitTo: 100}}
+                  {{ds.heading.length > 100 ? '...':''}}</a>
+              </div>
+              <div class="panel-body">{{ds.description}}</div>
+              <div class="panel-footer ds-panel-footer text-muted">
+                <div class="row">
+                  <div class="col-sm-4 col-md-4"><label>Created on:</label>  {{ds.createDate| date:'short'}}</div>
+                  <div class="col-sm-4 col-md-4"><label>Size: </label> {{publicDataset.sizeOnDisk(ds.size)}}</div>                
+                  <div class="col-sm-4 col-md-4">
+                    <span data-placement="bottom" data-toggle="tooltip" title="Add to project" ng-click="publicDataset.addPublicDatasetModal(ds)">
+                      <i class="card-footer-icon fa fa-download fa-lg pull-right text-primary" style="margin-top: 7px;"
+                         aria-hidden="true" data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </article>
+  </div>
+  
+  
+  <!-- Section Projects -->
+  <div ng-controller="HomeCtrl as homeCtrl">
+    <div class="pull-right" style="margin-top: 120px; position: absolute; top:100; right: 360;">
     <!--div class="pull-left">-->
       <div class="pull-left" style="min-width: 330px; max-width: 330px">
         <!--span class="list-group-item active" MOD A11F>
@@ -530,39 +378,4 @@
       <ul uib-pager total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" style="background-color: #ffffff;"></ul>
        <!--div><a href="" class="list-group-item active">Help</a></div-->  
     </div>
-      <!--
-  <tour class="ng-scope" step="homeCtrl.tourService.currentStep_TourOne" post-tour="closeTour()" ng-if="homeCtrl.loadedView">
-    <virtual-step
-      class="ng-scope"
-      tourtip="Begin the tour by clicking Next, OR when {{homeCtrl.tourService.alive_TourOne}} seconds passed, click on the project"
-      tourtip-step="0"
-      tourtip-element="#true.list-group-item"
-      tourtip-placement="left"
-      tourtip-next-label="Next"
-      on-proceed="homeCtrl.EnterExampleProject(homeCtrl.exampleProjectID)"
-      tourtip-offset-vertical="-17"
-      tourtip-offset-horizontal="13"
-      ></virtual-step>
-  </tour>
-  <tour class="ng-scope" step="homeCtrl.tourService.toursInfoStep"
-        post-tour="closeTour()"
-        ng-if="homeCtrl.loadedView
-          && (homeCtrl.tourService.informAndTips
-            || homeCtrl.tourService.informOnly)">
-    <virtual-step
-            class="ng-scope"
-            tourtip="Follow our guided tours"
-            tourtip-step="0"
-            tourtip-element="#toursBox"
-            tourtip-placement="right"
-            tourtip-next-label="Got it!"
-            on-proceed="homeCtrl.disableInformBalloon()"
-            tourtip-offset-horizontal="50"
-    ></virtual-step>
-  </tour>
-      -->
-      </div>
-    </div>
-</div>
-  <--/div-->
-  <div ng-include="'footer.html'"></div>
+  </div>
