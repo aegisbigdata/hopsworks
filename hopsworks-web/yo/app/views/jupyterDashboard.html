@@ -67,14 +67,14 @@
               </h3>
 
 
-              <div>
+              <div ng-click="jupyterCtrl.advanced = 'false'">
                   <ul>
                       <li><a class="show-querybuilder" style="font-size: 16px">User guide Query builder </a></li>
                       <li><a class="show-visualiser" style="font-size: 16px">User guide Visualiser </a></li>
                   </ul>
               </div>
 
-              <div class="step-querybuilder" style="display:none">
+              <div class="step-querybuilder" style="display:none" ng-if="jupyterCtrl.advanced !== true">
               <div class="markdown-body" style="width: 70%">
                 <h1>Deployment and Usage</h1>
                     <p>Query Builder is implemented with python, html and javascript as a Jupyter notebook. Here, we describe how the tool can be utilized 
@@ -164,7 +164,7 @@
         </div>
             </div>
 
-              <div class="step-visualiser" style="display: none">
+              <div class="step-visualiser" style="display: none" ng-if="jupyterCtrl.advanced !== true">
                     <div class="markdown-body" style="width: 70%">
                         <h1>Deployment</h1>
                             <p>Visualizer is implemented with python as a Jupyter notebook. Here, we describe how the tool can be utilized from the AEGIS platform.</p>
@@ -351,7 +351,7 @@
     </div>
 
             <div class="row" ng-if="jupyterCtrl.val.mode !== '' && jupyterCtrl.ui === ''">
-                <div class="col-sm-8 col-md-8 col-lg-8" layout-align="center center" style='margin-top:20px; margin-left: 0px;'>
+                <div class="col-sm-8 col-md-8 col-lg-8" layout-align="center center" style='margin-top:20px; margin-left: 0px;margin-bottom: 80px'>
 
                   <!-- STYLE THIS (TENSORFLOW : SPARK) -->
                   <div class="row" ng-if="jupyterCtrl.advanced === true">
