@@ -18,7 +18,7 @@
   ~
   -->
 
-<div class="container content-wrapper" ng-controller="MainCtrl as mainCtrl" id="publicdatasetWrapper" style="width: 1500px; margin-left: 330px !important">
+<div class="container content-wrapper" ng-controller="MainCtrl as mainCtrl" id="publicdatasetWrapper" style="width: 1500px; margin-left: 180px !important">
   <!--div ng-include="'nav.html'"></div MOD A11F-->
   <div ng-include="'navBarProject.html'"></div>
   <div ng-if="mainCtrl.showSearchPage" class="row" ng-init="publicDataset.overflowYAuto()">
@@ -26,7 +26,7 @@
       <div ng-include="'views/search.html'"></div>
     </div>
   </div>
-  <div class="pull-left">
+  <div class="pull-left" ng-if="!mainCtrl.showSearchPage">
         <div  ng-init="indextab = 0">
             <uib-tabset active="indextab" >
               <uib-tab index="1" heading="Assets"  ng-click="mainCtrl.searchAssetsFromPublicAssets()" >
@@ -137,8 +137,8 @@
   
   
   <!-- Section Projects -->
-  <div ng-controller="HomeCtrl as homeCtrl">
-    <div class="pull-right" style="margin-top: 120px; position: absolute; top:100; right: 360;">
+  <div ng-controller="HomeCtrl as homeCtrl" ng-if="!mainCtrl.showSearchPage">
+    <div class="pull-right" style="margin-top: 120px; position: absolute; top:100; right: 180;">
     <!--div class="pull-left">-->
       <div class="pull-left" style="min-width: 330px; max-width: 330px">
         <!--span class="list-group-item active" MOD A11F>
