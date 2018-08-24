@@ -298,6 +298,69 @@ angular.module('hopsWorksApp')
               self.goToUrl('datasets');
             };
             
+            self.goToGetStarted = function () {
+              self.goToUrl('getStarted');
+            };
+            
+            self.goToVisualiser = function () {
+              
+              // Check which instance of Hopsworks is running Jupyter
+              // If that instance is running, URL redirect to that instance
+              // If not running, start a new instance
+
+//              http://localhost:8080/hopsworks/#!/project/1/settings
+
+
+//              if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+//                self.goToUrl('jupyter');
+//              } else {
+                self.enabling = true;
+                PythonDepsService.enabled(self.projectId).then(function (success) {
+                  self.goToUrl('visualiser');
+                }, function (error) {
+                  if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+                    self.goToUrl('jupyter');
+                  } else {
+                      ModalService.confirm('sm', 'Enable Anaconda First', 'You need to enable anaconda before running Jupyter!')
+                              .then(function (success) {
+                                self.goToUrl('settings');
+                              }, function (error) {
+                                self.goToUrl('visualiser');
+                              });
+                            }
+                    });
+            };
+            
+            
+            
+            self.goToQueryBuilder = function () {
+              
+              // Check which instance of Hopsworks is running Jupyter
+              // If that instance is running, URL redirect to that instance
+              // If not running, start a new instance
+
+//              http://localhost:8080/hopsworks/#!/project/1/settings
+
+
+//              if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+//                self.goToUrl('jupyter');
+//              } else {
+                self.enabling = true;
+                PythonDepsService.enabled(self.projectId).then(function (success) {
+                  self.goToUrl('queryBuilder');
+                }, function (error) {
+                  if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+                    self.goToUrl('jupyter');
+                  } else {
+                      ModalService.confirm('sm', 'Enable Anaconda First', 'You need to enable anaconda before running Jupyter!')
+                              .then(function (success) {
+                                self.goToUrl('settings');
+                              }, function (error) {
+                                self.goToUrl('queryBuilder');
+                              });
+                            }
+                    });
+            };
 
             self.goToJobs = function () {
               ProjectService.enableLogs({id: self.currentProject.projectId}).$promise.then(

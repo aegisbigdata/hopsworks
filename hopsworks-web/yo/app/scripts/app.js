@@ -108,7 +108,7 @@ angular.module('hopsWorksApp', [
               $('.step-querybuilder').show();
               $('.step-visualiser').hide();
             });
-            
+                        
             $(document).on('click', '.show-visualiser', function(e) {
               $('.step-querybuilder').hide();
               $('.step-visualiser').show();
@@ -190,6 +190,27 @@ angular.module('hopsWorksApp', [
                     })
                     .when('/delaclusterDataset', {
                       templateUrl: 'views/delaclusterDataset.html',
+                      controller: 'ClusterDatasetCtrl as publicDataset',
+                      resolve: {
+                        auth: ['$q', '$location', 'AuthService', '$cookies',
+                          function ($q, $location, AuthService, $cookies) {
+                            return AuthService.session().then(
+                                    function (success) {
+                                      $cookies.put("email", success.data.data.value);
+                                    },
+                                    function (err) {
+                                      $cookies.remove("email");
+                                      $cookies.remove("projectID");
+                                      $location.path('/login');
+                                      $location.replace();
+                                      return $q.reject(err);
+                                    });
+                          }]
+                      }
+                    })
+                    
+                    .when('/homePublicDataset', {
+                      templateUrl: 'views/homePublicDataset.html',
                       controller: 'ClusterDatasetCtrl as publicDataset',
                       resolve: {
                         auth: ['$q', '$location', 'AuthService', '$cookies',
@@ -329,6 +350,72 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
+                    
+                    .when('/project/:projectID/getStarted', {
+                      templateUrl: 'views/getStarted.html',
+                      controller: 'ProjectCtrl as projectCtrl',
+                      resolve: {
+                        auth: ['$q', '$location', 'AuthService', '$cookies',
+                          function ($q, $location, AuthService, $cookies) {
+                            return AuthService.session().then(
+                                    function (success) {
+                                      $cookies.put("email", success.data.data.value);
+                                    },
+                                    function (err) {
+                                      $cookies.remove("email");
+                                      $cookies.remove("projectID");
+                                      $location.path('/login');
+                                      $location.replace();
+                                      return $q.reject(err);
+                                    });
+                          }]
+                      }
+                    })
+                    
+                    
+                    .when('/project/:projectID/visualiser', {
+                      templateUrl: 'views/visualiser.html',
+                      controller: 'ProjectCtrl as projectCtrl',
+                      resolve: {
+                        auth: ['$q', '$location', 'AuthService', '$cookies',
+                          function ($q, $location, AuthService, $cookies) {
+                            return AuthService.session().then(
+                                    function (success) {
+                                      $cookies.put("email", success.data.data.value);
+                                    },
+                                    function (err) {
+                                      $cookies.remove("email");
+                                      $cookies.remove("projectID");
+                                      $location.path('/login');
+                                      $location.replace();
+                                      return $q.reject(err);
+                                    });
+                          }]
+                      }
+                    })
+                    
+                    
+                    .when('/project/:projectID/queryBuilder', {
+                      templateUrl: 'views/queryBuilder.html',
+                      controller: 'ProjectCtrl as projectCtrl',
+                      resolve: {
+                        auth: ['$q', '$location', 'AuthService', '$cookies',
+                          function ($q, $location, AuthService, $cookies) {
+                            return AuthService.session().then(
+                                    function (success) {
+                                      $cookies.put("email", success.data.data.value);
+                                    },
+                                    function (err) {
+                                      $cookies.remove("email");
+                                      $cookies.remove("projectID");
+                                      $location.path('/login');
+                                      $location.replace();
+                                      return $q.reject(err);
+                                    });
+                          }]
+                      }
+                    })
+                    
 
                     .when('/project/:projectID/workflows', {
                       templateUrl: 'views/workflows.html',

@@ -317,6 +317,21 @@ angular.module('hopsWorksApp')
               //alert("test res:" + self.searchResult );
             };
 
+            self.searchPublicDatasets = function() {
+               
+                window.location.replace("#!/homePublicDataset");
+                
+                
+            }
+            
+            self.searchAssetsFromPublicAssets = function() {
+               
+                window.location.replace("#!/home");                
+                
+            }
+
+
+
             self.searchAssets = function (param) {
                 
                 //self.searchTerm = "test";

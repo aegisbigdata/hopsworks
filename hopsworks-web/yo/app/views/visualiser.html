@@ -69,100 +69,12 @@
 
               <div>
                   <ul>
-                      <li><a class="show-querybuilder" style="font-size: 16px">User guide Query builder </a></li>
+                      
                       <li><a class="show-visualiser" style="font-size: 16px">User guide Visualiser </a></li>
                   </ul>
               </div>
 
-              <div class="step-querybuilder" style="display:none">
-              <div class="markdown-body" style="width: 70%">
-                <h1>Deployment and Usage</h1>
-                    <p>Query Builder is implemented with python, html and javascript as a Jupyter notebook. Here, we describe how the tool can be utilized 
-                        from the AEGIS platform.</p>
-                <h2>STEP 1(Optional) - Install the notebook</h2>
-                    <p>If the Query Builder Jupyter notebook does not already exist in a specific project, you should first 
-                        <a href="https://github.com/aegisbigdata/query-builder/archive/master.zip">download</a> it. Then, upload the QueryBuilder_v1.ipynb 
-                        file into Jupyter from the corresponding menu, as seen in figure below</p>
-                    <p><img src="images/9.png" style="width: 100%" alt="Upload Notebook"></p>
-                <h2>STEP 2 - Open the notebook</h2>
-                    <p>Once the notebook is present, click on it to open. You will see the following:</p>
-                    <p><img src="images/QB18.png" style="width: 100%" alt="QB Initial State"></p>
-                    <p>This is the initial state. All code cells are hidden and all output has been cleared. If you are not interested in reviewing or 
-                        altering the code (it is not required in the standard workflow) you may proceed with hiding the cell toolbars.
-                        In order to do that, select "View" from the menu, then "Cell Toolbar" and click on the "None" option, as shown below.</p>
-                    <p><img src="images/QB19.png" style="width: 100%" alt="Hide Toolbar"></p>
-                    <p>You should now see the following screen</p>
-                    <p><img src="images/QB1.png" style="width: 100%" alt="QB Initial State No Toolbar"></p>
-                <h2>STEP 3 - Initialize the notebook</h2>
-                    <p>Run the first cell: Make sure that the first cell is selected and either click on the "Run" button from the top Jupyter menu, or 
-                        press ctrl+enter.
-                    You should see a button appearing as shown below.</p>
-                    <p><img src="images/QB2.png" style="width: 100%" alt="Initialise Notebook"></p>
-                    <p>Click on the button and wait for the execution to stop. When this is donw, you should see a screen like the one below, where all 
-                        cell prompts have been replaced by numbers and a simple UI with two buttons has appeared.</p>
-                    <p><img src="images/QB3.png" style="width: 100%" alt="Initialised QB"></p>
-                    <p>Note that the output regarding the Spark application will only appear when the interpreter is started. This means that if the 
-                        "Initialise QB" button is pressed again, the message will disappear, but the tool will be still functional.</p>
-                <h2>STEP 4 - Working with the Query Builder</h2>
-                    <h3>Selecting a file</h3>
-                        <p>Query Builder offers two ways of exploring available files, each one corresponding to the two initial buttons.</p>
-                        <p>The <strong>Metadata Browser</strong> button shows the available datasets according to information from the metadata repository. 
-                            For each dataset, the title, description, contact point, publisher and relevant keywords are provided.</p>
-                        <p><img src="images/QB13.png" style="width: 100%" alt="Metadata Browser Datasets"></p>
-                        <p>By selecting a dataset, its contents (individual files) are presented:</p>
-                        <p><img src="images/QB12.png" style="width: 100%" alt="Metadata Browser Files"></p>
-                        <p>If you press the "open" button of a file, then the file is loaded (as a PySpark Dataframe) and becomes available for further 
-                            processing/querying.</p>
-                        <p>This data browsing is mostly intended for users exploring projects with a lot of data who are not yet certain which particular 
-                            files they are interested in. If you already know which file you want to open, you should press the <strong>Local Browser
-                            </strong> button and select the file from the dropdown list that will appear (as shown below):</p>
-                        <p><img src="images/QB4.PNG" style="width: 100%" alt="Local Browser"></p>
-                        <p>Once you choose a file and press the select button, the file will be loaded (as a PySpark Dataframe) and become available for 
-                            further processing/querying.</p>
-                        <p>Dataframes are essentially data tables. At each moment, Query Builder has two Dataframes: the <strong>temporary dataframe
-                            (tempDF)</strong> which holds the result of the last performed action, i.e. the contents of a file or the result of 
-                            applying a filter/query on the previous contents of tempDF and the <strong>master dataframe (MasterDF)</strong> which is 
-                            explicitly updated by pressing a button that moves the tempDF contents to the MasterDF.</p>
-                    <h3>Manipulating the temporary Dataframe (tempDF)</h3>
-                        <p><img src="images/QB5.png" style="width: 100%" alt="Loaded file"></p>
-                        <p>When a file is loaded, a form appears with several options for simple data filtering and processing.</p>
-                        <p><img src="images/QB7.png" style="width: 100%" alt="Filters form"></p>
-                        <p>Each selected action will open a new form with the necessary parameters. Once you fill the required information and press OK 
-                            a new filter will be added in the queue to be applied when you want. As an example, if you choose the "Rename Column" filter 
-                            you will need to select which column to rename and which should be the new name.</p>
-                        <p><img src="images/QB9.png" style="width: 100%" alt="Rename column"></p>
-                        <p>Once you press OK, the filter will be added in the queue, under the "Selected Filters" label</p>
-                        <p><img src="images/QB8.png" style="width: 100%" alt="Rename Col Filter"></p>
-                        <p>You may add more than one such filters before executing them. They will be added in the same list:</p>
-                        <p><img src="images/QB10.png" style="width: 100%" alt="Filter List"></p>
-                        <p>When you want to apply them, click on the "Apply Filters" button. When the execution is finished, all successfully applied 
-                            filters will have changed colour:</p>
-                        <p><img src="images/QB11.png" style="width: 100%" alt="Executed Filters"></p>
-                        <p>You may continue adding new filters after that point. The list will show both which filters have been already applied and 
-                            which are pending:</p>
-                        <p><img src="images/QB14.png" style="width: 100%" alt="All filters"></p>
-                    <h3>Previewing the contents of a Dataframe</h3>
-                        <p>By pressing the "Refresh temp" button, you will get the first 40 lines of the tempDF.</p>
-                        <p>This is useful both when you first load a file</p>
-                        <p><img src="images/QB6.png" style="width: 100%" alt="Temp Preview 1"></p>
-                        <p>but also to review the result of applying some filters</p>
-                        <p><img src="images/QB15.png" style="width: 100%" alt="Temp Preview 2"></p>
-                        <p>A "Refresh Master" button is also available to preview the contents of the master Dataset. Keep in mind that the two 
-                            Dataframes may hold completely different data. You may also join the two Dataframes through the corresponding option in the 
-                            filters form. The result will be kept in the tempDF.</p>
-                        <p><img src="images/QB17.png" style="width: 100%" alt="Temp and Master Preview"></p>
-                <h2>STEP 5 - Cleaning up</h2>
-                    <p>You may load, process and combine data following the previous steps in any order, until you are satisfied with the end-result. 
-                        At any time, you may press the "Initialise QB" button to clear the screen and start over. When you have completed your work 
-                        with the Query Builder, you may either directly exit the Notebook or clear all the output first so that you can have a fresh 
-                        start without any leftovers the next time. This can be achieved from Jupyter's top menu. Choose 
-                        <strong>Cell -&gt; All Output -&gt; Clear</strong></p>
-            <h1>Important Notes</h1>
-                <p>All the instructions above refer to the Query Builder as a standalone notebook and may be changed in future integrated versions.</p>
-            
-    
-        </div>
-            </div>
+             
 
               <div class="step-visualiser" style="display: none">
                     <div class="markdown-body" style="width: 70%">
