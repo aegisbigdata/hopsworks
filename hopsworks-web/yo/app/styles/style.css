@@ -683,3 +683,8 @@ md-input-container {
     font-size: 12px !important;
 }
 
+.search-bar::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #ddd;
+  opacity: 1; /* Firefox */
+}
+
