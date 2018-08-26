@@ -1,0 +1,64 @@
+<div ng-if="!mainCtrl.showSearchPage">
+            <div class="ds-sidenav" ng-class="{open: datasetsCtrl.tgState}">
+              <div class="ibox float-e-margins" style="margin-bottom: 0px; height: 100%;">
+                <div class="file-manager" style="height: 100%;">
+                  <md-content class="md-padding" style="height: 100%; background-color: #FFFFFF">
+                    <md-info style="min-height: 100%;">
+                      
+                        
+                        <table id="mytable1" ng-show="datasetsCtrl.selected" class="table table-detail">
+                          <tr style="border-top: none;">
+                            <td style="font-size: 11px; color: #00A2CA; text-transform: capitalize; padding: 0px 0px 10px 0px !important">Details</td>
+                          </tr>
+                          
+                          <tr style="border-top: none;">
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Name</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">{{datasetsCtrl.selectedFiles[datasetsCtrl.selected].name}}</td>
+                          </tr>
+
+                          <tr>
+                            <td ng-if="datasetsCtrl.selectedFiles[datasetsCtrl.selected].description != ''" style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Description</td>
+                            <td ng-if="datasetsCtrl.selectedFiles[datasetsCtrl.selected].description != ''" style="padding: 0px 0px 10px 0px !important;"><span ng-bind-html="datasetsCtrl.selectedFiles[datasetsCtrl.selected].description"></span></td>
+                          </tr>
+
+                          <tr>
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Last modified</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">{{datasetsCtrl.selectedFiles[datasetsCtrl.selected].modification| date:'short'}}</td>
+                          </tr>
+
+                          <tr>
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Owner</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">{{datasetsCtrl.selectedFiles[datasetsCtrl.selected].owner}}</td>
+                          </tr>
+                          
+                          <tr ng-show="datasetsCtrl.selectedFiles[datasetsCtrl.selected].publicDs !== 0">
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Public</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">This DataSet is public.</td>
+                          </tr>
+
+                          <tr ng-show="datasetsCtrl.selectedFiles[datasetsCtrl.selected].sharedWith > 0 && datasetsCtrl.selectedFiles[datasetsCtrl.selected].shared === false">
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Shared</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">This DataSet is shared with {{datasetsCtrl.selectedFiles[datasetsCtrl.selected].sharedWith}} other project(s)</td>
+                          </tr>
+
+                          <tr ng-show="datasetsCtrl.selectedFiles[datasetsCtrl.selected].shared === true">
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Shared</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">This DataSet is shared with you</td>
+                          </tr>
+
+                          <tr>
+                            <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important">Searchable</td>
+                            <td style="padding: 0px 0px 10px 0px !important;">This DataSet is {{datasetsCtrl.selectedFiles[datasetsCtrl.selected].searchable ? "" : "not"}} searchable</td>
+                          </tr>
+                        </table>
+                        <!--METADATA PRESENTATION SECTION-->
+                        <div id="board"  style="font-family: Lato; height: 76%;"
+                             ng-include="'views/metadata/extendedMetadata.html'">
+                        </div>
+                    </md-info>
+                  </md-content>
+                </div>
+
+              </div>
+            </div>
+          </div>

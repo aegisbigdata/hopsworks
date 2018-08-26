@@ -1,17 +1,36 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 
 .card-item {
     color: #1d3649;
-    cursor: pointer;
     background: #FFFFFF;
-    box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1);
     display: inline-block;
     float: left;
-    height: 175px;
-    margin-bottom: 1rem;
+    min-height: 175px;
+    margin-bottom: 20px;
     margin-right: 1rem;
     min-width: 285px;
     width: 100%;
     position: relative;
+    border: 1px solid #ddd;
 }
 
 .card-item-content {
@@ -23,6 +42,7 @@
     padding: 10px 15px 15px;
     position: relative;
 }
+
 
 .col-sm-4.col-md-4 .card-item-content {
   border-top: 2px solid;
@@ -73,6 +93,8 @@
 
 .card-item-content .header > label {
     margin-bottom: 0px;
+    font-size: 9px;
+    color: #FFFFFF;
     font-weight: 700;
     text-transform: uppercase;
 }
@@ -114,8 +136,9 @@
 
 .card-item-content .header > h3 {
     font-weight: 500;
-    font-size: 19px;
+    font-size: 14px;
     line-height: 1;
+    color: #333333;
 }
 
 .card-item-content .card-body {
@@ -133,8 +156,14 @@
     margin: 5px;
 }
 
+.card-footer-icons {
+    float: right;
+    margin-right: 32px;
+}
+
 .card-footer-icons > span > i{
-  color: #dddddd;
+  color: #E6AD1E;
+  font-size: 18px;
 }
 
 .card-footer-icons > span > i:hover{
@@ -142,7 +171,7 @@
 }
 
 .card-footer-icon {
-  margin: 0px 2px;
+  margin: 15px 0px;
 }
 .card-item-content .details {
     bottom: 30px;
@@ -152,8 +181,8 @@
 }
 
 .card-item-content .details label {
-    color: #8A8A8A;
-    font-size: 10px;
+    color: #B7B7B7;
+    font-size: 9px;
     letter-spacing: 1.25px;
     text-transform: uppercase;
     margin-bottom: 0px; 
@@ -173,10 +202,10 @@
   margin-top: 2px;
 }
 .card-item-content .value {
-    color: #224155;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
+    color: #333333;
+    font-size: 11px;
+    line-height: 2;
+    text-transfrom: uppercase;
 }
 
 .card-footer .progress {
@@ -191,4 +220,16 @@
   background: white;
 }
 
+.label-title {
+  background-color: #00A2CA;
+  color: #FFFFFF;
+  display: table;
+  width: 100%;
+  font-size: 11px;
+  font-weight: 700;
+}
 
+.label-logo {
+   display: table-cell;
+   width: 15%;
+}

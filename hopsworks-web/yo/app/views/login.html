@@ -1,20 +1,34 @@
-<div id="announcement" ng-show="loginCtrl.showAnnouncement()">
-  <div class="container content-wrapper" style="border-top:none">
-    <div id="announcement-text" class="col-md-10">
-      <p align="center">
-        <i class="fa fa-bullhorn"></i> {{loginCtrl.announcement}}
-      </p>
-    </div>
-  </div>
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
+<div class="alert alert-warning" ng-if="loginCtrl.announcement !== ''">
+  <p align="center"><i class="fa fa-bullhorn"></i> <strong>Announcement!</strong> {{loginCtrl.announcement}}</p>
 </div>
-<div class="container content-wrapper" ng-if="!loginCtrl.secondFactorRequired" style="border-top:none">
+<div class="container content-wrapper-login" ng-if="!loginCtrl.secondFactorRequired" style="border-top:none">
   <div class="row">
       <!-- MOD A11F-->
     <!--div class="center-block" style="width: 320px;"-->
     <div class="center-block" style="width: 496px;"> 
-      <div style="margin-bottom: 30px">
+        <div style="margin-bottom: 30px; text-align: center">
         <img alt="hops icon" class="block-center img-rounded text-center" style="margin-left:10px;" src="images/aegis-1.png"/>
-        <p>Advanced Big Data Value Chain for Public Safety and Personal Security</p>
+        <p class="text-center">Advanced Big Data Value Chain for Public Safety and Personal Security</p>
       </div>
       <div class="panel">
         <div class="panel-heading text-center">
@@ -24,10 +38,10 @@
           <!--a style="text-decoration:none; font-family: Lobster; font-size: 30px; margin-left: 5px; color: #fff;">
              <img alt="" class="block-center img-rounded" style="background-color: #FFFFFF; margin-left:10px" width="105" src="images/AEGIS_Logo_Web.gif"/>
           </a-->
-          <a style="text-decoration: none; font-size: 20px; color: #fff;">Sign in to continue</a>
+          <a style="text-decoration: none; font-size: 18px; color: #fff; font-weight: bold">Sign in to continue</a>
         </div>
         <div class="panel-body">
-          <p class="text-center">SIGN IN TO CONTINUE.</p>
+          
           <form name="loginForm" ng-submit="loginCtrl.login()" role="form">
             <div class="form-group">
               <input id="login_inputEmail" class="form-control" required autofocus
@@ -36,16 +50,18 @@
                      placeholder="Email"
                      name="user_email">
             </div>
-            <div class="form-group">
-              <input id="login_inputPassword" class="form-control" type="password" required
+            <div class="form-group" >
+              <input uib-tooltip="Default password is 'admin'" tooltip-placement="left" 
+                     tooltip-is-open="true" tooltip-enable="loginCtrl.showDefaultPassword()"
+                id="login_inputPassword" class="form-control" type="password" required
                      ng-model="loginCtrl.user.password"
                      autocomplete="off"
                      placeholder="Password"
                      name="user_password">
             </div>            
-            <div class="clearfix">
+            <div class="clearfix" style="margin-bottom: 50px">
               <div class="pull-left">
-                 <a class="text-muted" >Need support?</a>
+                 <!--a class="text-muted" >Need support?</a>
                  <!--a class="text-muted" href="https://groups.google.com/forum/#!forum/hopshadoop">Need support?</a-->
               </div>            
               <div class="pull-right">
@@ -66,6 +82,9 @@
           </div>
           <p></p>
           <a class="btn btn-block btn-default" href="#!/register">Register</a>
+          <a ng-if="loginCtrl.ldapEnabled" class="btn btn-block btn-default" href="#!/ldapLogin">
+            Login with LDAP
+          </a>
         </div>
       </div>
 
@@ -73,7 +92,7 @@
   </div>
 </div>
 
-<div class="container content-wrapper" ng-if="loginCtrl.secondFactorRequired" style="border-top:none">
+<div class="container content-wrapper-login" ng-if="loginCtrl.secondFactorRequired" style="border-top:none;">
   <div class="row">
     <div class="center-block" style="width: 320px;">
       <div class="panel">        
@@ -116,4 +135,20 @@
 
     </div>
   </div>
+  
+  <tour class="ng-scope" step="loginCtrl.tourService.currentStep_TourOne" post-tour="closeTour()" ng-if="loginCtrl.firstTime">
+    <virtual-step
+      class="ng-scope"
+      tourtip="Enter the admin account password: admin"
+      tourtip-step="0"
+      tourtip-element="#true.list-group-item"
+      tourtip-placement="left"
+      tourtip-next-label="Ok"
+      on-proceed="loginCtrl.enterAdminPassword()"
+      tourtip-offset-vertical="-17"
+      tourtip-offset-horizontal="13"
+      ></virtual-step>
+  </tour>  
+    
+    
 </div>

@@ -1,8 +1,28 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.kmon.struct;
 
-import io.hops.hopsworks.common.dao.role.RoleHostInfo;
 import io.hops.hopsworks.common.dao.host.Status;
 import io.hops.hopsworks.common.dao.host.Health;
+import io.hops.hopsworks.common.dao.kagent.HostServicesInfo;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +37,11 @@ public class ClusterInfo {
   private Long totalCores;
   private Long totalMemoryCapacity;
   private Long totalDiskCapacity;
+  private Set<String> groups = new HashSet<>();
   private Set<String> services = new HashSet<>();
-  private Set<String> roles = new HashSet<>();
   private Set<String> badServices = new HashSet<>();
-  private Set<String> badRoles = new HashSet<>();
-  private Map<String, Integer> rolesCount = new TreeMap<>();
-  private Map<String, String> rolesServicesMap = new TreeMap<>();
+  private Map<String, Integer> servicesCount = new TreeMap<>();
+  private Map<String, String> servicesGroupsMap = new TreeMap<>();
   private Integer started, stopped, timedOut;
 
   public ClusterInfo(String name) {
@@ -32,11 +51,11 @@ public class ClusterInfo {
     this.name = name;
   }
 
-  public void setNumberOfHost(Long numberOfHosts) {
+  public void setNumberOfHosts(Long numberOfHosts) {
     this.numberOfHosts = numberOfHosts;
   }
 
-  public Long getNumberOfMachines() {
+  public Long getNumberOfHosts() {
     return numberOfHosts;
   }
 
@@ -44,12 +63,12 @@ public class ClusterInfo {
     return name;
   }
 
-  public String[] getServices() {
-    return services.toArray(new String[services.size()]);
+  public String[] getGroups() {
+    return groups.toArray(new String[groups.size()]);
   }
 
-  public String[] getRoles() {
-    return roles.toArray(new String[roles.size()]);
+  public String[] getServices() {
+    return services.toArray(new String[services.size()]);
   }
 
   public Long getTotalCores() {
@@ -60,34 +79,34 @@ public class ClusterInfo {
     this.totalCores = totalCores;
   }
 
-  public Integer roleCount(String role) {
-    return rolesCount.get(role);
+  public Integer serviceCount(String service) {
+    return servicesCount.get(service);
   }
 
-  public String roleService(String role) {
-    return rolesServicesMap.get(role);
+  /** Returns the group for a service 
+   **/
+  public String serviceGroup(String service) {
+    return servicesGroupsMap.get(service);
   }
 
   public Health getClusterHealth() {
-    if (badRoles.isEmpty()) {
+    if (badServices.isEmpty()) {
       return Health.Good;
     }
     return Health.Bad;
+  }
+
+  public Health groupHealth(String group) {
+    if (badServices.contains(group)) {
+      return Health.Bad;
+    }
+    return Health.Good;
   }
 
   public Health serviceHealth(String service) {
     if (badServices.contains(service)) {
       return Health.Bad;
     }
-//      return Health.None;
-    return Health.Good;
-  }
-
-  public Health roleHealth(String role) {
-    if (badRoles.contains(role)) {
-      return Health.Bad;
-    }
-//      return Health.None;
     return Health.Good;
   }
 
@@ -106,36 +125,36 @@ public class ClusterInfo {
     return statusMap;
   }
 
-  public void addRoles(List<RoleHostInfo> roleHostList) {
-    for (RoleHostInfo roleHost : roleHostList) {
-      services.add(roleHost.getRole().getService());
-      if (roleHost.getRole().getRole().toString().equals("")) {
+  public void addServices(List<HostServicesInfo> serviceHostList) {
+    for (HostServicesInfo serviceHost : serviceHostList) {
+      groups.add(serviceHost.getHostServices().getGroup());
+      if (serviceHost.getHostServices().getService().toString().equals("")) {
         continue;
       }
-      roles.add(roleHost.getRole().getRole());
-      rolesServicesMap.put(roleHost.getRole().getRole(), roleHost.getRole().
-              getService());
-      if (roleHost.getStatus() == Status.Started) {
+      services.add(serviceHost.getHostServices().getService());
+      servicesGroupsMap.put(serviceHost.getHostServices().getService(), serviceHost.getHostServices().
+          getGroup());
+      if (serviceHost.getStatus() == Status.Started) {
         started += 1;
       } else {
-        badServices.add(roleHost.getRole().getService());
-        badRoles.add(roleHost.getRole().getRole());
-        if (roleHost.getStatus() == Status.Stopped) {
+        badServices.add(serviceHost.getHostServices().getService());
+        badServices.add(serviceHost.getHostServices().getService());
+        if (serviceHost.getStatus() == Status.Stopped) {
           stopped += 1;
-        } else if (roleHost.getStatus() == Status.TimedOut) {
+        } else if (serviceHost.getStatus() == Status.TimedOut) {
           timedOut += 1;
         }
       }
-      addRole(roleHost.getRole().getRole());
+      addService(serviceHost.getHostServices().getService());
     }
   }
 
-  private void addRole(String role) {
-    if (rolesCount.containsKey(role)) {
-      Integer current = rolesCount.get(role);
-      rolesCount.put(role, current + 1);
+  private void addService(String service) {
+    if (servicesCount.containsKey(service)) {
+      Integer current = servicesCount.get(service);
+      servicesCount.put(service, current + 1);
     } else {
-      rolesCount.put(role, 1);
+      servicesCount.put(service, 1);
     }
   }
 

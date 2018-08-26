@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 'use strict';
 
 angular.module('hopsWorksApp')
@@ -41,6 +61,18 @@ angular.module('hopsWorksApp')
             ];
             self.logLevelSelected;
 
+
+//  (Group/World readable, not writable)
+//  (Group readable and writable)
+//  (Not Group readable or writable)
+            self.umasks = [
+              {id: 1, name: '022'},
+              {id: 2, name: '007'},
+              {id: 3, name: '077'}
+            ];
+            self.umask = self.umasks[1];
+
+
             self.job = {'type': '',
               'name': '',
               'id': '',
@@ -50,12 +82,14 @@ angular.module('hopsWorksApp')
                       }
             };
 
-
-
-
             self.changeLogLevel = function () {
               self.val.logLevel = self.logLevelSelected.name;
             };
+
+            self.changeUmask = function () {
+              self.val.umask = self.umask.name;
+            };
+
 
             self.changeBaseDir = function () {
               self.val.baseDir = self.selected.name;
@@ -250,18 +284,6 @@ angular.module('hopsWorksApp')
               $location.path('/#!/project/' + self.projectId + '/jupyter');
             };
 
-
-            var installTourLibs = function () {
-              //Install numpy
-              var data = {"channelUrl": "default", "lib": "numpy", "version": "1.13.1"};
-              PythonDepsService.install(self.projectId, data).then(
-                      function (success) {
-                        console.log("success numpy");
-                        growl.info("Preparing Python Anaconda environment, please wait...", {ttl: 10000});
-                      }, function (error) {
-                console.log("failure numpy");
-              });
-            };
             var init = function () {
               JupyterService.running(self.projectId).then(
                       function (success) {
@@ -293,7 +315,6 @@ angular.module('hopsWorksApp')
                             growl.info("Preparing Python Anaconda environment, please wait...", {ttl: 20000});
                             PythonDepsService.enable(self.projectId, "2.7", "true").then(
                                     function (success) {
-                                      setTimeout(installTourLibs, 20000);
 
                                     }, function (error) {
                               growl.error("Could not enable Anaconda", {title: 'Error', ttl: 5000});
@@ -316,6 +337,16 @@ angular.module('hopsWorksApp')
                         } else {
                           self.logLevelSelected = self.log_levels[2];
                         }
+                        if (self.val.umask === "022") {
+                          self.umask = self.umasks[0];
+                        } else if (self.val.umask === "007") {
+                          self.umask = self.umasks[1];
+                        } else if (self.val.umask === "077") {
+                          self.umask = self.umasks[2];
+                        } else {
+                          self.umask = self.umasks[0];                          
+                        }
+                        
                       }, function (error) {
                 growl.error("Could not get Jupyter Notebook Server Settings.");
               }
@@ -414,8 +445,12 @@ angular.module('hopsWorksApp')
                   growl.error("Anaconda not enabled yet - retry starting Jupyter again in a few seconds.");
                 } else if (error.data !== undefined && error.status === 400) {
                   growl.error("Anaconda not enabled yet - retry starting Jupyter again in a few seconds.");
+                } else if (error.data !== undefined && error.status === 401) {
+                  growl.error("Cannot start Jupyter - your project has run out of credits. Please contact your system administrator.");
+                } else if (error.data !== undefined && error.status === 403) {
+                  growl.error("Cannot start Jupyter - your project has run out of credits. Please contact your system administrator.");
                 } else {
-                  growl.error("Could not start Jupyter.");
+                  growl.error("Could not start Jupyter. If this problem persists please contact your system administrator.");
                 }
                 stopLoading();
                 self.toggleValue = true;
@@ -423,7 +458,5 @@ angular.module('hopsWorksApp')
               );
 
             };
-
-
 
           }]);

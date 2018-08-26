@@ -1,3 +1,23 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
 <div class="modal-header">
   <button class="close"
           ng-click="memberCtrl.close()"
@@ -48,17 +68,19 @@
                    theme="select2" class="form-control" 
                    style="min-width: 300px;">
 
-          <ui-select-match placeholder="Select member..."  style="height:24px;">{{$select.selected.email}}</ui-select-match>
-          <ui-select-choices
-            repeat="card in memberCtrl.cards | cardFilter: {email: $select.search, firstname: $select.search, lastname: $select.search}">
+          <ui-select-match placeholder="Select member..."  style="box-shadow: none; height:24px;">{{$select.selected.email}}</ui-select-match>
+          <!--A07F 11-03-2018 -->
+          <!--ui-select-choices repeat="card in memberCtrl.cards | cardFilter: {email: $select.search, firstname: $select.search, lastname: $select.search}"-->
+          <ui-select-choices repeat="card in memberCtrl.cards | cardFilter: {firstname: $select.search, lastname: $select.search}">
 
             <div ng-bind-html="memberCtrl.card.email | highlight: $select.search"></div>
             <small>
               <i class="fa fa-user-plus"></i>
-              <span style="font-size: 14px;"
+              <!--A07F 06-03-2018 -->
+              <!--span style="font-size: 14px;"
                     ng-bind-html="''+card.email | highlight: $select.search">
               </span>
-              <br/>
+              <br/-->
               <span ng-bind-html="''+card.firstname | highlight: $select.search"></span>
               <span ng-bind-html="''+card.lastname | highlight: $select.search"></span>
             </small>
@@ -87,7 +109,9 @@
                   <div class="media">
                     <div class="media-body" style="padding-top:8px;">
                       <h4 class="media-heading" style="margin-bottom:0px;">
-                        <b>{{newMember.projectTeamPK.teamMember}}</b>
+                          <!--A07F 06-03-2018 -->
+                        <!--b>{{newMember.projectTeamPK.teamMember}}</b-->
+                        <b>{{newMember.projectTeamPK.name}}</b>
                       </h4>
                     </div>
                   </div>
@@ -104,7 +128,7 @@
                 </td>
                 <td>
                   <button type="button"
-                          style="width:32px; height: 32px; border-radius: 16px;"
+                          style="padding-left:0; padding-right:0; text-align: center; width:32px; height: 32px; border-radius: 16px;"
                           ng-click="memberCtrl.removeMember(newMember.projectTeamPK.teamMember)"
                           class="btn btn-danger pull-right">
                     <em class="fa fa-trash"></em>
@@ -162,8 +186,8 @@
                 <h4 class="media-heading" style="margin-bottom:0px;">
                   <b>{{member.user.fname}} {{member.user.lname}} <span ng-show="member.user.email === mainCtrl.email"> (me)</span></b>
                 </h4>
-
-                <p><span style="font-size:12px;">{{member.user.email}}</span></p>
+                  <!--A07F 06-03-2018 -->
+                <p><!--span style="font-size:12px;">{{member.user.email}}</span--></p>
               </div>
             </div>
           </td>
@@ -186,7 +210,7 @@
           </td>
           <td>
             <button type="button"
-                    style="width:32px; height: 32px; border-radius: 16px;"
+                    style="padding-left:0; padding-right:0; text-align: center; width:32px; height: 32px; border-radius: 16px;"
                     ng-disabled="member.user.email === memberCtrl.projectOwner.email ||
                       (memberCtrl.teamRole !== 'Data owner' && member.user.email !== mainCtrl.email)"
                     ng-click="memberCtrl.deleteMemberFromBackend(member.user.email)"

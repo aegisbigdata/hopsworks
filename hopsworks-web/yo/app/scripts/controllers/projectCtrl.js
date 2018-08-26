@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 /*jshint undef: false, unused: false, indent: 2*/
 /*global angular: false */
 
@@ -6,10 +26,10 @@
 angular.module('hopsWorksApp')
         .controller('ProjectCtrl', ['$scope', '$rootScope', '$location', '$routeParams', '$route',  '$timeout', 'UtilsService',
           'growl', 'ProjectService', 'ModalService', 'ActivityService', '$cookies', 'DataSetService', 'EndpointService',
-          'UserService', 'TourService', 'PythonDepsService', 'StorageService',
+          'UserService', 'TourService', 'PythonDepsService', 'StorageService', 'CertService', 'FileSaver', 'Blob', 
           function ($scope, $rootScope, $location, $routeParams, $route, $timeout, UtilsService, growl, ProjectService,
                   ModalService, ActivityService, $cookies, DataSetService, EndpointService, UserService, TourService, PythonDepsService,
-                  StorageService) {
+                  StorageService, CertService, FileSaver, Blob) {
 
             var self = this;
             self.loadedView = false;
@@ -31,9 +51,9 @@ angular.module('hopsWorksApp')
 
             // We could instead implement a service to get all the available types but this will do it for now
             if ($rootScope.isDelaEnabled) {
-              self.projectTypes = ['JOBS', 'ZEPPELIN', 'KAFKA', 'JUPYTER', 'HIVE', 'DELA'];
+              self.projectTypes = ['JOBS', 'ZEPPELIN', 'KAFKA', 'JUPYTER', 'HIVE', 'DELA', 'SERVING'];
             } else {
-              self.projectTypes = ['JOBS', 'ZEPPELIN', 'KAFKA', 'JUPYTER', 'HIVE'];
+              self.projectTypes = ['JOBS', 'ZEPPELIN', 'KAFKA', 'JUPYTER', 'HIVE', 'SERVING'];
             }
 
             $scope.activeService = "home";
@@ -217,6 +237,14 @@ angular.module('hopsWorksApp')
               });
             };
 
+            self.projectMetadata = function () {
+              ModalService.projectMetadata('lg', self.projectId).then(
+                      function (success) {
+                      }, function (error) {
+                        growl.info("You closed without saving.", {title: 'Info', ttl: 5000});
+              });
+            };
+
 
             self.saveProject = function () {
               self.working = true;
@@ -225,7 +253,6 @@ angular.module('hopsWorksApp')
                 'description': self.currentProject.description,
                 'services': self.selectionProjectTypes,
                 'retentionPeriod': self.currentProject.retentionPeriod,
-                'ethicalStatus': self.currentProject.ethicalStatus
               };
 
               ProjectService.update({id: self.currentProject.projectId}, $scope.newProject)
@@ -269,6 +296,70 @@ angular.module('hopsWorksApp')
 
             self.goToDatasets = function () {
               self.goToUrl('datasets');
+            };
+            
+            self.goToGetStarted = function () {
+              self.goToUrl('getStarted');
+            };
+            
+            self.goToVisualiser = function () {
+              
+              // Check which instance of Hopsworks is running Jupyter
+              // If that instance is running, URL redirect to that instance
+              // If not running, start a new instance
+
+//              http://localhost:8080/hopsworks/#!/project/1/settings
+
+
+//              if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+//                self.goToUrl('jupyter');
+//              } else {
+                self.enabling = true;
+                PythonDepsService.enabled(self.projectId).then(function (success) {
+                  self.goToUrl('visualiser');
+                }, function (error) {
+                  if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+                    self.goToUrl('jupyter');
+                  } else {
+                      ModalService.confirm('sm', 'Enable Anaconda First', 'You need to enable anaconda before running Jupyter!')
+                              .then(function (success) {
+                                self.goToUrl('settings');
+                              }, function (error) {
+                                self.goToUrl('visualiser');
+                              });
+                            }
+                    });
+            };
+            
+            
+            
+            self.goToQueryBuilder = function () {
+              
+              // Check which instance of Hopsworks is running Jupyter
+              // If that instance is running, URL redirect to that instance
+              // If not running, start a new instance
+
+//              http://localhost:8080/hopsworks/#!/project/1/settings
+
+
+//              if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+//                self.goToUrl('jupyter');
+//              } else {
+                self.enabling = true;
+                PythonDepsService.enabled(self.projectId).then(function (success) {
+                  self.goToUrl('queryBuilder');
+                }, function (error) {
+                  if (self.currentProject.projectName.startsWith("demo_tensorflow")) {
+                    self.goToUrl('jupyter');
+                  } else {
+                      ModalService.confirm('sm', 'Enable Anaconda First', 'You need to enable anaconda before running Jupyter!')
+                              .then(function (success) {
+                                self.goToUrl('settings');
+                              }, function (error) {
+                                self.goToUrl('queryBuilder');
+                              });
+                            }
+                    });
             };
 
             self.goToJobs = function () {
@@ -334,13 +425,22 @@ angular.module('hopsWorksApp')
               });
             };
 
+            
+            self.goToHome = function () {
+              self.goToUrl('home');
+            };
+
 
             self.goToWorklows = function () {
-              self.goToUrl('workflows');
+              self.goToUrl('workflows');f
             };
 
             self.goToTensorflow = function () {
               self.goToUrl('tensorflow');
+            };
+
+            self.goToTfServing = function () {
+              self.goToUrl('tfserving');
             };
 
             self.goToKafka = function () {
@@ -432,10 +532,6 @@ angular.module('hopsWorksApp')
               return showService("Charon");
             };
 
-            self.showBiobanking = function () {
-              return showService("Biobanking");
-            };
-
             self.showKafka = function () {
               return showService("Kafka");
             };
@@ -449,6 +545,10 @@ angular.module('hopsWorksApp')
 
             self.showTensorflow = function () {
               return showService("Tensorflow");
+            };
+
+            self.showTfServing = function () {
+              return showService("Serving");
             };
 
             self.showWorkflows = function () {
@@ -588,12 +688,40 @@ angular.module('hopsWorksApp')
             };
             
             self.getCerts = function () {
-              ModalService.certs('sm', 'Certificates Download', 'Please type your password', self.projectId).then();
+              ModalService.certs('sm', 'Certificates Download', 'Please type your password', self.projectId)
+                .then(function (successPwd) {
+                  CertService.downloadProjectCert(self.currentProject.projectId, successPwd)
+                    .then(function (success) {
+                      var certs = success.data;
+                      download(atob(certs.kStore), 'keyStore.' + certs.fileExtension);
+                      download(atob(certs.tStore), 'trustStore.' + certs.fileExtension);
+                    }, function (error) {
+                      growl.error(error.data.errorMsg, {title: 'Failed', ttl: 5000});
+                  });
+                }, function (error) {
+
+                });
+            };
+            
+            var download = function (text, fileName) {
+              var bytes = toByteArray(text);
+              var data = new Blob([bytes], {type: 'application/octet-binary'});
+              FileSaver.saveAs(data, fileName);
+            };
+            
+            var toByteArray = function (text) {
+              var l = text.length;
+              var bytes = new Uint8Array(l);
+              for (var i = 0; i < l; i++) {
+                bytes[i] = text.charCodeAt(i);
+              }
+              return bytes;
             };
 
             self.isServiceEnabled = function(service) {
                 var idx = self.projectTypes.indexOf(service);
-                return idx === -1
-            }
-            
+                return idx === -1;
+            };
           }]);
+      
+      

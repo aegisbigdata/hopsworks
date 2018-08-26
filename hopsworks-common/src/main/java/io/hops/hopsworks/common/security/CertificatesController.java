@@ -1,19 +1,21 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 package io.hops.hopsworks.common.security;
 
@@ -43,6 +45,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,29 +79,40 @@ public class CertificatesController {
     String userKeyPwd = HopsUtils.randomString(64);
     String encryptedKey = HopsUtils.encrypt(user.getPassword(), userKeyPwd,
         certificatesMgmService.getMasterEncryptionPassword());
-    LocalhostServices.createUserCertificates(settings.getIntermediateCaDir(),
-        project.getName(),
-        user.getUsername(),
-        user.getAddress().getCountry(),
-        user.getAddress().getCity(),
-        user.getOrganization().getOrgName(),
-        user.getEmail(),
-        user.getOrcid(),
-        userKeyPwd);
-    LOG.log(Level.FINE, "Created project specific certificates for user: "
-        + project.getName() + "__" + user.getUsername());
-  
-    // Project-wide certificates are needed because Zeppelin submits
-    // requests as user: ProjectName__PROJECTGENERICUSER
-    if (generateProjectWideCerts) {
-      LocalhostServices.createServiceCertificates(settings.getIntermediateCaDir(),
-          project.getProjectGenericUser(),
+    ReentrantLock lock = certificatesMgmService.getOpensslLock();
+    try {
+      lock.lock();
+      LocalhostServices.createUserCertificates(settings.getIntermediateCaDir(),
+          project.getName(),
+          user.getUsername(),
           user.getAddress().getCountry(),
           user.getAddress().getCity(),
           user.getOrganization().getOrgName(),
           user.getEmail(),
           user.getOrcid(),
           userKeyPwd);
+      LOG.log(Level.FINE, "Created project specific certificates for user: "
+          + project.getName() + "__" + user.getUsername());
+    } finally {
+      lock.unlock();
+    }
+  
+    // Project-wide certificates are needed because Zeppelin submits
+    // requests as user: ProjectName__PROJECTGENERICUSER
+    if (generateProjectWideCerts) {
+      try {
+        lock.lock();
+        LocalhostServices.createServiceCertificates(settings.getIntermediateCaDir(),
+            project.getProjectGenericUser(),
+            user.getAddress().getCountry(),
+            user.getAddress().getCity(),
+            user.getOrganization().getOrgName(),
+            user.getEmail(),
+            user.getOrcid(),
+            userKeyPwd);
+      } finally {
+        lock.unlock();
+      }
       certsFacade.putProjectGenericUserCerts(project.getProjectGenericUser(), encryptedKey);
       LOG.log(Level.FINE, "Created project generic certificates for project: "
           + project.getName());
@@ -112,8 +126,14 @@ public class CertificatesController {
   @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
   public void deleteProjectCertificates(Project project) throws IOException {
     String projectName = project.getName();
-    LocalhostServices.deleteProjectCertificates(settings.getIntermediateCaDir(),
-        projectName);
+    ReentrantLock lock = certificatesMgmService.getOpensslLock();
+    try {
+      lock.lock();
+      LocalhostServices.deleteProjectCertificates(settings.getIntermediateCaDir(),
+          projectName);
+    } finally {
+      lock.unlock();
+    }
     
     // Remove project generic certificates used by Spark interpreter in
     // Zeppelin. User specific certificates are removed by the foreign key
@@ -126,8 +146,14 @@ public class CertificatesController {
       throws IOException {
     String hdfsUsername = project.getName() + HdfsUsersController
         .USER_NAME_DELIMITER + user.getUsername();
-    LocalhostServices.deleteUserCertificates(settings.getIntermediateCaDir(),
-        hdfsUsername);
+    ReentrantLock lock = certificatesMgmService.getOpensslLock();
+    try {
+      lock.lock();
+      LocalhostServices.deleteUserCertificates(settings.getIntermediateCaDir(),
+          hdfsUsername);
+    } finally {
+      lock.unlock();
+    }
     certsFacade.removeUserProjectCerts(project.getName(), user.getUsername());
   }
   

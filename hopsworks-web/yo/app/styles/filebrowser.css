@@ -1,6 +1,27 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 .file-box {
   float: left;
   width: 198px;
+  min-height: 255px;
 }
 .file-manager h5 {
   text-transform: uppercase;
@@ -75,6 +96,14 @@
   padding: 0;
   position: relative;
 }
+
+.file-details {
+  background-color: #ffffff;
+  margin-bottom: 20px;
+  margin-right: 20px;
+  padding: 0;
+  position: relative;
+}
 .file.greyed {
   background-color: #f3f3f4;
 }
@@ -84,24 +113,47 @@
 
 .file .icon, .file .image {
   /*height: 200px; MOD A11F*/
-  height: 160px;
+  height: 40px;
   overflow: hidden;
+  background-color: #ffffff;
 }
 .file .icon {
-  padding: 15px 10px;
-  text-align: center;
+  padding: 10px;
+  text-align: left;
+  background-color: #00A2CA;
+  color: #ffffff;
+  font-size: 15px;
+}
+.file .icon-light{
+  padding: 10px;
+  text-align: left;
+  background-color: #6ACAE2;
+  color: #ffffff;
+  font-size: 15px;
+  height: 40px;
 }
 .file-control {
-  color: inherit;
+  color: #B7B7B7;
   font-size: 11px;
-  margin-right: 10px;
+  margin-right: -3px;
+  padding: 5px 15px;
+  font-size: 11px;
+  border-bottom: 1px solid #B7B7B7;
 }
 .file-control.active {
-  text-decoration: underline;
+  text-decoration: none;
+  border-top: 3px solid #00A2CA;
+  border-left: 1px solid #B7B7B7;
+  border-right: 1px solid #B7B7B7;
+  border-bottom: none;
+  color: #333333;
+  
 }
+
 .file .icon i {
-  color: #dadada;
-  font-size: 70px;
+  color: #ffffff;
+  font-size: 11px;
+  margin-top: 3px;
 }
 .file .file-name {
   background-color: #f8f8f8;
@@ -109,6 +161,7 @@
   padding: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 180px;
 }
 
 /*@supports (-webkit-appearance:none) {
@@ -125,7 +178,8 @@
 }
 
 .file-name small {
-  color: #676a6c;
+  color: #B7B7B7;
+  text-transform: uppercase;
 }
 
 .corner {
@@ -367,7 +421,7 @@ md-backdrop.md-sidenav-backdrop {
 }
 
 .table-hover > tbody > tr.highlight {
-  background-color:#4285f4;
+  background-color:#00A2CA;
   color:white;
 }
 

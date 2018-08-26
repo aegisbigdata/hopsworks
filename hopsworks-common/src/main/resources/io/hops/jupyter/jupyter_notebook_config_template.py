@@ -4,6 +4,7 @@ c.HDFSContentsManager.hdfs_namenode_host='%%namenode_ip%%'
 c.HDFSContentsManager.hdfs_namenode_port=%%namenode_port%%
 c.HDFSContentsManager.root_dir='/Projects/%%project%%%%base_dir%%' 
 c.HDFSContentsManager.hdfs_user = '%%hdfs_user%%'
+c.HDFSContentsManager.hadoop_client_env_opts = '-D fs.permissions.umask-mode=0002'
 
 c.NotebookApp.contents_manager_class='hdfscontents.hdfsmanager.HDFSContentsManager'
 
@@ -28,6 +29,8 @@ c.NotebookApp.iopub_data_rate_limit=10000000
 
 
 c.NotebookApp.base_url='/hopsworks-api/jupyter/%%port%%/'
+
+c.Application.log_level="WARN"
 
 
 c.JupyterConsoleApp.kernel_name="PySpark"
@@ -68,7 +71,7 @@ c.NotebookApp.allow_origin = '*'
 
 c.NotebookApp.tornado_settings = {
     'headers': {
-        'Content-Security-Policy': "child-src * "
+        'Content-Security-Policy': "frame-ancestors 'self' "
 #'Content-Security-Policy': "frame-ancestors 'https://%%hopsworks_endpoint%%' 'self' "
     }
 }

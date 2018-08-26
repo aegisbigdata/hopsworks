@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package io.hops.hopsworks.rest.application.config;
 
 import io.swagger.annotations.Api;
@@ -16,15 +36,16 @@ public class ApplicationConfig extends ResourceConfig {
     register(io.hops.hopsworks.api.exception.mapper.AccessControlExceptionMapper.class);
     register(io.hops.hopsworks.api.exception.mapper.AppExceptionMapper.class);
     register(io.hops.hopsworks.api.exception.mapper.AuthExceptionMapper.class);
+    register(io.hops.hopsworks.api.exception.mapper.LoginExceptionMapper.class);
     register(io.hops.hopsworks.api.exception.mapper.ThrowableExceptionMapper.class);
     register(io.hops.hopsworks.api.exception.mapper.TransactionExceptionMapper.class);
     register(io.hops.hopsworks.api.filter.RequestAuthFilter.class);
     register(io.hops.hopsworks.api.jobs.AdamService.class);
-    register(io.hops.hopsworks.api.jobs.BiobankingService.class);
     register(io.hops.hopsworks.api.jobs.ExecutionService.class);
     register(io.hops.hopsworks.api.jobs.FlinkService.class);
     register(io.hops.hopsworks.api.jobs.JobService.class);
     register(io.hops.hopsworks.api.jupyter.JupyterService.class);
+    register(io.hops.hopsworks.api.tensorflow.TfServingService.class);
     register(io.hops.hopsworks.api.jobs.KafkaService.class);
     register(io.hops.hopsworks.api.jobs.SparkService.class);
     register(io.hops.hopsworks.api.project.DataSetService.class);
@@ -58,9 +79,14 @@ public class ApplicationConfig extends ResourceConfig {
     register(io.hops.hopsworks.api.zeppelin.rest.ZeppelinRestApi.class);
     register(io.hops.hopsworks.api.app.ApplicationService.class);
     register(io.hops.hopsworks.api.cluster.Monitor.class);
+
+    // admin
     register(io.hops.hopsworks.api.admin.UsersAdmin.class);
     register(io.hops.hopsworks.api.admin.SystemAdminService.class);
-    
+    register(io.hops.hopsworks.api.admin.ProjectsAdmin.class);
+    register(io.hops.hopsworks.api.admin.llap.LlapAdmin.class);
+    register(io.hops.hopsworks.api.admin.CertificateMaterializerAdmin.class);
+
     register(org.glassfish.jersey.media.multipart.MultiPartFeature.class);
     
     //dela
@@ -72,7 +98,6 @@ public class ApplicationConfig extends ResourceConfig {
     register(io.hops.hopsworks.api.hopssite.HopssiteService.class);
     register(io.hops.hopsworks.api.hopssite.CommentService.class);
     register(io.hops.hopsworks.api.hopssite.RatingService.class);
-    
     //swagger
     register(io.swagger.jaxrs.listing.ApiListingResource.class);
     register(io.swagger.jaxrs.listing.SwaggerSerializers.class);

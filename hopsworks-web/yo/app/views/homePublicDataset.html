@@ -1,0 +1,381 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
+<div class="container content-wrapper" ng-controller="MainCtrl as mainCtrl" id="publicdatasetWrapper" style="width: 1500px; margin-left: 180px !important">
+  <!--div ng-include="'nav.html'"></div MOD A11F-->
+  <div ng-include="'navBarProject.html'"></div>
+  <div ng-if="mainCtrl.showSearchPage" class="row" ng-init="publicDataset.overflowYAuto()">
+    <div id="projectSearchResults">
+      <div ng-include="'views/search.html'"></div>
+    </div>
+  </div>
+  <div class="pull-left" ng-if="!mainCtrl.showSearchPage">
+        <div  ng-init="indextab = 0">
+            <uib-tabset active="indextab" >
+              <uib-tab index="1" heading="Assets"  ng-click="mainCtrl.searchAssetsFromPublicAssets()" >
+                  <!--A07F 15-03-2018 -->
+                  <form role="form" name="Assets" >
+                      <!--div ng-if="mainCtrl.showSearchAssets" class="row">
+                        <div id="projectSearchResults">
+                          <div ng-include="'views/search.html'"></div>
+                        </div>
+                      </div-->
+                  </form>
+                </uib-tab>
+                <uib-tab index="0"  heading="Public Datasets" ng-click="mainCtrl.searchPublicDatasets()">
+                  
+                  <form role="form" name="popularAssets">       
+                      
+                  </form>
+                </uib-tab>
+              
+              <!--uib-tab index="2"  disable="true" heading="Offers Assets" ng-click="mainCtrl.searchAssets('1')">
+                <form role="form" name="offersAssets">
+                      
+                </form>
+              </uib-tab-->
+                
+            </uib-tabset>
+
+    </div>
+   
+  </div>
+  <div growl reference="13" class="pull-right"></div>
+  <div ng-if="!mainCtrl.showSearchPage" class="row" ng-init="publicDataset.setupStyle()" style="margin-top: 100px;">
+    <nav class="publicdataset-nav" id="publicdataset">
+      <ul class=" keep-open">
+        <li class="publicdataset-heading">Public Datasets</li>
+        <div ng-if="publicDataset.loadingDisplayCategories" class="text-muted loading-dots"></div>
+        <li class="dropdown" ng-repeat="displayCategory in publicDataset.displayCategories track by $index">
+          <a id="dLabel" class="publicdataset-nav-item dropdown-toggle"
+             ng-click="publicDataset.selectDisplayCategory(displayCategory)"
+             ng-class="{'publicdataset-nav-selectedItem': isSelected(displayCategory.displayName)}"
+             data-toggle="dropdown"> {{displayCategory.displayName}}</a>
+          <ul class="dropdown-menu" role="menu">
+            <form>
+              <li ng-repeat="selectedItem in publicDataset.selectedCategoryMap[displayCategory.categoryName].selectedList">
+                <span class="publicdataset-nav-text">
+                  <a ng-click="publicDataset.selectItem(selectedItem)">{{selectedItem.name}}</a>
+                </span>
+              </li>
+            </form>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <article class="publicdataset-view" id="publicdataset-article">
+      <div ng-if="publicDataset.selectedDataset !== undefined">
+        <div><h4 class="publicdataset-view-heading">{{publicDataset.selectedDataset.name}}</h4></div>
+        <br>
+        <div class="publicdataset-view-rating"></div>
+        <br>
+        <div class="panel panel-default">
+          <div class="panel-heading">README.md
+            <div class="pull-right text-muted">
+              <span data-placement="bottom" data-toggle="tooltip" title="Add to project" style="padding: 10px;"
+                    ng-click="publicDataset.addPublicDatasetModal(publicDataset.selectedDataset)">
+                <i class="fa fa-download fa-lg text-primary" aria-hidden="true"></i>
+              </span>           
+            </div>   
+          </div>            
+          <div ng-if="publicDataset.readme === undefined && !publicDataset.loadingReadme" class="panel-body text-muted">No readme file.</div>
+          <div ng-if="publicDataset.readme !== undefined && !publicDataset.loadingReadme" class="panel-body" ng-bind-html="publicDataset.readme"></div>
+          <div ng-if="publicDataset.loadingReadme" class="panel-body text-muted" style="text-align: center;">
+            <span class="loading-dots">Loading</span>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="publicDataset.selectedDataset === undefined">
+        <div><h4 class="publicdataset-view-heading">{{publicDataset.selectedCategory.displayName}}</h4></div>
+        <br>
+        <div class="publicdataset-view-content">
+          <div ng-if="publicDataset.loadingSelectedCategory" class="text-muted loading-dots">Loading</div>
+          <div ng-repeat="ds in publicDataset.selectedCategoryMap[publicDataset.selectedCategory.categoryName].selectedList">
+            <div class="panel panel-default">
+              <div class="panel-heading ds-panel-heading">
+                <a ng-click="publicDataset.selectDataset(ds)">{{ds.name | limitTo: 100}}
+                  {{ds.heading.length > 100 ? '...':''}}</a>
+              </div>
+              <div class="panel-body">{{ds.description}}</div>
+              <div class="panel-footer ds-panel-footer text-muted">
+                <div class="row">
+                  <div class="col-sm-4 col-md-4"><label>Created on:</label>  {{ds.createDate| date:'short'}}</div>
+                  <div class="col-sm-4 col-md-4"><label>Size: </label> {{publicDataset.sizeOnDisk(ds.size)}}</div>                
+                  <div class="col-sm-4 col-md-4">
+                    <span data-placement="bottom" data-toggle="tooltip" title="Add to project" ng-click="publicDataset.addPublicDatasetModal(ds)">
+                      <i class="card-footer-icon fa fa-download fa-lg pull-right text-primary" style="margin-top: 7px;"
+                         aria-hidden="true" data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </article>
+  </div>
+  
+  
+  <!-- Section Projects -->
+  <div ng-controller="HomeCtrl as homeCtrl" ng-if="!mainCtrl.showSearchPage">
+    <div class="pull-right" style="margin-top: 120px; position: absolute; top:100; right: 180;">
+    <!--div class="pull-left">-->
+      <div class="pull-left" style="min-width: 330px; max-width: 330px">
+        <!--span class="list-group-item active" MOD A11F>
+          <span class="badge pull-left" style="margin-right: 10px;">{{homeCtrl.projects.length}}</span> Projects
+
+          <button class="btn btn-success pull-right"  id="buttonCreateProject"
+                  style="height: 43px;margin-right: -16px;margin-top: -11px;width: 70px; border-radius: 0px; background-color: #E6AD1E; border-color: #E6AD1E;"
+                  ng-click="homeCtrl.newProject()">
+            <i class="fa fa-plus-circle fa-lg"></i>
+            <span style="margin-left:3px;">New</span>
+          </button>
+
+        </span-->
+        
+        <span class="list-group-item active">
+          <button class="btn btn-success pull-right"  id="buttonCreateProject"
+                  style="text-align: left; height: 43px;margin-right: -16px;margin-top: -11px;min-width: 330px; max-width: 330px; border-radius: 0px; background-color: #E6AD1E; border-color: #E6AD1E;"
+                  ng-click="homeCtrl.newProject()">
+            <i class="fa fa-plus fa-2 pull-right" style="margin-top: 4px"></i>
+            <span style="margin-left:3px;">New Project</span>
+          </button>
+        </span>
+        <span class="list-group-item active" style="text-align: left; font; margin-top: 20px">
+            <span class="badge pull-left" style="margin-right: 10px;"></span> <b>Projects</b>
+        </span>
+        <div class="list-group-item"
+             style="background-color: #00A2CA; border: 1px solid #00A2CA; padding: 0px 15px 10px">
+          <input type="hidden" name="search_param" value="all" id="search_param">
+          <input type="text" class="form-control pull-left ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="searchProject"
+                 style="width: 85%; border-radius: 0; border: none; font-size: 12px"
+                 name="x" placeholder="Find project..." aria-invalid="false">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" style="height:34px; border: none">
+              <span class="glyphicon glyphicon-search" style="color: #B7B7B7"></span>
+            </button>
+          </span>
+        </div>
+        <span class="list-group-item neutral"  style="color: #00A2CA">
+          <span class="badge pull-left" style="margin-right: 10px;"></span> 
+          <li ng-click="mainCtrl.showDiv('myDiv:1;pvDiv:0;pbDiv:0')" ng-init="mainCtrl.showDiv('myDiv:1;pvDiv:0;pbDiv:0')" style="list-style-type: none; font-weight: bold">My Projects</li>
+          <i ng-click="mainCtrl.showDiv('myDiv:1;pvDiv:0;pbDiv:0')" class="fa fa-caret-down fa-2 pull-right" style="margin-top: -13px; margin-right: 22px; color: #00A2CA"></i>
+        </span>
+        <div style="display:none;" id="myDiv">
+        
+        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects">
+          <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
+             href="#!/project/{{project.project.id}}"
+             class="list-group-item"
+             context-menu
+             data-target="menu-{{$index}}"
+             id="{{project.project.name.substr(0, 5) === 'demo_'}}" style="border-top: none;">
+            <div ng-if="project.teamRole === 'Data scientist'">
+              <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-lock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.teamRole === 'Data owner'">
+              <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-unlock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.project.archived">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px; color: #9d261d"
+                 class="fa fa-ban fa-2 pull-left"></i>
+            </div>
+            {{ project.project.name | limitTo: 17 }}{{project.project.name.length > 17 ? '...' : ''}}
+            <span ng-if="project.project.name.substr(0, 5) === 'demo_'" class="glyphicon glyphicon-play-circle pull-right" style="margin-top: 5px; margin-right: 22px;"></span>
+            <i class="fa fa-cog fa-spin fa-2x  fa-fw pull-right" ng-show="homeCtrl.working[project.project.id]"></i>
+          </a>
+          <div uib-dropdown class="dropdown position-fixed" id="menu-{{$index}}">
+            <ul uib-dropdown-menu class="dropdown-amore">
+              <!--            <li>
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="1"
+                               ng-click="">
+                              <span><i class="fa fa-share-alt"></i>
+                                Share...</span>
+                            </a>
+                          </li>-->
+              <li>
+                <a class="pointer"
+                   role="menuitem"
+                   tabindex="2"
+                   ng-click="homeCtrl.deleteProjectAndDatasets(project.project.id)">
+                  <span><i class="fa fa-trash"></i>
+                    Remove/delete Project-DataSets  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        </div>
+        <!--A07F 13-03-2018 -->
+        <!--span class="list-group-item neutral">
+          <span class="badge pull-left" style="margin-right: 10px;"></span> 
+          <li ng-click="mainCtrl.showDiv('myDiv:0;pvDiv:1;pbDiv:0')">Private Projects</li>
+        </span-->
+        <div style="display:none;" id="pvDiv">
+        <div class="list-group-item"
+             style="background-color: #f5f5f5;">
+          <input type="hidden" name="search_param" value="all" id="search_param">
+          <input type="text" class="form-control pull-left ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="searchProject"
+                 style="width: 85%; border-radius: 0; border: none; font-size: 12px"
+                 name="x" placeholder="Find project..." aria-invalid="false">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" style="height:34px; border: none">
+              <span class="glyphicon glyphicon-search" style="color: #B7B7B7"></span>
+            </button>
+          </span>
+        </div>
+        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects">
+          <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
+             href="#!/project/{{project.project.id}}"
+             class="list-group-item"
+             context-menu
+             data-target="menu-{{$index}}"
+             id="{{project.project.name.substr(0, 5) === 'demo_'}}" style="border-top:none">
+            <div ng-if="project.teamRole === 'Data scientist'">
+              <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-lock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.teamRole === 'Data owner'">
+              <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-unlock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.project.archived">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px; color: #9d261d"
+                 class="fa fa-ban fa-2 pull-left"></i>
+            </div>
+            {{ project.project.name | limitTo: 17 }}{{project.project.name.length > 17 ? '...' : ''}}
+            <span ng-if="project.project.name.substr(0, 5) === 'demo_'" class="glyphicon glyphicon-play-circle pull-right" style="margin-top: 5px; margin-right: 22px;"></span>
+            <i class="fa fa-cog fa-spin fa-2x  fa-fw pull-right" ng-show="homeCtrl.working[project.project.id]"></i>
+          </a>
+              <div uib-dropdown class="dropdown position-fixed" id="menu-{{$index}}">
+            <ul uib-dropdown-menu class="dropdown-amore">
+              <!--            <li>
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="1"
+                               ng-click="">
+                              <span><i class="fa fa-share-alt"></i>
+                                Share...</span>
+                            </a>
+                          </li>-->
+              <li>
+                <a class="pointer"
+                   role="menuitem"
+                   tabindex="2"
+                   ng-click="homeCtrl.deleteProjectAndDatasets(project.project.id)">
+                  <span><i class="fa fa-trash"></i>
+                    Remove and delete DataSets </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        </div>
+        
+        <div style="border: 1px solid #E6E6E6">
+        <!--span class="list-group-item neutral" style="color: #00A2CA">
+          <span class="badge pull-left" style="margin-right: 10px;"></span> 
+          <li ng-click="mainCtrl.showDiv('myDiv:0;pvDiv:0;pbDiv:1')" style="list-style-type: none; font-weight: bold">Public Projects</li>
+          <i ng-click="mainCtrl.showDiv('myDiv:0;pvDiv:0;pbDiv:1')" class="fa fa-caret-down fa-2 pull-right" style="margin-top: -13px; margin-right: 22px; color:  #00A2CA"></i>
+        </span-->
+        <div style="display:none;" id="pbDiv">
+        <div class="list-group-item"
+             style="background-color: #f5f5f5;">
+          <!--div class="input-group-btn search-panel pull-left" uib-dropdown 
+               style="width: 83px;">
+            <button type="button" class="btn btn-default" ihhd="filterByButton" uib-dropdown-toggle>
+              <span id="search_concept">Filter by</span>
+              <span class="caret"></span>
+            </button>
+
+            <ul uib-dropdown-menu class="dropdown-menu" role="menu">
+              <li><a href="#its_equal"> My own</a></li>
+              <li><a href="#greather_than"> Private</a></li>
+              <li><a href="#less_than"> Public </a></li>
+              <li class="divider"></li>
+              <li><a href="#all">All</a></li>
+            </ul>
+          </div-->
+          <input type="hidden" name="search_param" value="all" id="search_param">
+          <input type="text" class="form-control pull-left ng-valid ng-not-empty ng-dirty ng-valid-parse ng-touched" ng-model="searchProject"
+                 style="width: 85%; border-radius: 0; border: none; font-size: 12px"
+                 name="x" placeholder="Find project..." aria-invalid="false">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" style="height:34px; border: none">
+              <span class="glyphicon glyphicon-search" style="color: #B7B7B7"></span>
+            </button>
+          </span>
+        </div>
+        
+        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
+          <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
+             href="#!/project/{{project.project.id}}"
+             class="list-group-item"
+             context-menu
+             data-target="menu-{{$index}}"
+             id="{{project.project.name.substr(0, 5) === 'demo_'}}" style="border-top: none;"
+             title="{{project.project.name.length > 17 ? project.project.name:''}}">
+            <div ng-if="project.teamRole === 'Data scientist'">
+              <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-lock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.teamRole === 'Data owner'">
+              <i style="width: 20px; margin-right: 10px; margin-left: 15px; margin-top: 5px; font-size: 11px;" class="fa fa-unlock fa-2 pull-left"></i>
+            </div>
+            <div ng-if="project.project.archived">
+              <i style="width: 20px; margin-right: 10px; font-size: 20px; color: #9d261d"
+                 class="fa fa-ban fa-2 pull-left"></i>
+            </div>
+            {{ project.project.name | limitTo: 17 }}{{project.project.name.length > 17 ? '...' : ''}}
+            <span ng-if="project.project.name.substr(0, 5) === 'demo_'" class="glyphicon glyphicon-play-circle pull-right" style="margin-top: 5px; margin-right: 22px;"></span>
+            <i class="fa fa-cog fa-spin fa-2x  fa-fw pull-right" ng-show="homeCtrl.working[project.project.id]"></i>
+          </a>
+          <div uib-dropdown class="dropdown position-fixed" id="menu-{{$index}}">
+            <ul uib-dropdown-menu class="dropdown-amore">
+              <!--            <li>
+                            <a class="pointer"
+                               role="menuitem"
+                               tabindex="1"
+                               ng-click="">
+                              <span><i class="fa fa-share-alt"></i>
+                                Share...</span>
+                            </a>
+                          </li>-->
+              <li>
+                <a class="pointer"
+                   role="menuitem"
+                   tabindex="2"
+                   ng-click="homeCtrl.deleteProjectAndDatasets(project.project.id)">
+                  <span><i class="fa fa-trash"></i>
+                    Remove and delete DataSets </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        </div>
+        </div>
+      </div>
+      <ul uib-pager total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" style="background-color: #ffffff;"></ul>
+       <!--div><a href="" class="list-group-item active">Help</a></div-->  
+    </div>
+  </div>

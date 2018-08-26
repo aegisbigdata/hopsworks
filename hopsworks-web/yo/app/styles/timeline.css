@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 
 .timeline {
   margin: 0;
@@ -10,7 +30,7 @@
   /*left: 50%;*/
   margin-left: -1.5px;
   position: absolute;
-  width: 3px;
+  width: 1px;
 }
 .timeline .time-header {
   border: 1px solid #ededed;
@@ -74,7 +94,7 @@
 .timeline > div {
   clear: left;
   float: left;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   position: relative;
   width: 100%;
   z-index: 2;
@@ -83,17 +103,14 @@
   clear: right;
   float: left;
 }
-.timeline .r-arrow {
-  border-bottom: 9px solid transparent;
-  border-right: 9px solid #ededed;
-  border-top: 9px solid transparent;
-  height: 0;
-  /*left: -9px;*/
-  position: absolute;
-  /*top: 30px;*/
+.timeline .r-circle {
+  height: 5px;
+  left: -3px;
+  background: #00A2CA;
   margin-top: 40px;
-  width: 0;
-  z-index: 10;
+  position: absolute;
+  border-radius: 5px;
+  width: 5px;
 }
 .timeline .right > .task-type {
   left: -40px;
@@ -101,23 +118,15 @@
   top: 50px;
 }
 .about-task {
-  background: none repeat scroll 0 0 #fafafa;
-  border: 1px solid #ededed;
-  border-radius: 2px;
+  border: 1px solid #E6E6E6;
+  border-radius: 0px;
   margin-left: 9px;
   min-height: 60px;
   padding: 10px;
-  border: 1px solid transparent;
-  box-shadow: 0 1px 1px rgba(0,0,0,.25);
 }
 .about-task .header {
-  border-bottom: 1px solid #e6e6e6;
-  border-radius: 2px;
-  color: black;
-  font-size: 16px;
   height: 30px;
   line-height: 30px;
-  margin-bottom: 10px;
   padding: 0;
 }
 .about-task .header .btn{

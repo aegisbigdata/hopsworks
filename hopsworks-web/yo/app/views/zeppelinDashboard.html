@@ -1,3 +1,23 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
 <div ng-controller="MainCtrl as mainCtrl">
  <!--div ng-include="'nav.html'"></div MOD A11F-->
   <div ng-include="'navBarProject.html'"></div>
@@ -60,7 +80,7 @@
           <div ng-init="(iscollapsed$index) = true; zeppelinCtrl.tgState = true;"
                class="ds-content col-lg-12" ng-class="{'sidenav-open': zeppelinCtrl.tgState}" style="margin-top: 5px;">
             <div class="row row-no-margin-left" style="margin-top: 15px;">
-              <div class="col-lg-12">
+              <div class="col-lg-12 ds-box thin-scrollbar">
                 <div ng-if="zeppelinCtrl.pathArray.length === 0">
                   <!--div class="file-box" MOD A11F>
                     <div  class="file" ng-click="zeppelinCtrl.openZeppelin()">
@@ -78,7 +98,7 @@
                     <div  class="file" ng-click="zeppelinCtrl.createNewNote()">
                       <div class="icon">
                         <!--i class="glyphicon glyphicon-plus"></i MOD A11F-->
-                        <img src="images/aegis/queries_add_large.png"></img>
+                        <img src="images/aegis/queries_add_large.png" style="width: 20px"></img>
                       </div>
                       <div class="file-name">
                         <!--div style="text-align: center; color: green;"-->
@@ -95,9 +115,9 @@
                       <a><span class="corner"></span>
                         <!-- MOD A11F -->
                         <div class="icon">
-                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open_large.png"></img>
-                          <img ng-if="note.children == null " src="images/aegis/queries_open_large.png"></i>
-                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del_large.png"></img>
+                          <img ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_open_large.png" style="width: 20px"></img>
+                          <img ng-if="note.children == null " src="images/aegis/queries_open_large.png" style="width: 20px"></i>
+                          <img ng-if="note.id === zeppelinCtrl.TRASH_FOLDER_ID" src="images/aegis/queries_del_large.png" style="width: 20px"></img>
                           <!--
                           <i ng-if="note.children != null && note.id !== zeppelinCtrl.TRASH_FOLDER_ID" class="fa fa-folder"></i>
                           <i ng-if="note.children == null " class="fa fa-file-code-o"></i>

@@ -1,494 +1,826 @@
+<!--
+  ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  ~ software and associated documentation files (the "Software"), to deal in the Software
+  ~ without restriction, including without limitation the rights to use, copy, modify, merge,
+  ~ publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+  ~ persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or
+  ~ substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+  ~ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+  ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ~
+  -->
+
 <div ng-controller="MainCtrl as mainCtrl">
   <!--div ng-include="'nav.html'"></div MOD A11F-->
-  <div ng-include="'navBarProject.html'"></div>
-  <div id="wrapper" class="toggled"  ng-controller="JupyterCtrl as jupyterCtrl">
-    <div class="overlay"></div>
-    <div ng-include="'navProject.html'"></div>
-    <div>
+    <div ng-include="'navBarProject.html'"></div>
+    <div id="wrapper" class="toggled"  ng-controller="JupyterCtrl as jupyterCtrl">
+        <div class="overlay"></div>
+        <div ng-include="'navProject.html'"></div>
+        <div>
 
 
-      <section>  
-        <div ng-if="jupyterCtrl.loading" class="loadingwrap">
-          <div class="loading-content">
-            <div class="loader-in-wrap"></div>
-            {{jupyterCtrl.loadingText}}
-          </div>
+        <section>  
+            <div ng-if="jupyterCtrl.loading" class="loadingwrap">
+                <div class="loading-content">
+                    <div class="loader-in-wrap"></div>
+                    {{jupyterCtrl.loadingText}}
+                </div>
+            </div>
+
+
+            <div class="content-wrapper">                      
+              <div growl reference="10" class="pull-right" ></div>
+
+              <h3>
+                <div class="col-md-4 col-lg-4" style="margin-top:-17px;"> 
+                  <img height="30" src="images/jupyter.png"/>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top:-17px;" ng-if="jupyterCtrl.ui === ''">
+                  <button class="btn btn-success" ng-click="jupyterCtrl.start()" type="button" id="newNotebook">
+                    Start Jupyter 
+                  </button>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2 " style="margin-top:-17px; margin-left: 15px;"  ng-if="jupyterCtrl.ui === ''">
+                  <label><input type="checkbox" ng-model="jupyterCtrl.advanced"> Cluster Setup </label>
+                </div>
+                <ul class="nav navbar-nav pull-right" style="margin-right:30px;  margin-top:-17px;">
+                  <li class="pull-left" 
+                      ng-class="{'connected-space' : jupyterCtrl.connectedStatus, 'disconnected-space':!jupyterCtrl.connectedStatus}">
+                  <hamburger-toggle state="jupyterCtrl.tgState" class="hamburger-toggle" ng-click="jupyterCtrl.deselect()">
+                  </hamburger-toggle>
+                  </li>
+                  <li class="server-status">
+                    <span class="fa fa-circle" ng-class="{'server-connected' :jupyterCtrl.ui !== '', 
+                              'server-disconnected':jupyterCtrl.ui === ''}"></span>  
+                    <span ng-show="jupyterCtrl.jupyterCtrl.ui !== ''">Connected</span>
+                    <span ng-show="jupyterCtrl.jupyterCtrl.ui === ''">Disconnected</span>
+                  </li>
+                </ul>
+              </h3>
+
+
+              <div ng-click="jupyterCtrl.advanced = 'false'">
+                  <ul>
+                      <li><a class="show-querybuilder" style="font-size: 16px">User guide Query builder </a></li>
+                      <li><a class="show-visualiser" style="font-size: 16px">User guide Visualiser </a></li>
+                  </ul>
+              </div>
+
+              <div class="step-querybuilder" style="display:none" ng-if="jupyterCtrl.advanced !== true">
+              <div class="markdown-body" style="width: 70%">
+                <h1>Deployment and Usage</h1>
+                    <p>Query Builder is implemented with python, html and javascript as a Jupyter notebook. Here, we describe how the tool can be utilized 
+                        from the AEGIS platform.</p>
+                <h2>STEP 1(Optional) - Install the notebook</h2>
+                    <p>If the Query Builder Jupyter notebook does not already exist in a specific project, you should first 
+                        <a href="https://github.com/aegisbigdata/query-builder/archive/master.zip">download</a> it. Then, upload the QueryBuilder_v1.ipynb 
+                        file into Jupyter from the corresponding menu, as seen in figure below</p>
+                    <p><img src="images/9.png" style="width: 100%" alt="Upload Notebook"></p>
+                <h2>STEP 2 - Open the notebook</h2>
+                    <p>Once the notebook is present, click on it to open. You will see the following:</p>
+                    <p><img src="images/QB18.png" style="width: 100%" alt="QB Initial State"></p>
+                    <p>This is the initial state. All code cells are hidden and all output has been cleared. If you are not interested in reviewing or 
+                        altering the code (it is not required in the standard workflow) you may proceed with hiding the cell toolbars.
+                        In order to do that, select "View" from the menu, then "Cell Toolbar" and click on the "None" option, as shown below.</p>
+                    <p><img src="images/QB19.png" style="width: 100%" alt="Hide Toolbar"></p>
+                    <p>You should now see the following screen</p>
+                    <p><img src="images/QB1.png" style="width: 100%" alt="QB Initial State No Toolbar"></p>
+                <h2>STEP 3 - Initialize the notebook</h2>
+                    <p>Run the first cell: Make sure that the first cell is selected and either click on the "Run" button from the top Jupyter menu, or 
+                        press ctrl+enter.
+                    You should see a button appearing as shown below.</p>
+                    <p><img src="images/QB2.png" style="width: 100%" alt="Initialise Notebook"></p>
+                    <p>Click on the button and wait for the execution to stop. When this is donw, you should see a screen like the one below, where all 
+                        cell prompts have been replaced by numbers and a simple UI with two buttons has appeared.</p>
+                    <p><img src="images/QB3.png" style="width: 100%" alt="Initialised QB"></p>
+                    <p>Note that the output regarding the Spark application will only appear when the interpreter is started. This means that if the 
+                        "Initialise QB" button is pressed again, the message will disappear, but the tool will be still functional.</p>
+                <h2>STEP 4 - Working with the Query Builder</h2>
+                    <h3>Selecting a file</h3>
+                        <p>Query Builder offers two ways of exploring available files, each one corresponding to the two initial buttons.</p>
+                        <p>The <strong>Metadata Browser</strong> button shows the available datasets according to information from the metadata repository. 
+                            For each dataset, the title, description, contact point, publisher and relevant keywords are provided.</p>
+                        <p><img src="images/QB13.png" style="width: 100%" alt="Metadata Browser Datasets"></p>
+                        <p>By selecting a dataset, its contents (individual files) are presented:</p>
+                        <p><img src="images/QB12.png" style="width: 100%" alt="Metadata Browser Files"></p>
+                        <p>If you press the "open" button of a file, then the file is loaded (as a PySpark Dataframe) and becomes available for further 
+                            processing/querying.</p>
+                        <p>This data browsing is mostly intended for users exploring projects with a lot of data who are not yet certain which particular 
+                            files they are interested in. If you already know which file you want to open, you should press the <strong>Local Browser
+                            </strong> button and select the file from the dropdown list that will appear (as shown below):</p>
+                        <p><img src="images/QB4.PNG" style="width: 100%" alt="Local Browser"></p>
+                        <p>Once you choose a file and press the select button, the file will be loaded (as a PySpark Dataframe) and become available for 
+                            further processing/querying.</p>
+                        <p>Dataframes are essentially data tables. At each moment, Query Builder has two Dataframes: the <strong>temporary dataframe
+                            (tempDF)</strong> which holds the result of the last performed action, i.e. the contents of a file or the result of 
+                            applying a filter/query on the previous contents of tempDF and the <strong>master dataframe (MasterDF)</strong> which is 
+                            explicitly updated by pressing a button that moves the tempDF contents to the MasterDF.</p>
+                    <h3>Manipulating the temporary Dataframe (tempDF)</h3>
+                        <p><img src="images/QB5.png" style="width: 100%" alt="Loaded file"></p>
+                        <p>When a file is loaded, a form appears with several options for simple data filtering and processing.</p>
+                        <p><img src="images/QB7.png" style="width: 100%" alt="Filters form"></p>
+                        <p>Each selected action will open a new form with the necessary parameters. Once you fill the required information and press OK 
+                            a new filter will be added in the queue to be applied when you want. As an example, if you choose the "Rename Column" filter 
+                            you will need to select which column to rename and which should be the new name.</p>
+                        <p><img src="images/QB9.png" style="width: 100%" alt="Rename column"></p>
+                        <p>Once you press OK, the filter will be added in the queue, under the "Selected Filters" label</p>
+                        <p><img src="images/QB8.png" style="width: 100%" alt="Rename Col Filter"></p>
+                        <p>You may add more than one such filters before executing them. They will be added in the same list:</p>
+                        <p><img src="images/QB10.png" style="width: 100%" alt="Filter List"></p>
+                        <p>When you want to apply them, click on the "Apply Filters" button. When the execution is finished, all successfully applied 
+                            filters will have changed colour:</p>
+                        <p><img src="images/QB11.png" style="width: 100%" alt="Executed Filters"></p>
+                        <p>You may continue adding new filters after that point. The list will show both which filters have been already applied and 
+                            which are pending:</p>
+                        <p><img src="images/QB14.png" style="width: 100%" alt="All filters"></p>
+                    <h3>Previewing the contents of a Dataframe</h3>
+                        <p>By pressing the "Refresh temp" button, you will get the first 40 lines of the tempDF.</p>
+                        <p>This is useful both when you first load a file</p>
+                        <p><img src="images/QB6.png" style="width: 100%" alt="Temp Preview 1"></p>
+                        <p>but also to review the result of applying some filters</p>
+                        <p><img src="images/QB15.png" style="width: 100%" alt="Temp Preview 2"></p>
+                        <p>A "Refresh Master" button is also available to preview the contents of the master Dataset. Keep in mind that the two 
+                            Dataframes may hold completely different data. You may also join the two Dataframes through the corresponding option in the 
+                            filters form. The result will be kept in the tempDF.</p>
+                        <p><img src="images/QB17.png" style="width: 100%" alt="Temp and Master Preview"></p>
+                <h2>STEP 5 - Cleaning up</h2>
+                    <p>You may load, process and combine data following the previous steps in any order, until you are satisfied with the end-result. 
+                        At any time, you may press the "Initialise QB" button to clear the screen and start over. When you have completed your work 
+                        with the Query Builder, you may either directly exit the Notebook or clear all the output first so that you can have a fresh 
+                        start without any leftovers the next time. This can be achieved from Jupyter's top menu. Choose 
+                        <strong>Cell -&gt; All Output -&gt; Clear</strong></p>
+            <h1>Important Notes</h1>
+                <p>All the instructions above refer to the Query Builder as a standalone notebook and may be changed in future integrated versions.</p>
+            
+    
+        </div>
+            </div>
+
+              <div class="step-visualiser" style="display: none" ng-if="jupyterCtrl.advanced !== true">
+                    <div class="markdown-body" style="width: 70%">
+                        <h1>Deployment</h1>
+                            <p>Visualizer is implemented with python as a Jupyter notebook. Here, we describe how the tool can be utilized from the AEGIS platform.</p>
+                            <h2>STEP 1(Optional) - Install the notebook</h2>
+                                <p>If the Jupyter notebook does not already exist in a specific project, one should first 
+                                    <a href="https://github.com/aegisbigdata/query-builder/archive/master.zip">download</a> it. Then, upload the 
+                                    Visualizer.ipynb file into Jupyter from the corresponding menu, as seen in figure below</p>
+                                <p><img src="images/9.png" style="width: 100%" alt="Upload Notebook"></p>
+                            <h2>STEP 2 - Open the notebook</h2>
+                                <p>Once the notebook is present, click on it to open. You will see the following:</p>
+                                <p><img src="images/1.png" style="width: 100%" alt="Visualizer Initial State"></p>
+                                <p>This is the initial state. All code cells are hidden by using the <a href="https://github.com/kirbs-/hide_code">
+                                        hide code plugin</a> and also all output has been cleared.</p>
+                            <h2>STEP 3 - Initialize the notebook</h2>
+                                <p>Disable code hidding in the first cell by unchecking "Hide Code" box. When the code unfolds, you will see something 
+                                    like this:</p>
+                                <p><img src="images/0.png" style="width: 100%" alt="First Cell Code"></p>
+                                <p>Then, you should edit the variables <strong>project_user</strong> and <strong>project_name</strong> accordingly. 
+                                    <strong>project_name</strong> is the name of the project currently working with. For the <strong>project_user</strong> variable the rule is a little bit more complex. Username is a string that consists of a total of 8 characters and involves the user's first part of the email (before the @). If this part contains more than 8 characters, the first 8 are used and the rest are truncated. On the contrary, if it less than 8 characters, we fill any remaining empty positions with zeros. Finally, any dot (.) characters are being replaced by underscores (_).
+                                For instance, a user with email <a href="mailto:testuser@domain.com">testuser@domain.com</a> would have a username 
+                                "testuser". One with email <a href="mailto:test.user@domain.com">test.user@domain.com</a> would have a username "test_use" and finally, one with email <a href="mailto:user@domain.com">user@domain.com</a> would have "user0000".</p>
+                                <p>After editing those two variables, hide again the code in the first cell, make sure the cell is selected and 
+                                    either click on the "Run" button from the top Jupyter menu, or press ctrl+enter.</p>
+                            <h2>STEP 4 - Working with the visualiser</h2>
+                                <p>Now that everyhting is set, the first widget that appears is something like a file picker, where a user can 
+                                    navigate between the files stored in the current project and open a desired one. Note that currently only CSV 
+                                    files are supported.</p>
+                                <p><img src="images/2.png" style="width: 100%" alt="File Picker"></p>
+                                <p>Once a file is open, a small preview in tabular format will be shown</p>
+                                <p><img src="images/3.png" style="width: 100%" alt="File Preview"></p>
+                                <p>Afterwards, a list with the available visualization types will be displayed. Pick a desired type and click on 
+                                    the <strong>Apply</strong> button.</p>
+                                <p><img src="images/4.png" style="width: 100%" alt="Visualization Types"></p>
+
+                                <p>For every visualization type, a widget with various options depending on the type will be opened. Fill mandatory 
+                                    fields with the desired values and then click on the <strong>Visualize</strong> button.</p>
+                                <p><img src="images/5.png" style="width: 100%" alt="Parameters"></p>
+                                <p><img src="images/6.png" style="width: 100%" alt="Parameters Filled"></p>
+                                <p>Pay attention to the parameter called <strong>Position</strong>. This actually refers to the position on the 
+                                    dashboard that we would like to place the chart to. If you notice in the previous picture, there are five empty 
+                                    cells in the end of the notebook. Those act as placeholders for the dashboard. Currently only up to five different charts at the same time are supported, but this can be easily extended. The dashboard can contain several charts from the same dataset or even from different ones. When a new dataset is openned, previous charts are not deleted.</p>
+                                <p>A sample chart that appers after filling the necessary options can be seen below.</p>
+                                <p><img src="images/7.png" style="width: 100%" alt="Sample Scatter Plot"></p>
+                            <h2>STEP 5 - Cleaning up</h2>
+                                <p>When you have completed your work with the visualiser, it is highly recommended to clear all the output, so you 
+                                    can do a fresh start without any leftovers the next time. This can be achieved from Jupyter's top menu. Choose 
+                                    <strong>Cell -&gt; All Output -&gt; Clear</strong></p>
+                                <p><img src="images/8.png" style="width: 100%" alt="Clear Output"></p>
+                    <h1>Important Notes</h1>
+                        <p>All the instructions above refer to the Visualizer as a standalone notebook. In future work step 1 will be dropped, 
+                            since the notebook would we automatically available in every newly created project. Furthermore, when the integration 
+                            with the other two notebooks takes place(Query Builder, Algorithm Execution Container), step 3 will also be dropped, 
+                            and the file reading part from step 4 will be utilized from the Query Builder.</p>
+                    
+
+            </div>
+
+        </div>
+              
+              <!--div class="markdown-body">
+                <h1>A. Quick Introduction to the AEGIS tools</h1>
+                    <p>AEGIS offers various tools to address the diverse needs of its users:</p>
+                    <ul>
+                        <li>
+                            <p>AEGIS Integrated Services</p>
+                            <p>The AEGIS platform provides multi-tenant data management and processing services for Big Data, allowing different 
+                                users and services to securely and privately access and process their data and share them with other users, allowing 
+                                access for specific services. In order to do that, AEGIS builds upon Hopsworks, which also enables AEGIS to provide 
+                                integrated support for various services such as interactive notebooks with Zeppelin and Jupyter, Kafka, and ELK 
+                                stack.</p>
+                        </li>
+                        <li>
+                            <p>Query Builder</p>
+                            <p>Query Builder provides the capability to interactively define and execute queries on data available inside AEGIS. 
+                                Query Builder aims to simplify and accelerate the process of retrieving data and creating views on them, which 
+                                could be then saved as new datasets or used as input for more high-level AEGIS tools, like the Visualiser and the 
+                                Algorithm Execution Container</p>
+                        </li>
+                        <li>
+                            <p>Visualiser</p>
+                            <p>The Visualiser is the component enabling the visualisation capabilities of the AEGIS platform for the output of 
+                                the querying and filtering results coming from the Query Builder as well as the output of the analysis results 
+                                as produced from the Algorithm Execution Container.</p>
+                        </li>
+                        <li>
+                            <p>Algorithm Execution Container</p>
+                            <p>This component features a UI that consists of an algorithm selection template, which offers to users some basic 
+                                information regarding each algorithm available in the big data analysis platform of AEGIS and also enables the 
+                                configuration and the execution of the selected algorithm.</p>
+                        </li>
+                        <li>
+                            <p>The Data Harvester and Annotator</p>
+                            <p>The Data Harvester and Annotator features several sub-components which, in connection, represent the process of 
+                                harvesting, transforming, harmonising, annotating and providing the required data and metadata for the AEGIS 
+                                platform.</p>
+                        </li>
+                    </ul>
+                    <p>The previous tools are the ones that the users directly interact with through the core AEGIS platform. There are also some 
+                        tools working "under the hood" to enable certain functionalities:</p>
+                    <ul>
+                        <li>AEGIS Linked Data Store, which is responsible for storing the metadata associated with a particular dataset within the 
+                            AEGIS platform</li>
+                        <li>Brokerage Engine, which includes elements of the Data Policy and the Business Brokerage framework.</li>
+                    </ul>
+                    <p>Finally, AEGIS offers two optional offline tools, specifically:</p>
+                    <ul>
+                        <li>An anonymisation tool, which is an extensible, schema-agnostic plugin that allows real-time efficient data 
+                            anonymisation.</li>
+                        <li>A cleansing tool that enables data validation, data cleansing and data completion processes towards increasing the r
+                            eliability, accuracy and completeness of the data that will be imported in the AEGIS platform</li>
+                    </ul>
+                <h1>B. Getting started workflow</h1>
+                    <p>Welcome to the AEGIS platform! The following lines aim to help you familiarise yourself with the platform and begin using 
+                        our various tools and services.</p>
+                    <h2>Part 1 - First visit step by step</h2>
+                        <ol>
+                            <li>Create a new account in the platform and wait for your activation e-mail.</li>
+                            <li>Welcome! You are now in the AEGIS home page, where you can browse our assets, i.e. our projects and datasets. Search 
+                                around a bit to see what we have!</li>
+                            <li>When you have looked around enough, it's time to move on to do more interesting things and for that, you will need a 
+                                project! You might have come to AEGIS through an invitation to join a project, so you may find yourself in an already 
+                                populated workspace. But we'll assume that's not the case for this intro. So, go ahead and create a project by 
+                                pressing the yellow button on the right</li>
+                            <li>You are now in the project's home page. From here you can review the last actions performed by the project users 
+                                (currently only you). The menu on the left is the entrance point to the various offered tools. Please note the 
+                                cluster utilisation percentage right under the menu, it shows the current work load on the cluster and it will be 
+                                affected by the things you do in the platform as well.</li>
+                            <li>Select the "Project Datsets" menu option. From here you can explore the available datasets and of-course upload 
+                                more data in your project. You will find six datasets already there, which are necessary parts of every project. 
+                                Don't mind them for now. Go ahead and create another dataset by pressing the yellow button on the right. After that, 
+                                you can upload some files in your new dataset - make sure to upload some csv files as well to use in our next steps. 
+                                When the upload is over, select one of the uploaded files and notice the hdfs path that appears in the yellow box on 
+                                the right. You may need this path in the future, so make sure you remember how to find it.</li>
+                            <li>Select the "Visualiser" menu option. For more information on how this tool is used and what you can do with it, you 
+                                may refer to <a href="https://github.com/aegisbigdata/documentation/wiki/Visualizer">this guide</a>. For now, just 
+                                try loading one of your previously uploaded csv files and then choose a simple visualisation.</li>
+                            <li>Select the "Query Builder" menu option. Let's assume that in the previous step, when using the Visualiser, you would 
+                                have wanted to filter out some values prior to visualising the data. Follow the provided instructions  
+                                <a href="https://github.com/aegisbigdata/documentation/wiki/Query-Builder">here</a> to perform this simple task. 
+                                The guide provides information for more advanced tasks as well and you can always try things on your own to find 
+                                out exactly what you can do.</li>
+                            <li>Select the "Analytics" menu option. Again, for information about what you can do with this tool and how, you may 
+                                refer to <a href="" title="Coming soon">this guide</a>. 
+                                Here you will need that hdfs path from step 5. Copy it and go ahead to try the tool!</li>
+                            <li>Go to the "Metadata Designer" menu option. From here you can add metadata to your data which are used for enhanced 
+                                search and may also, under the hood, facilitate some data management processes. This part may seem a bit advanced, 
+                                but keep in mind it's there. For now keep experimenting in steps 5-8 and you will gradually understand what metadata 
+                                offer and you may even decide to contribute yourself! Take a look 
+                                <a href="" title="Coming soon">here</a> when you are 
+                                ready to know more!</li>
+                        </ol>
+                    <h2>Part 2 - Advanced options</h2>
+                        <p>Once you familiarise yourslef with the processes described in the first tour, you will understand how the related tools 
+                            can be leveraged to enable and/or facilitate various data management and processing tasks. At the same time, you may 
+                            realise some limitations and you may want to move on to more advanced operations. There are four menu options not 
+                            included in the first part, that offer exactly these capabilities:</p>
+                        <ol>
+                            <li>Jupyter menu option: This will open another window with Jupyter Notebook, i.e. an open-source web application that 
+                                allows you to create and share documents that contain live code, equations, visualizations and narrative text. Uses 
+                                include data cleaning and transformation, numerical simulation, statistical modeling, data visualization, machine 
+                                learning, and more (see also <a href="http://jupyter.org/" rel="nofollow">Jupyter website</a>. You have already seen 
+                                Jupyter in the first tour, since Visualiser and Query Builder are built inside this notebook. We support the 
+                                sparkmagic Jupyter kernel, which is used to run Spark applications.</li>
+                            <li>Zeppelin menu option: This will take you to Apache Zeppelin, which is also a web-based interactive notebook with 
+                                support for various interpreters, including Spark and Angular.</li>
+                            <li>Jobs menu option: This will take you to the AEGIS UI that provides support for running Jobs. Jobs could be Spark 
+                                applications or Spark workflows and they can be scheduled for periodic execution or run on-demand.</li>
+                            <li>Kafka: This will take you to the Kafka management page. AEGIS supports Kafka-as-a-Service. Kafka topics (used as 
+                                channels for producing/consuming messages) are private to projects and users can create a topic with just a few 
+                                clicks. Topics can also be shared with other projects enabling real-time communication between projects.</li>
+                        </ol>
+
+              </div-->
+
+            </div>
         </div>
 
 
-        <div class="content-wrapper">                      
-          <div growl reference="10" class="pull-right" ></div>
-          <h3>
-            <div class="col-md-4 col-lg-4" style="margin-top:-17px;"> 
-              <img height="30" src="images/jupyter.png"/>
-            </div>
-            <div class="col-sm-2 col-md-2 col-lg-2" style="margin-top:-17px;" ng-if="jupyterCtrl.ui === ''">
-              <button class="btn btn-success" ng-click="jupyterCtrl.start()" type="button" id="newNotebook">
-                Start Jupyter 
-              </button>
-            </div>
-            <div class="col-sm-2 col-md-2 col-lg-2 " style="margin-top:-17px; margin-left: 15px;"  ng-if="jupyterCtrl.ui === ''">
-              <label><input type="checkbox" ng-model="jupyterCtrl.advanced"> Cluster Setup </label>
-            </div>
-            <ul class="nav navbar-nav pull-right" style="margin-right:30px;  margin-top:-17px;">
-              <li class="pull-left" 
-                  ng-class="{'connected-space' : jupyterCtrl.connectedStatus, 'disconnected-space':!jupyterCtrl.connectedStatus}">
-              <hamburger-toggle state="jupyterCtrl.tgState" class="hamburger-toggle" ng-click="jupyterCtrl.deselect()">
-              </hamburger-toggle>
-              </li>
-              <li class="server-status">
-                <span class="fa fa-circle" ng-class="{'server-connected' :jupyterCtrl.ui !== '', 
-                          'server-disconnected':jupyterCtrl.ui === ''}"></span>  
-                <span ng-show="jupyterCtrl.jupyterCtrl.ui !== ''">Connected</span>
-                <span ng-show="jupyterCtrl.jupyterCtrl.ui === ''">Disconnected</span>
-              </li>
-            </ul>
-          </h3>
-          <div ng-init="(iscollapsed$index) = true; jupyterCtrl.tgState = true;"
-               class="ds-content col-lg-12" ng-class="{'sidenav-open': jupyterCtrl.tgState}" style="margin-top: 5px;">
-            <div class="row row-no-margin-left" style="margin-top: 15px;">
-            </div>
-          </div>
 
-          <div class="row" ng-if="jupyterCtrl.val.mode !== '' && jupyterCtrl.ui === ''">
-            <div class="col-sm-8 col-md-8 col-lg-8" layout-align="center center" style='margin-top:20px; margin-left: 0px;'>
-
-              <!-- STYLE THIS (TENSORFLOW : SPARK) -->
-              <div class="row" ng-if="jupyterCtrl.advanced === true">
-                <div class="col-md-2"></div>
-                <div class="col-md-8 pull-left" style="margin-left: 43px;">
-                  <div class="btn-group blocks" style="padding: " data-toggle="buttons" ng-if="jupyterCtrl.ui === ''">
-                    <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'tensorflow', focus: jupyterCtrl.val.mode === 'tensorflow'}"
-                           ng-click="jupyterCtrl.val.mode = 'tensorflow'">
-                      <input type="radio" name="tensorflow" id="tensorflow" autocomplete="off"> TensorFlow
-                    </label>
-                    <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'distributedTensorFlow', focus: jupyterCtrl.val.mode === 'distributedTensorFlow'}"
-                           ng-click="jupyterCtrl.val.mode = 'distributedTensorFlow'">
-                      <input type="radio" name="distributedTensorFlow" id="distributedTensorFlow" autocomplete="off"> TensorFlowOnSpark
-                    </label>
-                    <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'horovod', focus: jupyterCtrl.val.mode === 'horovod'}"
-                           ng-click="jupyterCtrl.val.mode = 'horovod'">
-                      <input type="radio" name="horovod" id="horovod" autocomplete="off"> Horovod
-                    </label>
-                    <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'sparkStatic', focus: jupyterCtrl.val.mode === 'sparkStatic'}"
-                           ng-click="jupyterCtrl.val.mode = 'sparkStatic'">
-                      <input type="radio" name="sparks" id="sparkStatic" autocomplete="off"> Spark (Static)
-                    </label>
-                    <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'sparkDynamic', focus: jupyterCtrl.val.mode === 'sparkDynamic'}"
-                           ng-click="jupyterCtrl.val.mode = 'sparkDynamic'">
-                      <input type="radio" name="sparkd" id="sparkDynamic" autocomplete="off"> Spark (Dynamic)
-                    </label>
-                  </div>
-                  <br>
-                </div>
-              </div>
-              <div class="row top-buffer" ng-if="jupyterCtrl.advanced === true">
-                <div class="row">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6"> Base Directory <i class="fa fa-info-circle"
-                                                                        uib-tooltip="Root Directory for Jupyter Notebooks. If your Notebook is not stored in the '/Jupyter' Dataset, choose '/'." 
-                                                                        tooltip-placement="bottom" style="margin-left: 10px">
-                      </i>
-                    </div>
-                    <div class="col-md-2 jupyter-left">
-
-                      <ui-select 
-                        ng-model="jupyterCtrl.selected" theme="bootstrap" on-select="jupyterCtrl.changeBaseDir()">
-                        <ui-select-match>
-                          <span ng-bind="$select.selected.name"></span>
-                        </ui-select-match>
-                        <ui-select-choices repeat="dir in (jupyterCtrl.dirs | filter: $select.search) track by dir.name">
-                          <div ng-bind="dir.name | highlight: $select.search"></div>
-                        </ui-select-choices>
-                      </ui-select>
-                    </div>
-                  </div>
-                  <div class="row" ng-show="jupyterCtrl.selected.name === '/'">
-                    <div class="col-md-2 jupyter-left"></div>
-                    <div class="col-md-10 pull-right" style="font-weight: bold; color: red;">
-                      Info: You can only create notebooks inside a dataset - not in the '/' (root) directory.
-                    </div>
-                  </div>
-                </div>
-                <!-- AppMaster specific configuration should always be first -->
-                <div class="row">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">AppMaster memory (MB)<i class="fa fa-info-circle" uib-tooltip="The amount of memory, in MB, that should be requested for the Yarn Application Master container. 1024 MB is more than sufficient for most cases." style="margin-left: 10px"></i></div>
-                    <div class="col-md-2 jupyter-left">
-                      <input type="number" step="256" ng-model="jupyterCtrl.val.appmasterMemory" min="1024" class="form-control">
-                    </div>
-                  </div>
-                </div>
-                  <div class="row" ng-if="jupyterCtrl.val.mode === 'sparkStatic' || jupyterCtrl.val.mode === 'sparkDynamic'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">AppMaster virtual cores<i class="fa fa-info-circle" uib-tooltip="The number of virtual cores that should be requested for the Yarn Application Master container." style="margin-left: 10px"></i></div>
-                    <div class="col-md-2 jupyter-left">
-                      <input type="number" step="1" ng-model="jupyterCtrl.val.appmasterCores" ng-init="1" min="1" class="form-control">
-                    </div>
-                  </div>
-                  </div>
-
-                <div class="row"  ng-if="jupyterCtrl.val.mode === 'horovod'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Number of hosts <i class="fa fa-info-circle"
-                                                                        uib-tooltip="The number of hosts to run Horovod on. Current support is only 1 host." style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left"><input type="number" step="1" ng-readonly="true" ng-init="1" ng-model="jupyterCtrl.val.numExecutors" min="0" max="1" class="form-control"></div>
-                  </div>
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6"> Memory (MB) per host <i class="fa fa-info-circle" uib-tooltip="The amount of memory, in MB, that should be allocated on each host. The specified amount of memory will be shared by all MPI processes on the machine." style="margin-left: 10px"></i></div>
-                    <div class="col-md-2 jupyter-left"><input type="number" step="256" min="1024" ng-model="jupyterCtrl.val.executorMemory" class="form-control"></div>
-                  </div>
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Number of processes<i class="fa fa-info-circle"
-                                                                           uib-tooltip="The number of Horovod MPI processes (-np) per host."
-                                                                           style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left">
-                      <input type="number" ng-init="1"  ng-model="jupyterCtrl.val.numMpiNp" min="1" class="form-control">
-                    </div>
-                  </div>
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Number of GPUs per process<i class="fa fa-info-circle"
-                                                                                  uib-tooltip="The number of GPUs accessible for each process (0 or 1)."
-                                                                                  style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left">
-                      <input type="number" ng-init="0"  ng-model="jupyterCtrl.val.numTfGpus" min="0" max="1" class="form-control">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row"  ng-if="jupyterCtrl.val.mode === 'distributedTensorFlow'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Parameter servers <i class="fa fa-info-circle"
-                                                                          uib-tooltip="Number of parameter servers in Distributed TensorFlow."
-                                                                          style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left">
-                      <input type="number" ng-init="1" ng-model="jupyterCtrl.val.numTfPs" class="form-control" min="1">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row" ng-if="jupyterCtrl.val.mode === 'sparkDynamic'" >
-                  <div class="row top-buffer">
-                    <div class="col-md-3"></div>
-                    <!--<div class="col-md-6 customHr"></div>-->
-                  </div>
-                  <div class="row top-buffer">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6" style="margin-left:20px;">Set min and max number of executors with the Slider below.</div>
-                    <div class="col-md-2"></div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4">
-                      <rzslider style="margin-top: 32px;" 
-                                rz-slider-model="jupyterCtrl.sliderOptions.min"
-                                rz-slider-high="jupyterCtrl.sliderOptions.max"
-                                rz-slider-options="jupyterCtrl.sliderOptions.options">
-                      </rzslider>
-                    </div>
-                    <div class="col-md-4"></div>
-                  </div>
-                  <div class="row top-buffer">
-                    <div class="col-md-3"></div>
-                    <!--<div class="col-md-6 customHr"></div>-->
-                  </div>
-
-                  <div class="row top-buffer">
-                    <div class="text-right col-md-6">Initial number of executors <i class="fa fa-info-circle"
-                                                                                    uib-tooltip="The initial number of executors that should be requested. Must be greater than the minimum and smaller than the maximum number of executors." style="margin-left: 10px"></i></div>
-
-                    <div class="col-md-2 jupyter-left"><input type="number"  
-                                                              ng-change="jupyterCtrl.setInitExecs()" min="0" value="{{jupyterCtrl.val.dynamicMinExecutors}}" ng-model="jupyterCtrl.val.dynamicMinExecutors"
-                                                              class="form-control">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row" ng-if="jupyterCtrl.val.mode !== 'sparkDynamic' && jupyterCtrl.val.mode !== 'horovod' && jupyterCtrl.val.mode !== 'tensorflow'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Number of executors <i class="fa fa-info-circle"
-                                                                            uib-tooltip="The number of executors that should be requested for this job." style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left"><input type="number" ng-model="jupyterCtrl.val.numExecutors" ng-init="1" min="1" value="1" class="form-control"></div>
-                  </div>
-                </div>
-                <div class="row" ng-if="jupyterCtrl.val.mode === 'tensorflow'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Max parallel executions <i class="fa fa-info-circle" uib-tooltip="The maximum number of parallel tflauncher executions. If this configuration is less than the number of tflauncher jobs, the remaining jobs will be queued and executed once a previous job is finished." style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left"><input type="number" ng-model="jupyterCtrl.val.numExecutors" ng-init="1" min="1" value="1" class="form-control"></div>
-                  </div>
-                </div>
-                <div class="row" ng-if="jupyterCtrl.val.mode !== 'horovod'">
-                  <div class="row clusterparams">
-                      <div class="text-right col-md-6"> Executor memory (MB) <i class="fa fa-info-circle" uib-tooltip="The amount of memory, in MB, that should be requested for each Spark executor in this job." style="margin-left: 10px"></i></div>
-                      <div class="col-md-2 jupyter-left"><input type="number" step="256" min="1024" ng-model="jupyterCtrl.val.executorMemory" class="form-control"></div>
-                    </div>
-                </div>
-                  <div class="row" ng-if="jupyterCtrl.val.mode === 'sparkStatic' || jupyterCtrl.val.mode === 'sparkDynamic'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6"> Executor virtual cores <i class="fa fa-info-circle"
-                                                                                uib-tooltip="The number of cores that should be requested for each Spark executor in this job." style="margin-left: 10px"></i></div>
-                    <div class="col-md-2 jupyter-left"><input type="number" min="1" step="1" ng-model="jupyterCtrl.val.numExecutorCores" class="form-control"></div>
-                    </div>
-                    </div>
-                <div class="row" ng-if="jupyterCtrl.val.mode === 'tensorflow'">
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">Executor GPUs<i class="fa fa-info-circle"
-                                                                     uib-tooltip="The number of GPUs allocated for each Spark executor in this job."
-                                                                     style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left"><input type="number" ng-init="0"  ng-model="jupyterCtrl.val.numTfGpus" min="0" class="form-control"></div>
-                  </div>
-                </div>
-                <div class="row"  ng-if="jupyterCtrl.val.mode === 'distributedTensorFlow'">
-
-                  <div class="row clusterparams">
-                    <div class="text-right col-md-6">GPUs per worker<i class="fa fa-info-circle"
-                                                                       uib-tooltip="The number of GPUs allocated for each worker. Parameter servers do not have access to a GPU."
-                                                                       style="margin-left: 10px"></i>
-                    </div>
-                    <div class="col-md-2 jupyter-left">
-                      <input type="number" ng-init="0"  ng-model="jupyterCtrl.val.numTfGpus" min="0" class="form-control">
-                    </div>
-                  </div>
-                </div>
-                <div class="row clusterparams">
-                  <div class="text-right col-md-6">
-                    <label for="archives">
-                      <button uib-tooltip='Comma-separated quoted list of .zip or .tgz files, this option corresponds to --archives option in Spark.' id="selectArchiveButton" class="btn btn-default" ng-click="jupyterCtrl.selectFile('archives')">
-                        <span>Add archive file</span>
-                      </button>  
-                    </label>
-                    <i class="fa fa-info-circle" uib-tooltip='Comma-separated quoted list of .zip or .tgz files, this option corresponds to --archives option in Spark.' style="margin-left: 10px"></i>
-                  </div>
-                  <div class="col-md-4 jupyter-left">
-                    <input uib-tooltip="Comma-separated quoted list of .zip or .tgz files, this option corresponds to --archives option in Spark." ng-init="jupyterCtrl.val.archives = ''" type="text" class="form-control"
-                           id="archives" ng-model="jupyterCtrl.val.archives">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="text-right col-md-6">
-                    <label for="jars">
-                      <button uib-tooltip='Comma-separated quoted list of .jar files, this option corresponds to --jars option in Spark.' id="selectJarButton" class="btn btn-default"
-                              ng-click="jupyterCtrl.selectFile('jars')">
-                        <span>Add jar file</span>
-                      </button>  
-                    </label>
-                    <i class="fa fa-info-circle" uib-tooltip='Comma-separated quoted list of .jar files, this option corresponds to --jars option in Spark.' style="margin-left: 10px"></i>
-                  </div>
-                  <div class="col-md-4 jupyter-left">
-                    <input uib-tooltip="Comma-separated quoted list of .jar files, this option corresponds to --jars option in Spark." ng-init="jupyterCtrl.val.jars = ''"
-                           type="text" class="form-control" id="jars" ng-model="jupyterCtrl.val.jars">
-                  </div>
-                </div>
-
-                <div class="row" ng-if="jupyterCtrl.val.mode === 'tensorflow' || jupyterCtrl.val.mode === 'distributedTensorFlow' || jupyterCtrl.val.mode === 'horovod'">
-                  <div class="text-right col-md-6">
-                    <label for="pyFiles">
-                      <button uib-tooltip='Comma-separated list of .py, .zip or .egg files that should be added to PYTHONPATH. This option corresponds to --pyFiles option in Spark. ' id="selectPyFileButton" class="btn btn-default"
-                              ng-click="jupyterCtrl.selectFile('pyfiles')">
-                        <span>Add python file</span>
-                      </button>
-                    </label>                      
-                    <i class="fa fa-info-circle" uib-tooltip='Comma-separated list of .py, .zip or .egg files that should be added to PYTHONPATH. This option corresponds to --pyFiles option in Spark. ' style="margin-left: 10px"></i>
-                  </div>
-                  <div class="col-md-4 jupyter-left">
-
-                    <input uib-tooltip="Comma-separated list of .py, .zip or .egg files that should be added to PYTHONPATH. This option corresponds to --pyFiles option in Spark. "
-                           ng-init="jupyterCtrl.val.pyFiles = ''" type="text" class="form-control"
-                           id="pyFiles" ng-model="jupyterCtrl.val.pyFiles">
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="text-right col-md-6">
-                    <label for="files">
-                      <button uib-tooltip='Comma-separated list of files that should be accessible by the application. This option corresponds to --files option in Spark.' id="selectFileButton" class="btn btn-default"
-                              ng-click="jupyterCtrl.selectFile('files')">
-                        <span>Add file</span>
-                      </button>
-                    </label>
-                    <i class="fa fa-info-circle" uib-tooltip='Comma-separated list of files that should be accessible by the application. This option corresponds to --files option in Spark.' style="margin-left: 10px"></i>
-                  </div>
-                  <div class="col-md-4 jupyter-left">
-                    <input uib-tooltip="Comma-separated list of files that should be accessible by the application. This option corresponds to --files option in Spark." ng-init="jupyterCtrl.val.files = ''"
-                           type="text" class="form-control" id="files" ng-model="jupyterCtrl.val.files">
-                  </div>
-                </div>
-
-                <div class="row clusterparams" ng-if="jupyterCtrl.advanced === true">
-                  <div class="text-right col-md-6">Log Level <i class="fa fa-info-circle"
-                                                                uib-tooltip="Log4j log level for this job." 
-                                                                style="margin-left: 10px"></i>
-                  </div>
-                  <div class="col-md-2 jupyter-left">
-                    <ui-select ng-model="jupyterCtrl.logLevelSelected" theme="bootstrap"
-                               on-select="jupyterCtrl.changeLogLevel()">
-                      <ui-select-match >
-                        <span ng-bind="jupyterCtrl.logLevelSelected.name"></span>
-                      </ui-select-match>
-                      <ui-select-choices repeat="level in (jupyterCtrl.log_levels | filter: $select.search) track by level.name">
-                        <span ng-bind="level.name | highlight: $select.search"></span>
-                      </ui-select-choices>
-                    </ui-select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row clusterparams" ng-if="jupyterCtrl.advanced === true">
-                <div class="text-right col-md-6">More Spark Properties <i class="fa fa-info-circle"
-                      uib-tooltip="Enter additional line-separated Spark properties here. Use spaces to separate parameters from values." 
-                      style="margin-left: 10px"></i>
-                </div>
-                <div class="col-md-5 jupyter-left">
-                  <textarea style="width: 100%;" id="TextArea" ng-model="jupyterCtrl.val.sparkParams" 
-                            ng-keyup="autoExpand($event)" 
-                            placeholder="spark.yarn.am.port  12242">
-                  </textarea>
-                </div>
-
-                <!--                <div class="col-md-2 jupyter-left">
-                                                  <fieldset  data-ng-repeat="jupyterCtrl.sparkParamsSelected in sparkParams">
-                                    <select>
-                                      <option>spark.yarn.</option>
-                                      <option>Office</option>
-                                      <option>Home</option>
-                                    </select>
-                                    <input type="text" ng-model="jupyterCtrl.sparkParamsSelected.name" name="" 
-                                           placeholder="Additional Spark Parameters">
-                                    <button class="remove" ng-show="$last" ng-click="jupyterCtrl.removeSparkParam()">-</button>
-                                  </fieldset>
-                                  <button class="addfields" ng-click="jupyterCtrl.addSparkParam()">Add fields</button>
-                
-                                  <div id="choicesDisplay">
-                                    {{ sparkParams}}
-                                  </div>                      
-                
-                                  <ui-select ng-model="jupyterCtrl.sparkParamsSelected" theme="bootstrap"
-                                             on-select="jupyterCtrl.changeSparkParam()">
-                                    <ui-select-match >
-                                      <span ng-bind="jupyterCtrl.logLevelSelected.name"></span>
-                                    </ui-select-match>
-                                    <ui-select-choices repeat="level in (jupyterCtrl.log_levels | filter: $select.search) track by level.name">
-                                      <span ng-bind="level.name | highlight: $select.search"></span>
-                                    </ui-select-choices>
-                                  </ui-select>
-                                </div>
-                              </div>-->
-              </div>
-            </div>
-          </div>
+            <div ng-init="(iscollapsed$index) = true; jupyterCtrl.tgState = true;"
+            class="ds-content col-lg-12" ng-class="{'sidenav-open': jupyterCtrl.tgState}" style="margin-top: 5px;">
+        <div class="row row-no-margin-left" style="margin-top: 15px;">
         </div>
-
-        <div class="row top-buffer" ng-if="jupyterCtrl.ui !== ''">
-
-          <div class="col-md-1"></div> 
-          <div class="col-md-8 panel panel-default shift-left">
-            <div class="panel-heading" >
-              <div>
-                <span style="font-weight: bold;">Jupyter Notebook Server Details</span>
-              </div>
-            </div>
-            <div class="panel-body">
-              <div>
-                <div>Port <i class="fa fa-info-circle" uib-tooltip="Port number where this Jupyter Notebook Server is listening" style="margin-left: 10px"></i> 
-                  <span style="margin-left: 10px;">  {{jupyterCtrl.config.port}}</span>
-                </div>
-              </div>             
-              <div>
-                <div>Token <i class="fa fa-info-circle" uib-tooltip="Secret token used to authenticate with this Jupyter Notebook Server." style="margin-left: 10px"></i>
-                  <span style="margin-left: 10px;">{{jupyterCtrl.config.token}}</span>
-                </div>
-              </div>   
-              <div>
-                <div>$PDIR <i class="fa fa-info-circle" uib-tooltip="Private local directory on this server for Python Notebooks." style="margin-left: 10px"></i>
-                  <span style="margin-left: 10px;">{{jupyterCtrl.val.privateDir}}</span>
-                </div>
-              </div>   
-              <!--              <div class="row top-buffer">
-                              <div class="text-right col-md-2"></div>
-                              <i class="fa fa-info" aria-hidden="true" uib-tooltip="Info: You cannot create notebooks in the '/' (root) folder of your project as you cannot store files in the project root directory. Notebooks are stored as files in HDFS, and files must be stored in datasets in Hopsworks. So, in Jupyter, navigate to a dataset from where you can create/save a new Notebook :)">
-                              </i> Jupyter Kernels (pyspark, python2) cannot be opened in the root folder - open within a dataset
-                              (e.g., 'Resources' or 'Jupyter').
-                            </div>-->
-
-            </div>
-          </div>
-        </div>
-        <!--, top-buffer: jupyterCtrl.ui !== ''-->
-        <div class="ds-sidenav" ng-class="{open: jupyterCtrl.tgState}" ng-if="jupyterCtrl.ui !== ''">
-          <div class="ibox float-e-margins" style="margin-bottom:-25px; height: 95%;">
-            <div class="file-manager">
-              <div>
-                <md-content class="md-padding" style="padding-top: 0px;">
-                  <md-tabs md-dynamic-height md-border-bottom>
-                    <md-tab label="Notebook Server">
-                      <md-content>
-                        <table class="table table-hover ds-sidenav-table" style="width: 100%">
-                          <tbody>
-                            <tr>
-                              <td>Open Jupyter in a new Tab</td>
-                              <td style="text-align: right">                                      
-                                <button uib-tooltip="Open a new Browser Tab to connect to the running Jupyter Notebook Server" 
-                                        tooltip-placement="auto left"
-                                        ng-click="jupyterCtrl.openWindow()" 
-                                        type="button" class="btn btn-info btn-sm">
-                                  <span class="glyphicon glyphicon-eye-open" ></span>
-                                </button>
-                              </td>
-                            </tr>
-                            <tr ng-repeat="session in sessions">
-                              <td>Open UI for {{session.appId}}</td>
-                              <td style="text-align: right">                                      
-                                <button
-                                  uib-tooltip="Open the Spark UI for a Livy Session" 
-                                  tooltip-placement="auto left"
-                                  ng-click="jupyterCtrl.showLivyUI(session.appId)"
-                                  type="button" class="btn btn-info btn-sm" >
-                                  <span class="glyphicon glyphicon-eye-open" ></span>
-                                </button>
-                              </td>
-                            </tr>
-                            <!--                        <tr  ng-if="interpreter.interpreter.group === 'tensorflow' && !interpreter.interpreter.notRunning">
-                                                      <td><span>Open TensorBoard UI</span></td>
-                                                      <td style="text-align: right">                                      
-                                                        <button
-                                                                uib-tooltip="Open the TensorBoard UI for an existing TFoS Livy Session" 
-                                                                ng-click="jupyterCtrl.showTensorboardUI()"
-                                                                type="button" class="btn btn-info btn-sm" 
-                                                                ng-disabled="interpreter.interpreter.notRunning">
-                                                          <span class="glyphicon glyphicon-eye-open" ></span>
-                                                        </button>
-                                                      </td>
-                                                    </tr>-->
-                            <tr>
-                              <td>Shutdown Notebook Server</td>
-                              <td style="text-align: right">                                      			  
-                                <button tooltip-placement="auto left"
-                                        uib-tooltip="Shutdown Jupyter Notebook Server and stop applications." 
-                                        tooltip-placement="auto left"
-                                        ng-click="jupyterCtrl.stop()" 
-                                        type="button" class="btn btn-danger btn-sm" >
-                                  <span class="glyphicon glyphicon-off" ></span>
-                                </button>
-                              </td>
-                            </tr>
-                          </tbody>                     
-                        </table>
-                      </md-content>
-                    </md-tab>
-                  </md-tabs>
-                </md-content>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
-  </div>
+
+            <div class="row" ng-if="jupyterCtrl.val.mode !== '' && jupyterCtrl.ui === ''">
+                <div class="col-sm-8 col-md-8 col-lg-8" layout-align="center center" style='margin-top:20px; margin-left: 0px;margin-bottom: 80px'>
+
+                  <!-- STYLE THIS (TENSORFLOW : SPARK) -->
+                  <div class="row" ng-if="jupyterCtrl.advanced === true">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8 pull-left" style="margin-left: 43px;">
+                      <div class="btn-group blocks" style="padding: " data-toggle="buttons" ng-if="jupyterCtrl.ui === ''">
+                        <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'tensorflow', focus: jupyterCtrl.val.mode === 'tensorflow'}"
+                               ng-click="jupyterCtrl.val.mode = 'tensorflow'">
+                          <input type="radio" name="tensorflow" id="tensorflow" autocomplete="off"> TensorFlow
+                        </label>
+                        <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'distributedTensorFlow', focus: jupyterCtrl.val.mode === 'distributedTensorFlow'}"
+                               ng-click="jupyterCtrl.val.mode = 'distributedTensorFlow'">
+                          <input type="radio" name="distributedTensorFlow" id="distributedTensorFlow" autocomplete="off"> TensorFlowOnSpark
+                        </label>
+                        <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'horovod', focus: jupyterCtrl.val.mode === 'horovod'}"
+                               ng-click="jupyterCtrl.val.mode = 'horovod'">
+                          <input type="radio" name="horovod" id="horovod" autocomplete="off"> Horovod
+                        </label>
+                        <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'sparkStatic', focus: jupyterCtrl.val.mode === 'sparkStatic'}"
+                               ng-click="jupyterCtrl.val.mode = 'sparkStatic'">
+                          <input type="radio" name="sparks" id="sparkStatic" autocomplete="off"> Spark (Static)
+                        </label>
+                        <label class="btn btn-primary" ng-class="{active: jupyterCtrl.val.mode === 'sparkDynamic', focus: jupyterCtrl.val.mode === 'sparkDynamic'}"
+                               ng-click="jupyterCtrl.val.mode = 'sparkDynamic'">
+                          <input type="radio" name="sparkd" id="sparkDynamic" autocomplete="off"> Spark (Dynamic)
+                        </label>
+                      </div>
+                      <br>
+                    </div>
+                  </div>
+                  <div class="row top-buffer" ng-if="jupyterCtrl.advanced === true">
+                    <div class="row">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6"> Base Directory <i class="fa fa-info-circle"
+                                                                            uib-tooltip="Root Directory for Jupyter Notebooks. If your Notebook is not stored in the '/Jupyter' Dataset, choose '/'." 
+                                                                            tooltip-placement="bottom" style="margin-left: 10px">
+                          </i>
+                        </div>
+                        <div class="col-md-2 jupyter-left">
+
+                          <ui-select 
+                            ng-model="jupyterCtrl.selected" theme="bootstrap" on-select="jupyterCtrl.changeBaseDir()">
+                            <ui-select-match>
+                              <span ng-bind="$select.selected.name"></span>
+                            </ui-select-match>
+                            <ui-select-choices repeat="dir in (jupyterCtrl.dirs | filter: $select.search) track by dir.name">
+                              <div ng-bind="dir.name | highlight: $select.search"></div>
+                            </ui-select-choices>
+                          </ui-select>
+                        </div>
+                      </div>
+                      <div class="row" ng-show="jupyterCtrl.selected.name === '/'">
+                        <div class="col-md-2 jupyter-left"></div>
+                        <div class="col-md-10 pull-right" style="font-weight: bold; color: red;">
+                          Info: You can only create notebooks inside a dataset - not in the '/' (root) directory.
+                        </div>
+                      </div>
+                    </div>
+                    <!-- AppMaster specific configuration should always be first -->
+                    <div class="row">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">AppMaster memory (MB)<i class="fa fa-info-circle" uib-tooltip="The amount of memory, in MB, that should be requested for the Yarn Application Master container. 1024 MB is more than sufficient for most cases." style="margin-left: 10px"></i></div>
+                        <div class="col-md-2 jupyter-left">
+                          <input type="number" step="1" ng-model="jupyterCtrl.val.appmasterMemory" min="1024" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'sparkStatic' || jupyterCtrl.val.mode === 'sparkDynamic'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">AppMaster virtual cores<i class="fa fa-info-circle" uib-tooltip="The number of virtual cores that should be requested for the Yarn Application Master container." style="margin-left: 10px"></i></div>
+                        <div class="col-md-2 jupyter-left">
+                          <input type="number" step="1" ng-model="jupyterCtrl.val.appmasterCores" ng-init="1" min="1" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row"  ng-if="jupyterCtrl.val.mode === 'horovod'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">Number of hosts <i class="fa fa-info-circle"
+                                                                            uib-tooltip="The number of hosts to run Horovod on. Current support is only 1 host." style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left"><input type="number" step="1" ng-readonly="true" ng-init="1" value="1" min="0" max="1" class="form-control"></div>
+                      </div>
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6"> Memory (MB) per host <i class="fa fa-info-circle" uib-tooltip="The amount of memory, in MB, that should be allocated on each host. The specified amount of memory will be shared by all MPI processes on the machine." style="margin-left: 10px"></i></div>
+                        <div class="col-md-2 jupyter-left"><input type="number" step="1" min="1024" ng-model="jupyterCtrl.val.executorMemory" class="form-control"></div>
+                      </div>
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">Number of processes<i class="fa fa-info-circle"
+                                                                               uib-tooltip="The number of Horovod MPI processes (-np) per host."
+                                                                               style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left">
+                          <input type="number" ng-init="1"  ng-model="jupyterCtrl.val.numMpiNp" min="1" class="form-control">
+                        </div>
+                      </div>
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">GPUs per process<i class="fa fa-info-circle"
+                                                                            uib-tooltip="The number of GPUs accessible for each process (0 or 1)."
+                                                                            style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left">
+                          <input type="number" ng-init="0"  ng-model="jupyterCtrl.val.numTfGpus" min="0" max="1" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row"  ng-if="jupyterCtrl.val.mode === 'distributedTensorFlow'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">Parameter servers <i class="fa fa-info-circle"
+                                                                              uib-tooltip="Number of parameter servers in Distributed TensorFlow."
+                                                                              style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left">
+                          <input type="number" ng-init="1" ng-model="jupyterCtrl.val.numTfPs" class="form-control" min="1">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'sparkDynamic'" >
+                      <div class="row top-buffer">
+                        <div class="col-md-3"></div>
+                        <!--<div class="col-md-6 customHr"></div>-->
+                      </div>
+                      <div class="row top-buffer">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6" style="margin-left:20px;">Set min and max number of executors with the Slider below.</div>
+                        <div class="col-md-2"></div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                          <rzslider style="margin-top: 32px;" 
+                                    rz-slider-model="jupyterCtrl.sliderOptions.min"
+                                    rz-slider-high="jupyterCtrl.sliderOptions.max"
+                                    rz-slider-options="jupyterCtrl.sliderOptions.options">
+                          </rzslider>
+                        </div>
+                        <div class="col-md-4"></div>
+                      </div>
+                      <div class="row top-buffer">
+                        <div class="col-md-3"></div>
+                        <!--<div class="col-md-6 customHr"></div>-->
+                      </div>
+
+                      <div class="row top-buffer">
+                        <div class="text-right col-md-6">Initial number of executors <i class="fa fa-info-circle"
+                                                                                        uib-tooltip="The initial number of executors that should be requested. Must be greater than the minimum and smaller than the maximum number of executors." style="margin-left: 10px"></i></div>
+
+                        <div class="col-md-2 jupyter-left"><input type="number"  
+                                                                  ng-change="jupyterCtrl.setInitExecs()" min="0" value="{{jupyterCtrl.val.dynamicMinExecutors}}" ng-model="jupyterCtrl.val.dynamicMinExecutors"
+                                                                  class="form-control">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row" ng-if="jupyterCtrl.val.mode !== 'sparkDynamic' && jupyterCtrl.val.mode !== 'horovod' && jupyterCtrl.val.mode !== 'tensorflow' && jupyterCtrl.val.mode !== 'distributedTensorFlow'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">Number of executors <i class="fa fa-info-circle"
+                                                                                uib-tooltip="The number of executors that should be requested for this job." style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left"><input type="number" ng-model="jupyterCtrl.val.numExecutors" ng-init="1" min="1" value="1" class="form-control"></div>
+                      </div>
+                    </div>
+
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'distributedTensorFlow'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6"> Workers <i class="fa fa-info-circle"
+                                                                     uib-tooltip="The number of workers that should be requested for this job." style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left"><input type="number" ng-model="jupyterCtrl.val.numExecutors" ng-init="1" min="1" value="1" class="form-control"></div>
+                      </div>
+                    </div>
+
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'tensorflow'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">Max parallel executions <i class="fa fa-info-circle" uib-tooltip="The maximum number of parallel tflauncher executions. If this configuration is less than the number of tflauncher jobs, the remaining jobs will be queued and executed once a previous job is finished." style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left"><input type="number" ng-model="jupyterCtrl.val.numExecutors" ng-init="1" min="1" value="1" class="form-control"></div>
+                      </div>
+                    </div>
+                    <div class="row" ng-if="jupyterCtrl.val.mode !== 'horovod'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6"> Executor memory (MB) <i class="fa fa-info-circle" uib-tooltip="The amount of memory, in MB, that should be requested for each Spark executor in this job." style="margin-left: 10px"></i></div>
+                        <div class="col-md-2 jupyter-left"><input type="number" step="1" min="1024" ng-model="jupyterCtrl.val.executorMemory" class="form-control"></div>
+                      </div>
+                    </div>
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'sparkStatic' || jupyterCtrl.val.mode === 'sparkDynamic'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6"> Executor virtual cores <i class="fa fa-info-circle"
+                                                                                    uib-tooltip="The number of cores that should be requested for each Spark executor in this job." style="margin-left: 10px"></i></div>
+                        <div class="col-md-2 jupyter-left"><input type="number" min="1" step="1" ng-model="jupyterCtrl.val.numExecutorCores" class="form-control"></div>
+                      </div>
+                    </div>
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'tensorflow'">
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">Executor GPUs<i class="fa fa-info-circle"
+                                                                         uib-tooltip="The number of GPUs allocated for each Spark executor in this job."
+                                                                         style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left"><input type="number" ng-init="0"  ng-model="jupyterCtrl.val.numTfGpus" min="0" class="form-control"></div>
+                      </div>
+                    </div>
+                    <div class="row"  ng-if="jupyterCtrl.val.mode === 'distributedTensorFlow'">
+
+                      <div class="row clusterparams">
+                        <div class="text-right col-md-6">GPUs per worker<i class="fa fa-info-circle"
+                                                                           uib-tooltip="The number of GPUs allocated for each worker. Parameter servers do not have access to a GPU."
+                                                                           style="margin-left: 10px"></i>
+                        </div>
+                        <div class="col-md-2 jupyter-left">
+                          <input type="number" ng-init="0"  ng-model="jupyterCtrl.val.numTfGpus" min="0" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row clusterparams" ng-if="jupyterCtrl.advanced === true">
+                      <div class="text-right col-md-6">Log Level <i class="fa fa-info-circle"
+                                                                    uib-tooltip="Log4j log level for this job." 
+                                                                    style="margin-left: 10px"></i>
+                      </div>
+                      <div class="col-md-2 jupyter-left">
+                        <ui-select ng-model="jupyterCtrl.logLevelSelected" theme="bootstrap"
+                                   on-select="jupyterCtrl.changeLogLevel()">
+                          <ui-select-match >
+                            <span ng-bind="jupyterCtrl.logLevelSelected.name"></span>
+                          </ui-select-match>
+                          <ui-select-choices repeat="level in (jupyterCtrl.log_levels | filter: $select.search) track by level.name">
+                            <span ng-bind="level.name | highlight: $select.search"></span>
+                          </ui-select-choices>
+                        </ui-select>
+                      </div>
+                    </div>
+
+
+                    <div class="row clusterparams">
+                      <div class="text-right col-md-6">
+                        <label for="archives">
+                          <button uib-tooltip='Comma-separated quoted list of .zip or .tgz files, this option corresponds to --archives option in Spark.' id="selectArchiveButton" class="btn btn-default" ng-click="jupyterCtrl.selectFile('archives')">
+                            <span>Add archive file</span>
+                          </button>  
+                        </label>
+                        <i class="fa fa-info-circle" uib-tooltip='Comma-separated quoted list of .zip or .tgz files, this option corresponds to --archives option in Spark.' style="margin-left: 10px"></i>
+                      </div>
+                      <div class="col-md-4 jupyter-left">
+                        <input uib-tooltip="Comma-separated quoted list of .zip or .tgz files, this option corresponds to --archives option in Spark." ng-init="jupyterCtrl.val.archives = ''" type="text" class="form-control"
+                               id="archives" ng-model="jupyterCtrl.val.archives">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="text-right col-md-6">
+                        <label for="jars">
+                          <button uib-tooltip='Comma-separated quoted list of .jar files, this option corresponds to --jars option in Spark.' id="selectJarButton" class="btn btn-default"
+                                  ng-click="jupyterCtrl.selectFile('jars')">
+                            <span>Add jar file</span>
+                          </button>  
+                        </label>
+                        <i class="fa fa-info-circle" uib-tooltip='Comma-separated quoted list of .jar files, this option corresponds to --jars option in Spark.' style="margin-left: 10px"></i>
+                      </div>
+                      <div class="col-md-4 jupyter-left">
+                        <input uib-tooltip="Comma-separated quoted list of .jar files, this option corresponds to --jars option in Spark." ng-init="jupyterCtrl.val.jars = ''"
+                               type="text" class="form-control" id="jars" ng-model="jupyterCtrl.val.jars">
+                      </div>
+                    </div>
+
+                    <div class="row" ng-if="jupyterCtrl.val.mode === 'tensorflow' || jupyterCtrl.val.mode === 'distributedTensorFlow' || jupyterCtrl.val.mode === 'horovod'">
+                      <div class="text-right col-md-6">
+                        <label for="pyFiles">
+                          <button uib-tooltip='Comma-separated list of .py, .zip or .egg files that should be added to PYTHONPATH. This option corresponds to --pyFiles option in Spark. ' id="selectPyFileButton" class="btn btn-default"
+                                  ng-click="jupyterCtrl.selectFile('pyfiles')">
+                            <span>Add python file</span>
+                          </button>
+                        </label>                      
+                        <i class="fa fa-info-circle" uib-tooltip='Comma-separated list of .py, .zip or .egg files that should be added to PYTHONPATH. This option corresponds to --pyFiles option in Spark. ' style="margin-left: 10px"></i>
+                      </div>
+                      <div class="col-md-4 jupyter-left">
+
+                        <input uib-tooltip="Comma-separated list of .py, .zip or .egg files that should be added to PYTHONPATH. This option corresponds to --pyFiles option in Spark. "
+                               ng-init="jupyterCtrl.val.pyFiles = ''" type="text" class="form-control"
+                               id="pyFiles" ng-model="jupyterCtrl.val.pyFiles">
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="text-right col-md-6">
+                        <label for="files">
+                          <button uib-tooltip='Comma-separated list of files that should be accessible by the application. This option corresponds to --files option in Spark.' id="selectFileButton" class="btn btn-default"
+                                  ng-click="jupyterCtrl.selectFile('files')">
+                            <span>Add file</span>
+                          </button>
+                        </label>
+                        <i class="fa fa-info-circle" uib-tooltip='Comma-separated list of files that should be accessible by the application. This option corresponds to --files option in Spark.' style="margin-left: 10px"></i>
+                      </div>
+                      <div class="col-md-4 jupyter-left">
+                        <input uib-tooltip="Comma-separated list of files that should be accessible by the application. This option corresponds to --files option in Spark." ng-init="jupyterCtrl.val.files = ''"
+                               type="text" class="form-control" id="files" ng-model="jupyterCtrl.val.files">
+                      </div>
+                    </div>
+
+                  <div class="row clusterparams" ng-if="jupyterCtrl.advanced === true">
+                    <div class="text-right col-md-6">More Spark Properties <i class="fa fa-info-circle"
+                                                                              uib-tooltip="Enter additional line-separated Spark properties here. Use the equality symbol to separate parameters from values." 
+                                                                              style="margin-left: 10px"></i>
+                    </div>
+                    <div class="col-md-5 jupyter-left">
+                      <textarea style="width: 100%;" id="TextArea" ng-model="jupyterCtrl.val.sparkParams" 
+                                ng-keyup="autoExpand($event)" 
+                                title="spark.yarn.am.port=12242&#10;spark.driver.extraLibraryPath=/path/to/extra/library">
+                      </textarea>
+                    </div>
+
+                    <!--                <div class="col-md-2 jupyter-left">
+                                                      <fieldset  data-ng-repeat="jupyterCtrl.sparkParamsSelected in sparkParams">
+                                        <select>
+                                          <option>spark.yarn.</option>
+                                          <option>Office</option>
+                                          <option>Home</option>
+                                        </select>
+                                        <input type="text" ng-model="jupyterCtrl.sparkParamsSelected.name" name="" 
+                                               placeholder="Additional Spark Parameters">
+                                        <button class="remove" ng-show="$last" ng-click="jupyterCtrl.removeSparkParam()">-</button>
+                                      </fieldset>
+                                      <button class="addfields" ng-click="jupyterCtrl.addSparkParam()">Add fields</button>
+
+                                      <div id="choicesDisplay">
+                                        {{ sparkParams}}
+                                      </div>                      
+
+                                      <ui-select ng-model="jupyterCtrl.sparkParamsSelected" theme="bootstrap"
+                                                 on-select="jupyterCtrl.changeSparkParam()">
+                                        <ui-select-match >
+                                          <span ng-bind="jupyterCtrl.logLevelSelected.name"></span>
+                                        </ui-select-match>
+                                        <ui-select-choices repeat="level in (jupyterCtrl.log_levels | filter: $select.search) track by level.name">
+                                          <span ng-bind="level.name | highlight: $select.search"></span>
+                                        </ui-select-choices>
+                                      </ui-select>
+                                    </div>
+                                  </div>-->
+                  </div>
+                </div>
+
+                    <div class="row clusterparams" ng-if="jupyterCtrl.advanced === true">
+                      <div class="text-right col-md-6">Umask (output files) <i class="fa fa-info-circle"
+                                                                               uib-tooltip="022 - Group readable/not-writable : 007 Group readable/writable : 077 - Group not-readable/not-writable" 
+                                                                               style="margin-left: 10px"></i>
+                      </div>
+                      <div class="col-md-2 jupyter-left">
+                        <ui-select ng-model="jupyterCtrl.umask" theme="bootstrap"
+                                   on-select="jupyterCtrl.changeUmask()">
+                          <ui-select-match >
+                            <span ng-bind="jupyterCtrl.umask.name"></span>
+                          </ui-select-match>
+                          <ui-select-choices repeat="level in (jupyterCtrl.umasks | filter: $select.search) track by level.name">
+                            <span ng-bind="level.name | highlight: $select.search"></span>
+                          </ui-select-choices>
+                        </ui-select>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+
+
+            <div class="row top-buffer" ng-if="jupyterCtrl.ui !== ''">
+
+              <div class="col-md-1"></div> 
+              <div class="col-md-7 panel panel-default shift-left">
+                <div class="panel-heading" >
+                  <div>
+                    <span style="font-weight: bold;">Jupyter Notebook Server Details</span>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div>
+                    <div>Port <i class="fa fa-info-circle" uib-tooltip="Port number where this Jupyter Notebook Server is listening" style="margin-left: 10px"></i> 
+                      <span style="margin-left: 10px;">  {{jupyterCtrl.config.port}}</span>
+                    </div>
+                  </div>             
+                  <div>
+                    <div>Token <i class="fa fa-info-circle" uib-tooltip="Secret token used to authenticate with this Jupyter Notebook Server." style="margin-left: 10px"></i>
+                      <span style="margin-left: 10px;">{{jupyterCtrl.config.token}}</span>
+                    </div>
+                  </div>   
+                  <div>
+                    <div>$PDIR <i class="fa fa-info-circle" uib-tooltip="Private local directory on this server for Python Notebooks." style="margin-left: 10px"></i>
+                      <span style="margin-left: 10px;">{{jupyterCtrl.val.privateDir}}</span>
+                    </div>
+                  </div>   
+                  <!--              <div class="row top-buffer">
+                                  <div class="text-right col-md-2"></div>
+                                  <i class="fa fa-info" aria-hidden="true" uib-tooltip="Info: You cannot create notebooks in the '/' (root) folder of your project as you cannot store files in the project root directory. Notebooks are stored as files in HDFS, and files must be stored in datasets in Hopsworks. So, in Jupyter, navigate to a dataset from where you can create/save a new Notebook :)">
+                                  </i> Jupyter Kernels (pyspark, python2) cannot be opened in the root folder - open within a dataset
+                                  (e.g., 'Resources' or 'Jupyter').
+                                </div>-->
+
+                </div>
+              </div>
+
+            </div>
+            <!--, top-buffer: jupyterCtrl.ui !== ''-->
+            <div class="ds-sidenav" ng-class="{open: jupyterCtrl.tgState}" ng-if="jupyterCtrl.ui !== ''">
+              <div class="ibox float-e-margins" style="margin-bottom:-25px; height: 95%;">
+                <div class="file-manager">
+                  <div>
+                    <md-content class="md-padding" style="padding-top: 0px;">
+                      <md-tabs md-dynamic-height md-border-bottom>
+                        <md-tab label="Notebook Server">
+                          <md-content>
+                            <table class="table table-hover ds-sidenav-table" style="width: 100%; margin: 20px 0px">
+                              <tbody>
+                                <tr>
+                                  <td>                                      
+                                    <button uib-tooltip="Open a new Browser Tab to connect to the running Jupyter Notebook Server" 
+                                            tooltip-placement="auto right"
+                                            ng-click="jupyterCtrl.openWindow()" 
+                                            type="button" class="btn btn-info btn-sm">
+                                      <span class="glyphicon glyphicon-eye-open" ></span>
+                                    </button>
+                                  </td>
+                                  <td style="text-align: right">Open Jupyter in a new Tab</td>
+                                </tr>
+                                <tr ng-repeat="session in sessions">
+                                  <td>                                      
+                                    <button
+                                      uib-tooltip="Open the Spark UI for a Livy Session" 
+                                      tooltip-placement="auto top"
+                                      ng-click="jupyterCtrl.showLivyUI(session.appId)"
+                                      type="button" class="btn btn-info btn-sm" >
+                                      <span class="glyphicon glyphicon-eye-open" ></span>
+                                    </button>
+                                  </td>
+                                  <td style="text-align: right">Open UI for {{session.appId}}</td>
+                                </tr>
+                                <!--                        <tr  ng-if="interpreter.interpreter.group === 'tensorflow' && !interpreter.interpreter.notRunning">
+                                                          <td><span>Open TensorBoard UI</span></td>
+                                                          <td style="text-align: right">                                      
+                                                            <button
+                                                                    uib-tooltip="Open the TensorBoard UI for an existing TFoS Livy Session" 
+                                                                    ng-click="jupyterCtrl.showTensorboardUI()"
+                                                                    type="button" class="btn btn-info btn-sm" 
+                                                                    ng-disabled="interpreter.interpreter.notRunning">
+                                                              <span class="glyphicon glyphicon-eye-open" ></span>
+                                                            </button>
+                                                          </td>
+                                                        </tr>-->
+                                <tr>
+                                  <td>                                      			  
+                                    <button tooltip-placement="auto right"
+                                            uib-tooltip="Shutdown Jupyter Notebook Server and stop applications." 
+                                            ng-click="jupyterCtrl.stop()" 
+                                            type="button" class="btn btn-danger btn-sm" >
+                                      <span class="glyphicon glyphicon-off" ></span>
+                                    </button>
+                                  </td>
+                                  <td style="text-align: right">Shutdown Notebook Server</td>
+                                </tr>
+                              </tbody>                     
+                            </table>
+                          </md-content>
+                        </md-tab>
+                      </md-tabs>
+                    </md-content>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </section>
+        </div>
+        </div>
 </div>
+
+

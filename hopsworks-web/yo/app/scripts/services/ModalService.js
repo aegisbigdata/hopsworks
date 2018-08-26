@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 'use strict';
 
 angular.module('hopsWorksApp')
@@ -6,6 +26,25 @@ angular.module('hopsWorksApp')
               confirm: function (size, title, msg, projectId) {
                 var modalInstance = $uibModal.open({
                   templateUrl: 'views/confirmModal.html',
+                  controller: 'ModalCtrl as modalCtrl',
+                  size: size,
+                  resolve: {
+                    title: function () {
+                      return title;
+                    },
+                    msg: function () {
+                      return msg;
+                    },
+                    projectId: function () {
+                      return projectId;
+                    }
+                  }
+                });
+                return modalInstance.result;
+              },
+              viewJson: function (size, title, msg, projectId) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'views/jsonModal.html',
                   controller: 'ModalCtrl as modalCtrl',
                   size: size,
                   resolve: {
@@ -222,7 +261,7 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
-              shareDataset: function (size, dsName) {
+              shareDataset: function (size, dsName, permissions) {
                 var modalInstance = $uibModal.open({
                   templateUrl: 'views/shareDataset.html',
                   controller: 'ShareDatasetCtrl as shareDatasetCtrl',
@@ -241,14 +280,17 @@ angular.module('hopsWorksApp')
                       }],
                     dsName: function () {
                       return dsName;
+                    }, 
+                    permissions: function () {
+                      return permissions;
                     }
                   }
                 });
                 return modalInstance.result;
               },
-              makeEditable: function (size, dsName) {
+              permissions: function (size, dsName, permissions) {
                 var modalInstance = $uibModal.open({
-                  templateUrl: 'views/makeEditable.html',
+                  templateUrl: 'views/datasetPermissions.html',
                   controller: 'ShareDatasetCtrl as shareDatasetCtrl',
                   size: size,
                   resolve: {
@@ -265,30 +307,9 @@ angular.module('hopsWorksApp')
                       }],
                     dsName: function () {
                       return dsName;
-                    }
-                  }
-                });
-                return modalInstance.result;
-              },
-              removeEditable: function (size, dsName) {
-                var modalInstance = $uibModal.open({
-                  templateUrl: 'views/removeEditable.html',
-                  controller: 'ShareDatasetCtrl as shareDatasetCtrl',
-                  size: size,
-                  resolve: {
-                    auth: ['$q', '$location', 'AuthService',
-                      function ($q, $location, AuthService) {
-                        return AuthService.session().then(
-                                function (success) {
-                                },
-                                function (err) {
-                                  $location.path('/login');
-                                  $location.replace();
-                                  return $q.reject(err);
-                                });
-                      }],
-                    dsName: function () {
-                      return dsName;
+                    },
+                    permissions: function () {
+                      return permissions;
                     }
                   }
                 });
@@ -313,6 +334,9 @@ angular.module('hopsWorksApp')
                       }],
                     dsName: function () {
                       return dsName;
+                    }, 
+                    permissions: function () {
+                      return permissions;
                     }
                   }
                 });
@@ -1154,5 +1178,95 @@ angular.module('hopsWorksApp')
                 });
                 return modalInstance.result;
               },
+              ldapUserConsent: function (size, data, val) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'views/ldapUserConsentModal.html',
+                  controller: 'LdapUserConsentModalCtrl as ldapUserConsentModalCtrl',
+                  size: size,
+                  resolve: {
+                    data: function () {
+                      return data;
+                    },
+                    val: function () {
+                      return val;
+                    }
+                  }
+                });
+                return modalInstance.result;
+              },
+              projectMetadata: function (size, projectId) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'views/metadata/metadataExtendedProject.html',
+                  controller: 'MetadataExtendedModalCtrl',
+                  controllerAs: 'vm',
+                  size: size,
+                  resolve: {
+                    auth: ['$q', '$location', 'AuthService',
+                      function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                                function (success) {
+                                },
+                                function (err) {
+                                  $location.path('/login');
+                                  $location.replace();
+                                  return $q.reject(err);
+                                });
+                      }],
+                    projectId: function () {
+                      return projectId;
+                    },
+                    detailData: function () {
+                      return null
+                    }
+                  }
+                });
+                return modalInstance.result;
+              },
+              addExtendedMetadata: function (size, file, detailData) {
+                var templateUrl = '';
+                if (file.dir) { // file is a folder or dataset
+                  templateUrl = 'views/metadata/metadataExtendedDataset.html';
+                } else { // file is not a folder or dataset
+                  templateUrl = 'views/metadata/metadataExtendedDistribution.html';
+                }
+
+                /* ProjectService.getDatasetInfo(423305).$promise.then(function (success) {
+                  console.log("More info ", success);
+                }).catch(function (error) {
+                  console.log("Error occerued while getting more info", error);
+                }); */
+
+                var modalInstance = $uibModal.open({
+                  templateUrl: templateUrl,
+                  controller: 'MetadataExtendedModalCtrl',
+                  controllerAs: 'vm',
+                  size: size,
+                  backdrop: 'static',
+                  resolve: {
+                    auth: ['$q', '$location', 'AuthService',
+                      function ($q, $location, AuthService) {
+                        return AuthService.session().then(
+                                function (success) {
+                                },
+                                function (err) {
+                                  $location.path('/login');
+                                  $location.replace();
+                                  return $q.reject(err);
+                                });
+                      }],
+                    file: function () {
+                      return file;
+                    },
+                    detailData: function () {
+                      return detailData;
+                    },
+                    projectId: function () {
+                      return null;
+                    }
+                  }
+                });
+
+                return modalInstance.result;
+              }
             };
           }]);

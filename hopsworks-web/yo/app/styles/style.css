@@ -1,9 +1,29 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 html {
   background-color: #FFFFFF !important;
 }
 body {
   height: 100%;
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: "Lato", sans-serif;
   font-size: 14px;
   line-height: 1.52857;
   padding: 0;
@@ -25,14 +45,21 @@ h2 {
 }
 
 button, html, input, select, textarea {
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: "Lato", sans-serif;
   font-size: 14px;
   line-height: 1.52857;
   padding: 0;
 }
 
-a:focus {
+.button-page {
+  font-size: 1.5em;
+}
+
+a:hover, a:focus {
   outline: none;
+  color: #00A2CA;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .form-validate .form-control.ng-dirty.ng-valid, .form-validate .form-control.ng-dirty.ng-valid:focus {
@@ -49,9 +76,8 @@ a:focus {
 
 .panel {
   background-color: #fafafa;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E6E6E6;
+  border-radius: 0px;
   margin-bottom: 21px;
 }
 .panel.panel-filter {
@@ -77,22 +103,21 @@ a:focus {
   margin-right: 0px;
 }
 .panel-heading {
-  border-color: #cfdbe2;
+  border-color: #E6E6E6;
   /*background-color: #3a3f51;*/
   background-color: #00A2CA;
   color: #fff;
   border-bottom: 0 none;
   font-size: 14px;
-  border-bottom: 1px solid transparent;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  padding: 10px 15px;
+  border-width: 1px;
+  border-radius: 0px;
+  padding: 15px;
 }
 .view-info .panel-heading a:after {
   font-family:'Glyphicons Halflings';
   content:"\e114";
   float: right;
-  color: grey;
+  color: #00A2CA;
 }
 .view-info .panel-heading a.collapsed:after {
   content:"\e080";
@@ -146,7 +171,7 @@ a:focus {
 
 .pager li > a, .pager li > span {
   background-color: inherit;
-  /*color: #fff;*/
+  color: #00A2CA;
   border: 0px;
   border-radius: 0;
   display: inline-block;
@@ -155,7 +180,6 @@ a:focus {
 
 .pager li > a:focus, .pager li > a:hover {
   background-color: inherit;
-  font-weight: bolder;
 }
 
 .datasetList {
@@ -206,14 +230,15 @@ div.scroll {
 
 #readme{
   background: white;
-  height: 150px;
+  min-height: 150px;
   overflow: auto;
   width: auto;
-  resize: vertical;
 }
 
 #moreInfo {
   background: white;
+  border-top: 1 px solid #E6E6E6;
+  border-bottom: 1 px solid #E6E6E6;
 }
 
 div.scroll > ul {
@@ -511,6 +536,11 @@ md-input-container {
     outline: none;
 }
 
+.btn {
+  border-radius: 0px;
+  font-weight: bold;
+}
+
 .btn-group {
   display: flex;
 }
@@ -519,9 +549,11 @@ md-input-container {
   display: flex;
 }
 
+
 .fields-in-table {
   border-style: solid;
   border-top: 0px; 
+  border-width: 1px;
   padding-left:10px;
   display: flex;
   flex-direction: column;
@@ -529,13 +561,16 @@ md-input-container {
 }
 
 .form-control > a.select2-choice {
-  margin-top: -4px;
+  margin-top: -10px;
   margin-right: -10px;
   margin-left: -10px;
+  background-color: transparent;
+  border: none;
 }
 
 .form-control > div.ui-select-dropdown {
-  margin-left: -10px;
+  margin-left: -13px;
+  margin-top: 2px;
 }
 
 .form-control > span.multiSelect > button {
@@ -562,3 +597,95 @@ md-input-container {
   display: inline-block;
   vertical-align: middle;
 }
+
+.menu-style {
+    font-size: 11px;
+    line-height: 13px;
+    border: 1px solid #E6E6E6;
+    box-shadow: none;
+    border-radius: none;
+    color: #333333;
+}
+
+.menu-style > li > a:hover {
+    color: #E6AD1E;
+    background-color: transparent;
+}
+
+.menu-icon-db {
+    position: absolute;
+    right: 10px;
+}
+
+.fa-check:before, .fa-times:before {
+    color: #B7B7B7;
+}
+
+.capbox {
+	background-color: #92D433;
+	border: #B3E272 0px solid;
+	border-width: 0px 12px 0px 0px;
+	display: inline-block;
+	*display: inline; zoom: 1; /* FOR IE7-8 */
+	padding: 8px 40px 8px 8px;
+	}
+
+.capbox-inner {
+	font: bold 11px arial, sans-serif;
+	color: #000000;
+	background-color: #DBF3BA;
+	margin: 5px auto 0px auto;
+	padding: 3px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	}
+        
+.message-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  background-color: #ddd;
+  z-index: 9999;
+}
+
+.footer-info {
+      font-size: 14px;
+      line-height: 17px;
+      margin-top: 10px !important;
+}
+
+
+ .footer-info a {
+    color: #000000;
+}
+  
+.footer-image {
+      width: 30px;
+      height: 20px;
+      position: absolute;
+      left: 16%;
+      top: 25%;
+  }
+
+
+
+#CaptchaDiv {
+	font: bold 17px verdana, arial, sans-serif;
+	font-style: italic;
+	color: #000000;
+	background-color: #FFFFFF;
+	padding: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	}
+
+#CaptchaInput { margin: 1px 0px 1px 0px; width: 135px; }
+
+.readme-style h1, .readme-style h2 {
+    font-size: 12px !important;
+}
+

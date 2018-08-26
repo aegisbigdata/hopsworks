@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 /*jshint undef: false, unused: false, indent: 2*/
 /*global angular: false */
 
@@ -7,11 +27,11 @@ angular.module('hopsWorksApp')
         .controller('MainCtrl', ['$interval', '$cookies', '$location', '$scope', '$rootScope',
           'AuthService', 'UtilsService', 'ElasticService', 'DelaProjectService',
           'DelaService', 'md5', 'ModalService', 'ProjectService', 'growl',
-          'MessageService', '$routeParams', '$window', 'HopssiteService',
+          'MessageService', '$routeParams', '$window', 'HopssiteService', 'BannerService',
           function ($interval, $cookies, $location, $scope, $rootScope, AuthService, UtilsService,
-                  ElasticService, DelaProjectService, DelaService, md5, ModalService,
+                  ElasticService, DelaProjectService, DelaService, md5, ModalService, 
                   ProjectService, growl,
-                  MessageService, $routeParams, $window, HopssiteService) {
+                  MessageService, $routeParams, $window, HopssiteService, BannerService) {
             const MIN_SEARCH_TERM_LEN = 2;
             var self = this;
             self.email = $cookies.get('email');
@@ -25,7 +45,16 @@ angular.module('hopsWorksApp')
             } else {
               self.searchType = "global";
             }
-
+            
+            var checkeIsAdmin = function () {
+              AuthService.isAdmin().then(
+                  function (success) {
+                    $cookies.put("isAdmin", success.data === 'true');
+                },function (error) {
+                    $cookies.put("isAdmin", false);
+              });
+            };
+            checkeIsAdmin();
             self.isAdmin = function () {
               return $cookies.get('isAdmin');
             };
@@ -66,6 +95,22 @@ angular.module('hopsWorksApp')
               });
             };
             checkDelaEnabled(); // check 
+            
+            self.userNotification = '';
+            var getUserNotification = function () {
+              self.userNotification = '';
+              BannerService.findUserBanner().then(
+                function (success) {
+                  console.log(success);
+                  if (success.data.successMessage) {
+                    self.userNotification = success.data.successMessage;
+                  }
+                }, function (error) {
+                  console.log(error);
+                  self.userNotification = '';
+              });
+            };
+            getUserNotification();
 
             self.profileModal = function () {
               ModalService.profile('md');
@@ -135,7 +180,7 @@ angular.module('hopsWorksApp')
             self.resultItems = 0;
             self.resultItemsPublicSearch = 0;
             self.currentPage = 1;
-            self.pageSize = 9;
+            self.pageSize = 10;
 
             self.hitEnter = function (event) {
               var code = event.which || event.keyCode || event.charCode;
@@ -170,11 +215,10 @@ angular.module('hopsWorksApp')
               self.searchTerm = "";
             };
 
-            self.search = function () {
-              
+            self.search = function () {             
               self.showSearchPage = true;
               self.currentPage = 1;
-              self.pageSize = 9;
+              self.pageSize = 10;
               self.searchResult = [];
 
               if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
@@ -273,6 +317,243 @@ angular.module('hopsWorksApp')
               //alert("test res:" + self.searchResult );
             };
 
+            self.searchPublicDatasets = function() {
+               
+                window.location.replace("#!/homePublicDataset");
+                
+                
+            }
+            
+            self.searchAssetsFromPublicAssets = function() {
+               
+                window.location.replace("#!/home");                
+                
+            }
+
+
+
+            self.searchAssets = function (param) {
+                
+                //self.searchTerm = "test";
+                
+              
+              
+              self.showSearchPage = false;
+              //self.showSearchAssets = true;
+              self.currentPage = 1;
+              self.pageSize = 10;
+              self.searchResult = [];
+
+              //if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+              if (param === undefined || param === "" || param === null) {
+                return;
+              }
+              
+              //self.searching = true;
+              self.searching = false;
+              if (self.searchType === "global" && $rootScope.isDelaEnabled) {                
+                    var global_data;
+                var searchHits;
+                //triggering a global search
+                self.searchResult = [];
+                //elasticService.globalSearch(self.searchTerm)
+                elasticService.globalSearch(param)
+                        .then(function (response) {
+                          searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                          //DelaService.search(self.searchTerm).then(function (response2) {
+                          DelaService.search(param).then(function (response2) {
+                            global_data = response2.data;
+                            if (global_data.length > 0) {
+                              self.searchResult = concatUnique(searchHits, global_data);
+                              self.searching = false;
+                            } else {
+                              self.searching = false;
+                            }
+                            self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                            self.resultItems = self.searchResult.length;
+                          });
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {              
+                    var searchHits;
+                    
+                //triggering a global search
+                self.searchResult = [];
+                //alert(self.searchTerm);
+                //elasticService.globalSearch(self.searchTerm)
+                elasticService.globalSearch(param).then(function (response) {
+                          searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.searching = false;
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;                          
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "projectCentric") {
+                
+                    //elasticService.projectSearch($routeParams.projectID, self.searchTerm)
+                    elasticService.projectSearch($routeParams.projectID, param)
+                        .then(function (response) {
+                          self.searching = false;
+                          var searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "datasetCentric") {
+             
+                    //elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
+                    elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, param)
+                        .then(function (response) {
+                          self.searching = false;
+                          var searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              }
+              
+              datePicker();// this will load the function so that the date picker can call it.
+              //alert("test res:" + self.searchResult );
+            };
+
+
+
+self.searchAssetsMenu = function (param) {
+                
+              self.searchTerm = "*";
+                
+              self.showSearchPage = true;
+              self.currentPage = 1;
+              self.pageSize = 10;
+              self.searchResult = [];
+
+              if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+                return;
+              }
+              
+              self.searching = true;
+              if (self.searchType === "global" && $rootScope.isDelaEnabled) {
+                
+                    var global_data;
+                var searchHits;
+                //triggering a global search
+                self.searchResult = [];
+                elasticService.globalSearch(self.searchTerm)
+                        .then(function (response) {
+                          searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                          DelaService.search(self.searchTerm).then(function (response2) {
+                            global_data = response2.data;
+                            if (global_data.length > 0) {
+                              self.searchResult = concatUnique(searchHits, global_data);
+                              self.searching = false;
+                            } else {
+                              self.searching = false;
+                            }
+                            self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                            self.resultItems = self.searchResult.length;
+                          });
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {
+              
+                    var searchHits;
+                //triggering a global search
+                self.searchResult = [];
+                elasticService.globalSearch(self.searchTerm)
+                        .then(function (response) {
+                          searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.searching = false;
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;                          
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "projectCentric") {
+                
+                    elasticService.projectSearch($routeParams.projectID, self.searchTerm)
+                        .then(function (response) {
+                          self.searching = false;
+                          var searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              } else if (self.searchType === "datasetCentric") {
+             
+                    elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
+                        .then(function (response) {
+                          self.searching = false;
+                          var searchHits = response.data;
+                          if (searchHits.length > 0) {
+                            self.searchResult = searchHits;
+                          } else {
+                            self.searchResult = [];
+                          }
+                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
+                          self.resultItems = self.searchResult.length;
+                        }, function (error) {
+                          self.searching = false;
+                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        });
+              }
+              
+              datePicker();// this will load the function so that the date picker can call it.
+              //alert("test res:" + self.searchResult );
+            };
+
+
             var concatUnique = function (a, array2) {
               a = a.concat(array2);
               for (var i = 0; i < a.length; ++i) {
@@ -305,9 +586,9 @@ angular.module('hopsWorksApp')
 
             self.viewType = function (listView) {
               if (listView) {
-                self.pageSize = 4;
+                self.pageSize = 10;
               } else {
-                self.pageSize = 6;
+                self.pageSize = 10;
               }
             };
 
@@ -337,21 +618,28 @@ angular.module('hopsWorksApp')
 
             self.viewType = function (listView) {
               if (listView) {
-                self.pageSize = 4;
+                self.pageSize = 10;
               } else {
-                self.pageSize = 9;
+                self.pageSize = 10;
               }
             };
 
             self.incrementPage = function () {
-              self.pageSize = self.pageSize + 1;
+              if (self.pageSize == 1) {
+                  self.pageSize = self.pageSize + 9;
+                
+              } else {
+              self.pageSize = self.pageSize + 10;
+              }
             };
 
             self.decrementPage = function () {
-              if (self.pageSize < 2) {
-                return;
+              if (self.pageSize == 10) {
+                  self.pageSize = self.pageSize - 9;
+                
+              } else {
+              self.pageSize = self.pageSize - 10;
               }
-              self.pageSize = self.pageSize - 1;
             };
 
             self.viewDetail = function (result) {

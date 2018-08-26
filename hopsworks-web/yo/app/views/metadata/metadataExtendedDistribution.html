@@ -1,0 +1,168 @@
+<div>
+
+  <span>
+    <div class="controls">
+      <div class="modal-header" align="center">
+        <button type="button" class="close" ng-click="vm.close()">&times;</button>
+        <h3 class="modal-title">Add extended metadata for Distribution</h3>
+      </div>
+
+      <div class="modal-body">
+        <form class="form-horizontal">
+
+          <div class="form-group">
+            <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputTitle" class="form-control" placeholder="Title" ng-model="vm.metadataExtendedDistribution.title">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputDescription" class="form-control" placeholder="Description" ng-model="vm.metadataExtendedDistribution.description">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputFormat" class="col-sm-2 control-label">Format</label>
+            <div class="col-sm-10">
+              <input type="text" id="inputFormat" class="form-control" placeholder="Format" ng-model="vm.metadataExtendedDistribution.format">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputLicense" class="col-sm-2 control-label">License</label>
+            <div class="col-sm-10">
+              <select id="inputLicense" class="form-control" ng-model="vm.metadataExtendedDistribution.license">
+                <option value="" disabled>Select license...</option>
+                <option>CC BY 3.0 Austria</option>
+                <option>CC-BY 4.0</option>
+                <option>CC-BY 3.0 NL</option>
+                <option>CC-BY-NC 4.0</option>
+                <option>CC-BY-NC-ND 4.0</option>
+                <option>CC-BY-NC-SA 4.0</option>
+                <option>CC-BY-ND 4.0</option>
+                <option>CC-BY-SA 4.0</option>
+                <option>CC-BY-SA 3.0 NL</option>
+                <option>CC-PDM 1.0</option>
+                <option>CC0 1.0</option>
+                <option>DL-DE-BY 1.0</option>
+                <option>DL-DE-BY 2.0</option>
+                <option>DL-DE-BY-NC 1.0</option>
+                <option>DL-DE-ZERO 2.0</option>
+                <option>EUPL-1.1</option>
+                <option>EUPL-1.2</option>
+                <option>FR-LO</option>
+                <option>GFDL-1.1</option>
+                <option>GFDL-1.2</option>
+                <option>GFDL-1.3</option>
+                <option>HR-OD</option>
+                <option>IODL v1.0</option>
+                <option>IODL v2.0</option>
+                <option>NLOD</option>
+                <option>ODC-BY</option>
+                <option>ODC-ODbL</option>
+                <option>ODC-PDDL</option>
+                <option>OGL 1.0</option>
+                <option>OGL 2.0</option>
+                <option>OGL 3.0</option>
+                <option>OGL-NC</option>
+                <option>OGL-ROU-1.0</option>
+                <option>PSEUL</option>
+              </select>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="form-group">
+            <label for="inputTypeOfData" class="col-sm-2 control-label">Type of data</label>
+            <div class="col-sm-10">
+              <select required id="inputTypeOfData" class="form-control" ng-model="vm.metadataExtendedDistribution.typeOfData">
+                <option value="" disabled selected>Select type of data...</option>
+                <option value="tabular">Tabular data</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row" ng-if="vm.metadataExtendedDistribution.typeOfData == 'tabular'">
+            <div class=col-sm-12>
+              <h4 style="margin-bottom: 15px;">Fields
+                <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.push({})" style="float: right">
+                  <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
+              </h4>
+
+              <div class="table-responsive">
+                <table class="table table-bordred table-hover">
+                  <thead>
+                    <tr>
+                      <th>Primary</th>
+                      <th>Name</th>
+                      <th>Number</th>
+                      <th>Description</th>
+                      <th>Type</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr ng-repeat="field in vm.metadataExtendedDistribution.fields">
+                      <td>
+                        <md-checkbox class="md-primary" ng-checked="field.primary" ng-click="field.primary = !field.primary" aria-label="Select as primary"></md-checkbox>
+                      </td>
+                      <td>
+                        <input type="text" class="form-control col-sm-3" placeholder="Name" ng-model="field.name">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control" placeholder="Number" ng-model="field.number">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control" placeholder="Description" ng-model="field.description">
+                      </td>
+                      <td>
+                        <select required class="form-control" ng-model="field.type" placeholder="Type">
+                          <option value="" disabled selected>Select type...</option>
+                          <option>string</option>
+                          <option>number</option>
+                          <option>integer</option>
+                          <option>boolean</option>
+                          <option>object</option>
+                          <option>array</option>
+                          <option>date</option>
+                          <option>time</option>
+                          <option>datetime</option>
+                          <option>year</option>
+                          <option>yearmonth</option>
+                          <option>duration</option>
+                          <option>geopoint</option>
+                          <option>geojson</option>
+                          <option>any</option>
+                        </select>
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.splice($index, 1)">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger pull-left" ng-click="vm.deleteMetadata()"><i class="fa fa-trash"></i>&nbsp;Delete metadata</button>
+        <button type="button" class="btn btn-default" ng-click="vm.close()">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-click="vm.saveFieldsDistribution()">Save</button>
+      </div>
+
+    </div>
+  </span>
+
+</div>
