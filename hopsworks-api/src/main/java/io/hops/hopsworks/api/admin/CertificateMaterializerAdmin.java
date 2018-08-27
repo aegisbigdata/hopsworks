@@ -21,6 +21,8 @@
 package io.hops.hopsworks.api.admin;
 
 import io.hops.hopsworks.api.admin.dto.MaterializerStateResponse;
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.exception.AppException;
@@ -28,7 +30,6 @@ import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.security.CertificateMaterializer;
 import io.swagger.annotations.Api;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -57,7 +58,6 @@ import java.util.regex.Pattern;
  * REST API to monitor and control CertificateMaterializer service
  */
 @Path("/admin/materializer")
-@RolesAllowed({"HOPS_ADMIN"})
 @Api(value = "Admin")
 @Produces(MediaType.APPLICATION_JSON)
 @Stateless
@@ -82,6 +82,8 @@ public class CertificateMaterializerAdmin {
    * @throws AppException
    */
   @GET
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getMaterializerState(@Context SecurityContext sc, @Context HttpServletRequest request)
     throws AppException {
   
@@ -137,6 +139,8 @@ public class CertificateMaterializerAdmin {
    */
   @DELETE
   @Path("/local/{name}/{directory}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response removeLocalMaterializedCrypto(@Context SecurityContext sc, @Context HttpServletRequest request,
       @PathParam("name") String materialName, @PathParam("directory") String directory) throws AppException {
     if (materialName == null || materialName.isEmpty()) {
@@ -185,6 +189,8 @@ public class CertificateMaterializerAdmin {
    */
   @DELETE
   @Path("/remote/{name}/{directory}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response removeRemoteMaterializedCrypto(@Context SecurityContext sc, @Context HttpServletRequest request,
       @PathParam("name") String materialName, @PathParam("directory") String directory) throws AppException {
     if (materialName == null || materialName.isEmpty()) {

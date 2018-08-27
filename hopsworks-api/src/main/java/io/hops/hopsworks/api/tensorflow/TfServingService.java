@@ -51,6 +51,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.hdfsUser.HdfsUsers;
@@ -120,6 +121,7 @@ public class TfServingService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getAllTfServings(@Context SecurityContext sc, @Context HttpServletRequest req) throws AppException {
     if (projectId == null) {
       throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
@@ -137,6 +139,7 @@ public class TfServingService {
   @Path("/logs/{servingId}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response getLogs(@PathParam("servingId") int servingId,
                          @Context SecurityContext sc, @Context HttpServletRequest req) throws AppException {
     if (projectId == null) {
@@ -187,6 +190,7 @@ public class TfServingService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response createTfServing(TfServing tfServing,
                                         @Context SecurityContext sc,
                                         @Context HttpServletRequest req) throws AppException {
@@ -266,6 +270,7 @@ public class TfServingService {
   @Path("/{servingId}")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response deleteTfServing(@PathParam("servingId") int servingId,
                             @Context SecurityContext sc,
                             @Context HttpServletRequest req) throws AppException {
@@ -302,6 +307,7 @@ public class TfServingService {
   @POST
   @Path("/start/{servingId}")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response startTfServing(@PathParam("servingId") int servingId,
                                       @Context SecurityContext sc,
                                       @Context HttpServletRequest req) throws AppException {
@@ -384,6 +390,7 @@ public class TfServingService {
   @Path("/version")
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response changeTfServingVersion(TfServing tfServing,
                                  @Context SecurityContext sc,
                                  @Context HttpServletRequest req) throws AppException {
@@ -455,6 +462,7 @@ public class TfServingService {
   @POST
   @Path("/stop/{servingId}")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response stopTfServing(@PathParam("servingId") int servingId,
                                  @Context SecurityContext sc,
                                  @Context HttpServletRequest req) throws AppException {

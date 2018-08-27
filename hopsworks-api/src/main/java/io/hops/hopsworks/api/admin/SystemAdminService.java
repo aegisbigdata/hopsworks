@@ -161,6 +161,8 @@ public class SystemAdminService {
   
   @GET
   @Path("/hosts")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getAllClusterNodes(@Context SecurityContext sc, @Context HttpServletRequest request)
       throws AppException {
     List<Hosts> allNodes = hostsFacade.find();
@@ -182,6 +184,8 @@ public class SystemAdminService {
   @PUT
   @Consumes({MediaType.APPLICATION_JSON})
   @Path("/hosts")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response updateClusterNode(@Context SecurityContext sc, @Context HttpServletRequest request, Hosts
       nodeToUpdate) throws AppException {
   
@@ -214,6 +218,8 @@ public class SystemAdminService {
   
   @DELETE
   @Path("/hosts/{hostid}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response deleteNode(@Context SecurityContext sc, @Context HttpServletRequest request,
       @PathParam("hostid") String hostId) throws AppException {
     if (hostId != null) {
@@ -234,6 +240,8 @@ public class SystemAdminService {
   @POST
   @Consumes({MediaType.APPLICATION_JSON})
   @Path("/hosts")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response addNewClusterNode(@Context SecurityContext sc, @Context HttpServletRequest request, Hosts newNode)
     throws AppException {
     

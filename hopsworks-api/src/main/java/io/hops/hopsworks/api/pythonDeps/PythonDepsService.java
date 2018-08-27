@@ -157,6 +157,7 @@ public class PythonDepsService {
   @GET
   @Path("/destroyAnaconda")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response removeAnacondaEnv(@Context SecurityContext sc, @Context HttpServletRequest req) throws AppException {
 
     pythonDepsFacade.removeProject(project);
@@ -247,6 +248,7 @@ public class PythonDepsService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/clearCondaOps")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
   public Response clearCondaOps(PythonDepJson library) throws AppException {
 
     pythonDepsFacade.clearCondaOps(project,

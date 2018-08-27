@@ -20,6 +20,8 @@
 
 package io.hops.hopsworks.api.admin.llap;
 
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.admin.llap.LlapClusterFacade;
 import io.hops.hopsworks.common.admin.llap.LlapClusterLifecycle;
@@ -28,7 +30,6 @@ import io.hops.hopsworks.common.constants.message.ResponseMessages;
 import io.hops.hopsworks.common.exception.AppException;
 import io.swagger.annotations.Api;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -43,7 +44,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/admin/llap")
-@RolesAllowed({"HOPS_ADMIN"})
 @Api(value = "Admin")
 @Stateless
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -64,6 +64,8 @@ public class LlapAdmin {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response clusterStatus() throws AppException {
     LlapClusterStatus status = llapClusterFacade.getClusterStatus();
     GenericEntity<LlapClusterStatus> statusEntity =
@@ -80,6 +82,8 @@ public class LlapAdmin {
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response changeClusterStatus(LlapClusterStatus llapClusterRequest) throws AppException {
     LlapClusterStatus oldClusterStatus = llapClusterFacade.getClusterStatus();
     LlapClusterStatus.Status desiredStatus = llapClusterRequest.getClusterStatus();

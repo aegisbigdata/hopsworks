@@ -22,6 +22,8 @@ package io.hops.hopsworks.api.admin;
 
 import io.hops.hopsworks.api.admin.dto.ProjectDeletionLog;
 import io.hops.hopsworks.api.admin.dto.ProjectAdminInfoDTO;
+import io.hops.hopsworks.api.filter.AllowedProjectGroups;
+import io.hops.hopsworks.api.filter.JWTokenNeeded;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.constants.message.ResponseMessages;
@@ -36,7 +38,6 @@ import io.hops.hopsworks.common.util.Settings;
 import io.hops.hopsworks.common.project.QuotasDTO;
 import io.swagger.annotations.Api;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -61,7 +62,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Path("/admin")
-@RolesAllowed({"HOPS_ADMIN"})
 @Api(value = "Admin")
 @Stateless
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -80,6 +80,8 @@ public class ProjectsAdmin {
   @DELETE
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/projects/{id}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response deleteProject(@Context SecurityContext sc, @Context HttpServletRequest req,
       @PathParam("id") Integer id) throws AppException {
     Project project = projectFacade.find(id);
@@ -102,6 +104,8 @@ public class ProjectsAdmin {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/projects/createas")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response createProjectAsUser(@Context SecurityContext sc, @Context HttpServletRequest request,
       ProjectDTO projectDTO) throws AppException {
     String userEmail = sc.getUserPrincipal().getName();
@@ -148,6 +152,8 @@ public class ProjectsAdmin {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/projects")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getProjectsAdminInfo(@Context SecurityContext sc, @Context HttpServletRequest req) {
 
     List<Project> projects = projectFacade.findAll();
@@ -174,6 +180,8 @@ public class ProjectsAdmin {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/projects/{id}")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response getProjectAdminInfo(@Context SecurityContext sc, @Context HttpServletRequest req,
                                       @PathParam("id") Integer projectId) throws AppException {
     Project project = projectFacade.find(projectId);
@@ -194,6 +202,8 @@ public class ProjectsAdmin {
   @PUT
   @Consumes(MediaType.APPLICATION_JSON)
   @Path("/projects")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response setProjectAdminInfo (@Context SecurityContext sc, @Context HttpServletRequest req,
                                        ProjectAdminInfoDTO projectAdminInfoDTO) throws AppException {
     // for changes in space quotas we need to check that both space and ns options are not null
@@ -218,6 +228,8 @@ public class ProjectsAdmin {
   @DELETE
   @Path("/projects/{name}/force")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
   public Response forceDeleteProject(@Context SecurityContext sc, @Context HttpServletRequest request,
       @PathParam("name") String projectName) throws AppException {
     String userEmail = sc.getUserPrincipal().getName();

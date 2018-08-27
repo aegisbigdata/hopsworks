@@ -356,17 +356,21 @@ public class AuthService {
   }
   
   private String issueToken(String email, List<String> bbcGroups) {
-    String keyString = "2adfj517dAHD828ASiw1";
-    Key key = new SecretKeySpec(keyString.getBytes(), 0, keyString.getBytes().length, "DES");
-
     Map<String, Object> claims = new HashMap<>();
-    claims.put("sub", email);
-    claims.put("iss", uriInfo.getAbsolutePath().toString());
-    claims.put("iat", new Date());
-    claims.put("exp", toDate(LocalDateTime.now().plusHours(2L)));
     claims.put("bbc", bbcGroups);
     
-    return Jwts.builder().addClaims(claims).signWith(SignatureAlgorithm.HS512, key).compact();
+    String keyString = "2adfj517dAHD828ASiw1";
+    Key key = new SecretKeySpec(keyString.getBytes(), 0, keyString.getBytes().length, "DES");
+    String jwt = Jwts.builder()
+            .setSubject(email)
+            .setIssuer(uriInfo.getAbsolutePath().toString())
+            .setIssuedAt(new Date())
+            .setExpiration(toDate(LocalDateTime.now().plusHours(5L)))
+            .addClaims(claims)
+            .signWith(SignatureAlgorithm.HS512, key)
+            .compact();
+    
+    return jwt;
   }
   
   private Date toDate(LocalDateTime localDateTime) {

@@ -118,6 +118,8 @@ public class HopssiteService {
 
   @GET
   @Path("userId")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response getUserId(@Context SecurityContext sc) throws ThirdPartyException {
     String id = String.valueOf(hopsSite.getUserId(sc.getUserPrincipal().getName()));
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(id).build();

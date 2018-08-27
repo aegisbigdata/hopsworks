@@ -1392,6 +1392,8 @@ public class DataSetService {
    * @throws AppException 
    */
   @Path("upload/{path: .+}")
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
   public UploadService upload(
           @PathParam("path") String path, @Context SecurityContext sc,
           @QueryParam("templateId") int templateId) throws AppException {

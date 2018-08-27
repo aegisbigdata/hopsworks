@@ -295,6 +295,9 @@ public class ProjectService {
   @GET
   @Path("/readme/byInodeId/{inodeId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  @JWTokenNeeded
   public Response getReadmeByInodeId(@PathParam("inodeId") Integer inodeId) throws AppException {
     if (inodeId == null) {
       throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
@@ -895,6 +898,8 @@ public class ProjectService {
   @Path("{id}/downloadCert")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public Response downloadCerts(@PathParam("id") Integer id, @FormParam("password") String password,
       @Context HttpServletRequest req) throws AppException {
     Users user = userFacade.findByEmail(req.getRemoteUser());
@@ -966,6 +971,8 @@ public class ProjectService {
 
   @Path("{id}/tfserving")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
+  @JWTokenNeeded
   public TfServingService tfServingService(
           @PathParam("id") Integer id) throws AppException {
     Project project = projectController.findProjectById(id);
