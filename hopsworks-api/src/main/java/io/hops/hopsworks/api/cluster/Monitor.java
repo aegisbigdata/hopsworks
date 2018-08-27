@@ -148,9 +148,9 @@ public class Monitor {
 
   @POST
   @Path("/groups/{groupName}")
-  @RolesAllowed({"HOPS_ADMIN"})
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response serviceOp(@PathParam("groupName") String groupName, @Context SecurityContext sc,
       @Context HttpServletRequest req, ServicesActionDTO action) throws AppException {
@@ -162,9 +162,9 @@ public class Monitor {
 
   @POST
   @Path("/groups/{groupName}/services/{serviceName}")
-  @RolesAllowed({"HOPS_ADMIN"})
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response serviceOp(@PathParam("groupName") String groupName, @PathParam("serviceName") String serviceName,
       @Context SecurityContext sc, @Context HttpServletRequest req, ServicesActionDTO action) throws AppException {
@@ -175,9 +175,9 @@ public class Monitor {
 
   @POST
   @Path("/groups/{groupName}/services/{serviceName}/hosts/{hostId}")
-  @RolesAllowed({"HOPS_ADMIN"})
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response serviceOnHostOp(@PathParam("groupName") String groupName,
       @PathParam("serviceName") String serviceName,

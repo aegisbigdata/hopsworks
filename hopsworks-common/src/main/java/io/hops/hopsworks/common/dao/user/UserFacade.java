@@ -173,6 +173,15 @@ public class UserFacade extends AbstractFacade<Users> {
     return (List<Integer>) query.getResultList();
   }
 
+  public List<String> findGroups(int uid) {
+    String sql
+            = "SELECT group_name FROM hopsworks.bbc_group INNER JOIN hopsworks.user_group "
+            + "ON (hopsworks.user_group.gid = hopsworks.bbc_group.gid "
+            + "AND hopsworks.user_group.uid = " + uid + " )";
+    List<String> existing = em.createNativeQuery(sql).getResultList();
+    return existing;
+  }
+  
   /**
    * Add a new group for a user.
    *

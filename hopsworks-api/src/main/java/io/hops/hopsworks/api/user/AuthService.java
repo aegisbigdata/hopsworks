@@ -40,10 +40,8 @@ import io.hops.hopsworks.common.user.ldap.LdapUserState;
 import io.swagger.annotations.Api;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -65,7 +63,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.Key;
@@ -101,6 +98,9 @@ public class AuthService {
   private AuthController authController;
   @EJB
   private LdapUserController ldapUserController;
+  
+  @Context
+  private UriInfo uriInfo;
 
   @GET
   @Path("session")
@@ -203,54 +203,31 @@ public class AuthService {
           @Context SecurityContext sc,
           @Context HttpServletRequest req, 
           @Context HttpHeaders httpHeaders) throws AppException, MessagingException {
-    
-    req.getServletContext().log("email: " + email);
-    req.getServletContext().log("SESSIONID@login: " + req.getSession().getId());
-    req.getServletContext().log("SecurityContext in user role: " + sc.isUserInRole("HOPS_USER"));
-    req.getServletContext().log("SecurityContext in sysadmin role: " + sc.isUserInRole("HOPS_ADMIN"));
-    req.getServletContext().log("SecurityContext in agent role: " + sc.isUserInRole("AGENT"));
-    req.getServletContext().log("SecurityContext in cluster_agent role: " + sc.isUserInRole("CLUSTER_AGENT"));
+    logUserLogin(req);
     if (email == null || email.isEmpty()) {
       throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),"Email address field cannot be empty");
     }
-    Users user = userBean.findByEmail(email);
+    Users user = userFacade.findByEmail(email);
     if (user == null) {
       throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
               "Unrecognized email address. Have you registered yet?");
     }
-    String newPassword = null;
-    Variables varTwoFactor = settings.findById("twofactor_auth");
-    Variables varExclude = settings.findById("twofactor-excluded-groups");
-    String twoFactorMode = (varTwoFactor != null ? varTwoFactor.getValue() : "");
-    String excludes = (varExclude != null ? varExclude.getValue() : null);
-    String[] groups = (excludes != null && !excludes.isEmpty() ? excludes.split(";") : null);
-    if (!isInGroup(user, groups)) {
-      if ((twoFactorMode.equals("mandatory") || (twoFactorMode.equals("true") && user.getTwoFactor()))) {
-        if (otp == null || otp.isEmpty() && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE)) {
-          if (user.getPassword().equals(DigestUtils.sha256Hex(password))) {
-            throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Second factor required.");
-          }
-        }
-      }
+    // Do pre cauth realm check 
+    String passwordWithSaltPlusOtp = authController.preCustomRealmLoginCheck(user, password, otp, req);
+    
+    // logout any user already loggedin if a new user tries to login 
+    if (req.getRemoteUser() != null && !req.getRemoteUser().equals(email)) {
+      logoutAndInvalidateSession(req);
     }
-    // Add padding if custom realm is disabled
-    if (otp == null || otp.isEmpty() && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE)) {
-      otp = AuthenticationConstants.MOBILE_OTP_PADDING;
-    }
-    if (otp.length() == AuthenticationConstants.MOBILE_OTP_PADDING.length()
-            && user.getMode().equals(PeopleAccountType.M_ACCOUNT_TYPE)) {
-      newPassword = password + otp;
-    } else if (otp.length() == AuthenticationConstants.YUBIKEY_OTP_PADDING.
-            length() && user.getMode().equals(PeopleAccountType.Y_ACCOUNT_TYPE)) {
-      newPassword = password + otp + AuthenticationConstants.YUBIKEY_USER_MARKER;
+    //only login if not already logged...
+    if (req.getRemoteUser() == null) {
+      login(user, email, passwordWithSaltPlusOtp, req);
     } else {
-      throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.
-              getStatusCode(),
-              "Could not recognize the account type. Report a bug.");
+      req.getServletContext().log("Skip logged because already logged in: " + email);
     }
     
     // Issue a token for the user
-    String token = issueToken(email, userManager.findGroups(user.getUid()));
+    String token = issueToken(email, userFacade.findGroups(user.getUid()));
       
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
@@ -394,6 +371,7 @@ public class AuthService {
   
   private Date toDate(LocalDateTime localDateTime) {
     return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+  }
 
   private void logUserLogin(HttpServletRequest req) {
     StringBuilder roles = new StringBuilder();
