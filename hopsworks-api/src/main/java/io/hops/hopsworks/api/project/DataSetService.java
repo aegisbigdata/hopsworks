@@ -68,6 +68,7 @@ import io.hops.hopsworks.common.dao.metadata.Template;
 import io.hops.hopsworks.common.dao.metadata.db.TemplateFacade;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dao.project.team.ProjectTeam;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeamFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
@@ -117,6 +118,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -1227,5 +1229,25 @@ public class DataSetService {
             + inode.getId());
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
             json).build();
+  }
+  
+  @GET
+  @Path("/{inodeId}/access")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  public Response accessQuery(ContainerRequestContext requestContext, @PathParam("inodeId") Long datasetInodeId) {
+    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByEmail(userEmail);
+    Inode datasetInode = inodes.findById(datasetInodeId);
+    List<Project> sharedWithProjects = datasetFacade.findProjectSharedWith(project, datasetInode);
+    List<Integer> accessableProjects = new ArrayList<>();
+    for(Project project : sharedWithProjects) {
+      String projectRole = projectTeamFacade.findCurrentRole(project, user);
+      if(projectRole != null) {
+        accessableProjects.add(project.getId());
+      }
+    }
+    GenericEntity<List<Integer>> result = new GenericEntity<List<Integer>>(accessableProjects) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
   }
 }
