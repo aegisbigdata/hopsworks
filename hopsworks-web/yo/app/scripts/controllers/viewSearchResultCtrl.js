@@ -175,7 +175,10 @@ angular.module('hopsWorksApp')
               }
               $rootScope.selectedFile = splitedPath[splitedPath.length - 1];
 
-              $location.path("/project/" + self.thisProjectId + "/datasets" + parentPath);
+              var projectId = self.thisProjectId;
+              if (projectId == undefined) projectId = self.content.id;
+
+              $location.path("/project/" + projectId + "/datasets" + parentPath);
 
               $uibModalInstance.dismiss('close');
             };
