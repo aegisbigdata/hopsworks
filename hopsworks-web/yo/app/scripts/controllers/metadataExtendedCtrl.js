@@ -128,7 +128,6 @@ angular.module('hopsWorksApp')
                 }, function (err) {
                   self.metadataDisplay = false;
                   self.metadataAvailable = false;
-                  growl.error("No extended metadata available", {title: 'Error', ttl: 2000});
                 });
               } else {
                 ExtendedMetadataService.getDistribution(file.parentId, file.id)
@@ -140,7 +139,6 @@ angular.module('hopsWorksApp')
                 }, function (err) {
                   self.metadataDisplay = false;
                   self.metadataAvailable = false;
-                  growl.error("No extended metadata available", {title: 'Error', ttl: 2000});
                 });
               }
             };
