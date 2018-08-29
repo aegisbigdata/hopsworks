@@ -626,20 +626,22 @@ self.searchAssetsMenu = function (param) {
 
             self.incrementPage = function () {
               if (self.pageSize == 1) {
-                  self.pageSize = self.pageSize + 9;
+                  self.pageSize = parseInt(self.pageSize) + 9;
                 
               } else {
-              self.pageSize = self.pageSize + 10;
+              self.pageSize = parseInt(self.pageSize) + 10;
               }
             };
 
             self.decrementPage = function () {
+              var newPageSize;
               if (self.pageSize == 10) {
-                  self.pageSize = self.pageSize - 9;
-                
+                newPageSize = parseInt(self.pageSize) - 9;
               } else {
-              self.pageSize = self.pageSize - 10;
+                newPageSize = parseInt(self.pageSize) - 10;
               }
+              if (newPageSize < 2) newPageSize = 1;
+              self.pageSize = newPageSize;
             };
 
             self.viewDetail = function (result) {
