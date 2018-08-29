@@ -136,6 +136,23 @@ angular.module('hopsWorksApp')
                 $location.path('/delahopsDataset');
               }
             };
+
+            self.goTo = function (content) {
+              console.log('content', content);
+              if (content.type == "ds") {
+                var projectId;
+                // getting project id
+                for(var i = 0; i < content.map.entry.length; i++) {
+                  if (content.map.entry[i].key == "project_id") {
+                    projectId = content.map.entry[i].value;
+                  }
+                }
+                $location.path("/project/" + projectId + "/datasets/" + content.name + "/");
+              } else if (content.type == "proj") {
+                var projectId = content.id;
+                $location.path("/project/" + projectId + "/datasets");
+              }
+            };
             
           }]);
 

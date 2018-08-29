@@ -203,6 +203,7 @@
     </div>        
     <br ng-show="viewSearchResultCtrl.type !== 'Project'" style="margin:15px">
     <div class="modal-footer" style="padding-bottom: 1px; padding-right: 1px; border: none">
+      <button ng-show="viewSearchResultCtrl.content.type === 'ds'" class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.goto()" style="height: 40px;">Go to Dataset</button>
       <button ng-show="viewSearchResultCtrl.content.details.project_id===viewSearchResultCtrl.thisProjectId" class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.goto()" style="height: 40px;">Go to</button>
       <button class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.close()" style="height: 40px;">Cancel</button>
       <button class="btn btn-primary" type="submit" ng-disabled="dataSetForm.project_name.$error.required || viewSearchResultCtrl.content.downloading" ng-if="viewSearchResultCtrl.content.type !== 'inode'" style="height: 40px;">
