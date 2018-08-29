@@ -149,7 +149,7 @@ angular.module('hopsWorksApp')
                 $location.path("/project/" + projectId + "/datasets/" + content.name + "/");
               } else if (content.type == "proj") {
                 var projectId = content.id;
-                $location.path("/project/" + projectId + "/datasets");
+                $location.path("/project/" + projectId);
               }
             };
             
