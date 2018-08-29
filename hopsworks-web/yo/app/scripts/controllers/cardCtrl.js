@@ -94,7 +94,6 @@ angular.module('hopsWorksApp')
               }
 
               ExtendedMetadataService.getDataset(content.id).then(function (result) {
-                console.log('showing metadata', result.data);
                 content.extendedMetadata = result.data;
               }, function (err) {
               });
