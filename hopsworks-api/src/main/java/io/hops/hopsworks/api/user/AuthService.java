@@ -194,15 +194,10 @@ public class AuthService {
   }
 
   @POST
-  @Path("login/jwt")
+  @Path("/login/jwt")
   @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-  public Response loginJWT(@FormParam("email") String email,
-          @FormParam("password") String password, 
-          @FormParam("otp") String otp,
-          @Context SecurityContext sc,
-          @Context HttpServletRequest req, 
-          @Context HttpHeaders httpHeaders) throws AppException, MessagingException {
+  public Response loginJWT(@FormParam("email") String email, @FormParam("password") String password, 
+          @FormParam("otp") String otp, @Context HttpServletRequest req) throws AppException, MessagingException {
     logUserLogin(req);
     if (email == null || email.isEmpty()) {
       throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),"Email address field cannot be empty");
