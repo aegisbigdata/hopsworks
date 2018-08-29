@@ -28,7 +28,6 @@ import javax.ejb.EJB;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 @Provider
 @JWTokenNeeded
@@ -43,9 +42,6 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
 
   @Context
   private ResourceInfo resourceInfo;
-  
-  @Context
-  UriInfo uriInfo;
   
   private final static Logger log = Logger.getLogger(JWTokenNeededFilter.class.getName());
   
@@ -109,7 +105,7 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
         }
         @Override
         public boolean isSecure() {
-          return uriInfo.getAbsolutePath().toString().startsWith("https");
+          return requestContext.getUriInfo().getAbsolutePath().toString().startsWith("https");
         }
         @Override
         public String getAuthenticationScheme() {

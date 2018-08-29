@@ -68,7 +68,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.Key;
 import java.util.Date;
 import java.time.LocalDateTime;
-import javax.ws.rs.core.UriInfo;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
@@ -99,9 +98,6 @@ public class AuthService {
   @EJB
   private LdapUserController ldapUserController;
   
-  @Context
-  private UriInfo uriInfo;
-
   @GET
   @Path("session")
   @Produces(MediaType.APPLICATION_JSON)
@@ -194,7 +190,7 @@ public class AuthService {
   }
 
   @POST
-  @Path("/login/jwt")
+  @Path("jwtLogin")
   @Produces(MediaType.APPLICATION_JSON)
   public Response loginJWT(@FormParam("email") String email, @FormParam("password") String password, 
           @FormParam("otp") String otp, @Context HttpServletRequest req) throws AppException, MessagingException {
@@ -222,8 +218,8 @@ public class AuthService {
     }
     
     // Issue a token for the user
-    String token = issueToken(email, userFacade.findGroups(user.getUid()));
-      
+    String token = issueToken(email, userFacade.findGroups(user.getUid()), req.getRequestURL().toString());
+    
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
   }
@@ -350,7 +346,7 @@ public class AuthService {
     }
   }
   
-  private String issueToken(String email, List<String> bbcGroups) {
+  private String issueToken(String email, List<String> bbcGroups, String path) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("bbc", bbcGroups);
     
@@ -358,7 +354,7 @@ public class AuthService {
     Key key = new SecretKeySpec(keyString.getBytes(), 0, keyString.getBytes().length, "DES");
     String jwt = Jwts.builder()
             .setSubject(email)
-            .setIssuer(uriInfo.getAbsolutePath().toString())
+            .setIssuer(path)
             .setIssuedAt(new Date())
             .setExpiration(toDate(LocalDateTime.now().plusHours(5L)))
             .addClaims(claims)
