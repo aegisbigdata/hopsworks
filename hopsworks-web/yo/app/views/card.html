@@ -42,7 +42,7 @@
        {{content.type === 'ds' && content.public_ds && content.localDataset ? 'blue': ''}}
        {{content.type === 'ds' && content.public_ds && !content.localDataset ? 'darkblue': ''}}"> -->
     <div class="header" style="color: #000">
-      <h3>{{content.name}}
+      <h3>{{ content.extendedMetadata.title ? content.extendedMetadata.title : content.name}}
         <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
       </h3>
     </div>
