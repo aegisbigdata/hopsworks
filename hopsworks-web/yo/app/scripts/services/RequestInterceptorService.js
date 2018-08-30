@@ -33,6 +33,7 @@ angular.module('hopsWorksApp')
                 var isApi = config.url.indexOf(RESOURCE_NAME);
                 var isKibana = config.url.startsWith("/"+KIBANA_NAME);
                 var isCross = config.url.indexOf('http');
+                config.headers['Authorization'] =  window.localStorage.getItem('jwt');
                 
                 if ((isApi !== -1 || isKibana) && isCross === -1) {
                   config.url = RESOURCE_SERVER + config.url;

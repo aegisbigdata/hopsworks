@@ -74,6 +74,7 @@ angular.module('hopsWorksApp')
                         $cookies.remove("email");
                         $cookies.remove("isAdmin");
                         localStorage.removeItem("SESSIONID");
+                        localStorage.removeItem("jwt");
                         sessionStorage.removeItem("SESSIONID");
                       }, function (error) {
                 self.errorMessage = error.data.msg;

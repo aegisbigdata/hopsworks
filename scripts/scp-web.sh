@@ -1,9 +1,9 @@
 #!/bin/bash
 # Deploy the frontend to the glassfish home directory and run bower
 
-PORT=55170
-WEBPORT=48203
-USR=aaor
+PORT=21500
+WEBPORT=44591
+USR=stamatis
 SERVER=bbc6.sics.se
 
 TSERVER=localhost
@@ -20,7 +20,5 @@ scp -o PasswordAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKe
 
 ssh -o PasswordAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -q -i $KEY -p $PORT vagrant@${TSERVER} "cd ${BASEDIR}/docroot/app && bower install"
 
-firefox -new-tab http://${TSERVER}:$WEBPORT/app
-
+# firefox -new-tab http://${TSERVER}:$WEBPORT/app
 #google-chrome -new-tab http://${SERVER}:$WEBPORT/app
-

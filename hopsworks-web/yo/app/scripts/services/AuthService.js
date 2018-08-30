@@ -36,6 +36,9 @@ angular.module('hopsWorksApp')
               login: function (user) {
                 return $http.post('/api/auth/login', TransformRequest.jQueryStyle(user));
               },
+              jwtLogin: function (user) {
+                return $http.post('/api/auth/jwtLogin', TransformRequest.jQueryStyle(user));
+              },
               ldapLogin: function (user) {
                 return $http.post('/api/auth/ldapLogin', TransformRequest.jQueryStyle(user));
               },

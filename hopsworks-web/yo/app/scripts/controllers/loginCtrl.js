@@ -91,7 +91,7 @@ angular.module('hopsWorksApp')
 
             self.login = function () {
               self.working = true;
-              AuthService.login(self.user).then(
+              AuthService.jwtLogin(self.user).then(
                       function (success) {
                         if (self.firstTime == true) {
                           BannerService.firstSuccessfulLogin().then(
@@ -103,6 +103,7 @@ angular.module('hopsWorksApp')
                         }
                         self.working = false;
                         self.secondFactorRequired = false;
+                        localStorage.setItem('jwt', success.headers().authorization);
                         $cookies.put("email", self.user.email);
                         $location.path('/');
                       }, function (error) {
