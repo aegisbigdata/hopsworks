@@ -6,7 +6,18 @@
     </tr>
         
     <tr style="border-top: none;">
-      <td style="padding: 0px !important; word-break: break-word"><a ng-href="{{ metadataExtendedCtrl.metadataDisplay.rdf }}" target="_blank">{{ metadataExtendedCtrl.metadataDisplay.rdf }}</a></td>
+      <td style="padding: 0px !important; word-break: break-word">
+        <div class="row">
+          <div class="col-md-2">
+            <a href="http://www.w3.org/RDF/" title="RDF Resource Description Framework">
+              <img border="0" src="http://www.w3.org/RDF/icons/rdf_w3c_icon.48" alt="RDF Resource Description Framework Icon"/>
+            </a>
+          </div>
+          <div class="col-md-10">
+            <a ng-href="{{ metadataExtendedCtrl.metadataDisplay.rdf }}" target="_blank">{{ metadataExtendedCtrl.metadataDisplay.rdf }}</a>
+          </div>
+        </div>
+      </td>
     </tr>
   </table>
 
