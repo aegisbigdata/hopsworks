@@ -86,6 +86,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -969,5 +970,23 @@ public class ProjectService {
     this.delaclusterService.setProjectId(id);
 
     return this.delaclusterService;
+  }
+  
+  @GET
+  @Path("{id}/access")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  public Response accessQuery(ContainerRequestContext requestContext, @PathParam("id") Integer projectId) {
+    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByEmail(userEmail);
+    Project project = projectFacade.find(projectId);
+    boolean accessToProject = false;
+    for(ProjectTeam member : project.getProjectTeamCollection()) {
+      if(member.getUser().equals(user)) {
+        accessToProject = true;
+        break;
+      }
+    }
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(accessToProject).build();
   }
 }
