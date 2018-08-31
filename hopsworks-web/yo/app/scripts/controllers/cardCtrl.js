@@ -93,10 +93,19 @@ angular.module('hopsWorksApp')
                 });
               }
 
-              ExtendedMetadataService.getDataset(content.id).then(function (result) {
-                content.extendedMetadata = result.data;
-              }, function (err) {
-              });
+              // getting extended metadata
+              if (content.type == "proj") {
+                ExtendedMetadataService.getCatalog(content.id).then(function (result) {
+                  content.extendedMetadata = result.data;
+                }, function (err) {
+                });
+              }
+              if (content.type == "ds") {
+                ExtendedMetadataService.getDataset(content.id).then(function (result) {
+                  content.extendedMetadata = result.data;
+                }, function (err) {
+                });
+              }
               
               content.details = self.detail;
               console.log("Controller init: ", content);
