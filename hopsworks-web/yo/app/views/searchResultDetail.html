@@ -164,8 +164,8 @@
             <div class="col-md-12" style="padding: 10px;">
               <table class="table table-detail" style="word-break: break-word">
                   
-                <tr style="border-top: none;" ng-repeat="(key, value) in viewSearchResultCtrl.content.extendedMetadata track by $index" ng-switch="key">
-                  <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important; padding-right: 5px !important">{{ key }}</td>
+                <tr style="border-top: none;" ng-repeat="(key, value) in viewSearchResultCtrl.content.extendedMetadata track by $index" ng-switch="key" ng-show="value.length">
+                  <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important; padding-right: 5px !important; min-width: 120px;">{{ key }}</td>
             
                   <td ng-switch-when="keywords" style="padding-left: 0px !important; text-transform: none">
                     <span ng-repeat="keyword in value" style="background-color: #dedede; padding: 2px 5px; margin-right: 5px; border-radius: 2px;">{{ keyword }}</span>

@@ -15,7 +15,7 @@
       <td style="font-size: 11px; color: #00A2CA; text-transform: capitalize; padding: 0px 0px 10px 0px !important; min-width: 122px;">Extended metadata</td>
     </tr>
       
-    <tr style="border-top: none;" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay track by $index" ng-switch="key">
+    <tr style="border-top: none;" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay track by $index" ng-switch="key" ng-show="value.length" ng-hide="key == 'rdf'">
       <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important; padding-right: 5px !important">{{ key }}</td>
 
       <td ng-switch-when="keywords" style="padding-left: 0px !important; text-transform: none">
