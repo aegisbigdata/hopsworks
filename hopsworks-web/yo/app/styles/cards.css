@@ -200,6 +200,7 @@
 
 .card-item-content .header > h3 {
   margin-top: 2px;
+  word-break: break-word;
 }
 .card-item-content .value {
     color: #333333;

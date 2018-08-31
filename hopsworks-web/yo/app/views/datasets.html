@@ -74,13 +74,34 @@
             </h3>
             
             <div class="row row-no-margin-left" ng-controller="SearchResultCtrl as searchResultCtrl">
+              <div class="row" style="margin-top: -20px; padding-left: 15px">
+                <div class="col-md-4">
+                  <dir-pagination-controls
+                      max-size="4"
+                      direction-links="true"
+                      boundary-links="true">
+                  </dir-pagination-controls>
+                </div>
+                <div class="col-md-2" style="text-align:right; padding-top: 25px;">
+                  <p style="color: #ddd">Number of assets for page</p>
+                </div>
+                <div class="col-xs-2 col-sm-2 col-md-2" style="padding-top: 5px">
+                    <div class="input-group spinner">                                               
+                      <input type="text" class="form-control" ng-model="mainCtrl.pageSize">
+                      <div class="input-group-btn-vertical">
+                        <button class="btn btn-default" ng-click="mainCtrl.incrementPage()" type="button"><i class="fa fa-caret-up"></i></button>
+                        <button class="btn btn-default" ng-click="mainCtrl.decrementPage()" type="button"><i class="fa fa-caret-down"></i></button>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <div class="ds-content col-lg-12" ng-class="{'sidenav-open': datasetsCtrl.tgState == true}" style="margin-top: -5px; overflow: hidden;">
                 <div class="row" resizable r-directions="['bottom']" ng-class="{'rg-row-top-ds': readme !== null}">
                   <div class="col-lg-12 ds-box thin-scrollbar" style="margin-top: 15px;">                    
                     
                     <div class="loader loader-sm" ng-show="datasetsCtrl.working"></div>
                     <div ng-if="!datasetsCtrl.working" ng-init="searchResultCtrl.init_ds(datasetsCtrl)"></div>
-                    <div ng-repeat="dataset in datasetsCtrl.files | filter:{shared: datasetsCtrl.shared, status: datasetsCtrl.status, publicDs: datasetsCtrl.isPublic} | filter:search | orderBy: 'name'">
+                    <div dir-paginate="dataset in datasetsCtrl.files | filter:{shared: datasetsCtrl.shared, status: datasetsCtrl.status, publicDs: datasetsCtrl.isPublic} | filter:search | orderBy: 'name' | itemsPerPage: mainCtrl.pageSize">
                       <div>
                            
                         <div ng-init="(iscollapsed$index) = true"
@@ -90,7 +111,7 @@
                            >
                         <div class="file" ng-class="{'greyed' : datasetsCtrl.selected === dataset.name,
                                   'notAccepted' : dataset.status === false}">
-                          <a>
+                          <a style="white-space: nowrap">
                              <!-- <span class="corner"></span> -->
                             <div ng-if="dataset.status === false" data-toggle="tooltip" title="Shared Dataset. Click on this dataset to accept/reject it." class="icon" ng-click="projectCtrl.browseDataset(dataset)">
                               <!--i class="glyphicon" ng-class="{'glyphicon-eye-open' : datasetsCtrl.selected !== dataset.name}"></i MOD A11F -->

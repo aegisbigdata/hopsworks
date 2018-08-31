@@ -18,7 +18,6 @@ angular.module('hopsWorksApp')
           self.metadataExtendedCatalog = result.data
         }, function (err) {
           ProjectService.get({}, {'id': projectId}).$promise.then(function (success) {
-            console.log('success', success);
             self.metadataExtendedCatalog.title = success.projectName
           });
         })

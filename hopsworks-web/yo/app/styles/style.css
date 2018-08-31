@@ -660,14 +660,12 @@ md-input-container {
 
  .footer-info a {
     color: #000000;
+    text-decoration: underline;
 }
   
 .footer-image {
       width: 30px;
-      height: 20px;
-      position: absolute;
-      left: 16%;
-      top: 25%;
+      margin: 7px 10px;
   }
 
 
@@ -689,3 +687,12 @@ md-input-container {
     font-size: 12px !important;
 }
 
+.search-bar::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #ddd;
+  opacity: 1; /* Firefox */
+}
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+  background-color: #00A2CA;
+  border-color: #00A2CA;
+}

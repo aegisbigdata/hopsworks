@@ -93,11 +93,19 @@ angular.module('hopsWorksApp')
                 });
               }
 
-              ExtendedMetadataService.getDataset(content.id).then(function (result) {
-                console.log('showing metadata', result.data);
-                content.extendedMetadata = result.data;
-              }, function (err) {
-              });
+              // getting extended metadata
+              if (content.type == "proj") {
+                ExtendedMetadataService.getCatalog(content.id).then(function (result) {
+                  content.extendedMetadata = result.data;
+                }, function (err) {
+                });
+              }
+              if (content.type == "ds") {
+                ExtendedMetadataService.getDataset(content.id).then(function (result) {
+                  content.extendedMetadata = result.data;
+                }, function (err) {
+                });
+              }
               
               content.details = self.detail;
               console.log("Controller init: ", content);
@@ -134,6 +142,23 @@ angular.module('hopsWorksApp')
                 $location.path('/delaclusterDataset');
               } else {
                 $location.path('/delahopsDataset');
+              }
+            };
+
+            self.goTo = function (content) {
+              console.log('content', content);
+              if (content.type == "ds") {
+                var projectId;
+                // getting project id
+                for(var i = 0; i < content.map.entry.length; i++) {
+                  if (content.map.entry[i].key == "project_id") {
+                    projectId = content.map.entry[i].value;
+                  }
+                }
+                $location.path("/project/" + projectId + "/datasets/" + content.name + "/");
+              } else if (content.type == "proj") {
+                var projectId = content.id;
+                $location.path("/project/" + projectId);
               }
             };
             

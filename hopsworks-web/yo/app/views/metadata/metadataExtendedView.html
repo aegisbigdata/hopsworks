@@ -1,9 +1,4 @@
 <div ng-controller="MetadataExtendedCtrl as metadataExtendedCtrl">
-  <div ng-show="datasetsCtrl.selected !== null && datasetsCtrl.selected !== undefined && !metadataExtendedCtrl.metadataAvailable">
-    <div class="file" style="text-align: center; padding: 20px">
-      No extended metadata available.<br>Add metadata by right-clicking the file.
-    </div>
-  </div>
 
   <table ng-show="datasetsCtrl.selected &&  metadataExtendedCtrl.metadataDisplay.rdf" class="table table-detail">
     <tr style="border-top: none;">
@@ -11,7 +6,18 @@
     </tr>
         
     <tr style="border-top: none;">
-      <td style="padding: 0px !important; word-break: break-word"><a ng-href="{{ metadataExtendedCtrl.metadataDisplay.rdf }}" target="_blank">{{ metadataExtendedCtrl.metadataDisplay.rdf }}</a></td>
+      <td style="padding: 0px !important; word-break: break-word">
+        <div class="row">
+          <div class="col-md-2">
+            <a href="http://www.w3.org/RDF/" title="RDF Resource Description Framework">
+              <img border="0" src="http://www.w3.org/RDF/icons/rdf_w3c_icon.48" alt="RDF Resource Description Framework Icon"/>
+            </a>
+          </div>
+          <div class="col-md-10">
+            <a ng-href="{{ metadataExtendedCtrl.metadataDisplay.rdf }}" target="_blank">{{ metadataExtendedCtrl.metadataDisplay.rdf }}</a>
+          </div>
+        </div>
+      </td>
     </tr>
   </table>
 
@@ -20,7 +26,7 @@
       <td style="font-size: 11px; color: #00A2CA; text-transform: capitalize; padding: 0px 0px 10px 0px !important; min-width: 122px;">Extended metadata</td>
     </tr>
       
-    <tr style="border-top: none;" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay track by $index" ng-switch="key">
+    <tr style="border-top: none;" ng-repeat="(key, value) in metadataExtendedCtrl.metadataDisplay track by $index" ng-switch="key" ng-show="value.length" ng-hide="key == 'rdf'">
       <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important; padding-right: 5px !important">{{ key }}</td>
 
       <td ng-switch-when="keywords" style="padding-left: 0px !important; text-transform: none">
@@ -46,4 +52,10 @@
       <td ng-switch-default style="padding-left: 0px !important; text-transform: none">{{ value }}</td>
     </tr>
   </table>
+
+  <div ng-show="datasetsCtrl.selected !== null && datasetsCtrl.selected !== undefined && !metadataExtendedCtrl.metadataAvailable">
+    <div class="file" style="text-align: center; padding: 20px">
+      No extended metadata available.<br>Add metadata by right-clicking the file.
+    </div>
+  </div>
 </div>

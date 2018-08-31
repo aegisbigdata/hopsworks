@@ -167,6 +167,18 @@ angular.module('hopsWorksApp')
             };
 
             self.goto = function () {
+              if (self.content.type == "ds") {
+                var projectId;
+                // getting project id
+                for(var i = 0; i < self.content.map.entry.length; i++) {
+                  if (self.content.map.entry[i].key == "project_id") {
+                    projectId = self.content.map.entry[i].value;
+                  }
+                }
+                $location.path("/project/" + projectId + "/datasets/" + self.content.name + "/");
+                $uibModalInstance.dismiss('close');
+                return
+              }
               var splitedPath = self.content.details.path.split("/");
               var parentPath = "/";
 
@@ -175,7 +187,10 @@ angular.module('hopsWorksApp')
               }
               $rootScope.selectedFile = splitedPath[splitedPath.length - 1];
 
-              $location.path("/project/" + self.thisProjectId + "/datasets" + parentPath);
+              var projectId = self.thisProjectId;
+              if (projectId == undefined) projectId = self.content.id;
+
+              $location.path("/project/" + projectId + "/datasets" + parentPath);
 
               $uibModalInstance.dismiss('close');
             };

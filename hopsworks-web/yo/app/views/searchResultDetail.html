@@ -153,6 +153,59 @@
             </div>
         </div>
       </div>
+      <div class="panel panel-default" id="panel1" ng-show="viewSearchResultCtrl.content.extendedMetadata">
+        <div class="panel-heading" style="background: #fff">
+          <h4 class="panel-title" style="color: #00A2CA; font-size: 12px">
+            <a data-toggle="collapse" data-target="#extended-metadata">Extended metadata</a>
+          </h4>
+        </div>
+        <div id="extended-metadata" class="panel-collapse collapse" style="font-size: 11px; line-height: 16px">
+          <div class="row" style="margin: 0px; border-top: 1px solid #E6E6E6; border-bottom: 1px solid #E6E6E6">
+            <div class="col-md-12" style="padding: 10px;">
+              <table class="table table-detail" style="word-break: break-word">
+                  
+                <tr style="border-top: none;" ng-repeat="(key, value) in viewSearchResultCtrl.content.extendedMetadata track by $index" ng-switch="key" ng-show="value.length">
+                  <td style="color: #B7B7B7; text-transform: uppercase; padding: 0px !important; padding-right: 5px !important; min-width: 120px;">{{ key }}</td>
+            
+                  <td ng-switch-when="keywords" style="padding-left: 0px !important; text-transform: none">
+                    <span ng-repeat="keyword in value" style="background-color: #dedede; padding: 2px 5px; margin-right: 5px; border-radius: 2px;">{{ keyword }}</span>
+                  </td>
+            
+                  <td ng-switch-when="primary_keys" style="padding-left: 0px !important; text-transform: none">
+                    <span ng-repeat="keyword in value" style="background-color: #dedede; padding: 2px 5px; margin-right: 5px; border-radius: 2px;">{{ keyword }}</span>
+                  </td>
+            
+                  <td ng-switch-when="themes" style="padding-left: 0px !important; text-transform: none">
+                    <ul style="padding-left: 20px; margin-bottom: 0">
+                      <li ng-repeat="theme in value" style="padding-left: 0px !important; text-transform: none">{{ theme }}</li>
+                    </ul>
+                  </td>
+
+                  <td ng-switch-when="contact_point" style="padding-left: 0px !important; text-transform: none">
+                    <ul style="padding-left: 20px; margin-bottom: 0">
+                      <li ng-repeat="contact in value" style="padding-left: 0px !important; text-transform: none">{{ contact }}</li>
+                    </ul>
+                  </td>
+
+                  <td ng-switch-when="publisher" style="padding-left: 0px !important; text-transform: none">
+                    <ul style="padding-left: 20px; margin-bottom: 0">
+                      <li ng-repeat="contact in value" style="padding-left: 0px !important; text-transform: none">{{ contact }}</li>
+                    </ul>
+                  </td>
+            
+                  <td ng-switch-when="fields" style="padding-left: 0px !important; text-transform: none">
+                    <ul style="padding-left: 20px; margin-bottom: 0">
+                      <li ng-repeat="theme in value" style="padding-left: 0px !important; text-transform: none">{{ theme }}</li>
+                    </ul>
+                  </td>
+            
+                  <td ng-switch-default style="padding-left: 0px !important; text-transform: none">{{ value }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
       <div ng-show="viewSearchResultCtrl.type === 'Dataset' || viewSearchResultCtrl.type === 'Public Dataset'" 
            ng-if="viewSearchResultCtrl.content.type !== 'inode'" class="panel panel-default" id="panel3">
         <div class="panel-heading" style="background: #fff" ng-click="viewSearchResultCtrl.getReadme()">
@@ -203,6 +256,7 @@
     </div>        
     <br ng-show="viewSearchResultCtrl.type !== 'Project'" style="margin:15px">
     <div class="modal-footer" style="padding-bottom: 1px; padding-right: 1px; border: none">
+      <button ng-show="viewSearchResultCtrl.content.type === 'ds'" class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.goto()" style="height: 40px;">Go to Dataset</button>
       <button ng-show="viewSearchResultCtrl.content.details.project_id===viewSearchResultCtrl.thisProjectId" class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.goto()" style="height: 40px;">Go to</button>
       <button class="btn btn-default" type="button" ng-click="viewSearchResultCtrl.close()" style="height: 40px;">Cancel</button>
       <button class="btn btn-primary" type="submit" ng-disabled="dataSetForm.project_name.$error.required || viewSearchResultCtrl.content.downloading" ng-if="viewSearchResultCtrl.content.type !== 'inode'" style="height: 40px;">

@@ -18,7 +18,7 @@
   ~
   -->
 
-<div id="card-{{pageNo}}-{{cardIndex}}" class="card-item">
+<div id="card-{{pageNo}}-{{cardIndex}}" class="card-item" ng-click="cardCtrl.goTo(content)">
     
     <div class="label-title">
         <i ng-if="content.type === 'proj'" class="fa fa-file-text-o fa-2" style="width: 20px; margin-left: 10px; margin-top: 10px; font-size: 11px;"></i>
@@ -42,7 +42,7 @@
        {{content.type === 'ds' && content.public_ds && content.localDataset ? 'blue': ''}}
        {{content.type === 'ds' && content.public_ds && !content.localDataset ? 'darkblue': ''}}"> -->
     <div class="header" style="color: #000">
-      <h3>{{content.name}}
+      <h3>{{ content.extendedMetadata.title ? content.extendedMetadata.title : content.name}}
         <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
       </h3>
     </div>
@@ -90,12 +90,12 @@
         </span>-->    
         <span ng-if="content.type === 'ds' && content.public_ds"
               data-placement="bottom" data-toggle="tooltip" title="GoTo public dataset view"  
-              ng-click="cardCtrl.gotoPublicDataset(content)">
+              ng-click="cardCtrl.gotoPublicDataset(content); $event.stopPropagation();">
           <!--<i class="card-footer-icon fa fa-arrow-right" aria-hidden="true"></i>-->
         </span>
         <span ng-if="content.localDataset === false && !content.downloading && !content.downloaded"
               data-placement="bottom" data-toggle="tooltip" title="Download"
-              ng-click="downloadFn(content)">
+              ng-click="downloadFn(content); $event.stopPropagation();">
           <i class="card-footer-icon fa fa-cloud-download" aria-hidden="true"
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}"></i> 
         </span> 
@@ -105,7 +105,7 @@
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}" style="color: green;"></i> 
         </span> 
         <span data-placement="bottom" data-toggle="tooltip" title="Detail"
-              ng-click="detailsFn(content)">
+              ng-click="detailsFn(content); $event.stopPropagation();">
           <i class="card-footer-icon fa fa-bars" aria-hidden="true"
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}"></i>
         </span>
