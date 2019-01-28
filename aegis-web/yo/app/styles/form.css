@@ -137,6 +137,11 @@ textarea.form-control {
   right: 0;
 }
 
+.form-control:focus {
+    box-shadow: none;
+    border-color: rgb(102,102,102);
+}
+
 .text-danger {
   color: #f05050;
 }
@@ -218,5 +223,5 @@ textarea.form-control {
 }
 
 .dark::placeholder {
-  color: #fff !important;
+  color: rgb(102, 102, 102) !important;
 }

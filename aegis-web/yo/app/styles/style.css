@@ -63,6 +63,33 @@ button, html, input, select, textarea {
   padding: 0;
 }
 
+.newstyle-btn {
+  padding-left: 0px; 
+  font-style: italic; 
+  color: rgb(102,102,102); 
+  border-top: 0px; 
+  border-left: 0px; 
+  border-right: 0px; 
+  border-bottom: 1px solid;
+}
+
+.newstyle-icon-search {
+   height:34px; 
+   border: none; 
+   padding-bottom: 0px;  
+   transform: rotateY(180deg);
+}
+
+.title-icon {
+  font-size: 16px;
+  color: #0fb6cc;
+  padding: 10px;
+}
+
+.btn-noborder {
+  border: none;
+}
+
 a {
   cursor: pointer;
 }
@@ -85,9 +112,9 @@ a:focus {
 
 .panel {
   background-color: #fafafa;
-  border: none;
+  border: 1px solid #fafafa;
   border-radius: 0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: none;
 }
 .panel.panel-filter {
   box-shadow:none;
@@ -112,7 +139,7 @@ a:focus {
   margin-right: 0px;
 }
 .panel-heading {
-  background-color: #3a3f51;		
+  background-color: #4b91ea;		
   color: #fff;
   font-size: 14px;
   border-radius: 0;
@@ -362,8 +389,8 @@ div.scroll > ul > li > textarea {
 
 #gettingStaredSection .btn-default { 
   color: #FFFFFF; 
-  background-color: #4CAE4C; 
-  border-color: #2E353D; 
+  background-color: #FFFFFF; 
+  border-left-color: rgb(102, 102, 102); 
 } 
 
 #gettingStaredSection .btn-default:hover, 
@@ -601,13 +628,28 @@ md-input-container {
 }
 
 .form-control {
-  border-color: #dedede;
+  border-bottom-color: #dedede;
   box-shadow: none;
   border-radius: 0;
+  padding: 6px 12px;
+  color: rgb(102,102,102);
 }
 
 .btn {
   border-radius: 0;
+}
+
+.input-group-btn > .btn:hover, .input-group-btn > .btn:focus, .input-group-btn > .btn:active {
+  background-color: white;
+  border-left: 0px;
+  border-right: 0px;
+  border-top: 0px;
+  border-bottom: 0px;
+}
+
+.input-group-btn > .btn-border:hover, .input-group-btn > .btn-border:focus, .input-group-btn > .btn-border:active {
+  background-color: white;
+  border: 1px solid #b7bac9;
 }
 
 .dropdown-menu {
@@ -648,3 +690,5 @@ nav .dropdown-header {
   font-size: inherit;
   font-weight: bold;
 }
+
+

@@ -46,34 +46,45 @@
   </div>
 
   <div class="container content-wrapper" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl">
-    <div class="row">
-      <div class="col-md-12">
-        <h1 style="margin-top: 40px; margin-bottom: 30px">Projects</h1>
+    <div class="row" style="margin-top: 40px; margin-bottom: 10px">
+      <div class="col-md-9">
+        <h2 style="margin: 0">Projects</h2>
+      </div>
+   
+      <div class="col-md-3" style="display: flex; width: auto">
+        <input type="text" class="form-control pull-left newstyle-btn" ng-model="searchProject"  name="x" placeholder="Find project..." >
+        <span class="input-group-btn">
+          <button class="btn btn-default newstyle-icon-search" type="button">
+            <i class="fa fa-search" aria-hidden="true" style="font-size: 25px; color: #b7bac9;"></i>
+          </button>
+        </span>
       </div>
     </div>
+    <hr style="border-top: 2px solid rgb(102,102,102); margin-top: 0px">
     <div class="row">
-      <div class="col-sm-3">
+      <div class="col-sm-2">
         <a
           ng-click="homeCtrl.newProject()"
-          class="home-project-container"
-          style="background-color: #0492b3; color: #fff; padding: 28px 15px; text-align: center; margin-bottom: 25px; display: block; box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1)"
+          class="home-project-container file-newstyle-first"
         >
-          <h4 class="home-project-container-title"><span class="fa fa-plus"></span> New Project</h4>
+        <span class="fa fa-plus" style="font-size: 60px"></span>
         </a>
+        <h5 class="home-project-container-title newstyle-title">New Project</h5>
       </div>
-      <div class="col-sm-3" ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
+      <div class="col-sm-2" ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
         <a
-          class="home-project-container"
-          style="border-top: 4px solid #0492b3; padding: 15px; text-align: center; margin-bottom: 25px; display: block; box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1)"
+          class="home-project-container file-newstyle"
           href="#!/project/{{project.project.id}}"
           context-menu
           data-target="menu-{{$index}}"
           id="{{project.project.name.substr(0, 5) === 'demo_'}}"
           title="{{project.project.name.length > 28 ? project.project.name:''}}"
         >
-          <h4 class="home-project-container-title">{{ project.project.name | limitTo: 18 }}{{project.project.name.length > 18 ? '...' : ''}}</h4>
-          <div class="home-project-container-title">5 datasets</div>
+          <span class="fa fa-plus" style="font-size: 30px"></span>
+          <h5 class="home-project-container-title" style="word-break: break-all">{{ project.project.name | limitTo: 15 }}{{project.project.name.length > 15 ? '...' : ''}}</h5>
+          <div class="home-project-container-title" style="font-size: 14px">5 datasets</div>
         </a>
+        <h5 class="home-project-container-title newstyle-title">modified ... minutes ago</h5>
       </div>
     </div>
     <hr style="margin-bottom: 40px">
