@@ -1,9 +1,11 @@
 package io.hops.hopsworks.api.filter;
 
-import io.hops.hopsworks.api.util.JsonResponse;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeamFacade;
+import io.hops.hopsworks.common.dao.user.UserFacade;
+import io.hops.hopsworks.common.dao.user.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import java.util.logging.Logger;
@@ -39,6 +41,9 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
 
   @EJB
   private ProjectFacade projectBean;
+  
+  @EJB
+  private UserFacade userFacade;
 
   @Context
   private ResourceInfo resourceInfo;
@@ -87,6 +92,7 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
         
       //if the resource is only allowed for some roles check if the user have the requierd role for the resource.
       String userEmail = claims.getBody().getSubject();
+      Users user = this.userFacade.findByEmail(userEmail);
       List<String> bbcGroups = claims.getBody().get("bbc", List.class);
       
       requestContext.setSecurityContext(new SecurityContext() {
@@ -138,7 +144,7 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
               || pathParts[0].equalsIgnoreCase("notebook")
               || pathParts[0].equalsIgnoreCase("interpreter"))) {
 
-        JsonResponse json = new JsonResponse();
+        RESTApiJsonResponse json = new RESTApiJsonResponse();
         Integer projectId;
         String userRole;
         try {
@@ -176,12 +182,12 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
           return;
         }
 
-        userRole = projectTeamBean.findCurrentRole(project, userEmail);
+        userRole = projectTeamBean.findCurrentRole(project, user);
 
         if (userRole == null || userRole.isEmpty()) {
           log.log(Level.INFO,
                   "Trying to access resource, but you dont have any role in this project");
-          json.setStatusCode(Response.Status.FORBIDDEN.getStatusCode());
+          json.setErrorCode(Response.Status.FORBIDDEN.getStatusCode());
           json.setErrorMsg("You do not have access to this project.");
           requestContext.abortWith(Response
                   .status(Response.Status.FORBIDDEN)
@@ -191,7 +197,7 @@ public class JWTokenNeededFilter implements ContainerRequestFilter {
           log.log(Level.INFO,
                   "Trying to access resource that is only allowed for: {0}, But you are a: {1}",
                   new Object[]{rolesSet, userRole});
-          json.setStatusCode(Response.Status.FORBIDDEN.getStatusCode());
+          json.setErrorCode(Response.Status.FORBIDDEN.getStatusCode());
           json.setErrorMsg(
                   "Your role in this project is not authorized to perform this action.");
           requestContext.abortWith(Response

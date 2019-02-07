@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.common.util;
@@ -43,6 +62,7 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.yarn.api.records.LocalResourceType;
 import org.apache.hadoop.yarn.api.records.LocalResourceVisibility;
+import org.json.JSONObject;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -57,10 +77,12 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -83,7 +105,13 @@ public class HopsUtils {
   private static final Pattern SPARK_PROPS_PATTERN = Pattern.compile("(.+?)=(.+)");
   public static final ConfigReplacementPolicy OVERWRITE = new OverwriteConfigReplacementPolicy();
   public static final ConfigReplacementPolicy IGNORE = new IgnoreConfigReplacementPolicy();
-  public static final ConfigReplacementPolicy APPEND = new AppendConfigReplacementPolicy();
+  public static final ConfigReplacementPolicy APPEND_SPACE = new AppendConfigReplacementPolicy(
+      AppendConfigReplacementPolicy.Delimiter.SPACE);
+  public static final ConfigReplacementPolicy APPEND_PATH = new AppendConfigReplacementPolicy(
+      AppendConfigReplacementPolicy.Delimiter.PATH_SEPARATOR);
+  public static final ConfigReplacementPolicy APPEND_COMMA = new AppendConfigReplacementPolicy(
+      AppendConfigReplacementPolicy.Delimiter.COMMA);
+ 
   
   /**
    *
@@ -133,41 +161,38 @@ public class HopsUtils {
    * @param params
    * @return hadoop global classpath
    */
-  public static String getHadoopClasspathGlob(String... params) {
+  public static String getHadoopClasspathGlob(String... params) throws IOException, InterruptedException {
     ProcessBuilder pb = new ProcessBuilder(params);
-    try {
-      Process process = pb.start();
-      int errCode = process.waitFor();
-      if (errCode != 0) {
-        return "";
+    Process process = pb.start();
+    StringBuilder sb = new StringBuilder();
+    try (BufferedReader br
+           = new BufferedReader(new InputStreamReader(process.
+      getInputStream()))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        sb.append(line);
       }
-      StringBuilder sb = new StringBuilder();
-      try (BufferedReader br
-          = new BufferedReader(new InputStreamReader(process.
-              getInputStream()))) {
-        String line;
-        while ((line = br.readLine()) != null) {
-          sb.append(line);
-        }
-      }
-      //Now we must remove the yarn shuffle library as it creates issues for 
-      //Zeppelin Spark Interpreter
-      StringBuilder classpath = new StringBuilder();
-
-      for (String path : sb.toString().split(File.pathSeparator)) {
-        if (!path.contains("yarn") && !path.contains("jersey") && !path.
-            contains("servlet")) {
-          classpath.append(path).append(File.pathSeparator);
-        }
-      }
-      if (classpath.length() > 0) {
-        return classpath.toString().substring(0, classpath.length() - 1);
-      }
-
-    } catch (IOException | InterruptedException ex) {
-      Logger.getLogger(HopsUtils.class.getName()).log(Level.SEVERE, null, ex);
     }
-    return "";
+    process.waitFor(20l, TimeUnit.SECONDS);
+    int errCode  = process.exitValue();
+    if (errCode != 0) {
+      throw new IOException("Could not get hadoop glob classpath. errCode: " + errCode);
+    }
+    //Now we must remove the yarn shuffle library as it creates issues for
+    //Zeppelin Spark Interpreter
+    StringBuilder classpath = new StringBuilder();
+
+    for (String path : sb.toString().split(File.pathSeparator)) {
+      if (!path.contains("yarn") && !path.contains("jersey") && !path.
+          contains("servlet")) {
+        classpath.append(path).append(File.pathSeparator);
+      }
+    }
+    if (classpath.length() > 0) {
+      return classpath.toString().substring(0, classpath.length() - 1);
+    }
+  
+    throw new IOException("Could not get hadoop glob classpath.");
   }
 
   public static String getProjectKeystoreName(String project, String user) {
@@ -203,24 +228,6 @@ public class HopsUtils {
         jobType, dfso, projectLocalResources, jobSystemProperties,
         null, applicationId, certMat, isRpcTlsEnabled);
   }
-  
-  private static boolean checkUserMatCertsInHDFS(String username, String remoteFSDir,
-      DistributedFileSystemOps dfso, Settings settings) throws IOException {
-    Path kstoreU = new Path(remoteFSDir + Path.SEPARATOR +
-        username + Path.SEPARATOR + username + "__kstore.jks");
-    Path tstoreU = new Path(remoteFSDir + Path.SEPARATOR +
-        username + Path.SEPARATOR + username + "__tstore.jks");
-    Path passwdU = new Path(remoteFSDir + Path.SEPARATOR +
-        username + Path.SEPARATOR + username + "__cert.key");
-
-    if (!settings.getHopsRpcTls()) {
-      return dfso.exists(kstoreU.toString()) && dfso.exists(tstoreU.toString())
-          && dfso.exists(passwdU.toString());
-    }
-
-    return dfso.exists(kstoreU.toString()) && dfso.exists(tstoreU.toString());
-  }
-
 
   /**
    * Remote user generic project certificates materialized both from the local
@@ -228,14 +235,17 @@ public class HopsUtils {
    * @param projectName
    * @param remoteFSDir
    * @param certificateMaterializer
-   * @throws IOException
    */
   public static void cleanupCertificatesForProject(String projectName,
-      String remoteFSDir, CertificateMaterializer certificateMaterializer) throws IOException {
+      String remoteFSDir, CertificateMaterializer certificateMaterializer, Settings settings) {
     
     certificateMaterializer.removeCertificatesLocal(projectName);
-    String remoteDirectory = remoteFSDir + Path.SEPARATOR + projectName + Settings.PROJECT_GENERIC_USER_SUFFIX;
-    certificateMaterializer.removeCertificatesRemote(null, projectName, remoteDirectory);
+    
+    // If Hops RPC TLS is enabled then we haven't put them in HDFS, so we should not delete them
+    if (!settings.getHopsRpcTls()) {
+      String remoteDirectory = remoteFSDir + Path.SEPARATOR + projectName + Settings.PROJECT_GENERIC_USER_SUFFIX;
+      certificateMaterializer.removeCertificatesRemote(null, projectName, remoteDirectory);
+    }
   }
 
   /**
@@ -244,22 +254,24 @@ public class HopsUtils {
    * @param username
    * @param remoteFSDir
    * @param certificateMaterializer
-   * @throws IOException
    */
   public static void cleanupCertificatesForUserCustomDir(String username,
-      String projectName, String remoteFSDir, CertificateMaterializer certificateMaterializer, String directory) throws
-      IOException {
+      String projectName, String remoteFSDir, CertificateMaterializer certificateMaterializer, String directory,
+      Settings settings) {
 
     certificateMaterializer.removeCertificatesLocalCustomDir(username, projectName, directory);
     String projectSpecificUsername = projectName + HdfsUsersController
         .USER_NAME_DELIMITER + username;
-    String remoteDirectory = remoteFSDir + Path.SEPARATOR + projectSpecificUsername;
-    certificateMaterializer.removeCertificatesRemote(username, projectName, remoteDirectory);
+    // If Hops RPC TLS is enabled, we haven't put user certificates in HDFS, so we shouldn't try to remove them
+    if (!settings.getHopsRpcTls()) {
+      String remoteDirectory = remoteFSDir + Path.SEPARATOR + projectSpecificUsername;
+      certificateMaterializer.removeCertificatesRemote(username, projectName, remoteDirectory);
+    }
   }
   
   public static void cleanupCertificatesForUser(String username, String projectName, String remoteFSDir,
-      CertificateMaterializer certificateMaterializer) throws IOException {
-    cleanupCertificatesForUserCustomDir(username, projectName, remoteFSDir, certificateMaterializer, null);
+      CertificateMaterializer certificateMaterializer, Settings settings) throws IOException {
+    cleanupCertificatesForUserCustomDir(username, projectName, remoteFSDir, certificateMaterializer, null, settings);
   }
   
   /**
@@ -281,10 +293,13 @@ public class HopsUtils {
   
     certificateMaterializer.materializeCertificatesLocalCustomDir(userName, projectName, directory);
     
-    
-    String remoteDirectory = createRemoteDirectory(remoteFSDir, projectSpecificUsername, projectSpecificUsername, dfso);
-    certificateMaterializer.materializeCertificatesRemote(userName, projectName, projectSpecificUsername,
-        projectSpecificUsername, materialPermissions, remoteDirectory);
+    // When Hops RPC TLS is enabled, Yarn will take care of application certificate
+    if (!settings.getHopsRpcTls()) {
+      String remoteDirectory =
+          createRemoteDirectory(remoteFSDir, projectSpecificUsername, projectSpecificUsername, dfso);
+      certificateMaterializer.materializeCertificatesRemote(userName, projectName, projectSpecificUsername,
+          projectSpecificUsername, materialPermissions, remoteDirectory);
+    }
   }
   
   public static void materializeCertificatesForUser(String projectName, String userName, String remoteFSDir,
@@ -315,10 +330,14 @@ public class HopsUtils {
     
     String projectGenericUser = projectName + Settings.PROJECT_GENERIC_USER_SUFFIX;
   
-    String remoteDirectory = createRemoteDirectory(remoteFSDir, projectGenericUser, projectGenericUser, dfso);
-    
-    certificateMaterializer.materializeCertificatesRemote(null, projectName, projectGenericUser,
-        projectGenericUser, materialPermissions, remoteDirectory);
+    // When Hops RPC TLS is enabled, Yarn will take care of application certificate
+    // so we don't need them in HDFS
+    if (!settings.getHopsRpcTls()) {
+      String remoteDirectory = createRemoteDirectory(remoteFSDir, projectGenericUser, projectGenericUser, dfso);
+  
+      certificateMaterializer.materializeCertificatesRemote(null, projectName, projectGenericUser,
+          projectGenericUser, materialPermissions, remoteDirectory);
+    }
   }
   
   private static String createRemoteDirectory(String remoteFSDir, String certsSpecificDir, String owner,
@@ -420,37 +439,29 @@ public class HopsUtils {
                   Files.write(certFiles.get(Settings.T_CERTIFICATE), t_k_cert);
                 }
   
-                // If RPC TLS is enabled, password file would be injected by the
-                // NodeManagers. We don't need to add it as LocalResource
-                if (!isRpcTlsEnabled) {
-                  File certPass = new File(appDir.toString() + File.separator +
-                      passName);
-                  certPass.setExecutable(false);
-                  certPass.setReadable(true, true);
-                  certPass.setWritable(false);
-                  FileUtils.writeStringToFile(certPass, userCert
-                      .getUserKeyPwd(), false);
-                  jobSystemProperties.put(Settings.CRYPTO_MATERIAL_PASSWORD,
-                      certPass.toString());
-                }
+  
+                File certPass = new File(appDir.toString() + File.separator +
+                    passName);
+                certPass.setExecutable(false);
+                certPass.setReadable(true, true);
+                certPass.setWritable(false);
+                FileUtils.writeStringToFile(certPass, userCert
+                    .getUserKeyPwd(), false);
+                jobSystemProperties.put(Settings.CRYPTO_MATERIAL_PASSWORD,
+                    certPass.toString());
                 jobSystemProperties.put(Settings.K_CERTIFICATE, f_k_cert.toString());
                 jobSystemProperties.put(Settings.T_CERTIFICATE, t_k_cert.toString());
                 break;
-              case TENSORFLOW:
               case PYSPARK:
-              case TFSPARK:
               case SPARK:
                 Map<String, File> certs = new HashMap<>();
                 certs.put(Settings.K_CERTIFICATE, new File(
                     localTmpDir + File.separator + kCertName));
                 certs.put(Settings.T_CERTIFICATE, new File(
                     localTmpDir + File.separator + tCertName));
-                // If RPC TLS is enabled, password file would be injected by the
-                // NodeManagers. We don't need to add it as LocalResource
-                if (!isRpcTlsEnabled) {
-                  certs.put(Settings.CRYPTO_MATERIAL_PASSWORD, new File(
-                      localTmpDir + File.separator + passName));
-                }
+                certs.put(Settings.CRYPTO_MATERIAL_PASSWORD, new File(
+                    localTmpDir + File.separator + passName));
+                
                 for (Map.Entry<String, File> entry : certs.entrySet()) {
                   //Write the actual file(cert) to localFS
                   //Create HDFS certificate directory. This is done
@@ -678,7 +689,7 @@ public class HopsUtils {
 
   /**
    * Convert processing quota from human friendly to seconds
-   * The format accepted is -?[0-9]{1,}:([0-9]{1,2}:){2}[0-9]{1,2}
+   * The format accepted is -?[0-9]+:([0-9]+:){2}[0-9]+
    * @param quota
    * @return
    */
@@ -711,14 +722,14 @@ public class HopsUtils {
     Map<String, String> sparkProperties = new HashMap<>();
     if (sparkProps != null) {
       Arrays.asList(NEW_LINE_PATTERN.split(sparkProps)).stream()
-          .map(l -> l.trim())
-          .forEach(l -> {
-            // User defined properties should be in the form of property_name=value
-              Matcher propMatcher = SPARK_PROPS_PATTERN.matcher(l);
-              if (propMatcher.matches()) {
-                sparkProperties.put(propMatcher.group(1), propMatcher.group(2));
-              }
-            });
+        .map(l -> l.trim())
+        .forEach(l -> {
+          // User defined properties should be in the form of property_name=value
+          Matcher propMatcher = SPARK_PROPS_PATTERN.matcher(l);
+          if (propMatcher.matches()) {
+            sparkProperties.put(propMatcher.group(1), propMatcher.group(2));
+          }
+        });
     }
     if (LOG.isLoggable(Level.FINE)) {
       StringBuilder sb = new StringBuilder();
@@ -820,4 +831,23 @@ public class HopsUtils {
     return finalParams;
   }
   
+  /**
+   * Search recursively for a key in JSON.
+   * @param object json to parse
+   * @param searchedKey key to search for
+   * @return true if key is found, false otherwise.
+   */
+  public static boolean jsonKeyExists(JSONObject object, String searchedKey) {
+    boolean exists = object.has(searchedKey);
+    if (!exists) {
+      Iterator<?> keys = object.keys();
+      while (keys.hasNext()) {
+        String key = (String) keys.next();
+        if (object.get(key) instanceof JSONObject) {
+          exists = jsonKeyExists((JSONObject) object.get(key), searchedKey);
+        }
+      }
+    }
+    return exists;
+  }
 }

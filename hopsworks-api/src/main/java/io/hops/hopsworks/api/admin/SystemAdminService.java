@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,21 +35,23 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.admin;
 
+import com.google.common.base.Strings;
 import io.hops.hopsworks.api.admin.dto.VariablesRequest;
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.constants.message.ResponseMessages;
-import io.hops.hopsworks.common.dao.host.HostsFacade;
 import io.hops.hopsworks.common.dao.host.Hosts;
+import io.hops.hopsworks.common.dao.host.HostsFacade;
 import io.hops.hopsworks.common.dao.util.Variables;
-import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.exception.EncryptionMasterPasswordException;
+import io.hops.hopsworks.common.exception.HopsSecurityException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.ServiceException;
 import io.hops.hopsworks.common.security.CertificatesMgmService;
 import io.hops.hopsworks.common.util.Settings;
 import io.swagger.annotations.Api;
@@ -69,7 +91,7 @@ import io.hops.hopsworks.api.filter.JWTokenNeeded;
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class SystemAdminService {
   
-  private final Logger LOG = Logger.getLogger(SystemAdminService.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(SystemAdminService.class.getName());
   
   @EJB
   private CertificatesMgmService certificatesMgmService;
@@ -88,7 +110,6 @@ public class SystemAdminService {
    * @param oldPassword Current password
    * @param newPassword New password
    * @return
-   * @throws AppException
    */
   @PUT
   @Path("/encryptionPass")
@@ -96,22 +117,23 @@ public class SystemAdminService {
   @JWTokenNeeded
   public Response changeMasterEncryptionPassword(@Context SecurityContext sc, @Context HttpServletRequest request,
       @FormParam("oldPassword") String oldPassword, @FormParam("newPassword") String newPassword)
-    throws AppException {
-    LOG.log(Level.FINE, "Requested master encryption password change");
+    throws HopsSecurityException {
+    LOGGER.log(Level.FINE, "Requested master encryption password change");
     try {
       String userEmail = sc.getUserPrincipal().getName();
       certificatesMgmService.checkPassword(oldPassword, userEmail);
       certificatesMgmService.resetMasterEncryptionPassword(newPassword, userEmail);
   
-      JsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, ResponseMessages
+      RESTApiJsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, ResponseMessages
           .MASTER_ENCRYPTION_PASSWORD_CHANGE);
   
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(response).build();
     } catch (EncryptionMasterPasswordException ex) {
-      throw new AppException(Response.Status.FORBIDDEN.getStatusCode(), ex.getMessage());
+      throw new HopsSecurityException(RESTCodes.SecurityErrorCode.CERT_ACCESS_DENIED, Level.SEVERE, null,
+        ex.getMessage(), ex);
     } catch (IOException ex) {
-      throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Error while reading master " +
-          "password file: " + ex.getMessage());
+      throw new HopsSecurityException(RESTCodes.SecurityErrorCode.MASTER_ENCRYPTION_PASSWORD_ACCESS_ERROR,
+        Level.SEVERE, null, ex.getMessage(), ex);
     }
   }
   
@@ -119,12 +141,11 @@ public class SystemAdminService {
   @Path("/variables/refresh")
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
-  public Response refreshVariables(@Context SecurityContext sc, @Context HttpServletRequest request)
-    throws AppException {
-    LOG.log(Level.FINE, "Requested refreshing variables");
+  public Response refreshVariables(@Context SecurityContext sc, @Context HttpServletRequest request) {
+    LOGGER.log(Level.FINE, "Requested refreshing variables");
     settings.refreshCache();
     
-    JsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Variables refreshed");
+    RESTApiJsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Variables refreshed");
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(response).build();
   }
   
@@ -134,14 +155,12 @@ public class SystemAdminService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response updateVariables(@Context SecurityContext sc, @Context HttpServletRequest request,
-      VariablesRequest variablesRequest)
-    throws AppException {
+      VariablesRequest variablesRequest) {
   
     List<Variables> variables = variablesRequest.getVariables();
     
     if (variables == null) {
-      LOG.log(Level.WARNING, "Malformed request to update variables");
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Malformed request");
+      throw new IllegalArgumentException("variablesRequest was not provided or was incomplete.");
     }
     
     Map<String, String> updateVariablesMap = new HashMap<>(variablesRequest.getVariables().size());
@@ -149,13 +168,9 @@ public class SystemAdminService {
       updateVariablesMap.putIfAbsent(var.getId(), var.getValue());
     }
     
-    try {
-      settings.updateVariables(updateVariablesMap);
-    } catch (Exception ex) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), ex.getCause().getMessage());
-    }
+    settings.updateVariables(updateVariablesMap);
     
-    JsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Variables updated");
+    RESTApiJsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Variables updated");
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(response).build();
   }
   
@@ -163,8 +178,7 @@ public class SystemAdminService {
   @Path("/hosts")
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
-  public Response getAllClusterNodes(@Context SecurityContext sc, @Context HttpServletRequest request)
-      throws AppException {
+  public Response getAllClusterNodes(@Context SecurityContext sc, @Context HttpServletRequest request) {
     List<Hosts> allNodes = hostsFacade.find();
     
     List<Hosts> responseList = new ArrayList<>(allNodes.size());
@@ -187,12 +201,11 @@ public class SystemAdminService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response updateClusterNode(@Context SecurityContext sc, @Context HttpServletRequest request, Hosts
-      nodeToUpdate) throws AppException {
+      nodeToUpdate) throws ServiceException {
   
     Hosts storedNode = hostsFacade.findByHostname(nodeToUpdate.getHostname());
     if (storedNode == null) {
-      LOG.log(Level.WARNING, "Tried to update node that does not exist");
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Tried to update node that does not exist");
+      throw new ServiceException(RESTCodes.ServiceErrorCode.HOST_NOT_FOUND, Level.WARNING);
     } else {
       if (nodeToUpdate.getHostIp() != null && !nodeToUpdate.getHostIp().isEmpty()) {
         storedNode.setHostIp(nodeToUpdate.getHostIp());
@@ -209,9 +222,13 @@ public class SystemAdminService {
       if (nodeToUpdate.getAgentPassword() != null && !nodeToUpdate.getAgentPassword().isEmpty()) {
         storedNode.setAgentPassword(nodeToUpdate.getAgentPassword());
       }
-      
-      hostsFacade.storeHost(storedNode, true);
-      JsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Node updated");
+
+      if (nodeToUpdate.getCondaEnabled() != null) {
+        storedNode.setCondaEnabled(nodeToUpdate.getCondaEnabled());
+      }
+
+      hostsFacade.storeHost(storedNode);
+      RESTApiJsonResponse response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Node updated");
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NO_CONTENT).entity(response).build();
     }
   }
@@ -221,21 +238,21 @@ public class SystemAdminService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response deleteNode(@Context SecurityContext sc, @Context HttpServletRequest request,
-      @PathParam("hostid") String hostId) throws AppException {
-    if (hostId != null) {
-      boolean deleted = hostsFacade.removeByHostname(hostId);
-      JsonResponse response;
-      if (deleted) {
-        response = noCacheResponse.buildJsonResponse(Response.Status.OK, "Node with ID " + hostId + " deleted");
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(response).build();
-      } else {
-        response = noCacheResponse.buildJsonResponse(Response.Status.NOT_FOUND, "Could not delete node " + hostId);
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).entity(response).build();
-      }
+      @PathParam("hostid") String hostId) {
+    if (hostId == null) {
+      throw new IllegalArgumentException("hostId was not provided.");
     }
-    
-    throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Host ID cannot be null");
+    boolean deleted = hostsFacade.removeByHostname(hostId);
+    RESTApiJsonResponse response;
+    if (deleted) {
+      response = noCacheResponse.buildJsonResponse(Response.Status.OK, "Node with ID " + hostId + " deleted");
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(response).build();
+    } else {
+      response = noCacheResponse.buildJsonResponse(Response.Status.NOT_FOUND, "Could not delete node " + hostId);
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).entity(response).build();
+    }
   }
+  
   
   @POST
   @Consumes({MediaType.APPLICATION_JSON})
@@ -243,29 +260,38 @@ public class SystemAdminService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response addNewClusterNode(@Context SecurityContext sc, @Context HttpServletRequest request, Hosts newNode)
-    throws AppException {
+    throws ServiceException {
     
     // Do some sanity check
-    if (newNode.getHostname() == null || newNode.getHostname().isEmpty()
-        || newNode.getHostname() == null || newNode.getHostname().isEmpty()) {
-      LOG.log(Level.WARNING, "hostId or hostname of new node are empty");
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "hostId or hostname of new node are empty");
+    if (Strings.isNullOrEmpty(newNode.getHostname())) {
+      throw new IllegalArgumentException("hostId or hostname of new node are empty");
     }
     
     Hosts existingNode = hostsFacade.findByHostname(newNode.getHostname());
     if (existingNode != null) {
-      LOG.log(Level.WARNING, "Tried to add Host with ID " + newNode.getHostname() + " but a host already exist with " +
-          "the same ID");
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Host with the same ID already exist");
+      throw new ServiceException(RESTCodes.ServiceErrorCode.HOST_EXISTS,  Level.WARNING, "Host with the same ID " +
+        "already exist");
     }
     
     // Make sure we store what we want in the DB and not what the user wants to
     Hosts finalNode = new Hosts();
     finalNode.setHostname(newNode.getHostname());
     finalNode.setHostIp(newNode.getHostIp());
-    hostsFacade.storeHost(finalNode, true);
+    hostsFacade.storeHost(finalNode);
   
     GenericEntity<Hosts> response = new GenericEntity<Hosts>(finalNode){};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.CREATED).entity(response).build();
+  }
+  
+  @POST
+  @Path("/rotate")
+  @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
+  @JWTokenNeeded
+  public Response serviceKeyRotate(@Context SecurityContext sc, @Context HttpServletRequest request) {
+    certificatesMgmService.issueServiceKeyRotationCommand();
+    RESTApiJsonResponse
+      response = noCacheResponse.buildJsonResponse(Response.Status.NO_CONTENT, "Key rotation commands " +
+        "issued");
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NO_CONTENT).entity(response).build();
   }
 }

@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,15 +35,20 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.common.dao.kagent;
 
+import io.hops.hopsworks.common.agent.AgentController;
 import io.hops.hopsworks.common.dao.host.Hosts;
 import io.hops.hopsworks.common.dao.host.HostsFacade;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.dao.host.Status;
+import io.hops.hopsworks.common.exception.GenericException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.ServiceException;
 import io.hops.hopsworks.common.util.WebCommunication;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -31,6 +56,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.persistence.NonUniqueResultException;
@@ -44,7 +70,7 @@ public class HostServicesFacade {
   @EJB
   private HostsFacade hostEJB;
 
-  final static Logger logger = Logger.getLogger(HostServicesFacade.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(HostServicesFacade.class.getName());
 
   @PersistenceContext(unitName = "kthfsPU")
   private EntityManager em;
@@ -81,12 +107,6 @@ public class HostServicesFacade {
         .setParameter("cluster", cluster);
     return query.getResultList();
   }
-
-//  public List<String> findServices() {
-//    TypedQuery<String> query = em.createNamedQuery("HostServices.findServices",
-//        String.class);
-//    return query.getResultList();
-//  }
 
   public List<HostServices> findServiceOnHost(String hostname, String group, String service) {
     TypedQuery<HostServices> query = em.createNamedQuery("HostServices.findOnHost", HostServices.class)
@@ -155,6 +175,13 @@ public class HostServicesFacade {
     return query.getSingleResult();
   }
 
+  public Long totalGPUs(String cluster) {
+    TypedQuery<Long> query = em.createNamedQuery("HostServices.TotalGPUs",
+        Long.class)
+        .setParameter("cluster", cluster);
+    return query.getSingleResult();
+  }
+
   public Long totalMemoryCapacity(String cluster) {
     TypedQuery<Long> query = em.createNamedQuery("HostServices.TotalMemoryCapacity",
         Long.class)
@@ -191,29 +218,29 @@ public class HostServicesFacade {
         .setParameter("service", service);
     return query.getResultList();
   }
-
+  
   public HostServicesInfo findHostServices(String cluster, String group, String service,
-      String hostname) throws Exception {
+    String hostname) {
     TypedQuery<HostServicesInfo> query = em.
-        createNamedQuery("HostServices.findHostServicesBy-Cluster-Group-Service-Host",
-            HostServicesInfo.class)
-        .setParameter("cluster", cluster).setParameter("group", group)
-        .setParameter("service", service).setParameter("hostname", hostname);
+      createNamedQuery("HostServices.findHostServicesBy-Cluster-Group-Service-Host",
+        HostServicesInfo.class)
+      .setParameter("cluster", cluster).setParameter("group", group)
+      .setParameter("service", service).setParameter("hostname", hostname);
     try {
       return query.getSingleResult();
     } catch (NoResultException ex) {
-      throw new Exception("NoResultException");
+      return null;
     }
   }
 
-  public String findCluster(String ip, int webPort) {
+  public String findCluster(String ip) {
     TypedQuery<String> query = em.createNamedQuery(
         "HostServices.find.ClusterBy-Ip.WebPort", String.class)
         .setParameter("ip", ip);
     return query.getSingleResult();
   }
 
-  public String findPrivateIp(String cluster, String hostname, int webPort) {
+  public String findPrivateIp(String cluster, String hostname) {
     TypedQuery<String> query = em.createNamedQuery(
         "HostServices.find.PrivateIpBy-Cluster.Hostname.WebPort", String.class)
         .setParameter("cluster", cluster).setParameter("hostname", hostname);
@@ -248,28 +275,26 @@ public class HostServicesFacade {
     em.createNamedQuery("HostServices.DeleteBy-Hostname").setParameter("hostname", hostname).executeUpdate();
   }
 
-  public String serviceOp(String group, String serviceName, Action action) throws AppException {
+  public String serviceOp(String group, String serviceName, Action action) throws GenericException {
     return webOp(action, findGroups(group, serviceName));
   }
 
-  public String serviceOp(String service, Action action) throws AppException {
+  public String serviceOp(String service, Action action) throws GenericException {
     return webOp(action, findGroupServices(service));
   }
 
   public String serviceOnHostOp(String group, String serviceName, String hostname,
-      Action action) throws AppException {
+      Action action) throws GenericException {
     return webOp(action, findServiceOnHost(hostname, group, serviceName));
   }
 
-  private String webOp(Action operation, List<HostServices> services) throws AppException {
+  private String webOp(Action operation, List<HostServices> services) throws GenericException {
     if (operation == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-          "The action is not valid, valid action are " + Arrays.toString(
+      throw new IllegalArgumentException("The action is not valid, valid action are " + Arrays.toString(
               Action.values()));
     }
     if (services == null || services.isEmpty()) {
-      throw new AppException(Response.Status.NOT_FOUND.getStatusCode(),
-          "service not found");
+      throw new IllegalArgumentException("service was not provided.");
     }
     String result = "";
     boolean success = false;
@@ -283,12 +308,12 @@ public class HostServicesFacade {
           result += service.toString() + " " + web.serviceOp(operation.value(), ip, agentPassword,
               service.getCluster(), service.getGroup(), service.getService());
           success = true;
-        } catch (AppException ex) {
+        } catch (GenericException ex) {
           if (services.size() == 1) {
             throw ex;
           } else {
-            exception = ex.getStatus();
-            result += service.toString() + " " + ex.getStatus() + " " + ex.getMessage();
+            exception = ex.getErrorCode().getRespStatus().getStatusCode();
+            result += service.toString() + " " + ex.getErrorCode().getRespStatus() + " " + ex.getMessage();
           }
         }
       } else {
@@ -297,7 +322,8 @@ public class HostServicesFacade {
       result += "\n";
     }
     if (!success) {
-      throw new AppException(exception, result);
+      throw new GenericException(RESTCodes.GenericErrorCode.UNKNOWN_ERROR, Level.SEVERE,
+        "webOp error, exception: " + exception + ", " + "result: " + result);
     }
     return result;
   }
@@ -307,4 +333,61 @@ public class HostServicesFacade {
     return host;
   }
 
+  public List<HostServices> updateHostServices(AgentController.AgentHeartbeatDTO heartbeat) throws ServiceException {
+    Hosts host = hostEJB.findByHostname(heartbeat.getHostId());
+    if (host == null) {
+      throw new ServiceException(RESTCodes.ServiceErrorCode.HOST_NOT_FOUND, Level.WARNING,
+        "hostId: " + heartbeat.getHostId());
+    }
+    final List<HostServices> hostServices = new ArrayList<>(heartbeat.getServices().size());
+    for (final AgentController.AgentServiceDTO service : heartbeat.getServices()) {
+      final String cluster = service.getCluster();
+      final String name = service.getService();
+      final String group = service.getGroup();
+      HostServices hostService = null;
+      try {
+        hostService = find(heartbeat.getHostId(), cluster, group, name);
+      } catch (Exception ex) {
+        LOGGER.log(Level.WARNING, "Could not find service for " + heartbeat.getHostId() + "/"
+            + cluster + "/" + group + "/" + name);
+        continue;
+      }
+      
+      if (hostService == null) {
+        hostService = new HostServices();
+        hostService.setHost(host);
+        hostService.setCluster(cluster);
+        hostService.setGroup(group);
+        hostService.setService(name);
+        hostService.setStartTime(heartbeat.getAgentTime());
+      }
+  
+      final Integer pid = service.getPid() != null ? service.getPid(): -1;
+      hostService.setPid(pid);
+      if (service.getStatus() != null) {
+        if ((hostService.getStatus() == null || !hostService.getStatus().equals(Status.Started))
+            && service.getStatus().equals(Status.Started)) {
+          hostService.setStartTime(heartbeat.getAgentTime());
+        }
+        hostService.setStatus(service.getStatus());
+      } else {
+        hostService.setStatus(Status.None);
+      }
+  
+      if (service.getStatus().equals(Status.Started)) {
+        hostService.setStopTime(heartbeat.getAgentTime());
+      }
+      final Long startTime = hostService.getStartTime();
+      final Long stopTime = hostService.getStopTime();
+      if (startTime != null && stopTime != null) {
+        hostService.setUptime(stopTime - startTime);
+      } else {
+        hostService.setUptime(0L);
+      }
+      
+      store(hostService);
+      hostServices.add(hostService);
+    }
+    return hostServices;
+  }
 }

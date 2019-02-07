@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,14 +35,12 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.jobs;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import com.google.common.base.Strings;
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +60,8 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import org.apache.hadoop.security.AccessControlException;
+import io.hops.hopsworks.common.exception.JobException;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
 import io.hops.hopsworks.common.dao.jobs.description.JobFacade;
@@ -50,7 +69,6 @@ import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
-import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
@@ -69,7 +87,7 @@ import io.hops.hopsworks.api.filter.JWTokenNeeded;
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class SparkService {
 
-  private static final Logger logger = Logger.getLogger(SparkService.class.
+  private static final Logger LOGGER = Logger.getLogger(SparkService.class.
       getName());
 
   @EJB
@@ -104,15 +122,13 @@ public class SparkService {
    * @param sc
    * @param req
    * @return A list of all Jobs objects of type Spark in this project.
-   * @throws AppException
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
   @JWTokenNeeded
   public Response findAllSparkJobs(@Context SecurityContext sc,
-      @Context HttpServletRequest req)
-      throws AppException {
+      @Context HttpServletRequest req) {
     List<Jobs> jobs = jobFacade.findJobsForProjectAndType(project,
         JobType.SPARK);
     GenericEntity<List<Jobs>> jobList
@@ -129,8 +145,6 @@ public class SparkService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
-   * @throws org.apache.hadoop.security.AccessControlException
    */
   @GET
   @Path("/inspect/{path: .+}")
@@ -138,8 +152,7 @@ public class SparkService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @JWTokenNeeded
   public Response inspectJar(@PathParam("path") String path,
-      @Context SecurityContext sc, @Context HttpServletRequest req) throws
-      AppException, AccessControlException {
+      @Context SecurityContext sc, @Context HttpServletRequest req) throws JobException {
     String email = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(email);
     String username = hdfsUsersBean.getHdfsUserName(project, user);
@@ -147,23 +160,10 @@ public class SparkService {
     try {
       udfso = dfs.getDfsOps(username);
       SparkJobConfiguration config = sparkController.inspectProgram(path, username,
-          udfso);
+        udfso);
       //SparkJobConfiguration config = sparkController.inspectProgram(path, username, req.getSession().getId());
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
-          entity(config).build();
-    } catch (AccessControlException ex) {
-      throw new AccessControlException(
-          "Permission denied: You do not have access to the jar file.");
-    } catch (IOException ex) {
-      logger.log(Level.SEVERE, "Failed to inspect jar.", ex);
-      throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.
-          getStatusCode(), "Error reading jar file: " + ex.
-              getLocalizedMessage());
-    } catch (IllegalArgumentException e) {
-      logger.log(Level.WARNING, "Got a non-jar file to inspect as Spark jar.");
-      throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.
-          getStatusCode(), "Error reading jar file: " + e.
-              getLocalizedMessage());
+        entity(config).build();
     } finally {
       if (udfso != null) {
         dfs.closeDfsClient(udfso);
@@ -178,7 +178,6 @@ public class SparkService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @POST
   @Produces(MediaType.APPLICATION_JSON)
@@ -187,35 +186,24 @@ public class SparkService {
   @JWTokenNeeded
   public Response createJob(SparkJobConfiguration config,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) throws JobException {
     if (config == null) {
-      throw new AppException(Response.Status.NOT_ACCEPTABLE.getStatusCode(),
-          "Cannot create job for a null argument.");
+      throw new IllegalArgumentException("Job configuration was not provided.");
     } else {
       String email = sc.getUserPrincipal().getName();
       Users user = userFacade.findByEmail(email);
 
-      if (user == null) {
-        //Should not be possible, but, well...
-        throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
-            "You are not authorized for this invocation.");
-      }
-
       if (Strings.isNullOrEmpty(config.getAppName())) {
-        config.setAppName("Untitled Spark job");
+        throw new IllegalArgumentException("Job name was not provided.");
       } else if (!HopsUtils.jobNameValidator(config.getAppName(), Settings.FILENAME_DISALLOWED_CHARS)) {
-        throw new AppException(Response.Status.NOT_ACCEPTABLE.getStatusCode(),
-            "Invalid charater(s) in job name, the following characters (including space) are now allowed:"
-            + Settings.FILENAME_DISALLOWED_CHARS);
+        throw new JobException(RESTCodes.JobErrorCode.JOB_NAME_INVALID, Level.FINE, "job name: " +config.getAppName());
       }
       if (Strings.isNullOrEmpty(config.getAnacondaDir())) {
-        config.setAnacondaDir(settings.getAnacondaProjectDir(project.getName()));
+        config.setAnacondaDir(settings.getAnacondaProjectDir(project));
       }
       Jobs created = jobController.createJob(user, project, config);
-      activityFacade.persistActivity(ActivityFacade.CREATED_JOB + created.
-          getName(), project, email);
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
-          entity(created).build();
+      activityFacade.persistActivity(ActivityFacade.CREATED_JOB + created.getName(), project, email);
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(created).build();
     }
   }
 }

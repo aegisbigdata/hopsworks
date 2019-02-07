@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.zeppelin.server;
@@ -104,7 +123,8 @@ public class ZeppelinConfig {
   private final String owner;
 
   public ZeppelinConfig(String projectName, Integer projectId, String owner, Settings settings,
-      String interpreterConf, NotebookServerImpl nbs) throws IOException, RepositoryException, TaskRunnerException {
+      String interpreterConf, NotebookServerImpl nbs)
+    throws IOException, RepositoryException, TaskRunnerException, InterruptedException {
     this.projectName = projectName;
     this.projectId = projectId;
     this.owner = owner;
@@ -160,7 +180,7 @@ public class ZeppelinConfig {
       if(nbs!=null){
         setNotebookServer(nbs);
       }
-    } catch (IOException |RepositoryException|TaskRunnerException e) {
+    } catch (IOException | RepositoryException | TaskRunnerException | InterruptedException e) {
       if (newDir) { // if the folder was newly created delete it
         removeProjectDirRecursive();
       } else if (newFile) { // if the conf files were newly created delete them
@@ -422,7 +442,7 @@ public class ZeppelinConfig {
   }
 
   // returns true if one of the conf files were created anew
-  private boolean createZeppelinConfFiles(String interpreterConf) throws IOException {
+  private boolean createZeppelinConfFiles(String interpreterConf) throws IOException, InterruptedException {
     File zeppelin_env_file = new File(confDirPath + ZEPPELIN_ENV_SH);
     File zeppelin_site_xml_file = new File(confDirPath + ZEPPELIN_SITE_XML);
     File interpreter_file = new File(confDirPath + INTERPRETER_JSON);
@@ -435,8 +455,8 @@ public class ZeppelinConfig {
     boolean createdXml = false;
 
     String log4jPath = settings.getSparkLog4JPath();
-    String zeppelinPythonPath = settings.getAnacondaProjectDir(this.projectName)
-        + File.separator + "bin" + File.separator + "python";
+    String zeppelinPythonPath = settings.getAnacondaDir() + File.separator + "envs" + File.separator
+        + "python27" + File.separator + "bin" + File.separator + "python";
     if (!zeppelin_env_file.exists()) {
 
       String ldLibraryPath = "";
@@ -512,39 +532,29 @@ public class ZeppelinConfig {
         + settings.getHopsUtilFilename();
     
     StringBuilder distFiles = new StringBuilder();
-    distFiles
-        // KeyStore
-        .append("hdfs://").append(settings.getHdfsTmpCertDir()).append(File.separator)
-        .append(projectName)
-        .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
-        .append(File.separator)
-        .append(projectName)
-        .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
-        .append("__kstore.jks#")
-        .append(Settings.K_CERTIFICATE).append(",")
-        // TrustStore
-        .append("hdfs://").append(settings.getHdfsTmpCertDir()).append(File.separator)
-        .append(projectName)
-        .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
-        .append(File.separator)
-        .append(projectName)
-        .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
-        .append("__tstore.jks#")
-        .append(Settings.T_CERTIFICATE)
-        .append(",")
-        // Glassfish domain truststore
-        .append(settings.getGlassfishTrustStoreHdfs())
-        .append("#").append(Settings.DOMAIN_CA_TRUSTSTORE)
-        .append(",")
-        // Add HopsUtil
-        .append(settings.getHopsUtilHdfsPath()).append("#").append(settings.getHopsUtilFilename());
-    
-    // If RPC TLS is enabled, password file would be injected by the
-    // NodeManagers. We don't need to add it as LocalResource
+    // When Hops RPC TLS is enabled, Yarn will take care of application certificate
     if (!settings.getHopsRpcTls()) {
       distFiles
-          // File with crypto material password
+          // KeyStore
+          .append("hdfs://").append(settings.getHdfsTmpCertDir()).append(File.separator)
+          .append(projectName)
+          .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
+          .append(File.separator)
+          .append(projectName)
+          .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
+          .append("__kstore.jks#")
+          .append(Settings.K_CERTIFICATE).append(",")
+          // TrustStore
+          .append("hdfs://").append(settings.getHdfsTmpCertDir()).append(File.separator)
+          .append(projectName)
+          .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
+          .append(File.separator)
+          .append(projectName)
+          .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
+          .append("__tstore.jks#")
+          .append(Settings.T_CERTIFICATE)
           .append(",")
+          // Material password
           .append("hdfs://").append(settings.getHdfsTmpCertDir()).append(File.separator)
           .append(projectName)
           .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
@@ -552,8 +562,17 @@ public class ZeppelinConfig {
           .append(projectName)
           .append(Settings.PROJECT_GENERIC_USER_SUFFIX)
           .append("__cert.key#")
-          .append(Settings.CRYPTO_MATERIAL_PASSWORD);
+          .append(Settings.CRYPTO_MATERIAL_PASSWORD)
+          .append(",");
     }
+    distFiles
+        // Glassfish domain truststore
+        .append(settings.getGlassfishTrustStoreHdfs())
+        .append("#").append(Settings.DOMAIN_CA_TRUSTSTORE)
+        .append(",")
+        // Add HopsUtil
+        .append(settings.getHopsUtilHdfsPath()).append("#").append(settings.getHopsUtilFilename());
+    
 
     if (interpreterConf == null) {
       StringBuilder interpreter_json = ConfigFileGenerator.

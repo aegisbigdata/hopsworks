@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.admin.llap;
@@ -26,8 +45,8 @@ import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.admin.llap.LlapClusterFacade;
 import io.hops.hopsworks.common.admin.llap.LlapClusterLifecycle;
 import io.hops.hopsworks.common.admin.llap.LlapClusterStatus;
-import io.hops.hopsworks.common.constants.message.ResponseMessages;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.ServiceException;
 import io.swagger.annotations.Api;
 
 import javax.ejb.EJB;
@@ -42,6 +61,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.logging.Level;
 
 @Path("/admin/llap")
 @Api(value = "Admin")
@@ -60,13 +80,12 @@ public class LlapAdmin {
    * Return the state of the llap cluster and other information
    * such as the appId and the hosts on which the cluster is running
    * @return
-   * @throws AppException
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
-  public Response clusterStatus() throws AppException {
+  public Response clusterStatus() {
     LlapClusterStatus status = llapClusterFacade.getClusterStatus();
     GenericEntity<LlapClusterStatus> statusEntity =
         new GenericEntity<LlapClusterStatus>(status) {};
@@ -78,21 +97,19 @@ public class LlapAdmin {
    * Update the state of the cluster based on the ingested JSON
    * @param llapClusterRequest
    * @return
-   * @throws AppException
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
-  public Response changeClusterStatus(LlapClusterStatus llapClusterRequest) throws AppException {
+  public Response changeClusterStatus(LlapClusterStatus llapClusterRequest) throws ServiceException {
     LlapClusterStatus oldClusterStatus = llapClusterFacade.getClusterStatus();
     LlapClusterStatus.Status desiredStatus = llapClusterRequest.getClusterStatus();
 
     switch (desiredStatus) {
       case UP:
         if (oldClusterStatus.getClusterStatus() == desiredStatus) {
-          throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.LLAP_CLUSTER_ALREADY_UP);
+          throw new ServiceException(RESTCodes.ServiceErrorCode.LLAP_CLUSTER_ALREADY_UP, Level.WARNING);
         }
         llapClusterLifecycle.startCluster(llapClusterRequest.getInstanceNumber(),
             llapClusterRequest.getExecutorsMemory(),
@@ -102,14 +119,13 @@ public class LlapAdmin {
         break;
       case DOWN:
         if (oldClusterStatus.getClusterStatus() == desiredStatus) {
-          throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.LLAP_CLUSTER_ALREADY_DOWN);
+          throw new ServiceException(RESTCodes.ServiceErrorCode.LLAP_CLUSTER_ALREADY_DOWN, Level.WARNING);
         }
         llapClusterLifecycle.stopCluster();
         break;
       default:
-        throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-            ResponseMessages.LLAP_STATUS_INVALID);
+        throw new ServiceException(RESTCodes.ServiceErrorCode.LLAP_STATUS_INVALID, Level.WARNING,
+          "status: " + desiredStatus);
     }
 
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.CREATED).build();

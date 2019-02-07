@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.dela;
@@ -24,11 +43,13 @@ import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dataset.FilePreviewDTO;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.util.Settings;
 import io.hops.hopsworks.dela.DelaHdfsController;
-import io.hops.hopsworks.dela.exception.ThirdPartyException;
+import io.hops.hopsworks.common.exception.DelaException;
 import io.swagger.annotations.Api;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -51,7 +72,7 @@ import javax.ws.rs.core.Response;
   description = "Cross Dela Service")
 public class RemoteDelaService {
 
-  private final static Logger LOG = Logger.getLogger(RemoteDelaService.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(RemoteDelaService.class.getName());
   @EJB
   private NoCacheResponse noCacheResponse;
   @EJB
@@ -62,16 +83,15 @@ public class RemoteDelaService {
   @GET
   @Path("/datasets/{publicDSId}/readme")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response readme(@PathParam("publicDSId") String publicDSId) throws ThirdPartyException {
-    LOG.log(Settings.DELA_DEBUG, "remote:dela:readme {0}", publicDSId);
+  public Response readme(@PathParam("publicDSId") String publicDSId) throws DelaException {
+    LOGGER.log(Settings.DELA_DEBUG, "remote:dela:readme {0}", publicDSId);
     Optional<Dataset> dataset = datasetFacade.findByPublicDsId(publicDSId);
     if (!dataset.isPresent() || !dataset.get().isPublicDs()) {
-      throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(),
-        ThirdPartyException.Error.DATASET_DOES_NOT_EXIST.toString(), ThirdPartyException.Source.REMOTE_DELA,
-        "bad request");
+      throw new DelaException(RESTCodes.DelaErrorCode.DATASET_DOES_NOT_EXIST, Level.FINE,
+        DelaException.Source.REMOTE_DELA);
     }
     FilePreviewDTO result = hdfsDelaCtrl.getPublicReadme(dataset.get());
-    LOG.log(Settings.DELA_DEBUG, "remote:dela:readme - done {0}", publicDSId);
+    LOGGER.log(Settings.DELA_DEBUG, "remote:dela:readme - done {0}", publicDSId);
     return success(result);
   }
 

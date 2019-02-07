@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 package io.hops.hopsworks.common.security;
 
@@ -62,10 +81,13 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -75,37 +97,25 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.hops.hopsworks.common.util.Settings.CERT_PASS_SUFFIX;
+import static io.hops.hopsworks.common.util.Settings.KEYSTORE_SUFFIX;
+import static io.hops.hopsworks.common.util.Settings.TRUSTSTORE_SUFFIX;
+
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 @DependsOn("Settings")
 public class CertificateMaterializer {
   private static final Logger LOG = Logger.getLogger(CertificateMaterializer.class.getName());
-  private static final Map<String, TimeUnit> TIME_SUFFIXES;
-  static {
-    TIME_SUFFIXES = new HashMap<>(5);
-    TIME_SUFFIXES.put("ms", TimeUnit.MILLISECONDS);
-    TIME_SUFFIXES.put("s", TimeUnit.SECONDS);
-    TIME_SUFFIXES.put("m", TimeUnit.MINUTES);
-    TIME_SUFFIXES.put("h", TimeUnit.HOURS);
-    TIME_SUFFIXES.put("d", TimeUnit.DAYS);
-  }
-  private final static String KEYSTORE_SUFFIX = "__kstore.jks";
-  private final static String TRUSTSTORE_SUFFIX = "__tstore.jks";
-  private final static String CERT_PASS_SUFFIX = "__cert.key";
+  
   private final static Pattern HDFS_SCHEME = Pattern.compile("^hdfs://.*");
   private final static int MAX_NUMBER_OF_RETRIES = 3;
   private final static long RETRY_WAIT_TIMEOUT = 10;
   
   private final Map<MaterialKey, Bag> materializedCerts;
   private final Map<MaterialKey, CryptoMaterial> materialCache;
-  private final Map<MaterialKey, Map<String, Runnable>> fileRemovers;
-  private final ReentrantReadWriteLock localLock;
-  private final ReentrantReadWriteLock.ReadLock localReadLock;
-  private final ReentrantReadWriteLock.WriteLock localWriteLock;
-  private final ReentrantReadWriteLock remoteLock;
-  private final ReentrantReadWriteLock.ReadLock remoteReadLock;
-  private final ReentrantReadWriteLock.WriteLock remoteWriteLock;
+  private final Map<MaterialKey, Map<String, LocalFileRemover>> fileRemovers;
   private final Set<Integer> projectsWithOpenInterpreters;
+  private final Map<MaterialKey, ReentrantReadWriteLock> materialKeyLocks = new ConcurrentHashMap<>();
   
   private String lock_id;
   
@@ -136,12 +146,6 @@ public class CertificateMaterializer {
     materializedCerts = new HashMap<>();
     materialCache = new HashMap<>();
     fileRemovers = new HashMap<>();
-    localLock = new ReentrantReadWriteLock(true);
-    localReadLock = localLock.readLock();
-    localWriteLock = localLock.writeLock();
-    remoteLock = new ReentrantReadWriteLock(true);
-    remoteWriteLock = remoteLock.writeLock();
-    remoteReadLock = remoteLock.readLock();
     projectsWithOpenInterpreters = new ConcurrentSkipListSet<>();
   }
   
@@ -208,20 +212,8 @@ public class CertificateMaterializer {
     }
     transientDir = tmpDir.getAbsolutePath();
     String delayRaw = settings.getCertificateMaterializerDelay();
-    
-    Matcher matcher = Pattern.compile("([0-9]+)([a-z]+)?").matcher(delayRaw
-        .toLowerCase());
-    if (!matcher.matches()) {
-      throw new IllegalArgumentException("Invalid delay value: " + delayRaw);
-    }
-    
-    DELAY_VALUE = Long.parseLong(matcher.group(1));
-    String timeUnitStr = matcher.group(2);
-    if (null != timeUnitStr && !TIME_SUFFIXES.containsKey(timeUnitStr)) {
-      throw new IllegalArgumentException("Invalid delay suffix: " + timeUnitStr);
-    }
-    DELAY_TIMEUNIT = timeUnitStr == null ? TimeUnit.MINUTES : TIME_SUFFIXES
-        .get(timeUnitStr);
+    DELAY_VALUE = settings.getConfTimeValue(delayRaw);
+    DELAY_TIMEUNIT = settings.getConfTimeTimeUnit(delayRaw);
     
     try {
       String hostAddress = InetAddress.getLocalHost().getHostAddress();
@@ -267,12 +259,42 @@ public class CertificateMaterializer {
   public void materializeCertificatesLocal(String userName, String projectName)
       throws IOException {
     MaterialKey key = new MaterialKey(userName, projectName);
+    ReentrantReadWriteLock.WriteLock lock = null;
     try {
-      localWriteLock.lock();
+      lock = getWriteLockForKey(key);
+      lock.lock();
       materializeLocalInternal(key, transientDir);
     } finally {
-      localWriteLock.unlock();
+      lock.unlock();
     }
+  }
+  
+  private ReentrantReadWriteLock.ReadLock getReadLockForKey(MaterialKey key) {
+    ReentrantReadWriteLock lock = getLockForKey(key, false);
+    return lock != null ? lock.readLock() : null;
+  }
+  
+  private ReentrantReadWriteLock.WriteLock getWriteLockForKey(MaterialKey key) {
+    return getLockForKey(key, true).writeLock();
+  }
+  
+  /**
+   * Do NOT use this method directly. Use {@see CertificateMaterializer#getReadLockForKey}
+   * and {@see CertificateMaterializer#getWriteLockForKey} instead.
+   *
+   * @param key Key to take the lock for
+   * @param createIfMissing Create a lock if the key is not already associated with one
+   * @return The lock for that key, or null
+   */
+  private ReentrantReadWriteLock getLockForKey(MaterialKey key, boolean createIfMissing) {
+    if (createIfMissing) {
+      materialKeyLocks.putIfAbsent(key, new ReentrantReadWriteLock(true));
+    }
+    return materialKeyLocks.get(key);
+  }
+  
+  private void removeLockForKey(MaterialKey key) {
+    materialKeyLocks.remove(key);
   }
   
   /**
@@ -301,11 +323,13 @@ public class CertificateMaterializer {
     throws IOException {
     MaterialKey key = new MaterialKey(userName, projectName);
     localDirectory = localDirectory != null ? localDirectory : transientDir;
+    ReentrantReadWriteLock.WriteLock lock = null;
     try {
-      localWriteLock.lock();
+      lock = getWriteLockForKey(key);
+      lock.lock();
       materializeLocalInternal(key, localDirectory);
     } finally {
-      localWriteLock.unlock();
+      lock.unlock();
     }
   }
   
@@ -326,11 +350,17 @@ public class CertificateMaterializer {
    */
   public void removeCertificatesLocal(String userName, String projectName) {
     MaterialKey key = new MaterialKey(userName, projectName);
+    ReentrantReadWriteLock.WriteLock lock = null;
+    boolean materialExist = false;
     try {
-      localWriteLock.lock();
-      removeLocal(key, transientDir);
+      lock = getWriteLockForKey(key);
+      lock.lock();
+      materialExist = removeLocal(key, transientDir);
     } finally {
-      localWriteLock.unlock();
+      if (!materialExist) {
+        removeLockForKey(key);
+      }
+      lock.unlock();
     }
   }
   
@@ -354,11 +384,17 @@ public class CertificateMaterializer {
   public void removeCertificatesLocalCustomDir(String username, String projectName, String localDirectory) {
     MaterialKey key = new MaterialKey(username, projectName);
     localDirectory = localDirectory != null ? localDirectory : transientDir;
+    ReentrantReadWriteLock.WriteLock lock = null;
+    boolean materialExist = false;
     try {
-      localWriteLock.lock();
-      removeLocal(key, localDirectory);
+      lock = getWriteLockForKey(key);
+      lock.lock();
+      materialExist = removeLocal(key, localDirectory);
     } finally {
-      localWriteLock.unlock();
+      if (!materialExist) {
+        removeLockForKey(key);
+      }
+      lock.unlock();
     }
   }
   
@@ -380,11 +416,13 @@ public class CertificateMaterializer {
     }
     remoteDirectory = normalizeURI(remoteDirectory);
     MaterialKey key = new MaterialKey(userName, projectName);
+    ReentrantReadWriteLock.WriteLock lock = null;
     try {
-      remoteWriteLock.lock();
+      lock = getWriteLockForKey(key);
+      lock.lock();
       materializeRemoteInternal(key, ownerName, groupName, permissions, remoteDirectory);
     } finally {
-      remoteWriteLock.unlock();
+      lock.unlock();
     }
   }
   
@@ -401,11 +439,17 @@ public class CertificateMaterializer {
     }
     remoteDirectory = normalizeURI(remoteDirectory);
     MaterialKey key = new MaterialKey(userName, projectName);
+    ReentrantReadWriteLock.WriteLock lock = null;
+    boolean materialExist = false;
     try {
-      remoteWriteLock.lock();
-      removeRemoteInternal(key, remoteDirectory, false);
+      lock = getWriteLockForKey(key);
+      lock.lock();
+      materialExist = removeRemoteInternal(key, remoteDirectory, false);
     } finally {
-      remoteWriteLock.unlock();
+      if (!materialExist) {
+        removeLockForKey(key);
+      }
+      lock.unlock();
     }
   }
   
@@ -425,16 +469,33 @@ public class CertificateMaterializer {
       throw new IllegalArgumentException("Remote directory cannot be null");
     }
     remoteDirectory = normalizeURI(remoteDirectory);
+    MaterialKey key = new MaterialKey(username, projectName);
+    ReentrantReadWriteLock.WriteLock lock = null;
+    boolean deletedMaterial = false;
     try {
-      remoteWriteLock.lock();
-      MaterialKey key = new MaterialKey(username, projectName);
-      removeRemoteInternal(key, remoteDirectory, true);
+      lock = getWriteLockForKey(key);
+      lock.unlock();
+      deletedMaterial = removeRemoteInternal(key, remoteDirectory, true);
       if (bothProjectAndUser) {
+        ReentrantReadWriteLock.WriteLock projectLock = null;
+        boolean deletedProjectMaterial = false;
         key = new MaterialKey(null, projectName);
-        removeRemoteInternal(key, remoteDirectory, true);
+        try {
+          projectLock = getWriteLockForKey(key);
+          projectLock.lock();
+          deletedProjectMaterial = removeRemoteInternal(key, remoteDirectory, true);
+        } finally {
+          if (!deletedProjectMaterial) {
+            removeLockForKey(key);
+          }
+          projectLock.unlock();
+        }
       }
     } finally {
-      remoteWriteLock.unlock();
+      if (!deletedMaterial) {
+        removeLockForKey(key);
+      }
+      lock.unlock();
     }
   }
   
@@ -459,8 +520,14 @@ public class CertificateMaterializer {
    */
   public CryptoMaterial getUserMaterial(String username, String projectName) throws CryptoPasswordNotFoundException {
     MaterialKey key = new MaterialKey(username, projectName);
+    ReentrantReadWriteLock.ReadLock lock = null;
     try {
-      localReadLock.lock();
+      lock = getReadLockForKey(key);
+      if (lock == null) {
+        throw new CryptoPasswordNotFoundException("Could not find a lock associated with this key "
+            + key.getExtendedUsername());
+      }
+      lock.lock();
       CryptoMaterial material = materialCache.get(key);
       if (material == null) {
         throw new CryptoPasswordNotFoundException("Cryptographic material for user <" + key.getExtendedUsername() + "" +
@@ -468,7 +535,9 @@ public class CertificateMaterializer {
       }
       return material;
     } finally {
-      localReadLock.unlock();
+      if (lock != null) {
+        lock.unlock();
+      }
     }
   }
   
@@ -501,8 +570,14 @@ public class CertificateMaterializer {
   public boolean existsInLocalStore(String username, String projectName, String directory) {
     directory = directory != null ? directory : transientDir;
     MaterialKey key = new MaterialKey(username, projectName);
+    ReentrantReadWriteLock.ReadLock lock = null;
     try {
-      localReadLock.lock();
+      lock = getReadLockForKey(key);
+      if (lock == null) {
+        LOG.log(Level.WARNING, "Could not find read lock for key " + key.getExtendedUsername());
+        return false;
+      }
+      lock.lock();
       Bag materializedPaths = materializedCerts.get(key);
       if (materializedPaths == null) {
         return false;
@@ -510,7 +585,9 @@ public class CertificateMaterializer {
       
       return materializedPaths.contains(directory);
     } finally {
-      localReadLock.unlock();
+      if (lock != null) {
+        lock.unlock();
+      }
     }
   }
   
@@ -557,8 +634,9 @@ public class CertificateMaterializer {
    */
   @SuppressWarnings("unchecked")
   public MaterializerState<Map<String, Map<String, Integer>>, Map<String, Map<String, Integer>>,
-      Map<String, Set<String>>> getState() {
-    MaterializerState<Map<MaterialKey, Bag>, List<RemoteMaterialReferences>, Map<MaterialKey, Map<String, Runnable>>>
+      Map<String, Set<String>>, Map<String, Boolean>> getState() {
+    MaterializerState<Map<MaterialKey, Bag>, List<RemoteMaterialReferences>, Map<MaterialKey,
+        Map<String, Runnable>>, Map<MaterialKey, ReentrantReadWriteLock>>
         state = getImmutableState();
     
     Map<MaterialKey, Bag> localMaterialState = state.getLocalMaterial();
@@ -602,42 +680,76 @@ public class CertificateMaterializer {
       simpleScheduledRemovals.put(username, entry.getValue().keySet());
     }
     
-    return new MaterializerState<>(simpleLocalMaterialState, simpleRemoteMaterialState, simpleScheduledRemovals);
+    Map<MaterialKey, ReentrantReadWriteLock> materialKeyLocks = state.getMaterialKeyLocks();
+    // Username, Locked
+    Map<String, Boolean> flatMaterialKeyLocks = new HashMap<>(materialKeyLocks.size());
+    for (Map.Entry<MaterialKey, ReentrantReadWriteLock> lock : materialKeyLocks.entrySet()) {
+      flatMaterialKeyLocks.put(lock.getKey().getExtendedUsername(), lock.getValue().isWriteLocked());
+    }
+    
+    return new MaterializerState<>(simpleLocalMaterialState, simpleRemoteMaterialState,
+        simpleScheduledRemovals, flatMaterialKeyLocks);
   }
   
   private MaterializerState<Map<MaterialKey, Bag>, List<RemoteMaterialReferences>,
-      Map<MaterialKey, Map<String, Runnable>>> getImmutableState() {
+      Map<MaterialKey, Map<String, Runnable>>, Map<MaterialKey, ReentrantReadWriteLock>> getImmutableState() {
     Map<MaterialKey, Bag> localMaterial = null;
     Map<MaterialKey, Map<String, Runnable>> scheduledRemovals = null;
     List<RemoteMaterialReferences> remoteMaterial = null;
+    Map<MaterialKey, ReentrantReadWriteLock> materialKeyLocks = null;
+  
+    // Take all the write locks
+    TreeSet<ReentrantReadWriteLock> acquiredLocks = acquireWriteLocks(materialKeyLocks);
     try {
-      localWriteLock.lock();
       localMaterial = MapUtils.unmodifiableMap(materializedCerts);
       scheduledRemovals = MapUtils.unmodifiableMap(fileRemovers);
-    } finally {
-      localWriteLock.unlock();
-    }
-    
-    try {
-      remoteWriteLock.lock();
+      materialKeyLocks = MapUtils.unmodifiableMap(materialKeyLocks);
       remoteMaterial = remoteMaterialReferencesFacade.findAll();
     } finally {
-      remoteWriteLock.unlock();
+      // Release all locks acquired
+      releaseWriteLocks(acquiredLocks);
     }
     
-    return new MaterializerState(localMaterial, remoteMaterial, scheduledRemovals);
+    return new MaterializerState(localMaterial, remoteMaterial, scheduledRemovals, materialKeyLocks);
   }
   
+  private TreeSet<ReentrantReadWriteLock> acquireWriteLocks(Map<MaterialKey, ReentrantReadWriteLock> lockSet) {
+    TreeSet<ReentrantReadWriteLock> acquiredLocks = new TreeSet<>(new Comparator<ReentrantReadWriteLock>() {
+      @Override
+      public int compare(ReentrantReadWriteLock t0, ReentrantReadWriteLock t1) {
+        if (t0.hashCode() < t1.hashCode()) {
+          return -1;
+        } else if (t0.hashCode() > t1.hashCode()) {
+          return 1;
+        }
+        return 0;
+      }
+    });
+    
+    lockSet.values().stream()
+        .forEach(l -> {
+          l.writeLock().lock();
+          acquiredLocks.add(l);
+        });
+    return acquiredLocks;
+  }
+
+  private void releaseWriteLocks(TreeSet<ReentrantReadWriteLock> acquiredLocks) {
+    Set<ReentrantReadWriteLock> reversedLocks = acquiredLocks.descendingSet();
+    reversedLocks.stream().forEach(l -> l.writeLock().unlock());
+  }
   
-  public class MaterializerState<T, S, R> {
+  public class MaterializerState<T, S, R, P> {
     private final T localMaterial;
     private final S remoteMaterial;
     private final R scheduledRemovals;
+    private final P materialKeyLocks;
     
-    public MaterializerState(T localMaterial, S remoteMaterial, R scheduledRemovals) {
+    public MaterializerState(T localMaterial, S remoteMaterial, R scheduledRemovals, P materialKeyLocks) {
       this.localMaterial = localMaterial;
       this.remoteMaterial = remoteMaterial;
       this.scheduledRemovals = scheduledRemovals;
+      this.materialKeyLocks = materialKeyLocks;
     }
     
     public T getLocalMaterial() {
@@ -650,6 +762,10 @@ public class CertificateMaterializer {
     
     public R getScheduledRemovals() {
       return scheduledRemovals;
+    }
+    
+    public P getMaterialKeyLocks() {
+      return materialKeyLocks;
     }
   }
   
@@ -732,12 +848,12 @@ public class CertificateMaterializer {
   // Return true if materializeCertificates should proceed with the materialization
   private boolean checkWithScheduledRemovalsLocal(MaterialKey key, String materializationDirectory)
       throws IOException {
-    Map<String, Runnable> materialRemovers = fileRemovers.get(key);
+    Map<String, LocalFileRemover> materialRemovers = fileRemovers.get(key);
     if (materialRemovers == null) {
       return true;
     }
     
-    LocalFileRemover localFileRemover = (LocalFileRemover) materialRemovers.get(materializationDirectory);
+    LocalFileRemover localFileRemover = materialRemovers.get(materializationDirectory);
     if (localFileRemover == null) {
       return true;
     }
@@ -792,21 +908,23 @@ public class CertificateMaterializer {
   /*
    * Remove local section
    */
-  private void removeLocal(MaterialKey key, String materializationDirectory) {
+  private boolean removeLocal(MaterialKey key, String materializationDirectory) {
     Bag materialBag = materializedCerts.get(key);
     if (materialBag != null) {
       materialBag.remove(materializationDirectory, 1);
       if (materialBag.getCount(materializationDirectory) <= 0) {
         scheduleFileRemover(key, materializationDirectory);
       }
+      return true;
     }
+    return false;
   }
   
   private void scheduleFileRemover(MaterialKey key, String materializationDirectory) {
     LocalFileRemover fileRemover = new LocalFileRemover(key, materialCache.get(key), materializationDirectory);
     fileRemover.scheduledFuture = scheduler.schedule(fileRemover, DELAY_VALUE, DELAY_TIMEUNIT);
     
-    Map<String, Runnable> materialRemovesForKey = fileRemovers.get(key);
+    Map<String, LocalFileRemover> materialRemovesForKey = fileRemovers.get(key);
     if (materialRemovesForKey != null) {
       materialRemovesForKey.put(materializationDirectory, fileRemover);
     } else {
@@ -831,14 +949,16 @@ public class CertificateMaterializer {
   }
   
   private void forceRemoveLocalMaterial(String username, String projectName, String materializationDirectory) {
+    ReentrantReadWriteLock.WriteLock lock = null;
     try {
-      localWriteLock.lock();
       materializationDirectory = materializationDirectory != null ? materializationDirectory : transientDir;
       MaterialKey key = new MaterialKey(username, projectName);
+      lock = getWriteLockForKey(key);
+      lock.lock();
       // First remove from File Removers list
-      Map<String, Runnable> materialRemovers = fileRemovers.get(key);
+      Map<String, LocalFileRemover> materialRemovers = fileRemovers.get(key);
       if (materialRemovers != null) {
-        LocalFileRemover fileRemover = (LocalFileRemover) materialRemovers.remove(materializationDirectory);
+        LocalFileRemover fileRemover = materialRemovers.remove(materializationDirectory);
         if (fileRemover != null) {
           fileRemover.scheduledFuture.cancel(true);
         }
@@ -862,8 +982,9 @@ public class CertificateMaterializer {
       
       // Then from local FS
       deleteMaterialFromLocalFs(key, materializationDirectory);
+      removeLockForKey(key);
     } finally {
-      localWriteLock.unlock();
+      lock.unlock();
     }
   }
   
@@ -904,19 +1025,16 @@ public class CertificateMaterializer {
             
             Path trustStore = new Path(remoteDirectory + Path.SEPARATOR + key.getExtendedUsername()
                 + TRUSTSTORE_SUFFIX);
-            writeToHDFS(dfso, trustStore, material.getKeyStore().array());
+            writeToHDFS(dfso, trustStore, material.getTrustStore().array());
             dfso.setOwner(trustStore, ownerName, groupName);
             dfso.setPermission(trustStore, permissions);
-            
-            // If RPC TLS is enabled, password file is injected automatically by the NodeManager
-            if (!settings.getHopsRpcTls()) {
-              Path passwordFile = new Path(remoteDirectory + Path.SEPARATOR + key.getExtendedUsername()
-                  + CERT_PASS_SUFFIX);
-              writeToHDFS(dfso, passwordFile, new String(material.getPassword()));
-              dfso.setOwner(passwordFile, ownerName, groupName);
-              dfso.setPermission(passwordFile, permissions);
-            }
-            
+  
+            Path passwordFile = new Path(remoteDirectory + Path.SEPARATOR + key.getExtendedUsername()
+                + CERT_PASS_SUFFIX);
+            writeToHDFS(dfso, passwordFile, new String(material.getPassword()).getBytes());
+            dfso.setOwner(passwordFile, ownerName, groupName);
+            dfso.setPermission(passwordFile, permissions);
+  
             // Cache should be flushed otherwise NN will raise permission exceptions
             dfso.flushCache(ownerName, groupName);
           } finally {
@@ -975,33 +1093,24 @@ public class CertificateMaterializer {
     }
   }
   
-  private void writeToHDFS(DistributedFileSystemOps dfso, Path path, String data) throws IOException {
-    if (dfso == null) {
-      throw new IOException("DistributedFilesystemOps is null");
-    }
-    FSDataOutputStream fsStream = dfso.getFilesystem().create(path);
-    try {
-      fsStream.writeUTF(data);
-      fsStream.hflush();
-    } finally {
-      if (fsStream != null) {
-        fsStream.close();
-      }
-    }
-  }
-  
+
   /*
    * Remove remote section
    */
   
-  private void removeRemoteInternal(MaterialKey key, String remoteDirectory, boolean force) {
+  private boolean removeRemoteInternal(MaterialKey key, String remoteDirectory, boolean force) {
     RemoteMaterialReferences materialRef = null;
     RemoteMaterialRefID identifier = new RemoteMaterialRefID(key.getExtendedUsername(), remoteDirectory);
     
     int retries = 0;
+    boolean deletedMaterial = false;
     while (materialRef == null && retries < MAX_NUMBER_OF_RETRIES) {
       try {
-        materialRef = remoteMaterialReferencesFacade.acquireLock(identifier, lock_id);
+        if (force) {
+          materialRef = new RemoteMaterialReferences(identifier);
+        } else {
+          materialRef = remoteMaterialReferencesFacade.acquireLock(identifier, lock_id);
+        }
         
         if (materialRef != null) {
           materialRef.decrementReferences();
@@ -1015,6 +1124,7 @@ public class CertificateMaterializer {
                   + "> could not be removed from HDFS. You SHOULD clean them manually!");
             }
             remoteMaterialReferencesFacade.delete(materialRef.getIdentifier());
+            deletedMaterial = true;
           } else {
             materialRef.decrementReferences();
             remoteMaterialReferencesFacade.update(materialRef);
@@ -1038,12 +1148,17 @@ public class CertificateMaterializer {
         }
       } finally {
         try {
-          remoteMaterialReferencesFacade.releaseLock(identifier, lock_id);
+          if (!deletedMaterial) {
+            remoteMaterialReferencesFacade.releaseLock(identifier, lock_id);
+          } else {
+            removeLockForKey(key);
+          }
         } catch (AcquireLockException ex) {
           LOG.log(Level.SEVERE, "Cannot release lock for " + identifier, ex);
         }
       }
     }
+    return deletedMaterial;
   }
   
   private String normalizeURI(String uri) {
@@ -1222,34 +1337,37 @@ public class CertificateMaterializer {
       this.cryptoMaterial = cryptoMaterial;
       this.materializationDirectory = materializationDirectory != null ? materializationDirectory : transientDir;
     }
-    
+  
     @Override
     public void run() {
-      deleteMaterialFromLocalFs(key, materializationDirectory);
-      Map<String, Runnable> materialRemovers = fileRemovers.get(key);
-      if (materialRemovers != null) {
-        materialRemovers.remove(materializationDirectory);
-        if (materialRemovers.isEmpty()) {
-          fileRemovers.remove(key);
-        }
-  
-        // No more references to that crypto material, wipe out password
-        try {
-          localWriteLock.lock();
+      ReentrantReadWriteLock.WriteLock lock = null;
+      try {
+        lock = getWriteLockForKey(key);
+        lock.lock();
+        deleteMaterialFromLocalFs(key, materializationDirectory);
+        Map<String, LocalFileRemover> materialRemovers = fileRemovers.get(key);
+        if (materialRemovers != null) {
+          materialRemovers.remove(materializationDirectory);
+          if (materialRemovers.isEmpty()) {
+            fileRemovers.remove(key);
+          }
+        
+          // No more references to that crypto material, wipe out password
           Bag materialBag = materializedCerts.get(key);
-          if (materialBag.isEmpty()) {
+          if (materialBag != null && materialBag.isEmpty()) {
             materializedCerts.remove(key);
             CryptoMaterial material = materialCache.remove(key);
             if (material != null) {
               material.wipePassword();
             }
           }
-        } finally {
-          localWriteLock.unlock();
-        }
         
-        LOG.log(Level.FINEST, "Deleted crypto material for <" + key.getExtendedUsername() + "> from directory "
-            + materializationDirectory);
+          LOG.log(Level.FINEST, "Deleted crypto material for <" + key.getExtendedUsername() + "> from directory "
+              + materializationDirectory);
+        }
+        removeLockForKey(key);
+      } finally {
+        lock.unlock();
       }
     }
   }

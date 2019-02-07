@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 
@@ -31,16 +50,19 @@
   transition: all 0.5s ease;
 }
 
+#wrapper.toggled {
+  padding-left: 200px;
+}
+
 #sidebar-wrapper {
   z-index: 12;
   left: 200px;
   width: 0;
-  height: 320px;
+  height: 100%;
   margin-left: -200px;
-  border-color: transparent;
-  
-  /*background: #2e353d; MOD A11F */
-   background: #00A2CA;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #2e353d;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -52,7 +74,7 @@
 }
 
 #wrapper.toggled #sidebar-wrapper {
-  width: 220px;
+  width: 200px;
 }
 
 #page-content-wrapper {
@@ -70,10 +92,10 @@
 /*-------------------------------*/
 
 .sidebar-nav {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Roboto', sans-serif;
   position: absolute;
   top: 0;
-  width: 220px;
+  width: 200px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -84,7 +106,6 @@
   line-height: 20px;
   display: inline-block;
   width: 100%;
-  background: #00A2CA;
 }
 
 .sidebar-nav li:before {
@@ -95,15 +116,47 @@
   z-index: -1;
   height: 100%;
   width: 3px;
-  background-color: #33b5d5;
+  background-color: #1c1c1c;
   -webkit-transition: width .2s ease-in;
   -moz-transition:  width .2s ease-in;
   -ms-transition:  width .2s ease-in;
   transition: width .2s ease-in;
 
 }
-
-
+.sidebar-nav li:first-child a {
+  color: #fff;
+  background-color: #1a1a1a;
+  line-height: 1;
+  padding: 10px 0px 10px 0px;
+  font-size: 20px;
+}
+.sidebar-nav li:nth-child(2):before {
+  background-color: #ec1b5a;
+}
+.sidebar-nav li:nth-child(3):before {
+  background-color: #79aefe;
+}
+.sidebar-nav li:nth-child(4):before {
+  background-color: #314190;
+}
+.sidebar-nav li:nth-child(5):before {
+  background-color: #279636;
+}
+.sidebar-nav li:nth-child(6):before {
+  background-color: #7d5d81;
+}
+.sidebar-nav li:nth-child(7):before {
+  background-color: #ead24c;
+}
+.sidebar-nav li:nth-child(8):before {
+  background-color: #2d2366;
+}
+.sidebar-nav li:nth-child(9):before {
+  background-color: #35acdf;
+}
+.sidebar-nav li:nth-child(10):before {
+  background-color: #ffa43d;
+}
 .sidebar-nav li:hover:before,
 .sidebar-nav li.open:hover:before {
   width: 100%;
@@ -116,9 +169,8 @@
 
 .sidebar-nav li a {
   display: block;
-  color: #fff;
+  color: #ddd;
   text-decoration: none;
-  font-weight: bold;
   padding: 10px 10px 10px 15px;
 }
 
@@ -151,13 +203,74 @@
 }
 
 
-.sidebar-nav li a:active,
-.sidebar-nav li a:focus,
-.sidebar-nav li.open a:active,
-.sidebar-nav li.open a:focus{
-  /*MOD A11F*/
-  background-color: #33b5d5;
-  /*background-color: #ec1b5a;*/
+
+.sidebar-nav li:nth-child(2) a:active,
+.sidebar-nav li:nth-child(2) a:focus,
+.sidebar-nav li:nth-child(2).open a:active,
+.sidebar-nav li:nth-child(2).open a:focus{
+  background-color: #ec1b5a;
+}
+
+
+.sidebar-nav li:nth-child(3) a:active,
+.sidebar-nav li:nth-child(3) a:focus,
+.sidebar-nav li:nth-child(3).open a:active,
+.sidebar-nav li:nth-child(3).open a:focus{
+  background-color: #79aefe;
+}
+
+
+.sidebar-nav li:nth-child(4) a:active,
+.sidebar-nav li:nth-child(4) a:focus,
+.sidebar-nav li:nth-child(4).open a:active,
+.sidebar-nav li:nth-child(4).open a:focus{
+  background-color: #314190;
+}
+
+
+.sidebar-nav li:nth-child(5) a:active,
+.sidebar-nav li:nth-child(5) a:focus,
+.sidebar-nav li:nth-child(5).open a:active,
+.sidebar-nav li:nth-child(5).open a:focus{
+  background-color: #279636;
+}
+
+
+.sidebar-nav li:nth-child(6) a:active,
+.sidebar-nav li:nth-child(6) a:focus,
+.sidebar-nav li:nth-child(6).open a:active,
+.sidebar-nav li:nth-child(6).open a:focus{
+  background-color: #7d5d81;
+}
+
+
+.sidebar-nav li:nth-child(7) a:active,
+.sidebar-nav li:nth-child(7) a:focus,
+.sidebar-nav li:nth-child(7).open a:active,
+.sidebar-nav li:nth-child(7).open a:focus{
+  background-color: #ead24c;
+}
+
+
+.sidebar-nav li:nth-child(8) a:active,
+.sidebar-nav li:nth-child(8) a:focus,
+.sidebar-nav li:nth-child(8).open a:active,
+.sidebar-nav li:nth-child(8).open a:focus{
+  background-color: #2d2366;
+}
+
+.sidebar-nav li:nth-child(9) a:active,
+.sidebar-nav li:nth-child(9) a:focus,
+.sidebar-nav li:nth-child(9).open a:active,
+.sidebar-nav li:nth-child(9).open a:focus{
+  background-color: #35acdf;
+}
+
+.sidebar-nav li:nth-child(10) a:active,
+.sidebar-nav li:nth-child(10) a:focus,
+.sidebar-nav li:nth-child(10).open a:active,
+.sidebar-nav li:nth-child(10).open a:focus{
+  background-color: #ffa43d;
 }
 
 .sidebar-nav > .sidebar-brand {
@@ -303,8 +416,7 @@
   margin-top: 0; }
 
 .sidebar-nav-static {
-  padding: 10px 0px 10px 10px;
-  width: 220px;
+  padding: 2px 15px 2px 15px;
 }
 
 .status-success{

@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,60 +35,65 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.app;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.common.dao.app.ServingEndpointJsonDTO;
+import io.hops.hopsworks.common.dao.app.EmailJsonDTO;
+import io.hops.hopsworks.common.dao.app.JobWorkflowDTO;
+import io.hops.hopsworks.common.dao.app.KeystoreDTO;
+import io.hops.hopsworks.common.dao.app.TopicJsonDTO;
+import io.hops.hopsworks.common.dao.certificates.CertsFacade;
+import io.hops.hopsworks.common.dao.certificates.UserCerts;
+import io.hops.hopsworks.common.dao.hdfsUser.HdfsUsers;
+import io.hops.hopsworks.common.dao.hdfsUser.HdfsUsersFacade;
+import io.hops.hopsworks.common.dao.jobs.description.JobFacade;
+import io.hops.hopsworks.common.dao.jobs.description.Jobs;
+import io.hops.hopsworks.common.dao.jupyter.JupyterProject;
 import io.hops.hopsworks.common.dao.kafka.KafkaFacade;
 import io.hops.hopsworks.common.dao.kafka.SchemaDTO;
+import io.hops.hopsworks.common.dao.project.Project;
+import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dao.user.UserFacade;
+import io.hops.hopsworks.common.dao.user.Users;
+import io.hops.hopsworks.common.exception.GenericException;
+import io.hops.hopsworks.common.exception.JobException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.UserException;
+import io.hops.hopsworks.common.hdfs.HdfsUsersController;
+import io.hops.hopsworks.common.jobs.execution.ExecutionController;
+import io.hops.hopsworks.common.security.CertificatesController;
+import io.hops.hopsworks.common.security.CertificatesMgmService;
+import io.hops.hopsworks.common.user.UsersController;
+import io.hops.hopsworks.common.util.EmailBean;
+import io.hops.hopsworks.common.util.HopsUtils;
+import io.hops.hopsworks.common.util.Settings;
+import io.hops.security.HopsUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.json.JSONObject;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import io.hops.hopsworks.common.dao.app.EmailJsonDTO;
-import io.hops.hopsworks.common.dao.app.JobWorkflowDTO;
-import io.hops.hopsworks.common.dao.app.TopicJsonDTO;
-import io.hops.hopsworks.common.dao.certificates.CertsFacade;
-import io.hops.hopsworks.common.dao.certificates.UserCerts;
-import io.hops.hopsworks.common.dao.jobhistory.ExecutionFacade;
-import io.hops.hopsworks.common.dao.jobs.description.JobFacade;
-import io.hops.hopsworks.common.dao.jobs.description.Jobs;
-import io.hops.hopsworks.common.dao.project.Project;
-import io.hops.hopsworks.common.dao.project.ProjectFacade;
-import io.hops.hopsworks.common.dao.tfserving.TfServing;
-import io.hops.hopsworks.common.dao.tfserving.TfServingFacade;
-import io.hops.hopsworks.common.dao.user.UserFacade;
-import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.exception.AppException;
-import io.hops.hopsworks.common.hdfs.HdfsUsersController;
-import io.hops.hopsworks.common.jobs.execution.ExecutionController;
-import io.hops.hopsworks.common.user.UsersController;
-import io.hops.hopsworks.common.security.CertificatesController;
-import io.hops.hopsworks.common.util.EmailBean;
-import io.hops.hopsworks.common.util.Settings;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.SecurityContext;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("/appservice")
 @Stateless
@@ -76,7 +101,7 @@ import javax.ws.rs.core.SecurityContext;
     description = "Application Service")
 public class ApplicationService {
 
-  final static Logger LOGGER = Logger.getLogger(ApplicationService.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(ApplicationService.class.getName());
 
   @EJB
   private NoCacheResponse noCacheResponse;
@@ -101,16 +126,17 @@ public class ApplicationService {
   @EJB
   private JobFacade jobFacade;
   @EJB
-  private ExecutionFacade executionFacade;
+  private CertificatesMgmService certificatesMgmService;
   @EJB
-  private TfServingFacade tfServingFacade;
+  private HdfsUsersFacade hdfsUsersFacade;
+  @EJB
+  private Settings settings;
 
   @POST
   @Path("mail")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response sendEmail(@Context SecurityContext sc,
-      @Context HttpServletRequest req, EmailJsonDTO mailInfo) throws
-      AppException {
+      @Context HttpServletRequest req, EmailJsonDTO mailInfo) throws UserException {
     String projectUser = checkAndGetProjectUser(mailInfo.
         getKeyStoreBytes(), mailInfo.getKeyStorePwd().toCharArray());
 
@@ -138,67 +164,62 @@ public class ApplicationService {
   @Path("schema")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getSchemaForTopics(@Context SecurityContext sc,
-      @Context HttpServletRequest req, TopicJsonDTO topicInfo) throws
-      AppException {
+      @Context HttpServletRequest req, TopicJsonDTO topicInfo) throws UserException {
     String projectUser = checkAndGetProjectUser(topicInfo.getKeyStoreBytes(),
         topicInfo.getKeyStorePwd().toCharArray());
 
-    Project project = projectFacade.findByName(hdfsUserBean.getProjectName(
-        projectUser));
-
-    if (project == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-          "Incomplete request!");
-    }
-
     SchemaDTO schemaDto = kafka.getSchemaForTopic(topicInfo.getTopicName());
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
+    if(schemaDto != null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
         entity(schemaDto).build();
+    } else {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).
+        entity(schemaDto).build();
+    }
   }
 
   @POST
-  @Path("tfserving")
+  @Path("notebook")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getServingEndpoint(@Context SecurityContext sc,
-                            @Context HttpServletRequest req, ServingEndpointJsonDTO servingEndpointJsonDTO) throws
-          AppException {
+  public Response versionNotebook(@Context HttpServletRequest req,
+                                  KeystoreDTO keystoreDTO) throws UserException {
 
-    String projectUser = checkAndGetProjectUser(servingEndpointJsonDTO.
-            getKeyStoreBytes(), servingEndpointJsonDTO.getKeyStorePwd().toCharArray());
-
-    String projectName = servingEndpointJsonDTO.getProject();
-    String model = servingEndpointJsonDTO.getModel();
+    String projectUser = checkAndGetProjectUser(keystoreDTO.
+            getKeyStoreBytes(), keystoreDTO.getKeyStorePwd().toCharArray());
 
     //check if user is member of project
+
+    Users user = userFacade.findByUsername(hdfsUserBean.getUserName(projectUser));
+    String username = user.getUsername();
+
     Project project = projectFacade.findByName(hdfsUserBean.getProjectName(
             projectUser));
 
-    if(project != null && project.getName().equals(projectName)) {
-
-      String host = null;
-      String port = null;
-      List <TfServing> tfServings = tfServingFacade.findForProject(project);
-      for(TfServing tfServing: tfServings) {
-        if(tfServing.getModelName().equals(model)) {
-          host = tfServing.getHostIp();
-          port = tfServing.getPort().toString();
-          break;
-        }
-      }
-
-      JsonObjectBuilder arrayObjectBuilder = Json.createObjectBuilder();
-      if(host != null && port != null) {
-        arrayObjectBuilder.add("host", host);
-        arrayObjectBuilder.add("port", port);
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(arrayObjectBuilder.build()).build();
-      } else {
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
-      }
-    } else {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).
-              build();
+    Collection<HdfsUsers> hdfsUsers = hdfsUsersFacade.findProjectUsers(project.getName());
+    if(hdfsUsers == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
+    HdfsUsers jupyterHdfsUser = null;
+    for(HdfsUsers hdfsUser: hdfsUsers) {
+      if(hdfsUser.getUsername().equals(username)) {
+        jupyterHdfsUser = hdfsUser;
+      }
+    }
+
+    Collection<JupyterProject> jps = project.getJupyterProjectCollection();
+    for(JupyterProject jp: jps) {
+      if(jp.getHdfsUserId() == jupyterHdfsUser.getId()) {
+
+        JSONObject obj = new JSONObject(ClientBuilder.newClient()
+                .target(settings.getRestEndpoint() + "/hopsworks-api/jupyter/" + jp.getPort() + "/api/sessions")
+                .request()
+                .method("GET")
+                .readEntity(String.class));
+      }
+    }
+
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
   }
 
   /////////////////////////////////////////////////
@@ -209,7 +230,7 @@ public class ApplicationService {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "Submit IDs of jobs to start")
   public Response startJobs(@Context SecurityContext sc,
-      @Context HttpServletRequest req, JobWorkflowDTO jobsDTO) throws AppException {
+      @Context HttpServletRequest req, JobWorkflowDTO jobsDTO) throws GenericException, UserException, JobException {
     String projectUser = checkAndGetProjectUser(jobsDTO.getKeyStoreBytes(), jobsDTO.getKeyStorePwd().toCharArray());
     Users user = userFacade.findByUsername(hdfsUserBean.getUserName(projectUser));
     Project project = projectFacade.findByName(projectUser.split(Settings.DOUBLE_UNDERSCORE)[0]);
@@ -224,13 +245,7 @@ public class ApplicationService {
       jobsToRun.add(job);
     }
     for (Jobs job : jobsToRun) {
-      try {
-        executionController.start(job, user);
-      } catch (IOException ex) {
-        LOGGER.log(Level.SEVERE, null, ex);
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.INTERNAL_SERVER_ERROR).entity(
-            "An error occured while starting job with id:" + job.getId()).build();
-      }
+      executionController.start(job, user);
     }
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
   }
@@ -241,7 +256,7 @@ public class ApplicationService {
   @Consumes(MediaType.APPLICATION_JSON)
   @ApiOperation(value = "Retrieve jobs state")
   public Response getJobsWithRunningState(@Context SecurityContext sc,
-      @Context HttpServletRequest req, JobWorkflowDTO jobsDTO) throws AppException {
+      @Context HttpServletRequest req, JobWorkflowDTO jobsDTO) throws UserException {
     String projectUser = checkAndGetProjectUser(jobsDTO.getKeyStoreBytes(), jobsDTO.getKeyStorePwd().toCharArray());
     Project project = projectFacade.findByName(projectUser.split(Settings.DOUBLE_UNDERSCORE)[0]);
     List<Jobs> jobsRunning = jobFacade.getRunningJobs(project, projectUser, jobsDTO.getJobIds());
@@ -261,28 +276,47 @@ public class ApplicationService {
    * @param keyStore project-user keystore
    * @param keyStorePwd project-user password
    * @return CN of certificate
-   * @throws AppException When user is not authorized to access project.
    */
-  private String checkAndGetProjectUser(byte[] keyStore, char[] keyStorePwd)
-      throws AppException {
-    String commonName = certificatesController.extractCNFromCertificate(keyStore, keyStorePwd);
-
-    UserCerts userCert = certificateBean.findUserCert(hdfsUserBean.
-        getProjectName(commonName), hdfsUserBean.getUserName(commonName));
-
-    if (!Arrays.equals(userCert.getUserKey(), keyStore)) {
-      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
-          "Certificate error!");
+  private String checkAndGetProjectUser(byte[] keyStore, char[] keyStorePwd) throws UserException {
+    
+    try {
+      String dn = certificatesController.validateCertificate(keyStore, keyStorePwd);
+      String commonName = HopsUtil.extractCNFromSubject(dn);
+  
+      UserCerts userCert = certificateBean.findUserCert(hdfsUserBean.
+          getProjectName(commonName), hdfsUserBean.getUserName(commonName));
+  
+      if (userCert.getUserKey() == null || userCert.getUserKey().length == 0) {
+        throw new GeneralSecurityException("Could not find certificates for user " + commonName);
+      }
+      
+      String username = hdfsUserBean.getUserName(commonName);
+      Users user = userFacade.findByUsername(username);
+      if (user == null) {
+        throw new UserException(RESTCodes.UserErrorCode.AUTHENTICATION_FAILURE, Level.FINE, "user: " + commonName);
+      }
+      
+      String decryptedPassword = HopsUtils.decrypt(user.getPassword(), userCert.getUserKeyPwd(),
+          certificatesMgmService.getMasterEncryptionPassword());
+      
+      String storedCN = certificatesController.extractCNFromCertificate(userCert.getUserKey(),
+          decryptedPassword.toCharArray(), commonName);
+      if (!storedCN.equals(commonName)) {
+        throw new UserException(RESTCodes.UserErrorCode.AUTHENTICATION_FAILURE, Level.FINE, "user: " + commonName);
+      }
+      
+      return commonName;
+    } catch (Exception ex) {
+      throw new UserException(RESTCodes.UserErrorCode.AUTHENTICATION_FAILURE, Level.SEVERE, null, ex.getMessage());
     }
-    return commonName;
   }
 
-  private void assertAdmin(String projectUser) throws AppException {
+  private void assertAdmin(String projectUser) throws UserException {
     String username = hdfsUserBean.getUserName(projectUser);
     Users user = userFacade.findByUsername(username);
     if (!usersController.isUserInRole(user, "HOPS_ADMIN")) {
-      throw new AppException((Response.Status.UNAUTHORIZED.getStatusCode()),
-          "only admins can call this function");
+      throw new UserException(RESTCodes.UserErrorCode.AUTHENTICATION_FAILURE, Level.FINE,
+        "Method can be only be invoked by an admin");
     }
   }
 }

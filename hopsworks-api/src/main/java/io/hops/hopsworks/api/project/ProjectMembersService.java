@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,16 +35,19 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.project;
 
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
+import io.hops.hopsworks.common.exception.KafkaException;
+import io.hops.hopsworks.common.exception.ProjectException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.ServiceException;
+import io.hops.hopsworks.common.exception.UserException;
+import io.hops.hopsworks.common.security.CAException;
+
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -43,14 +66,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
-import io.hops.hopsworks.api.util.JsonResponse;
 import io.hops.hopsworks.common.constants.message.ResponseMessages;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeam;
-import io.hops.hopsworks.common.exception.AppException;
 import io.hops.hopsworks.common.project.MembersDTO;
 import io.hops.hopsworks.common.project.ProjectController;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RequestScoped
 @TransactionAttribute(TransactionAttributeType.NEVER)
@@ -83,7 +108,7 @@ public class ProjectMembersService {
   @JWTokenNeeded
   public Response findMembersByProjectID(
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException {
+          @Context HttpServletRequest req) {
 
     List<ProjectTeam> list = projectController.findProjectTeamById(
             this.projectId);
@@ -101,21 +126,19 @@ public class ProjectMembersService {
   public Response addMembers(
           MembersDTO members,
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException {
+          @Context HttpServletRequest req) throws KafkaException, ProjectException, UserException {
 
     Project project = projectController.findProjectById(this.projectId);
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     List<String> failedMembers = null;
     String owner = sc.getUserPrincipal().getName();
 
     if (members.getProjectTeam() == null || members.getProjectTeam().isEmpty()) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.NO_MEMBER_TO_ADD);
+      throw new IllegalArgumentException("Member was not provided in MembersDTO");
     }
     if (project != null) {
       //add new members of the project
-      failedMembers = projectController.addMembers(project, owner, members.
-              getProjectTeam());
+      failedMembers = projectController.addMembers(project, owner, members.getProjectTeam());
     }
 
     if (members.getProjectTeam().size() > 1) {
@@ -148,22 +171,19 @@ public class ProjectMembersService {
           @PathParam("email") String email,
           @FormParam("role") String role,
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException {
+          @Context HttpServletRequest req) throws ProjectException, UserException {
 
     Project project = projectController.findProjectById(this.projectId);
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     String owner = sc.getUserPrincipal().getName();
     if (email == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.EMAIL_EMPTY);
+      throw new IllegalArgumentException("Email was not provided.");
     }
     if (role == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.ROLE_NOT_SET);
+      throw new IllegalArgumentException("Role was not provided.");
     }
     if (project.getOwner().getEmail().equals(email)) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.PROJECT_OWNER_ROLE_NOT_ALLOWED);
+      throw new ProjectException(RESTCodes.ProjectErrorCode.PROJECT_OWNER_ROLE_NOT_ALLOWED, Level.FINE);
     }
     projectController.updateMemberRole(project, owner, email, role);
 
@@ -181,31 +201,23 @@ public class ProjectMembersService {
   public Response removeMembersByID(
           @PathParam("email") String email,
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException, Exception {
+          @Context HttpServletRequest req)
+    throws ProjectException, ServiceException, CAException, UserException, IOException {
 
     Project project = projectController.findProjectById(this.projectId);
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     String owner = sc.getUserPrincipal().getName();
     if (email == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.EMAIL_EMPTY);
+      throw new IllegalArgumentException("Email was not provided");
     }
     //Data Scientists are only allowed to remove themselves
     if (sc.isUserInRole(AllowedProjectRoles.DATA_SCIENTIST) && !owner.equals(email)) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.MEMBER_REMOVAL_NOT_ALLOWED);
+      throw new ProjectException(RESTCodes.ProjectErrorCode.MEMBER_REMOVAL_NOT_ALLOWED, Level.FINE);
     }
     if (project.getOwner().getEmail().equals(email)) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.PROJECT_OWNER_NOT_ALLOWED);
+      throw new ProjectException(RESTCodes.ProjectErrorCode.PROJECT_OWNER_NOT_ALLOWED, Level.FINE);
     }
-    try {
-      projectController.removeMemberFromTeam(project, owner, email, req.getSession().getId());
-    } catch (IOException ex) {
-      //FIXME: take an action?
-      logger.log(Level.WARNING,
-              "Error while trying to delete a member from team", ex);
-    }
+    projectController.removeMemberFromTeam(project, owner, email);
 
     json.setSuccessMessage(ResponseMessages.MEMBER_REMOVED_FROM_TEAM);
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(

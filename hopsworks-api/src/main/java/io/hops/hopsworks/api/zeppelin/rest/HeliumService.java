@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.zeppelin.rest;
@@ -28,7 +47,8 @@ import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeamFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.ZeppelinException;
 import io.swagger.annotations.Api;
 import javax.ejb.EJB;
 import javax.inject.Inject;
@@ -37,10 +57,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import java.util.logging.Level;
 
 @Path("/zeppelin/{projectID}/helium")
 @Produces("application/json")
@@ -65,28 +85,23 @@ public class HeliumService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public HeliumRestApi interpreter(@PathParam("projectID") String projectID,
-          @Context HttpServletRequest httpReq) throws
-          AppException {
+          @Context HttpServletRequest httpReq) throws ZeppelinException {
     Project project = zeppelinResource.getProject(projectID);
     if (project == null) {
-      throw new AppException(Response.Status.FORBIDDEN.getStatusCode(),
-              "Could not find project. Make sure cookies are enabled.");
+      throw new ZeppelinException(RESTCodes.ZeppelinErrorCode.PROJECT_NOT_FOUND, Level.FINE);
     }
     Users user = userBean.findByEmail(httpReq.getRemoteUser());
     if (user == null) {
-      throw new AppException(Response.Status.FORBIDDEN.getStatusCode(),
-              "Could not find remote user.");
+      throw new ZeppelinException(RESTCodes.ZeppelinErrorCode.USER_NOT_FOUND, Level.FINE);
     }
     String userRole = projectTeamBean.findCurrentRole(project, user);
     if (userRole == null) {
-      throw new AppException(Response.Status.FORBIDDEN.getStatusCode(),
-              "You curently have no role in this project!");
+      throw new ZeppelinException(RESTCodes.ZeppelinErrorCode.ROLE_NOT_FOUND, Level.FINE);
     }
 
     ZeppelinConfig zeppelinConf = zeppelinConfFactory.getProjectConf(project.getName());
     if (zeppelinConf == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Could not connect to web socket.");
+      throw new ZeppelinException(RESTCodes.ZeppelinErrorCode.WEB_SOCKET_ERROR, Level.FINE);
     }
     heliumRestApi.setParms(zeppelinConf);
     return heliumRestApi;

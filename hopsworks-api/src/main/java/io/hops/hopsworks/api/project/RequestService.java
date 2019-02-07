@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,32 +35,14 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.project;
 
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
-import io.hops.hopsworks.common.constants.message.ResponseMessages;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dao.dataset.DatasetRequest;
@@ -55,12 +57,30 @@ import io.hops.hopsworks.common.dao.project.team.ProjectTeam;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeamFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.DatasetException;
+import io.hops.hopsworks.common.exception.ProjectException;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.message.MessageController;
 import io.hops.hopsworks.common.util.EmailBean;
 import io.hops.hopsworks.common.util.Settings;
 import io.swagger.annotations.Api;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("/request")
 @Api(value = "Request Service", description = "Request Service")
@@ -99,53 +119,31 @@ public class RequestService {
   @JWTokenNeeded
   public Response requestAccess(RequestDTO requestDTO,
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException {
-    JsonResponse json = new JsonResponse();
+          @Context HttpServletRequest req) throws DatasetException, ProjectException {
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     if (requestDTO == null || requestDTO.getInodeId() == null
             || requestDTO.getProjectId() == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Incomplete request!");
+      throw new IllegalArgumentException("requestDTO was not provided or was incomplete!");
     }
     Users user = userFacade.findByEmail(sc.getUserPrincipal().getName());
     Inode inode = inodes.findById(requestDTO.getInodeId());
-    if (inode == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.DATASET_NOT_FOUND);
-    }
-
     Inode parent = inodes.findParent(inode);
     //requested project
     Project proj = projectFacade.findByName(parent.getInodePK().getName());
     Dataset ds = datasetFacade.findByProjectAndInode(proj, inode);
 
-    if (ds == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.DATASET_NOT_FOUND);
-    }
     //requesting project
     Project project = projectFacade.find(requestDTO.getProjectId());
-
-    if (project == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.PROJECT_NOT_FOUND);
-    }
     Dataset dsInRequesting = datasetFacade.findByProjectAndInode(project, inode);
 
     if (dsInRequesting != null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Project already contains dataset.");
+      throw new DatasetException(RESTCodes.DatasetErrorCode.DESTINATION_EXISTS, Level.INFO);
     }
 
     ProjectTeam projectTeam = projectTeamFacade.findByPrimaryKey(project, user);
-
-    if (projectTeam == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "You do not have any role in this project.");
-    }
     ProjectTeam projTeam = projectTeamFacade.findByPrimaryKey(proj, user);
     if (projTeam != null && proj.equals(project)) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "This dataset is already in the requesting project.");
+      throw new ProjectException(RESTCodes.ProjectErrorCode.TEAM_MEMBER_ALREADY_EXISTS, Level.FINE);
     }
     DatasetRequest dsRequest = datasetRequest.findByProjectAndDataset(
             project, ds);
@@ -166,10 +164,7 @@ public class RequestService {
     if (dsRequest != null && (dsRequest.getProjectTeam().getTeamRole().equals(
             projectTeam.getTeamRole()) || dsRequest.getProjectTeam().
             getTeamRole().equals(AllowedProjectRoles.DATA_OWNER))) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "There is a prior request for this dataset by " + projectTeam.
-              getUser().getFname() + " " + projectTeam.getUser().getLname()
-              + "from the same project.");
+      throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_REQUEST_EXISTS, Level.FINE);
     } else if (dsRequest != null && projectTeam.getTeamRole().equals(
             AllowedProjectRoles.DATA_OWNER)) {
       dsRequest.setProjectTeam(projectTeam);
@@ -200,8 +195,7 @@ public class RequestService {
       try {
         datasetRequest.persistDataset(dsRequest);
       } catch (Exception ex) {
-        logger.log(Level.SEVERE, "Could not persist datset request:",
-                ex.getMessage());
+        logger.log(Level.SEVERE, "Could not persist dataset request", ex);
         messageBean.remove(newMsg);
       }
     }
@@ -230,26 +224,21 @@ public class RequestService {
   @JWTokenNeeded
   public Response requestJoin(RequestDTO requestDTO,
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException {
-    JsonResponse json = new JsonResponse();
+          @Context HttpServletRequest req) throws ProjectException {
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     if (requestDTO == null || requestDTO.getProjectId() == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Incomplete request!");
+      throw new IllegalArgumentException("requestDTO wast not provided or was incomplete.");
     }
     //should be removed when users and user merg.
     Users user = userFacade.findByEmail(sc.getUserPrincipal().getName());
     Project project = projectFacade.find(requestDTO.getProjectId());
-
-    if (project == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              ResponseMessages.PROJECT_NOT_FOUND);
+    if(project == null){
+      throw new ProjectException(RESTCodes.ProjectErrorCode.PROJECT_NOT_FOUND, Level.FINE);
     }
-
     ProjectTeam projectTeam = projectTeamFacade.findByPrimaryKey(project, user);
 
     if (projectTeam != null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "You are already a member of this project.");
+      throw new ProjectException(RESTCodes.ProjectErrorCode.TEAM_MEMBER_ALREADY_EXISTS, Level.FINE);
     }
     //email body
     String msg = "Hi " + project.getOwner().getFname() + " " + project.

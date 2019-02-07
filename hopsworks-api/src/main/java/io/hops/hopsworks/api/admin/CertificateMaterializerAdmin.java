@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,17 +35,16 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.admin;
 
+import com.google.common.base.Strings;
 import io.hops.hopsworks.api.admin.dto.MaterializerStateResponse;
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
 import io.hops.hopsworks.common.security.CertificateMaterializer;
 import io.swagger.annotations.Api;
@@ -49,7 +68,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +84,7 @@ public class CertificateMaterializerAdmin {
   
   private final Pattern projectSpecificPattern = Pattern.compile("(\\w*)" + HdfsUsersController.USER_NAME_DELIMITER +
       "(\\w*)");
-  private final Logger LOG = Logger.getLogger(CertificateMaterializerAdmin.class.getName());
+  private final Logger LOGGER = Logger.getLogger(CertificateMaterializerAdmin.class.getName());
   
   @EJB
   private NoCacheResponse noCacheResponse;
@@ -79,16 +97,13 @@ public class CertificateMaterializerAdmin {
    * @param sc
    * @param request
    * @return
-   * @throws AppException
    */
   @GET
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
-  public Response getMaterializerState(@Context SecurityContext sc, @Context HttpServletRequest request)
-    throws AppException {
-  
+  public Response getMaterializerState(@Context SecurityContext sc, @Context HttpServletRequest request) {
     CertificateMaterializer.MaterializerState<Map<String, Map<String, Integer>>, Map<String, Map<String, Integer>>,
-        Map<String, Set<String>>> materializerState = certificateMaterializer.getState();
+        Map<String, Set<String>>, Map<String, Boolean>> materializerState = certificateMaterializer.getState();
     
     List<MaterializerStateResponse.CryptoMaterial> localStateResponse = createMaterializerResponse(materializerState
         .getLocalMaterial());
@@ -106,7 +121,7 @@ public class CertificateMaterializerAdmin {
     }
     
     MaterializerStateResponse responseState = new MaterializerStateResponse(localStateResponse, remoteStateResponse,
-        fileRemovalsResponse);
+        fileRemovalsResponse, materializerState.getMaterialKeyLocks());
     
     GenericEntity<MaterializerStateResponse> response = new GenericEntity<MaterializerStateResponse>(responseState){};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(response).build();
@@ -135,20 +150,18 @@ public class CertificateMaterializerAdmin {
    * @param materialName Name of the materialized crypto
    * @param directory Local directory of the crypto material
    * @return
-   * @throws AppException
    */
   @DELETE
   @Path("/local/{name}/{directory}")
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response removeLocalMaterializedCrypto(@Context SecurityContext sc, @Context HttpServletRequest request,
-      @PathParam("name") String materialName, @PathParam("directory") String directory) throws AppException {
-    if (materialName == null || materialName.isEmpty()) {
-      LOG.log(Level.WARNING, "Request to remove crypto material but the material name is either null or empty");
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Material name is null or empty");
+      @PathParam("name") String materialName, @PathParam("directory") String directory) {
+    if (Strings.isNullOrEmpty(materialName)) {
+      throw new IllegalArgumentException("materialName was not provided or was empty");
     }
     
-    JsonResponse response;
+    RESTApiJsonResponse response;
     Matcher psuMatcher = projectSpecificPattern.matcher(materialName);
     if (psuMatcher.matches()) {
       String projectName = psuMatcher.group(1);
@@ -185,20 +198,18 @@ public class CertificateMaterializerAdmin {
    * @param materialName Name of the materialized crypto
    * @param directory Remote directory of the crypto material
    * @return
-   * @throws AppException
    */
   @DELETE
   @Path("/remote/{name}/{directory}")
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response removeRemoteMaterializedCrypto(@Context SecurityContext sc, @Context HttpServletRequest request,
-      @PathParam("name") String materialName, @PathParam("directory") String directory) throws AppException {
-    if (materialName == null || materialName.isEmpty()) {
-      LOG.log(Level.WARNING, "Request to remove crypto material but the material name is either null or empty");
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Material name is null or empty");
+      @PathParam("name") String materialName, @PathParam("directory") String directory) {
+    if (Strings.isNullOrEmpty(materialName)) {
+      throw new IllegalArgumentException("materialName was not provided or was empty");
     }
     
-    JsonResponse response;
+    RESTApiJsonResponse response;
     Matcher psuMatcher = projectSpecificPattern.matcher(materialName);
     if (psuMatcher.matches()) {
       String projectName = psuMatcher.group(1);

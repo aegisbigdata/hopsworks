@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,14 +35,14 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.jobs;
 
+import com.google.common.base.Strings;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.jobhistory.Execution;
 import io.hops.hopsworks.common.dao.jobhistory.ExecutionFacade;
 import io.hops.hopsworks.common.dao.jobhistory.YarnApplicationAttemptStateFacade;
@@ -30,15 +50,16 @@ import io.hops.hopsworks.common.dao.jobhistory.YarnApplicationstate;
 import io.hops.hopsworks.common.dao.jobhistory.YarnApplicationstateFacade;
 import io.hops.hopsworks.common.dao.jobs.description.AppIdDTO;
 import io.hops.hopsworks.common.dao.jobs.description.AppInfoDTO;
-import io.hops.hopsworks.common.dao.jobs.description.Jobs;
 import io.hops.hopsworks.common.dao.jobs.description.JobFacade;
+import io.hops.hopsworks.common.dao.jobs.description.Jobs;
 import io.hops.hopsworks.common.dao.jobs.description.YarnAppUrlsDTO;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
-import io.hops.hopsworks.common.elastic.ElasticController;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.GenericException;
+import io.hops.hopsworks.common.exception.JobException;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
@@ -50,31 +71,9 @@ import io.hops.hopsworks.common.jobs.jobhistory.JobState;
 import io.hops.hopsworks.common.jobs.jobhistory.JobType;
 import io.hops.hopsworks.common.jobs.yarn.YarnLogUtil;
 import io.hops.hopsworks.common.jobs.yarn.YarnMonitor;
-import io.hops.hopsworks.common.metadata.exception.DatabaseException;
 import io.hops.hopsworks.common.util.Settings;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.net.InetAddress;
-import java.net.URLEncoder;
-import java.util.Map;
-import java.util.Objects;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import io.hops.hopsworks.common.yarn.YarnClientService;
+import io.hops.hopsworks.common.yarn.YarnClientWrapper;
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -98,14 +97,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
-
-import io.hops.hopsworks.common.yarn.YarnClientService;
-import io.hops.hopsworks.common.yarn.YarnClientWrapper;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
@@ -123,6 +129,17 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -146,13 +163,7 @@ public class JobService {
   @Inject
   private SparkService spark;
   @Inject
-  private AdamService adam;
-  @Inject
   private FlinkService flink;
-  @Inject
-  private TensorFlowService tensorflow;
-  @Inject
-  private InfluxDBService influxdb;
   @EJB
   private JobController jobController;
   @EJB
@@ -171,8 +182,6 @@ public class JobService {
   private YarnApplicationstateFacade yarnApplicationstateFacade;
   @EJB
   private HdfsUsersController hdfsUsersBean;
-  @EJB
-  private ElasticController elasticController;
   @EJB
   private UserFacade userFacade;
   @EJB
@@ -195,15 +204,13 @@ public class JobService {
    * @param sc
    * @param req
    * @return A list of all defined Jobs in this project.
-   * @throws io.hops.hopsworks.common.exception.AppException
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
   @JWTokenNeeded
   public Response findAllJobs(@Context SecurityContext sc,
-      @Context HttpServletRequest req)
-      throws AppException {
+      @Context HttpServletRequest req) {
     List<Jobs> jobs = jobFacade.findForProject(project);
     GenericEntity<List<Jobs>> jobList
         = new GenericEntity<List<Jobs>>(jobs) { };
@@ -218,7 +225,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @GET
   @Path("/{jobId}")
@@ -227,7 +233,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getJob(@PathParam("jobId") int jobId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Jobs job = jobFacade.findById(jobId);
     if (job == null) {
       return noCacheResponse.
@@ -255,7 +261,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @GET
   @Path("/{jobId}/config")
@@ -264,7 +269,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getJobConfiguration(@PathParam("jobId") int jobId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Jobs job = jobFacade.findById(jobId);
     if (job == null) {
       return noCacheResponse.
@@ -287,7 +292,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return url
-   * @throws AppException
    */
   @GET
   @Path("/{jobId}/appId")
@@ -296,7 +300,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getAppId(@PathParam("jobId") int jobId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Jobs job = jobFacade.findById(jobId);
     if (job == null) {
       return noCacheResponse.
@@ -340,7 +344,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return url
-   * @throws AppException
    */
   @GET
   @Path("/{jobId}/appIds")
@@ -349,7 +352,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getAppIds(@PathParam("jobId") int jobId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Jobs job = jobFacade.findById(jobId);
     if (job == null) {
       return noCacheResponse.
@@ -387,17 +390,9 @@ public class JobService {
     }
   }
 
-  private String getHdfsUser(SecurityContext sc) throws AppException {
-    if (project.getId() == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-          "Incomplete request!");
-    }
+  private String getHdfsUser(SecurityContext sc) {
     String loggedinemail = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(loggedinemail);
-    if (user == null) {
-      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
-          "You are not authorized for this invocation.");
-    }
     String hdfsUsername = hdfsUsersController.getHdfsUserName(project, user);
 
     return hdfsUsername;
@@ -409,7 +404,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return url
-   * @throws AppException
    */
   @GET
   @Path("/projectName")
@@ -418,7 +412,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getProjectName(
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
 
     try {
 
@@ -434,7 +428,7 @@ public class JobService {
 
   }
 
-  private List<YarnAppUrlsDTO> getTensorboardUrls(String hdfsUser, String appId) throws AppException {
+  private List<YarnAppUrlsDTO> getTensorBoardUrls(String hdfsUser, String appId) throws JobException {
     List<YarnAppUrlsDTO> urls = new ArrayList<>();
 
     DistributedFileSystemOps client = null;
@@ -442,10 +436,10 @@ public class JobService {
     try {
       client = dfs.getDfsOps(hdfsUser);
       FileStatus[] statuses = client.getFilesystem().globStatus(new org.apache.hadoop.fs.Path("/Projects/" + project.
-          getName() + "/Logs/TensorFlow/" + appId + "/tensorboard.exec*"));
+          getName() + "/Experiments/" + appId + "/TensorBoard.*"));
       DistributedFileSystem fs = client.getFilesystem();
       for (FileStatus status : statuses) {
-        LOGGER.log(Level.INFO, "Reading tensorboard for: {0}", status.getPath());
+        LOGGER.log(Level.FINE, "Reading tensorboard for: {0}", status.getPath());
         FSDataInputStream in = null;
         try {
           in = fs.open(new org.apache.hadoop.fs.Path(status.getPath().toString()));
@@ -463,12 +457,8 @@ public class JobService {
         }
 
       }
-
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "exception while geting job ui " + e.
-          getLocalizedMessage(), e);
-      throw new AppException(Response.Status.NO_CONTENT.getStatusCode(),
-          "Error getting the Tensorboard(s) for this application.");
+      throw new JobException(RESTCodes.JobErrorCode.TENSORBOARD_ERROR, Level.SEVERE, null, e.getMessage(), e);
     } finally {
       if (client != null) {
         dfs.closeDfsClient(client);
@@ -478,7 +468,7 @@ public class JobService {
     return urls;
   }
 
-  
+
   /**
    * Get the Job UI url for the specified job
    * <p>
@@ -487,7 +477,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return url
-   * @throws AppException
    */
   @GET
   @Path("/{appId}/ui/{isLivy}")
@@ -497,7 +486,46 @@ public class JobService {
   public Response getJobUI(@PathParam("appId") String appId,
       @PathParam("isLivy") String isLivy,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
+    Response noAccess = checkAccessRight(appId);
+    if (noAccess != null) {
+      return noAccess;
+    }
+    Response.Status response = Response.Status.OK;
+    List<YarnAppUrlsDTO> urls = new ArrayList<>();
+
+    try {
+      String trackingUrl = appAttemptStateFacade.findTrackingUrlByAppId(appId);
+      if (trackingUrl != null && !trackingUrl.isEmpty()) {
+        trackingUrl = "/hopsworks-api/api/project/" + project.getId() + "/jobs/"
+            + appId + "/prox/" + trackingUrl;
+        urls.add(new YarnAppUrlsDTO("spark", trackingUrl));
+      }
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "exception while geting job ui " + e.
+          getLocalizedMessage(), e);
+    }
+
+    GenericEntity<List<YarnAppUrlsDTO>> listUrls = new GenericEntity<List<YarnAppUrlsDTO>>(urls) { };
+
+    return noCacheResponse.getNoCacheResponseBuilder(response)
+        .entity(listUrls).build();
+  }
+
+  /**
+   * Get the Job UI url for the specified job
+   * <p>
+   * @param appId
+   * @param sc
+   * @return url
+   */
+  @GET
+  @Path("/{appId}/tensorboard")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
+  @JWTokenNeeded
+  public Response getTensorBoardUrls(@PathParam("appId") String appId,
+                                     @Context SecurityContext sc)  {
     Response noAccess = checkAccessRight(appId);
     if (noAccess != null) {
       return noAccess;
@@ -507,23 +535,9 @@ public class JobService {
     String hdfsUser = getHdfsUser(sc);
 
     try {
-      String trackingUrl = appAttemptStateFacade.findTrackingUrlByAppId(appId);
-      if (trackingUrl != null && !trackingUrl.isEmpty()) {
-        trackingUrl = "/hopsworks-api/api/project/" + project.getId() + "/jobs/"
-            + appId + "/prox/" + trackingUrl;
-        urls.add(new YarnAppUrlsDTO("spark", trackingUrl));
-      }
-
-      if (isLivy.compareToIgnoreCase("true") == 0) {
-        YarnApplicationstate appStates;
-        appStates = appStateBean.findByAppId(appId);
-        if (appStates != null && appStates.getAppname().toUpperCase().contains("TENSORFLOW")) {
-          urls.addAll(getTensorboardUrls(hdfsUser, appId));
-        }
-      }
-
+      urls.addAll(getTensorBoardUrls(hdfsUser, appId));
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "exception while geting job ui " + e.
+      LOGGER.log(Level.SEVERE, "Exception while getting TensorBoard endpoints" + e.
           getLocalizedMessage(), e);
     }
 
@@ -556,7 +570,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return url
-   * @throws AppException
    */
   @GET
   @Path("/{appId}/yarnui")
@@ -565,7 +578,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getYarnUI(@PathParam("appId") String appId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Response response = checkAccessRight(appId);
     if (response != null) {
       return response;
@@ -596,7 +609,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return url
-   * @throws AppException
    */
   @GET
   @Path("/{appId}/appinfo")
@@ -605,7 +617,7 @@ public class JobService {
   @JWTokenNeeded
   public Response getAppInfo(@PathParam("appId") String appId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Response response = checkAccessRight(appId);
     if (response != null) {
       return response;
@@ -730,7 +742,6 @@ public class JobService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @GET
   @Path("/{appId}/prox/{path: .+}")
@@ -742,7 +753,7 @@ public class JobService {
       @PathParam("path")
       final String param,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
 
     Response response = checkAccessRight(appId);
     if (response != null) {
@@ -769,9 +780,6 @@ public class JobService {
       params.setBooleanParameter(HttpClientParams.ALLOW_CIRCULAR_REDIRECTS,
           true);
       HttpClient client = new HttpClient(params);
-      HostConfiguration config = new HostConfiguration();
-      InetAddress localAddress = InetAddress.getLocalHost();
-      config.setLocalAddress(localAddress);
 
       final HttpMethod method = new GetMethod(uri.getEscapedURI());
       Enumeration<String> names = req.getHeaderNames();
@@ -794,14 +802,17 @@ public class JobService {
             + URLEncoder.encode(user, "ASCII"));
       }
 
-      client.executeMethod(config, method);
+      client.executeMethod(method);
       Response.ResponseBuilder responseBuilder = noCacheResponse.
           getNoCacheResponseBuilder(Response.Status.OK);
       for (Header header : method.getResponseHeaders()) {
         responseBuilder.header(header.getName(), header.getValue());
       }
+      //method.getPath().contains("/allexecutors") is needed to replace the links under Executors tab
+      //which are in a json response object
       if (method.getResponseHeader("Content-Type") == null || method.
-          getResponseHeader("Content-Type").getValue().contains("html")) {
+          getResponseHeader("Content-Type").getValue().contains("html")
+          || method.getPath().contains("/allexecutors")) {
         final String source = "http://" + method.getURI().getHost() + ":"
             + method.getURI().getPort();
         if (method.getResponseHeader("Content-Length") == null) {
@@ -898,8 +909,13 @@ public class JobService {
     ui = ui.replaceAll("(?<=(href|src)=\')(?=[a-zA-Z])",
         "/hopsworks-api/api/project/"
         + project.getId() + "/jobs/" + appId + "/prox/" + param);
+    ui = ui.replaceAll("(?<=\"(stdout\"|stderr\") : \")(?=[a-zA-Z])",
+        "/hopsworks-api/api/project/"
+        + project.getId() + "/jobs/" + appId + "/prox/");
+    ui = ui.replaceAll("here</a>\\s+for full log", "here</a> for latest " + settings.getSparkUILogsOffset()
+        + " bytes of logs");
+    ui = ui.replaceAll("/@hwqmstart=0", "/@hwqmstart=-" + settings.getSparkUILogsOffset());
     return ui;
-
   }
 
   private boolean hasAppAccessRight(String trackingUrl) {
@@ -1002,11 +1018,6 @@ public class JobService {
     for (Jobs desc : running) {
       try {
         Execution execution = exeFacade.findForJob(desc).get(0);
-        Execution updatedExecution = exeFacade.getExecution(execution.getJob().
-            getId());
-        if (updatedExecution != null) {
-          execution = updatedExecution;
-        }
         long executiontime = System.currentTimeMillis() - execution.
             getSubmissionTime().getTime();
         //not given appId (not submited yet)
@@ -1123,24 +1134,20 @@ public class JobService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @JWTokenNeeded
   public Response getLog(@PathParam("appId") String appId,
-      @PathParam("type") String type) throws AppException {
-    if (appId == null || appId.isEmpty()) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "Can not get log. No ApplicationId.");
+      @PathParam("type") String type) throws JobException {
+    if (Strings.isNullOrEmpty(appId)) {
+      throw new IllegalArgumentException("appId cannot be null or empty.");
     }
     Execution execution = exeFacade.findByAppId(appId);
     if (execution == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "No excution for appId " + appId);
+      throw new JobException(RESTCodes.JobErrorCode.JOB_EXECUTION_NOT_FOUND, Level.FINE, "AppId: " + appId);
     }
     if (!execution.getState().isFinalState()) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "Job still running.");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_EXECUTION_INVALID_STATE, Level.FINE, "Job still running.");
     }
     if (!execution.getJob().getProject().equals(this.project)) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "No excution for appId " + appId
-          + ".");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_ACCESS_ERROR, Level.FINE,
+        "Requested execution does not belong to a job of project: " + project.getName());
     }
 
     JsonObjectBuilder arrayObjectBuilder = Json.createObjectBuilder();
@@ -1168,34 +1175,35 @@ public class JobService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @JWTokenNeeded
   public Response getLogByJobId(@PathParam("jobId") Integer jobId, @PathParam("submissionTime") String submissionTime,
-      @PathParam("type") String type) throws AppException {
+      @PathParam("type") String type) throws GenericException, JobException {
     if (jobId == null || jobId <= 0) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Can not get log. No JobId.");
+      throw new IllegalArgumentException("jobId must be a non-null positive integer number.");
     }
     if (submissionTime == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Can not get log. With no submission time.");
+      throw new IllegalArgumentException("submissionTime was not provided.");
     }
     Jobs job = jobFacade.find(jobId);
     if (job == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Can not get log. Job not found.");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_NOT_FOUND, Level.FINE, "JobId:" + jobId);
     }
     SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
     Date date;
     try {
       date = sdf.parse(submissionTime);
     } catch (ParseException ex) {
-      LOGGER.log(Level.SEVERE, "Can not get log. Incorrect submission time. ", ex);
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Can't get log. Incorrect submission time.");
+      throw new GenericException(RESTCodes.GenericErrorCode.INCOMPLETE_REQUEST, Level.WARNING,
+        "Cannot get log. Incorrect submission time. Error offset:"+ex.getErrorOffset(), ex.getMessage(), ex);
     }
     Execution execution = exeFacade.findByJobIdAndSubmissionTime(date, job);
     if (execution == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "No excution for jobId " + jobId);
+      throw new JobException(RESTCodes.JobErrorCode.JOB_EXECUTION_NOT_FOUND, Level.FINE, "JobId " + jobId);
     }
     if (!execution.getState().isFinalState()) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Job still running.");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_EXECUTION_INVALID_STATE, Level.FINE, "Job still running.");
     }
     if (!execution.getJob().getProject().equals(this.project)) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "No excution for jobId " + jobId + ".");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_ACCESS_ERROR, Level.FINE,
+        "Requested execution does not belong to a job of project: " + project.getName());
     }
 
     JsonObjectBuilder arrayObjectBuilder = Json.createObjectBuilder();
@@ -1220,24 +1228,20 @@ public class JobService {
   @JWTokenNeeded
   public Response retryLogAggregation(@PathParam("appId") String appId,
       @PathParam("type") String type,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) throws JobException {
     if (appId == null || appId.isEmpty()) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "Can not get log. No ApplicationId.");
+      throw new IllegalArgumentException("get log. No ApplicationId.");
     }
     Execution execution = exeFacade.findByAppId(appId);
     if (execution == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "No excution for appId " + appId);
+      throw new JobException(RESTCodes.JobErrorCode.JOB_EXECUTION_NOT_FOUND, Level.FINE, "AppId " + appId);
     }
     if (!execution.getState().isFinalState()) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "Job still running.");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_EXECUTION_INVALID_STATE, Level.FINE, "Job still running.");
     }
     if (!execution.getJob().getProject().equals(this.project)) {
-      throw new AppException(Response.Status.BAD_REQUEST.
-          getStatusCode(), "No excution for appId " + appId
-          + ".");
+      throw new JobException(RESTCodes.JobErrorCode.JOB_ACCESS_ERROR, Level.FINE,
+        "Requested execution does not belong to a job of project: " + project.getName());
     }
 
     DistributedFileSystemOps dfso = null;
@@ -1246,17 +1250,14 @@ public class JobService {
     String hdfsUser = hdfsUsersBean.getHdfsUserName(project, user);
     String aggregatedLogPath = settings.getAggregatedLogPath(hdfsUser, appId);
     if (aggregatedLogPath == null) {
-      throw new AppException(Response.Status.NOT_FOUND.
-          getStatusCode(),
-          "Aggregation is not enabled.");
+      throw new JobException(RESTCodes.JobErrorCode.LOG_AGGREGATION_NOT_ENABLED, Level.WARNING);
     }
     try {
       dfso = dfs.getDfsOps();
       udfso = dfs.getDfsOps(hdfsUser);
       if (!dfso.exists(aggregatedLogPath)) {
-        throw new AppException(Response.Status.NOT_FOUND.
-            getStatusCode(),
-            "Logs not available. This could be caused by the rentention policy");
+        throw new JobException(RESTCodes.JobErrorCode.LOG_RETRIEVAL_ERROR, Level.WARNING,
+          "This could be caused by the retention policy");
       }
       if (type.equals("out")) {
         String hdfsLogPath = "hdfs://" + execution.getStdoutPath();
@@ -1264,9 +1265,8 @@ public class JobService {
             isEmpty()) {
           if (dfso.exists(hdfsLogPath) && dfso.getFileStatus(
               new org.apache.hadoop.fs.Path(hdfsLogPath)).getLen() > 0) {
-            throw new AppException(Response.Status.BAD_REQUEST.
-                getStatusCode(),
-                "Destination file is not empty.");
+            throw new JobException(RESTCodes.JobErrorCode.LOG_RETRIEVAL_ERROR, Level.WARNING,
+              "Destination file is not empty:" + hdfsLogPath);
           } else {
             String[] desiredLogTypes = {"out"};
             YarnClientWrapper yarnClientWrapper = ycs
@@ -1279,8 +1279,8 @@ public class JobService {
               YarnLogUtil.copyAggregatedYarnLogs(udfso, aggregatedLogPath,
                   hdfsLogPath, desiredLogTypes, monitor);
             } catch (IOException | InterruptedException | YarnException ex) {
-              throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-                  "something went wrong during the log aggregation");
+              throw new JobException(RESTCodes.JobErrorCode.LOG_RETRIEVAL_ERROR, Level.SEVERE,
+                "Something went wrong during the log aggregation", ex.getMessage(), ex);
             } finally {
               monitor.close();
             }
@@ -1292,9 +1292,8 @@ public class JobService {
             isEmpty()) {
           if (dfso.exists(hdfsErrPath) && dfso.getFileStatus(
               new org.apache.hadoop.fs.Path(hdfsErrPath)).getLen() > 0) {
-            throw new AppException(Response.Status.BAD_REQUEST.
-                getStatusCode(),
-                "Destination file is not empty.");
+            throw new JobException(RESTCodes.JobErrorCode.LOG_RETRIEVAL_ERROR, Level.WARNING,
+              "Destination file is not empty:" + hdfsErrPath);
           } else {
             String[] desiredLogTypes = {"err", ".log"};
             YarnClientWrapper yarnClientWrapper = ycs
@@ -1306,8 +1305,8 @@ public class JobService {
               YarnLogUtil.copyAggregatedYarnLogs(udfso, aggregatedLogPath,
                   hdfsErrPath, desiredLogTypes, monitor);
             } catch (IOException | InterruptedException | YarnException ex) {
-              throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-                  "something went wrong during the log aggregation");
+              throw new JobException(RESTCodes.JobErrorCode.LOG_RETRIEVAL_ERROR, Level.SEVERE,
+                "Something went wrong during the log aggregation", ex.getMessage(), ex);
             } finally {
               monitor.close();
             }
@@ -1324,14 +1323,15 @@ public class JobService {
         dfs.closeDfsClient(udfso);
       }
     }
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Log retrieved successfuly.");
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
         json).build();
   }
 
+
   /**
-   * Delete the job associated to the project and jobid. The return value is a
+   * Remove scheduling for the job with this jobid. The return value is a
    * JSON object stating operation successful
    * or not.
    * <p>
@@ -1339,23 +1339,15 @@ public class JobService {
    * @param sc
    * @param req
    * @return
-   * @throws io.hops.hopsworks.common.exception.AppException
    */
   @DELETE
-  @Path("/{jobId}/deleteJob")
+  @Path("/{jobId}/unschedule")
   @Produces(MediaType.APPLICATION_JSON)
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @JWTokenNeeded
-  public Response deleteJob(@PathParam("jobId") int jobId,
-      @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
-    LOGGER.log(Level.INFO, "Request to delete job");
-    String loggedinemail = sc.getUserPrincipal().getName();
-    Users user = userFacade.findByEmail(loggedinemail);
-    if (user == null) {
-      throw new AppException(Response.Status.UNAUTHORIZED.getStatusCode(),
-          "You are not authorized for this invocation.");
-    }
+  public Response unscheduleJob(@PathParam("jobId") int jobId,
+                            @Context SecurityContext sc,
+                            @Context HttpServletRequest req) {
     Jobs job = jobFacade.findById(jobId);
     if (job == null) {
       return noCacheResponse.
@@ -1367,27 +1359,71 @@ public class JobService {
       return noCacheResponse.
           getNoCacheResponseBuilder(Response.Status.FORBIDDEN).build();
     } else {
-      try {
-        LOGGER.log(Level.INFO, "Request to delete job name ={0} job id ={1}",
-            new Object[]{job.getName(), job.getId()});
-
-        elasticController.deleteJobLogs(project.getName(), "logs", settings.getJobLogsIdField(), job.getId());
-        jobFacade.removeJob(job);
-        LOGGER.log(Level.INFO, "Deleted job name ={0} job id ={1}",
-            new Object[]{job.getName(), job.getId()});
-        JsonResponse json = new JsonResponse();
-        json.setSuccessMessage("Deleted job " + job.getName() + " successfully");
-        activityFacade.persistActivity(ActivityFacade.DELETED_JOB + job.
-            getName(), project, sc.getUserPrincipal().getName());
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
-            entity(json).build();
-      } catch (DatabaseException ex) {
-        LOGGER.log(Level.WARNING,
-            "Job cannot be deleted  job name ={0} job id ={1}",
-            new Object[]{job.getName(), job.getId()});
-        throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.
-            getStatusCode(), ex.getMessage());
+      if(job.getJobConfig().getSchedule() != null) {
+        boolean status = jobController.unscheduleJob(job);
+        job.getJobConfig().setSchedule(null);
+        jobFacade.updateJobSchedule(jobId, null);
+        if (status) {
+          RESTApiJsonResponse json = new RESTApiJsonResponse();
+          json.setSuccessMessage("Unscheduled job " + job.getName()
+              + " successfully");
+          return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
+              entity(json).build();
+        } else {
+          LOGGER.log(Level.WARNING,
+              "Schedule does not exist in the scheduler for jobid {0}",
+              jobId);
+        }
       }
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
+    }
+  }
+
+  /**
+   * Delete the job associated to the project and jobid. The return value is a
+   * JSON object stating operation successful
+   * or not.
+   * <p>
+   * @param jobId
+   * @param sc
+   * @param req
+   * @return
+   */
+  @DELETE
+  @Path("/{jobId}/deleteJob")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTokenNeeded
+  public Response deleteJob(@PathParam("jobId") int jobId,
+      @Context SecurityContext sc,
+      @Context HttpServletRequest req) {
+    LOGGER.log(Level.INFO, "Request to delete job");
+    String loggedinemail = sc.getUserPrincipal().getName();
+    Jobs job = jobFacade.findById(jobId);
+    if (job == null) {
+      return noCacheResponse.
+          getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+    } else if (!job.getProject().equals(project)) {
+      //In this case, a user is trying to access a job outside its project!!!
+      LOGGER.log(Level.SEVERE,
+          "A user is trying to access a job outside their project!");
+      return noCacheResponse.
+          getNoCacheResponseBuilder(Response.Status.FORBIDDEN).build();
+    } else {
+      if(job.getJobConfig().getSchedule() != null) {
+        jobController.unscheduleJob(job);
+      }
+      LOGGER.log(Level.INFO, "Request to delete job name ={0} job id ={1}",
+        new Object[]{job.getName(), job.getId()});
+      jobFacade.removeJob(job);
+      LOGGER.log(Level.INFO, "Deleted job name ={0} job id ={1}",
+        new Object[]{job.getName(), job.getId()});
+      RESTApiJsonResponse json = new RESTApiJsonResponse();
+      json.setSuccessMessage("Deleted job " + job.getName() + " successfully");
+      activityFacade.persistActivity(ActivityFacade.DELETED_JOB + job.
+        getName(), project, sc.getUserPrincipal().getName());
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
+        entity(json).build();
     }
   }
 
@@ -1424,7 +1460,7 @@ public class JobService {
   public Response updateSchedule(ScheduleDTO schedule,
       @PathParam("jobId") int jobId,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
+      @Context HttpServletRequest req) {
     Jobs job = jobFacade.findById(jobId);
     if (job == null) {
       return noCacheResponse.
@@ -1436,32 +1472,25 @@ public class JobService {
       return noCacheResponse.
           getNoCacheResponseBuilder(Response.Status.FORBIDDEN).build();
     } else {
-      try {
-        boolean isScheduleUpdated = jobFacade.updateJobSchedule(jobId, schedule);
-        if (isScheduleUpdated) {
-          boolean status = jobController.scheduleJob(jobId);
-          if (status) {
-            JsonResponse json = new JsonResponse();
-            json.setSuccessMessage("Scheduled job " + job.getName()
-                + " successfully");
-            activityFacade.persistActivity(ActivityFacade.SCHEDULED_JOB + job.
-                getName(), project, sc.getUserPrincipal().getName());
-            return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
-                entity(json).build();
-          } else {
-            LOGGER.log(Level.WARNING,
-                "Schedule is not created in the scheduler for the jobid {0}",
-                jobId);
-          }
+      boolean isScheduleUpdated = jobFacade.updateJobSchedule(jobId, schedule);
+      if (isScheduleUpdated) {
+        boolean status = jobController.scheduleJob(jobId);
+        if (status) {
+          RESTApiJsonResponse json = new RESTApiJsonResponse();
+          json.setSuccessMessage("Scheduled job " + job.getName()
+            + " successfully");
+          activityFacade.persistActivity(ActivityFacade.SCHEDULED_JOB + job.
+            getName(), project, sc.getUserPrincipal().getName());
+          return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).
+            entity(json).build();
         } else {
           LOGGER.log(Level.WARNING,
-              "Schedule is not updated in DB for the jobid {0}", jobId);
+            "Schedule is not created in the scheduler for the jobid {0}",
+            jobId);
         }
-
-      } catch (DatabaseException ex) {
-        LOGGER.log(Level.WARNING, "Cannot update schedule {0}", ex.getMessage());
-        throw new AppException(Response.Status.INTERNAL_SERVER_ERROR.
-            getStatusCode(), ex.getMessage());
+      } else {
+        LOGGER.log(Level.WARNING,
+          "Schedule is not updated in DB for the jobid {0}", jobId);
       }
     }
     return noCacheResponse.getNoCacheResponseBuilder(
@@ -1483,38 +1512,10 @@ public class JobService {
     return this.spark.setProject(project);
   }
 
-  @Path("/tfspark")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
-  @JWTokenNeeded
-  public SparkService tfspark() {
-    return this.spark.setProject(project);
-  }
-
-  @Path("/tensorflow")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
-  @JWTokenNeeded
-  public TensorFlowService tensorflow() {
-    return this.tensorflow.setProject(project);
-  }
-
-  @Path("/adam")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
-  @JWTokenNeeded
-  public AdamService adam() {
-    return this.adam.setProject(project);
-  }
-
   @Path("/flink")
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
   @JWTokenNeeded
   public FlinkService flink() {
     return this.flink.setProject(project);
-  }
-
-  @Path("/{appId}/influxdb")
-  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER, AllowedProjectRoles.DATA_SCIENTIST})
-  @JWTokenNeeded
-  public InfluxDBService influxdb(@PathParam("appId") String appId) {
-    return this.influxdb.setAppId(appId);
   }
 }

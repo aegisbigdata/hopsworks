@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.hopssite;
@@ -34,7 +53,7 @@ import io.hops.hopsworks.common.util.Settings;
 import io.hops.hopsworks.dela.dto.common.UserDTO;
 import io.hops.hopsworks.dela.dto.hopssite.DatasetDTO;
 import io.hops.hopsworks.dela.dto.hopssite.HopsSiteDatasetDTO;
-import io.hops.hopsworks.dela.exception.ThirdPartyException;
+import io.hops.hopsworks.common.exception.DelaException;
 import io.hops.hopsworks.dela.hopssite.HopssiteController;
 import io.hops.hopsworks.dela.old_hopssite_dto.DatasetIssueDTO;
 import io.swagger.annotations.Api;
@@ -110,7 +129,7 @@ public class HopssiteService {
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
-  public Response getClusterId() throws ThirdPartyException {
+  public Response getClusterId() throws DelaException {
     String clusterId = settings.getDELA_CLUSTER_ID();
     LOGGER.log(Level.INFO, "Cluster id on hops-site: {0}", clusterId);
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(clusterId).build();
@@ -120,7 +139,7 @@ public class HopssiteService {
   @Path("userId")
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
-  public Response getUserId(@Context SecurityContext sc) throws ThirdPartyException {
+  public Response getUserId(@Context SecurityContext sc) throws DelaException {
     String id = String.valueOf(hopsSite.getUserId(sc.getUserPrincipal().getName()));
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(id).build();
   }
@@ -136,7 +155,7 @@ public class HopssiteService {
   @JWTokenNeeded
   public Response getAllDatasets(
     @ApiParam(required = true) @QueryParam("filter") CategoriesFilter filter) 
-    throws ThirdPartyException {
+    throws DelaException {
     List<HopsSiteDatasetDTO> datasets;
     switch(filter) {
       case ALL : datasets = hopsSite.getAll(); break;
@@ -156,7 +175,7 @@ public class HopssiteService {
   @Path("datasets/{publicDSId}")
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
-  public Response getDataset(@PathParam("publicDSId") String publicDSId) throws ThirdPartyException {
+  public Response getDataset(@PathParam("publicDSId") String publicDSId) throws DelaException {
     DatasetDTO.Complete datasets = hopsSite.getDataset(publicDSId);
     LOGGER.log(Settings.DELA_DEBUG, "Get a dataset");
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(datasets).build();
@@ -199,7 +218,7 @@ public class HopssiteService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public Response addDatasetIssue(@PathParam("publicDSId") String publicDSId, DatasetIssueReqDTO datasetIssueReq,
-          @Context SecurityContext sc) throws ThirdPartyException {
+          @Context SecurityContext sc) throws DelaException {
     if (datasetIssueReq == null) {
       throw new IllegalArgumentException("Dataset issue not set.");
     }

@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 .nav .open > a, .nav .open > a:focus, .nav .open > a:hover {
@@ -23,39 +42,11 @@
     border-color: #337ab7;
 }
 
-.nav-tabs {
-    border-bottom: none;
-}
-
-.nav-tabs > li > a {
-    border-radius: 0px;
-    margin-right: -1px;
-    color: #ddd;
-}
-
-.nav-tabs > li {
-    border-bottom: 1px solid #ddd;
-    width: auto;
-    font-weight: bold;
-    text-align: center;
-}
-
-.nav-tabs > li.active {
-    border-bottom-color: transparent;
-}
-
-.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-    border-top: 3px solid #00A2CA;
-    border-radius: 0px;
-}
-
 .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
     background-color: transparent;
     color: #fff;
 }
-/*nav.navbar-sics { background: #2e353d; border-color: #ccc; box-shadow: 0 0 2px 0 #ccc; }*/
-nav.navbar-sics { background: #00A2CA; border-color: #ccc; box-shadow: 0 0 2px 0 #ccc; }
-
+nav.navbar-sics { background: #2e353d; border-color: #ccc; box-shadow: 0 0 2px 0 #ccc; }
 nav.navbar-sics a { color: #337ab7; }
 
 nav.navbar-sics ul.navbar-nav a {
@@ -90,10 +81,8 @@ nav.navbar-sics span.badge.new { background: rgba(255, 0, 0, 0.8); color: #fff; 
 }
 
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
-    /*background-color: #2e353d; MOD A11F */
-    background-color: #00A2CA;
-    /*border-color: #2e353d; MOD A11F */
-    border-color: #00A2CA;
+    background-color: #2e353d;
+    border-color: #2e353d;
     color: #fff;
     z-index: 100;
     height: 43px;
@@ -181,43 +170,33 @@ ul.dropdown-messages .dropdown-header {
   transition: all 0.3s ease;
 }
 .ds-content.sidenav-open {
-  width: 80%;
+  width: 79%;
 }
 .ds-sidenav {
   width: 0;
   overflow: hidden;
   position: absolute;
-  right: 25px;/*start from right*/
-  top: 290px;
+  right: 0;/*start from right*/
+  top: 110px;
   bottom: 0;
   transition: all 0.3s ease;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,.2);
+  -webkit-box-shadow: 0 4px 8px rgba(0,0,0,.2);
+  background: rgb(250,250,250);
   z-index: 10;
-  height: 360px;
-  border: 1px solid #E6E6E6;
+  height: auto;
 }
 .ds-sidenav.open {
     width: 20%;
-    min-width: 380px;
-    height: 100%;
 }
 
 .ds-sidenav-table > tbody > tr > td {
   max-width: 230px;
   text-overflow: ellipsis;
   overflow: hidden;
-}
-
-.table-detail td {
-    display: block;
-}
-
-.table-detail > tbody > tr > td {
-    border-top: none;
-    font-size: 11px; color: #333333;
-    text-transform: lowercase;
 }
 
 .row-no-margin-left {

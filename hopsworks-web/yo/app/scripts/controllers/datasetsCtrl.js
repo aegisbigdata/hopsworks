@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 'use strict';
@@ -59,7 +78,7 @@ angular.module('hopsWorksApp')
             self.shared = undefined;
             self.status = undefined;
 
-            self.tgState = true;
+            self.tgState = false;
 
             self.onSuccess = function (e) {
               growl.success("Copied to clipboard", {title: '', ttl: 1000});
@@ -218,7 +237,11 @@ angular.module('hopsWorksApp')
                 } else if (error.data.errorMsg.indexOf("Path not found :") > -1) {
                   self.routeParamArray = [];
                   //$route.updateParams({fileName:''});
-                  growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000, referenceId: 4});
+                if (typeof error.data.usrMsg !== 'undefined') {
+                    growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                } else {
+                    growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                }
                   getDirContents();
                 }
                 self.working = false;
@@ -241,7 +264,11 @@ angular.module('hopsWorksApp')
                         self.select(self.highlighted.name, self.highlighted, undefined);
                         $scope.search = self.highlighted.name;
                       }, function (error) {
-                growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000, referenceId: 4});
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                          growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      } else {
+                          growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      }
               });
             };
 
@@ -266,7 +293,7 @@ angular.module('hopsWorksApp')
               }
               getDirContents();
 
-              self.tgState = true;
+              self.tgState = false;
             };
 
             init();
@@ -300,7 +327,11 @@ angular.module('hopsWorksApp')
                         growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
                         getDirContents();
                       }, function (error) {
-                growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                          growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000});
+                      } else {
+                          growl.error("", {title: error.data.errorMsg, ttl: 5000});
+                      }
               });
             };
 
@@ -368,7 +399,11 @@ angular.module('hopsWorksApp')
                       getDirContents();
                     }, function (error) {
                       self.sharingDataset[id] = false;
-                      growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                          growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000});
+                      } else {
+                          growl.error("", {title: error.data.errorMsg, ttl: 5000});
+                      }
                   });
                 }
               );
@@ -391,7 +426,11 @@ angular.module('hopsWorksApp')
                         getDirContents();
                       }, function (error) {
                         self.sharingDataset[id] = false;
-                        growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
+                        if (typeof error.data.usrMsg !== 'undefined') {
+                            growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000});
+                        } else {
+                            growl.error("", {title: error.data.errorMsg, ttl: 5000});
+                        }
                     });
                   }
               );
@@ -415,7 +454,11 @@ angular.module('hopsWorksApp')
                                   growl.success(success.data.successMessage, {title: 'The DataSet is not Public(internet) anymore.', ttl: 1500});
                                   getDirContents();
                                 }, function (error) {
-                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000, referenceId: 4});
+                                if (typeof error.data.usrMsg !== 'undefined') {
+                                    growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4 });
+                                } else {
+                                    growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4 });
+                                }
                         });
 
                       }
@@ -431,7 +474,19 @@ angular.module('hopsWorksApp')
                                   growl.success(success.data.successMessage, {title: 'The DataSet is not Public(cluster) anymore.', ttl: 1500});
                                   getDirContents();
                                 }, function (error) {
-                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000, referenceId: 4});
+                                if (typeof error.data.usrMsg !== 'undefined') {
+                                    growl.error(error.data.usrMsg, {
+                                        title: error.data.errorMsg,
+                                        ttl: 5000,
+                                        referenceId: 4
+                                    });
+                                } else {
+                                    growl.error("", {
+                                        title: error.data.errorMsg,
+                                        ttl: 5000,
+                                        referenceId: 4
+                                    });
+                                }
                         });
 
                       }
@@ -458,13 +513,38 @@ angular.module('hopsWorksApp')
                         growl.success("Refresh your browser when finished",
                                 {title: 'Unzipping in Background', ttl: 5000, referenceId: 4});
                       }, function (error) {
-                growl.error(error.data.errorMsg, {title: 'Error unzipping file', ttl: 5000, referenceId: 4});
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                          growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      } else {
+                          growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      }
+              });
+            };
+
+            self.zip = function (filename) {
+              var pathArray = self.pathArray.slice(0);
+//              pathArray.push(self.selected);
+              pathArray.push(filename);
+              var filePath = getPath(pathArray);
+
+              growl.info("Started zipping...",
+                      {title: 'Zipping Started', ttl: 2000, referenceId: 4});
+              dataSetService.zip(filePath).then(
+                      function (success) {
+                        growl.success("Refresh your browser when finished",
+                                {title: 'Zipping in Background', ttl: 5000, referenceId: 4});
+                      }, function (error) {
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                          growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      } else {
+                          growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      }
               });
             };
 
             self.isZippedfile = function () {
 
-// https://stackoverflow.com/questions/680929/how-to-extract-extension-from-filename-string-in-javascript
+              // https://stackoverflow.com/questions/680929/how-to-extract-extension-from-filename-string-in-javascript
               var re = /(?:\.([^.]+))?$/;
               var ext = re.exec(self.selected)[1];
               switch (ext) {
@@ -487,6 +567,14 @@ angular.module('hopsWorksApp')
               return false;
             };
 
+            self.isDirectory = function () {
+                if (!(self.selected == null)) {
+                    return (self.selected).dir;
+                } else {
+                    return false;
+                }
+            };
+
             self.convertIPythonNotebook = function (filename) {
               var pathArray = self.pathArray.slice(0);
               pathArray.push(filename); //self.selected
@@ -500,9 +588,14 @@ angular.module('hopsWorksApp')
                                 {title: 'Converting in Background', ttl: 3000, referenceId: 4});
                         getDirContents();
                       }, function (error) {
-                growl.error(error.data.errorMsg, {title: 'Error converting notebook', ttl: 5000, referenceId: 4});
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                          growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      } else {
+                          growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      }
               });
             };
+           
 
             self.isIPythonNotebook = function () {
               if (self.selected === null || self.selected === undefined) {
@@ -556,7 +649,11 @@ angular.module('hopsWorksApp')
                           $scope.readme = conv.makeHtml(content);
                         }, function (error) {
                   //To hide README from UI
-                  growl.error(error.data.errorMsg, {title: 'Error retrieving README file', ttl: 5000, referenceId: 4});
+                        if (typeof error.data.usrMsg !== 'undefined') {
+                            growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                        } else {
+                            growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                        }
                   $scope.readme = null;
                 });
               } else {
@@ -582,7 +679,11 @@ angular.module('hopsWorksApp')
                           getDirContents();
                           growl.success('', {title: 'Copied ' + name + ' successfully', ttl: 5000, referenceId: 4});
                         }, function (error) {
-                  growl.error(error.data.errorMsg, {title: name + ' was not copied', ttl: 5000, referenceId: 4});
+                        if (typeof error.data.usrMsg !== 'undefined') {
+                            growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                        } else {
+                            growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                        }
                 });
               }, function (error) {
               });
@@ -611,7 +712,7 @@ angular.module('hopsWorksApp')
                             names[i] = name;
                             i++;
                           }
-                          var errorMsg = '';
+                          var errorCode = -1;
                           for (var name in self.selectedFiles) {
                             dataSetService.copy(self.selectedFiles[name].id, relPath + "/" + name).then(
                                     function (success) {
@@ -624,11 +725,15 @@ angular.module('hopsWorksApp')
                                         self.all_selected = false;
                                       }
                                       //growl.success('',{title: 'Copied successfully', ttl: 5000, referenceId: 4});
-                                    }, function (error) {                                      
-                                       growl.error(error.data.errorMsg, {title: name + ' was not copied', ttl: 5000});
-                                       errorMsg = error.data.errorMsg;
+                                    }, function (error) {
+                                    if (typeof error.data.usrMsg !== 'undefined') {
+                                        growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000});
+                                    } else {
+                                        growl.error("", {title: error.data.errorMsg, ttl: 5000});
+                                    }
+                                       errorCode = error.data.code;
                             });
-                            if (errorMsg === 'Can not copy/move to a public dataset.') {
+                            if (errorCode === 110045) {
                               break;
                             }
                           }
@@ -690,7 +795,7 @@ angular.module('hopsWorksApp')
                             i++;
                           }
 
-                          var errorMsg = '';
+                          var errorCode = -1;
                           for (var name in self.selectedFiles) {
                             dataSetService.move(self.selectedFiles[name].id, relPath + "/" + name).then(
                                     function (success) {
@@ -704,9 +809,9 @@ angular.module('hopsWorksApp')
                                       }
                                     }, function (error) {
                                         growl.error(error.data.errorMsg, {title: name + ' was not moved', ttl: 5000});
-                                        errorMsg = error.data.errorMsg;
+                                        errorCode = error.data.code;
                             });
-                            if (errorMsg === 'Can not copy/move to a public dataset.') {
+                            if (errorCode === 110045) {
                               break;
                             }
                           }
@@ -877,6 +982,7 @@ angular.module('hopsWorksApp')
                 var newPathArray = self.pathArray.slice(0);
                 newPathArray.push(file.name);
                 getDirContents(newPathArray);
+                self.tgState = false;
               } else if (!file.underConstruction) {
                 ModalService.confirm('sm', 'Confirm', 'Do you want to download this file?').then(
                         function (success) {
@@ -922,6 +1028,7 @@ angular.module('hopsWorksApp')
               var newPathArray = self.pathArray.slice(0);
               newPathArray.splice(index, newPathArray.length - index);
               getDirContents(newPathArray);
+              self.tgState = false;
             };
 
             self.menustyle = {
@@ -948,6 +1055,7 @@ angular.module('hopsWorksApp')
               if (self.isSelectedFiles() > 0) {
                 self.selected = null;
               } else {
+                self.tgState = true;
                 self.selected = file.name;
               }
               $rootScope.$broadcast('file-selected', file);
@@ -1040,6 +1148,7 @@ angular.module('hopsWorksApp')
                 self.selected = Object.keys(self.selectedFiles)[0];
               }
               self.all_selected = false;
+              self.tgState = false;
 
             };
 

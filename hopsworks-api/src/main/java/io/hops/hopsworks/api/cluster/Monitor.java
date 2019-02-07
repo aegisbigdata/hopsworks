@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,23 +35,20 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.cluster;
 
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.host.Hosts;
 import io.hops.hopsworks.common.dao.host.HostsFacade;
-import io.hops.hopsworks.common.dao.kagent.ServiceStatusDTO;
 import io.hops.hopsworks.common.dao.kagent.HostServices;
 import io.hops.hopsworks.common.dao.kagent.HostServicesFacade;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.dao.kagent.ServiceStatusDTO;
+import io.hops.hopsworks.common.exception.GenericException;
 import io.swagger.annotations.Api;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -49,6 +66,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/kmon")
 @Api(value = "Monitor Cluster Service")
@@ -153,9 +172,9 @@ public class Monitor {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response serviceOp(@PathParam("groupName") String groupName, @Context SecurityContext sc,
-      @Context HttpServletRequest req, ServicesActionDTO action) throws AppException {
+      @Context HttpServletRequest req, ServicesActionDTO action) throws GenericException {
     String result = hostServicesFacade.serviceOp(groupName, action.getAction());
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage(result);
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
   }
@@ -167,8 +186,8 @@ public class Monitor {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN})
   @JWTokenNeeded
   public Response serviceOp(@PathParam("groupName") String groupName, @PathParam("serviceName") String serviceName,
-      @Context SecurityContext sc, @Context HttpServletRequest req, ServicesActionDTO action) throws AppException {
-    JsonResponse json = new JsonResponse();
+      @Context SecurityContext sc, @Context HttpServletRequest req, ServicesActionDTO action) throws GenericException {
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage(hostServicesFacade.serviceOp(groupName, serviceName, action.getAction()));
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
   }
@@ -182,8 +201,8 @@ public class Monitor {
   public Response serviceOnHostOp(@PathParam("groupName") String groupName,
       @PathParam("serviceName") String serviceName,
       @PathParam("hostId") String hostId, @Context SecurityContext sc, @Context HttpServletRequest req,
-      ServicesActionDTO action) throws AppException {
-    JsonResponse json = new JsonResponse();
+      ServicesActionDTO action) throws GenericException {
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage(hostServicesFacade.serviceOnHostOp(groupName, serviceName, hostId, action.getAction()));
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
   }

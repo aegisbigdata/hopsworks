@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,14 +35,12 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.common.dataset;
 
 import io.hops.common.Pair;
 import io.hops.hopsworks.common.constants.auth.AllowedRoles;
-import io.hops.hopsworks.common.constants.message.ResponseMessages;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
@@ -39,32 +57,32 @@ import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeamFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.DatasetException;
+import io.hops.hopsworks.common.exception.HopsSecurityException;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
-import io.hops.hopsworks.common.metadata.exception.DatabaseException;
 import io.hops.hopsworks.common.util.HopsUtils;
 import io.hops.hopsworks.common.util.Settings;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.persistence.NonUniqueResultException;
-import javax.validation.ValidationException;
-import javax.ws.rs.core.Response;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.security.AccessControlException;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.persistence.NonUniqueResultException;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contains business logic pertaining DataSet management.
@@ -115,35 +133,18 @@ public class DatasetController {
    * whether it can be visible in the search results or not)
    * @param defaultDataset
    * @param dfso
-   * @throws NullPointerException If any of the given parameters is null.
-   * @throws io.hops.hopsworks.common.exception.AppException
-   * @throws IllegalArgumentException If the given DataSetDTO contains invalid
    * folder names, or the folder already exists.
-   * @throws IOException if the creation of the dataset failed.
-   * @see FolderNameValidator.java
    */
   @TransactionAttribute(TransactionAttributeType.NEVER)
   public void createDataset(Users user, Project project, String dataSetName,
       String datasetDescription, int templateId, boolean searchable,
       boolean defaultDataset, DistributedFileSystemOps dfso)
-      throws IOException, AppException {
+    throws DatasetException, HopsSecurityException {
     //Parameter checking.
-    if (user == null) {
-      throw new NullPointerException(
-          "A valid user must be passed upon DataSet creation. Received null.");
-    } else if (project == null) {
-      throw new NullPointerException(
-          "A valid project must be passed upon DataSet creation. Received null.");
-    } else if (dataSetName == null) {
-      throw new NullPointerException(
-          "A valid DataSet name must be passed upon DataSet creation. Received null.");
+    if (user == null || project == null || dataSetName == null) {
+      throw new IllegalArgumentException("User, project or dataset were not provided");
     }
-    try {
-      FolderNameValidator.isValidName(dataSetName, false);
-    } catch (ValidationException e) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-          "Invalid folder name for DataSet: " + e.getMessage());
-    }
+    FolderNameValidator.isValidName(dataSetName, false);
     //Logic
     boolean success;
     String dsPath = File.separator + Settings.DIR_ROOT + File.separator
@@ -154,9 +155,8 @@ public class DatasetController {
         HopsUtils.dataSetPartitionId(parent, dataSetName));
 
     if (ds != null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-          "Invalid folder name for DataSet: "
-          + ResponseMessages.FOLDER_NAME_EXIST);
+      throw new DatasetException(RESTCodes.DatasetErrorCode.DESTINATION_EXISTS, Level.FINE,
+        "Dataset name: " + dataSetName);
     }
     //Permission 770
     FsAction global = FsAction.NONE;
@@ -188,22 +188,22 @@ public class DatasetController {
           logDataset(logDs, OperationType.Add);
         }
       } catch (Exception e) {
-        IOException failed = new IOException("Failed to create dataset at path "
-            + dsPath + ".", e);
         try {
           dfso.rm(new Path(dsPath), true);//if dataset persist fails rm ds folder.
-          throw failed;
         } catch (IOException ex) {
           if (e.getCause() instanceof NonUniqueResultException) {
-            throw new IOException(
-                "A shared Dataset with the same name already exists.", ex);
+            throw new DatasetException(RESTCodes.DatasetErrorCode.DESTINATION_EXISTS, Level.SEVERE,
+              "path: " + dataSetName,
+              ex.getMessage(), ex);
           }
-          throw new IOException(
-              "Failed to clean up properly on dataset creation failure", ex);
+          throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_OPERATION_ERROR, Level.SEVERE,
+            "Could not cleanup failed dataset create operation at path: " + dataSetName,
+            ex.getMessage(), ex);
         }
       }
     } else {
-      throw new IOException("Could not create the directory at " + dsPath);
+      throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_OPERATION_ERROR, Level.INFO,
+        "Could not create dataset: " + dataSetName);
     }
   }
 
@@ -223,9 +223,7 @@ public class DatasetController {
    * @param description The description of the directory
    * @param searchable Defines if the directory can be searched upon
    * @param udfso
-   * @throws java.io.IOException If something goes wrong upon the creation of
    * the directory.
-   * @throws io.hops.hopsworks.common.exception.AppException
    * @throws IllegalArgumentException If:
    * <ul>
    * <li>Any of the folder names on the given path does not have a valid name or
@@ -239,7 +237,7 @@ public class DatasetController {
    */
   public void createSubDirectory(Project project, Path dirPath,
       int templateId, String description, boolean searchable,
-      DistributedFileSystemOps udfso) throws IOException, AppException {
+      DistributedFileSystemOps udfso) throws DatasetException, HopsSecurityException {
 
     if (project == null) {
       throw new NullPointerException(
@@ -251,11 +249,7 @@ public class DatasetController {
 
     String folderName = dirPath.getName();
     String parentPath = dirPath.getParent().toString();
-    try {
-      FolderNameValidator.isValidName(folderName, true);
-    } catch (ValidationException e) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), e.getLocalizedMessage());
-    }
+    FolderNameValidator.isValidName(folderName, true);
 
     //Check if the given folder already exists
     if (inodes.existsPath(dirPath.toString())) {
@@ -299,8 +293,8 @@ public class DatasetController {
   public boolean deleteDatasetDir(Dataset dataset, Path location,
       DistributedFileSystemOps udfso) throws IOException {
     OperationsLog log = new OperationsLog(dataset, OperationType.Delete);
-    boolean success;
-    success = udfso.rm(location, true);
+    udfso.unsetMetaEnabled(location);
+    boolean success = udfso.rm(location, true);
     if (success) {
       operationsLogFacade.persist(log);
     }
@@ -376,13 +370,13 @@ public class DatasetController {
    */
   private boolean createFolder(String path, int template,
       FsPermission fsPermission,
-      DistributedFileSystemOps dfso) throws IOException {
-    boolean success = false;
+      DistributedFileSystemOps dfso) throws HopsSecurityException {
+    boolean success;
     Path location = new Path(path);
-    if (fsPermission == null) {
-      fsPermission = dfso.getParentPermission(location);
-    }
     try {
+      if (fsPermission == null) {
+        fsPermission = dfso.getParentPermission(location);
+      }
       success = dfso.mkdir(location, fsPermission);
       if (success) {
         dfso.setPermission(location, fsPermission);
@@ -397,12 +391,9 @@ public class DatasetController {
           templates.updateTemplatesInodesMxN(templ);
         }
       }
-    } catch (AccessControlException ex) {
-      throw new AccessControlException(ex);
-    } catch (IOException ex) {
-      throw new IOException("Could not create the directory at " + path, ex);
-    } catch (DatabaseException e) {
-      throw new IOException("Could not attach template to folder. ", e);
+    } catch (IOException  ex) {
+      throw new HopsSecurityException(RESTCodes.SecurityErrorCode.HDFS_ACCESS_CONTROL, Level.WARNING, "path: " + path,
+        ex.getMessage(), ex);
     }
     return success;
   }
@@ -459,7 +450,7 @@ public class DatasetController {
    * @throws IOException
    */
   public FilePreviewDTO getReadme(String path, DistributedFileSystemOps dfso)
-      throws AccessControlException, IOException {
+      throws IOException {
     if (path == null || dfso == null) {
       throw new IllegalArgumentException("One or more arguments are not set.");
     }
@@ -467,14 +458,12 @@ public class DatasetController {
       throw new IllegalArgumentException("Path does not contain readme file.");
     }
     FilePreviewDTO filePreviewDTO = null;
-    FSDataInputStream is;
     DataInputStream dis = null;
     try {
       if (!dfso.exists(path) || dfso.isDir(path)) {
         throw new IOException("The file does not exist");
       }
-      is = dfso.open(path);
-      dis = new DataInputStream(is);
+      dis = new DataInputStream(dfso.open(path));
       long fileSize = dfso.getFileStatus(new org.apache.hadoop.fs.Path(
           path)).getLen();
       if (fileSize > Settings.FILE_PREVIEW_TXT_SIZE_BYTES) {
@@ -533,7 +522,7 @@ public class DatasetController {
       case HIVEDB:
         // Project name is the same of database name
         String dbName = ds.getInode().getInodePK().getName();
-        return projectFacade.findByName(dbName.substring(0, dbName.lastIndexOf(".")));
+        return projectFacade.findByName(dbName.substring(0, dbName.lastIndexOf('.')));
       default:
         return null;
     }
@@ -576,4 +565,15 @@ public class DatasetController {
     }
     return false;
   }
+  
+  public void unsetMetaEnabledForAllDatasets(DistributedFileSystemOps dfso, Project project) throws IOException {
+    Collection<Dataset> datasets = project.getDatasetCollection();
+    for (Dataset dataset : datasets) {
+      if (dataset.isSearchable() && !dataset.isShared()) {
+        Path dspath = getDatasetPath(dataset);
+        dfso.unsetMetaEnabled(dspath);
+      }
+    }
+  }
+  
 }

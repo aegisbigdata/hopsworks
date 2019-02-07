@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.dela;
@@ -24,17 +43,17 @@ import io.hops.hopsworks.api.dela.dto.InodeIdDTO;
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.dela.cluster.ClusterDatasetController;
-import io.hops.hopsworks.dela.exception.ThirdPartyException;
+import io.hops.hopsworks.common.exception.DelaException;
 import io.swagger.annotations.Api;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -50,6 +69,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -58,7 +79,7 @@ import io.hops.hopsworks.api.filter.JWTokenNeeded;
 @Api(value = "Dela Cluster Project Service",
   description = "Dela Cluster Project Service")
 public class DelaClusterProjectService {
-  private final static Logger logger = Logger.getLogger(DelaClusterProjectService.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(DelaClusterProjectService.class.getName());
   
   @EJB
   private NoCacheResponse noCacheResponse;
@@ -79,11 +100,11 @@ public class DelaClusterProjectService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTokenNeeded
-  public Response share(@Context SecurityContext sc, InodeIdDTO inodeId) throws ThirdPartyException {
+  public Response share(@Context SecurityContext sc, InodeIdDTO inodeId) throws DelaException {
     Inode inode = getInode(inodeId.getId());
     Dataset dataset = getDatasetByInode(inode);
     clusterCtrl.shareWithCluster(dataset);
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Dataset transfer is started - published");
     return successResponse(json);
   }
@@ -95,33 +116,27 @@ public class DelaClusterProjectService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTokenNeeded
   public Response removePublic(@Context SecurityContext sc, @PathParam("inodeId") Integer inodeId) 
-    throws ThirdPartyException {
+    throws DelaException {
     Inode inode = getInode(inodeId);
     Dataset dataset = getDatasetByInode(inode);
     clusterCtrl.unshareFromCluster(dataset);
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Dataset is now private");
     return successResponse(json);
   }
   
-  private Inode getInode(Integer inodeId) throws ThirdPartyException {
+  private Inode getInode(Integer inodeId) throws DelaException {
     if (inodeId == null) {
-      throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(), "inode not found",
-        ThirdPartyException.Source.LOCAL, "bad request");
+      throw new DelaException(RESTCodes.DelaErrorCode.ILLEGAL_ARGUMENT, Level.FINE, DelaException.Source.LOCAL,
+        "inodeId was not provided.");
     }
-    Inode inode = inodeFacade.findById(inodeId);
-    if (inode == null) {
-      throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(), "inode not found",
-        ThirdPartyException.Source.LOCAL, "bad request");
-    }
-    return inode;
+    return inodeFacade.findById(inodeId);
   }
   
-  private Dataset getDatasetByInode(Inode inode) throws ThirdPartyException {
+  private Dataset getDatasetByInode(Inode inode) throws DelaException {
     Dataset dataset = datasetFacade.findByProjectAndInode(this.project, inode);
     if (dataset == null) {
-      throw new ThirdPartyException(Response.Status.BAD_REQUEST.getStatusCode(), "dataset not found",
-        ThirdPartyException.Source.LOCAL, "bad request");
+      throw new DelaException(RESTCodes.DelaErrorCode.DATASET_DOES_NOT_EXIST, Level.FINE, DelaException.Source.LOCAL);
     }
     return dataset;
   }

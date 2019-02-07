@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,21 +35,18 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.elastic;
 
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
+import com.google.common.base.Strings;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.common.elastic.ElasticController;
 import io.hops.hopsworks.common.elastic.ElasticHit;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.ServiceException;
 import io.swagger.annotations.Api;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -45,6 +62,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import io.hops.hopsworks.api.filter.JWTokenNeeded;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("/elastic")
 @Api(value = "Elastic Service", description = "Elastic Service")
@@ -53,7 +73,7 @@ import io.hops.hopsworks.api.filter.JWTokenNeeded;
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class ElasticService {
 
-  private final static Logger logger = Logger.getLogger(ElasticService.class.
+  private static final Logger logger = Logger.getLogger(ElasticService.class.
           getName());
   @EJB
   private NoCacheResponse noCacheResponse;
@@ -68,7 +88,6 @@ public class ElasticService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @GET
   @Path("globalsearch/{searchTerm}")
@@ -79,10 +98,10 @@ public class ElasticService {
   public Response globalSearch(
           @PathParam("searchTerm") String searchTerm,
           @Context SecurityContext sc,
-          @Context HttpServletRequest req) throws AppException {
-
-    if (searchTerm == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Incomplete request!");
+          @Context HttpServletRequest req) throws ServiceException {
+  
+    if (Strings.isNullOrEmpty(searchTerm)) {
+      throw new IllegalArgumentException("searchTerm was not provided or was empty");
     }
 
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
@@ -99,7 +118,6 @@ public class ElasticService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @GET
   @Path("projectsearch/{projectId}/{searchTerm}")
@@ -111,9 +129,9 @@ public class ElasticService {
       @PathParam("projectId") Integer projectId,
       @PathParam("searchTerm") String searchTerm,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
-    if (projectId == null || searchTerm == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(), "Incomplete request!");
+      @Context HttpServletRequest req) throws ServiceException {
+    if (Strings.isNullOrEmpty(searchTerm) || projectId == null) {
+      throw new IllegalArgumentException("One or more required parameters were not provided.");
     }
 
     GenericEntity<List<ElasticHit>> searchResults = new GenericEntity<List<ElasticHit>>(elasticController.projectSearch(
@@ -130,7 +148,6 @@ public class ElasticService {
    * @param sc
    * @param req
    * @return
-   * @throws AppException
    */
   @GET
   @Path("datasetsearch/{projectId}/{datasetName}/{searchTerm}")
@@ -143,10 +160,10 @@ public class ElasticService {
       @PathParam("datasetName") String datasetName,
       @PathParam("searchTerm") String searchTerm,
       @Context SecurityContext sc,
-      @Context HttpServletRequest req) throws AppException {
-
-    if (datasetName == null || searchTerm == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),"Incomplete request!");
+      @Context HttpServletRequest req) throws ServiceException {
+  
+    if (Strings.isNullOrEmpty(searchTerm) || Strings.isNullOrEmpty(datasetName) || projectId == null) {
+      throw new IllegalArgumentException("One or more required parameters were not provided.");
     }
 
     GenericEntity<List<ElasticHit>> searchResults = new GenericEntity<List<ElasticHit>>(elasticController.

@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.zeppelin.rest;
@@ -40,6 +59,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.enterprise.context.RequestScoped;
 
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.ZeppelinException;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
@@ -72,8 +93,9 @@ import io.hops.hopsworks.api.zeppelin.util.InterpreterBindingUtils;
 import io.hops.hopsworks.api.zeppelin.util.SecurityUtils;
 import io.hops.hopsworks.api.zeppelin.util.ZeppelinResource;
 import io.hops.hopsworks.common.dao.project.Project;
-import io.hops.hopsworks.common.exception.AppException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+
 import org.apache.zeppelin.interpreter.InterpreterResult;
 import org.apache.zeppelin.notebook.NoteInfo;
 import org.apache.zeppelin.notebook.Notebook;
@@ -635,7 +657,7 @@ public class NotebookRestApi {
                   project.getName() + "__" + username);
               certificateMaterializer.closedInterpreter(project.getId());
               HopsUtils.cleanupCertificatesForProject(project.getName(),
-                  settings.getHdfsTmpCertDir(), certificateMaterializer);
+                  settings.getHdfsTmpCertDir(), certificateMaterializer, settings);
               throw ex;
             }
           }
@@ -1041,13 +1063,12 @@ public class NotebookRestApi {
    * <p/>
    * @param newNote
    * @return note info if successful.
-   * @throws AppException
    */
   @POST
   @Path("/new")
   @Consumes(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
-  public Response createNew(NewNotebookRequest newNote) throws AppException {
+  public Response createNew(NewNotebookRequest newNote) throws ZeppelinException {
     Note note;
     NoteInfo noteInfo;
     AuthenticationInfo subject = new AuthenticationInfo(this.hdfsUserName);
@@ -1084,8 +1105,8 @@ public class NotebookRestApi {
       noteInfo = new NoteInfo(note);
       zeppelinResource.persistToDB(this.project);
     } catch (IOException ex) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Could not create notebook. " + ex.getMessage());
+      throw new ZeppelinException(RESTCodes.ZeppelinErrorCode.CREATE_NOTEBOOK_ERROR, Level.SEVERE, null,
+        ex.getMessage(),ex);
     }
     notebookServer.broadcastNote(note);
     notebookServer.broadcastNoteList(subject, SecurityUtils.getRoles());

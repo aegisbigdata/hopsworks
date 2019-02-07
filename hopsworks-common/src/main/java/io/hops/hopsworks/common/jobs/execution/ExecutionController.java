@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +35,6 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.common.jobs.execution;
@@ -33,14 +52,15 @@ import io.hops.hopsworks.common.dao.jobhistory.ExecutionFacade;
 import io.hops.hopsworks.common.dao.jobs.JobsHistoryFacade;
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
 import io.hops.hopsworks.common.dao.user.Users;
+import io.hops.hopsworks.common.exception.GenericException;
+import io.hops.hopsworks.common.exception.JobException;
+import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
 import io.hops.hopsworks.common.hdfs.DistributedFsService;
 import io.hops.hopsworks.common.hdfs.HdfsUsersController;
-import io.hops.hopsworks.common.jobs.adam.AdamController;
 import io.hops.hopsworks.common.jobs.flink.FlinkController;
 import io.hops.hopsworks.common.jobs.spark.SparkController;
 import io.hops.hopsworks.common.jobs.spark.SparkJobConfiguration;
-import io.hops.hopsworks.common.jobs.tensorflow.TensorFlowController;
 import io.hops.hopsworks.common.util.Settings;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,11 +80,7 @@ public class ExecutionController {
   @EJB
   private SparkController sparkController;
   @EJB
-  private AdamController adamController;
-  @EJB
   private FlinkController flinkController;
-  @EJB
-  private TensorFlowController tensorflowController;
   @EJB
   private InodeFacade inodes;
   @EJB
@@ -80,31 +96,13 @@ public class ExecutionController {
   @EJB
   private ExecutionFacade execFacade;
 
-  private final static Logger LOGGER = Logger.getLogger(ExecutionController.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(ExecutionController.class.getName());
 
   @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-  public Execution start(Jobs job, Users user) throws IOException {
-    Execution exec = null;
+  public Execution start(Jobs job, Users user) throws GenericException, JobException {
+    Execution exec;
 
     switch (job.getJobType()) {
-      case ADAM:
-        exec = adamController.startJob(job, user);
-//        if (exec == null) {
-//          throw new IllegalArgumentException("Problem getting execution object for: " + job.
-//              getJobType());
-//        }
-//        int execId = exec.getId();
-//        AdamJobConfiguration adamConfig = (AdamJobConfiguration) job.getJobConfig();
-//        String path = adamConfig.getAppPath();
-//        String[] parts = path.split("/");
-//        String pathOfInode = path.replace("hdfs://" + parts[2], "");
-//        
-//        Inode inode = inodes.getInodeAtPath(pathOfInode);
-//        String inodeName = inode.getInodePK().getName();
-//        
-//        jobHistoryFac.persist(user, job, execId, exec.getAppId());
-//        activityFacade.persistActivity(activityFacade.EXECUTED_JOB + inodeName, job.getProject(), user);
-        break;
       case FLINK:
         return flinkController.startJob(job, user, null);
       case SPARK:
@@ -129,28 +127,24 @@ public class ExecutionController {
         String inodeName = inode.getInodePK().getName();
 
         jobHistoryFac.persist(user, job, execId, exec.getAppId());
-        activityFacade.persistActivity(activityFacade.EXECUTED_JOB + inodeName,
+        activityFacade.persistActivity(ActivityFacade.EXECUTED_JOB + inodeName,
                 job.getProject(), user);
         break;
       case PYSPARK:
-      case TFSPARK:
         exec = sparkController.startJob(job, user);
         if (exec == null) {
-          throw new IllegalArgumentException("Problem getting execution object for: " + job.getJobType());
+          throw new IllegalArgumentException("Error while getting execution object for: " + job.getJobType());
         }
         break;
-      case TENSORFLOW:
-        return tensorflowController.startJob(job, user);
       default:
-        throw new IllegalArgumentException(
-                "Unsupported job type: " + job.
-                getJobType());
+        throw new GenericException(RESTCodes.GenericErrorCode.UNKNOWN_ACTION, Level.FINE, "Unsupported job type: "
+          + job.getJobType());
     }
 
     return exec;
   }
 
-  public void kill(Jobs job, Users user) throws IOException {
+  public void kill(Jobs job, Users user) {
     //Get the lastest appId for the job, a job cannot have to concurrent application running.
     List<Execution> jobExecs = execFacade.findForJob(job);
     //Sort descending based on jobId
@@ -186,9 +180,6 @@ public class ExecutionController {
   public void stop(Jobs job, Users user, String appid) throws
           IOException {
     switch (job.getJobType()) {
-      case ADAM:
-        adamController.stopJob(job, user, appid);
-        break;
       case SPARK:
         sparkController.stopJob(job, user, appid);
         break;

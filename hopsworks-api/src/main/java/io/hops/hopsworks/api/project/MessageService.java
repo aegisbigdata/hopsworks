@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,24 +35,25 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 package io.hops.hopsworks.api.project;
 
 import io.hops.hopsworks.api.filter.AllowedProjectGroups;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
-import io.hops.hopsworks.api.util.JsonResponse;
+import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.dataset.DatasetRequest;
 import io.hops.hopsworks.common.dao.dataset.DatasetRequestFacade;
 import io.hops.hopsworks.common.dao.message.Message;
 import io.hops.hopsworks.common.dao.message.MessageFacade;
 import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
-import io.hops.hopsworks.common.exception.AppException;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.RequestException;
 import io.hops.hopsworks.common.message.MessageController;
 import io.swagger.annotations.Api;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -60,7 +81,7 @@ import io.hops.hopsworks.api.filter.JWTokenNeeded;
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class MessageService {
 
-  private final static Logger logger = Logger.getLogger(MessageService.class.
+  private static final Logger LOGGER = Logger.getLogger(MessageService.class.
           getName());
   @EJB
   private MessageController msgController;
@@ -109,7 +130,7 @@ public class MessageService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public Response countUnreadMessagesByUser(@Context SecurityContext sc) {
-    JsonResponse json = new JsonResponse();
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     Long unread = msgFacade.countUnreadMessagesTo(user);
@@ -124,14 +145,10 @@ public class MessageService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public Response markAsRead(@PathParam("msgId") Integer msgId,
-          @Context SecurityContext sc) throws AppException {
+          @Context SecurityContext sc) throws RequestException {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     Message msg = msgFacade.find(msgId);
-    if (msg == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Message not found.");
-    }
     //Delete Dataset request from the database
     if (!Strings.isNullOrEmpty(msg.getSubject())) {
       DatasetRequest dsReq = dsReqFacade.findByMessageId(msg);
@@ -151,13 +168,12 @@ public class MessageService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public Response moveToTrash(@PathParam("msgId") Integer msgId,
-          @Context SecurityContext sc) throws AppException {
+          @Context SecurityContext sc) throws RequestException {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     Message msg = msgFacade.find(msgId);
     if (msg == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Message not found.");
+      throw new RequestException(RESTCodes.RequestErrorCode.MESSAGE_NOT_FOUND, Level.FINE);
     }
     //Delete Dataset request from the database
     if (!Strings.isNullOrEmpty(msg.getSubject())) {
@@ -178,13 +194,12 @@ public class MessageService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public Response restoreFromTrash(@PathParam("msgId") Integer msgId,
-          @Context SecurityContext sc) throws AppException {
+          @Context SecurityContext sc) throws RequestException {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     Message msg = msgFacade.find(msgId);
     if (msg == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Message not found.");
+      throw new RequestException(RESTCodes.RequestErrorCode.MESSAGE_NOT_FOUND, Level.FINE);
     }
     checkMsgUser(msg, user);//check if the user is the owner of the message
     msg.setDeleted(false);
@@ -198,13 +213,12 @@ public class MessageService {
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
   public Response deleteMessage(@PathParam("msgId") Integer msgId,
-          @Context SecurityContext sc) throws AppException {
+          @Context SecurityContext sc) throws RequestException {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     Message msg = msgFacade.find(msgId);
     if (msg == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Message not found.");
+      throw new RequestException(RESTCodes.RequestErrorCode.MESSAGE_NOT_FOUND, Level.FINE);
     }
     checkMsgUser(msg, user);//check if the user is the owner of the message
     msgFacade.remove(msg);
@@ -216,8 +230,8 @@ public class MessageService {
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectGroups({AllowedProjectGroups.HOPS_ADMIN, AllowedProjectGroups.HOPS_USER})
   @JWTokenNeeded
-  public Response emptyTrash(@Context SecurityContext sc) throws AppException {
-    JsonResponse json = new JsonResponse();
+  public Response emptyTrash(@Context SecurityContext sc) {
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     int rowsAffected = msgFacade.emptyTrash(user);
@@ -234,33 +248,25 @@ public class MessageService {
   @JWTokenNeeded
   public Response reply(@PathParam("msgId") Integer msgId,
           String content,
-          @Context SecurityContext sc) throws AppException {
+          @Context SecurityContext sc) throws RequestException {
     String eamil = sc.getUserPrincipal().getName();
     Users user = userFacade.findByEmail(eamil);
     Message msg = msgFacade.find(msgId);
     if (msg == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Message not found.");
+      throw new RequestException(RESTCodes.RequestErrorCode.MESSAGE_NOT_FOUND, Level.FINE);
     }
     if (content == null) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "No content.");
+      throw new IllegalArgumentException("content was not provided.");
     }
     checkMsgUser(msg, user);//check if the user is the owner of the message
-    try {
-      msgController.reply(user, msg, content);
-    } catch (IllegalArgumentException e) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              e.getMessage());
-    }
+    msgController.reply(user, msg, content);
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
             msg).build();
   }
 
-  private void checkMsgUser(Message msg, Users user) throws AppException {
+  private void checkMsgUser(Message msg, Users user) throws RequestException {
     if (!msg.getTo().equals(user)) {
-      throw new AppException(Response.Status.BAD_REQUEST.getStatusCode(),
-              "Can not perform the rquested action.");
+      throw new RequestException(RESTCodes.RequestErrorCode.MESSAGE_ACCESS_NOT_ALLOWED, Level.FINE);
     }
   }
 }

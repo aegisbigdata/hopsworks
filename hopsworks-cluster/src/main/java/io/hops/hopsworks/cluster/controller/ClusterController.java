@@ -1,4 +1,24 @@
 /*
+ * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
+ * This file is part of Hopsworks
+ * Copyright (C) 2018, Logical Clocks AB. All rights reserved
+ *
+ * Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Affero General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+ * are released under the following license:
+ *
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -31,15 +51,23 @@ import io.hops.hopsworks.common.dao.user.security.audit.AccountsAuditActions;
 import io.hops.hopsworks.common.dao.user.security.ua.SecurityUtils;
 import io.hops.hopsworks.common.dao.user.security.ua.UserAccountStatus;
 import io.hops.hopsworks.common.dao.user.security.ua.UserAccountsEmailMessages;
-import io.hops.hopsworks.common.exception.AppException;
-import io.hops.hopsworks.common.security.PKIUtils;
+import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.exception.UserException;
+import io.hops.hopsworks.common.security.CAException;
+import io.hops.hopsworks.common.security.CertificateType;
+import io.hops.hopsworks.common.security.OpensslOperations;
 import io.hops.hopsworks.common.user.AuthController;
 import io.hops.hopsworks.common.user.UsersController;
 import io.hops.hopsworks.common.util.EmailBean;
 import io.hops.hopsworks.common.util.FormatUtils;
 import io.hops.hopsworks.common.util.Settings;
-import java.io.File;
-import java.io.FileNotFoundException;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,27 +76,19 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.security.cert.CertificateException;
-import javax.servlet.http.HttpServletRequest;
 
 @Stateless
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class ClusterController {
 
-  private final static Logger LOGGER = Logger.getLogger(ClusterController.class.getName());
-  private final static String CLUSTER_NAME_PREFIX = "Agent";
-  private final static String CLUSTER_GROUP = "CLUSTER_AGENT";
-  public final static long VALIDATION_KEY_EXPIRY_DATE = 48l;//hours to validate request
-  public final static long VALIDATION_KEY_EXPIRY_DATE_MS = 48l * 36l * 100000l;//milisecond to validate request
-  private final static int VALIDATION_KEY_LEN = 64;
+  private static final Logger LOGGER = Logger.getLogger(ClusterController.class.getName());
+  private static final String CLUSTER_NAME_PREFIX = "Agent";
+  private static final String CLUSTER_GROUP = "CLUSTER_AGENT";
+  public static final long VALIDATION_KEY_EXPIRY_DATE = 48l;//hours to validate request
+  static final long VALIDATION_KEY_EXPIRY_DATE_MS = 48l * 36l * 100000l;//millisecond to validate request
+  private static final int VALIDATION_KEY_LEN = 64;
 
-  public static enum OP_TYPE {
+  public enum OP_TYPE {
 
     REGISTER,
     UNREGISTER
@@ -87,9 +107,11 @@ public class ClusterController {
   private AuthController authController;
   @EJB
   private UsersController usersCtrl;
+  @EJB
+  private OpensslOperations opensslOperations;
 
-  public void registerClusterNewUser(ClusterDTO cluster, HttpServletRequest req, boolean autoValidate) 
-    throws MessagingException, AppException {
+  public void registerClusterNewUser(ClusterDTO cluster, HttpServletRequest req, boolean autoValidate)
+    throws MessagingException, UserException {
     isValidNewCluster(cluster);
     Users clusterAgent = createClusterAgent(cluster, req);
     ClusterCert clusterCert = createClusterCert(cluster, clusterAgent);
@@ -106,7 +128,7 @@ public class ClusterController {
   }
 
   public void registerClusterWithUser(ClusterDTO cluster, HttpServletRequest req, boolean autoValidate)
-    throws MessagingException, AppException {
+    throws MessagingException, UserException {
     isValidCluster(cluster);
     Optional<Users> clusterAgent = verifyClusterAgent(cluster, req);
     if (!clusterAgent.isPresent()) {
@@ -123,7 +145,7 @@ public class ClusterController {
       new Object[]{clusterAgent.get().getEmail(), clusterAgent.get().getUsername()});
   }
 
-  private Optional<Users> verifyClusterAgent(ClusterDTO cluster, HttpServletRequest req) throws AppException {
+  private Optional<Users> verifyClusterAgent(ClusterDTO cluster, HttpServletRequest req) throws UserException {
     Users clusterAgent = userBean.findByEmail(cluster.getEmail());
     if (clusterAgent == null) {
       return Optional.empty();
@@ -132,7 +154,7 @@ public class ClusterController {
     return Optional.of(clusterAgent);
   }
 
-  private Users createClusterAgent(ClusterDTO cluster, HttpServletRequest req) throws AppException {
+  private Users createClusterAgent(ClusterDTO cluster, HttpServletRequest req) throws UserException {
     Optional<Users> clusterAgentAux = verifyClusterAgent(cluster, req);
     if (clusterAgentAux.isPresent()) {
       return clusterAgentAux.get();
@@ -196,7 +218,7 @@ public class ClusterController {
     clusterCertFacade.update(clusterCert);
   }
 
-  public void unregister(ClusterDTO cluster, HttpServletRequest req) throws MessagingException, AppException {
+  public void unregister(ClusterDTO cluster, HttpServletRequest req) throws MessagingException, UserException {
     isValidCluster(cluster);
     Users clusterAgent = userBean.findByEmail(cluster.getEmail());
     if (clusterAgent == null) {
@@ -226,8 +248,7 @@ public class ClusterController {
     LOGGER.log(Level.INFO, "Unregistering cluster with email: {0}", clusterAgent.getEmail());
   }
 
-  public void validateRequest(String key, HttpServletRequest req, OP_TYPE type) throws IOException,
-    FileNotFoundException, InterruptedException, CertificateException {
+  public void validateRequest(String key, HttpServletRequest req, OP_TYPE type) throws IOException {
     Integer clusterCertId = extractClusterCertId(key);
     ClusterCert clusterCert = clusterCertFacade.find(clusterCertId);
     if (clusterCert == null) {
@@ -257,7 +278,7 @@ public class ClusterController {
       clusterCert.setRegistrationStatus(RegistrationStatusEnum.REGISTERED);
       clusterCertFacade.update(clusterCert);
     } else if (clusterCert.getRegistrationStatus().equals(RegistrationStatusEnum.UNREGISTRATION_PENDING)) {
-      revokeCert(clusterCert, true);
+      revokeCert(clusterCert);
       removeClusterCert(clusterCert);
     }
   }
@@ -287,8 +308,7 @@ public class ClusterController {
     }
   }
 
-  public List<ClusterCert> getAllClusters(ClusterDTO cluster, HttpServletRequest req) throws MessagingException,
-    AppException {
+  public List<ClusterCert> getAllClusters(ClusterDTO cluster, HttpServletRequest req) throws UserException {
     if (cluster == null) {
       throw new NullPointerException("Cluster not assigned.");
     }
@@ -306,8 +326,7 @@ public class ClusterController {
     return clusterCertFacade.getByAgent(clusterAgent);
   }
 
-  public List<ClusterYmlDTO> getAllClusterYml(ClusterDTO cluster, HttpServletRequest req) throws MessagingException,
-    AppException {
+  public List<ClusterYmlDTO> getAllClusterYml(ClusterDTO cluster, HttpServletRequest req) throws UserException {
     if (cluster == null) {
       throw new NullPointerException("Cluster not assigned.");
     }
@@ -336,7 +355,7 @@ public class ClusterController {
     return clusterYmlDTOs;
   }
 
-  public ClusterCert getCluster(ClusterDTO cluster, HttpServletRequest req) throws MessagingException, AppException {
+  public ClusterCert getCluster(ClusterDTO cluster, HttpServletRequest req) throws UserException {
 
     isValidCluster(cluster);
     Users clusterAgent = userBean.findByEmail(cluster.getEmail());
@@ -353,7 +372,7 @@ public class ClusterController {
   }
 
   private void checkUserPasswordAndStatus(ClusterDTO cluster, Users clusterAgent, HttpServletRequest req)
-    throws AppException {
+    throws UserException {
     authController.checkPasswordAndStatus(clusterAgent, cluster.getChosenPassword(), req);
     BbcGroup group = groupFacade.findByGroupName(CLUSTER_GROUP);
     if (!clusterAgent.getBbcGroupCollection().contains(group)) {
@@ -483,17 +502,19 @@ public class ClusterController {
     return TimeUnit.MILLISECONDS.toHours(diff);
   }
 
-  private void revokeCert(ClusterCert clusterCert, boolean intermediate) throws FileNotFoundException, IOException,
-    InterruptedException, CertificateException {
+  private void revokeCert(ClusterCert clusterCert) throws IOException {
     if (clusterCert == null || clusterCert.getSerialNumber() == null) {
       return;
     }
-    String agentP = intermediate ? settings.getIntermediateCaDir() : settings.getCertsDir();
-    File agentPem = new File(agentP + "/newcerts/" + clusterCert.getSerialNumber() + ".pem");
-    if (!agentPem.exists()) {
-      LOGGER.log(Level.WARNING, "Could not find cert to be revoked at path: {0}", agentPem.getPath());
-    }
-    PKIUtils.revokeCert(settings, agentPem.getPath(), intermediate);
-  }
 
+    try {
+      opensslOperations.revokeCertificate(clusterCert.getCommonName(), CertificateType.DELA,
+          true, true);
+    } catch (CAException cae){
+      if (cae.getErrorCode() == RESTCodes.CAErrorCode.CERTNOTFOUND) {
+        LOGGER.log(Level.WARNING, "Could not find certificate with CN: " +
+            clusterCert.getCommonName() + " to be revoked");
+      }
+    }
+  }
 }

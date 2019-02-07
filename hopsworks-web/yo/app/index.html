@@ -1,4 +1,24 @@
 <!--
+  ~ Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+  ~ are released under the following license:
+  ~
+  ~ This file is part of Hopsworks
+  ~ Copyright (C) 2018, Logical Clocks AB. All rights reserved
+  ~
+  ~ Hopsworks is free software: you can redistribute it and/or modify it under the terms of
+  ~ the GNU Affero General Public License as published by the Free Software Foundation,
+  ~ either version 3 of the License, or (at your option) any later version.
+  ~
+  ~ Hopsworks is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  ~ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  ~ PURPOSE.  See the GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License along with this program.
+  ~ If not, see <https://www.gnu.org/licenses/>.
+  ~
+  ~ Changes to this file committed before and including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
+  ~ are released under the following license:
+  ~
   ~ Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,23 +35,19 @@
   ~ NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
   ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  ~
   -->
 
 <html>
   <head>
     <meta charset="utf-8">
-    <!--title>HopsWorks</title MOD A11F -->
-    <title>AEGIS Workspace</title>
+    <title>Hopsworks</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-    <link rel="icon" type="image/png" href="images/aegis/AEGIS_Link.png" />
-    <!--link rel="icon" type="image/png" href="images/hops-black.png" /> MOD A11F -->
+    <link rel="icon" type="image/png" href="images/hops-black.png" />
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lobster'>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Varela+Round'>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:500'>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Source+Sans+Pro'>
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
@@ -66,7 +82,6 @@
     <link rel="stylesheet" href="styles/angular-tour.css"/>
     <link rel="stylesheet" href="styles/timeline.css">
     <link rel="stylesheet" href="styles/ExampleProjectLoaderFix.css">
-    <link rel="stylesheet" href="styles/workflows.css">
     <link rel="stylesheet" href="styles/jquery.qtip.css" />
     <link rel="stylesheet" href="styles/loading.css">
     <link rel="stylesheet" href="styles/angular-resizable.css">
@@ -86,7 +101,6 @@
     <div class="hw-wrapper" id="hwWrapper">
       <div ng-view=""></div>
     </div>
-    <div ng-include="'views/footer-banner.html'"></div>
     <!-- build:js(.) scripts/jquery.js -->
     <script src="bower_components/jquery/jquery.js"></script>
     <!-- endbuild -->
@@ -112,6 +126,7 @@
     <script src="bower_components/lodash/lodash.js"></script>
     <script src="bower_components/graphlib/dist/graphlib.core.js"></script>
     <script src="bower_components/dagre/dist/dagre.core.js"></script>
+    <script src="bower_components/dagre/dist/dagre.core.min.js"></script>
     <script src="bower_components/cytoscape-dagre/cytoscape-dagre.js"></script>
     <script src="bower_components/jstree/dist/jstree.js"></script>
     <script src="bower_components/recase/recase.js"></script>
@@ -158,18 +173,14 @@
     <script src="scripts/app.js"></script>
     <script src="scripts/js/util.js"></script>
     <script src="scripts/js/countries.js"></script>
-    <!--<script src="scripts/js/cytoscape-toolbar.js"></script>-->
-    <script src="scripts/js/jquery.ajax-retry.min.js"></script>
-    <script src="scripts/js/workflows.js"></script>
     <script src="scripts/js/hamburger.js"></script>
     <script src="scripts/js/ace/ace.js"></script>
     <script src="scripts/js/ace/mode-json.js"></script>
     <script src="scripts/js/graph-settings.js"></script>
-    
+
     <script src="scripts/directives/switch.js"></script>
     <script src="scripts/directives/modal.js"></script>
     <script src="scripts/directives/passwordMatch.js"></script>
-    <script src="scripts/directives/focus.js"></script>
     <script src="scripts/directives/hwcard.js"></script>
     <script src="scripts/directives/hwPanel.js"></script>
 
@@ -196,6 +207,8 @@
     <script src="scripts/controllers/modifyFieldCtrl.js"></script>
     <script src="scripts/controllers/registrationCtrl.js"></script>
     <script src="scripts/controllers/selectFileCtrl.js"></script>
+    <script src="scripts/controllers/selectEnvYmlCtrl.js"></script>
+    <script src="scripts/controllers/selectModelServingCtrl.js"></script>
     <script src="scripts/controllers/attachTemplateCtrl.js"></script>
     <script src="scripts/controllers/shareDatasetCtrl.js"></script>
     <script src="scripts/controllers/unshareDatasetCtrl.js"></script>
@@ -208,35 +221,27 @@
     <script src="scripts/controllers/metadataCtrl.js"></script>
     <script src="scripts/controllers/importTemplateCtrl.js"></script>
     <script src="scripts/controllers/zeppelinCtrl.js"></script>
-    <script src="scripts/controllers/vizopsCtrl.js"></script>
-    <script src="scripts/controllers/vizopsOverviewCtrl.js"></script>
-    <script src="scripts/controllers/vizopsDriverCtrl.js"></script>
-    <script src="scripts/controllers/vizopsExecutorCtrl.js"></script>
-    <script src="scripts/controllers/vizopsWorkerCtrl.js"></script>
-    <script src="scripts/controllers/vizopsStreamingCtrl.js"></script>
     <script src="scripts/controllers/messageCtrl.js"></script>
     <script src="scripts/controllers/sshKeysCtrl.js"></script>
     <script src="scripts/controllers/detachTemplateCtrl.js"></script>
     <script src="scripts/controllers/localFsCtrl.js"></script>
     <script src="scripts/controllers/inputModalCtrl.js"></script>
     <script src="scripts/controllers/uberCtrl.js"></script>
-    <script src="scripts/controllers/workflowCtrl.js"></script>
-    <script src="scripts/controllers/workflowcreatorCtrl.js"></script>
     <script src="scripts/controllers/uberCtrl.js"></script>
-    <script src="scripts/controllers/tfservingCtrl.js"></script>
     <script src="scripts/controllers/kafkaCtrl.js"></script>
-    <script src="scripts/controllers/tensorflowCtrl.js"></script>    
-    <script src="scripts/controllers/pythonDepsCtrl.js"></script>    
-    <script src="scripts/controllers/selectProjectCtrl.js"></script>    
-    <script src="scripts/controllers/createTopicCtrl.js"></script>    
-    <script src="scripts/controllers/createAclCtrl.js"></script> 
+    <script src="scripts/controllers/transformGraphCtrl.js"></script>
+    <script src="scripts/controllers/pythonDepsCtrl.js"></script>
+    <script src="scripts/controllers/experimentsCtrl.js"></script>
+    <script src="scripts/controllers/selectProjectCtrl.js"></script>
+    <script src="scripts/controllers/createTopicCtrl.js"></script>
+    <script src="scripts/controllers/createAclCtrl.js"></script>
     <script src="scripts/controllers/schemaCreateCtrl.js"></script>
     <script src="scripts/controllers/schemaViewContentCtrl.js"></script>
     <script src="scripts/controllers/schemaUpdateContentCtrl.js"></script>
+    <script src="scripts/controllers/servingCtrl.js"></script>
     <script src="scripts/controllers/delaCtrl.js"></script>
     <script src="scripts/controllers/delaClientCtrl.js"></script>
     <script src="scripts/controllers/setupDownload.js"></script>
-    <script src="scripts/controllers/json.js"></script> 
     <script src="scripts/controllers/filePreviewCtrl.js"></script>
     <script src="scripts/controllers/clusterUtilisationCtrl.js"></script>
     <script src="scripts/controllers/cardCtrl.js"></script>
@@ -248,10 +253,6 @@
     <script src="scripts/controllers/publicDSPanelCtrl.js"></script>
     <script src="scripts/controllers/ldapLoginCtrl.js"></script>
     <script src="scripts/controllers/ldapUserConsentModalCtrl.js"></script>
-    <script src="scripts/controllers/workflowexecutionCtrl.js"></script>
-    <script src="scripts/controllers/workflowjobCtrl.js"></script>
-    <script src="scripts/controllers/metadataExtendedCtrl.js"></script>
-    <script src="scripts/controllers/metadataExtendedModalCtrl.js"></script>
 
     <!-- Services -->
     <script src="scripts/services/AuthInterceptorService.js"></script>
@@ -272,13 +273,11 @@
     <script src="scripts/services/MembersService.js"></script>
     <script src="scripts/services/MetadataActionService.js"></script>
     <script src="scripts/services/SparkService.js"></script>
-    <script src="scripts/services/AdamService.js"></script>
     <script src="scripts/services/FlinkService.js"></script>
-    <script src="scripts/services/TfServingService.js"></script>p
-    <script src="scripts/services/TensorFlowService.js"></script>
+    <script src="scripts/services/TensorBoardService.js"></script>
+    <script src="scripts/services/ServingService.js"></script>
     <script src="scripts/services/HistoryService.js"></script>
     <script src="scripts/services/JobService.js"></script>
-    <script src="scripts/services/VizopsService.js"></script>
     <script src="scripts/services/RequestService.js"></script>
     <script src="scripts/services/MetadataRestService.js"></script>
     <script src="scripts/services/MetadataHelperService.js"></script>
@@ -288,9 +287,6 @@
     <script src="scripts/services/VariablesService.js"></script>
     <script src="scripts/services/LocalFsService.js"></script>
     <script src="scripts/services/TourService.js"></script>
-    <script src="scripts/services/WorkflowService.js"></script>
-    <script src="scripts/services/WorkflowExecutionService.js"></script>
-    <script src="scripts/services/WorkflowJobService.js"></script>
     <script src="scripts/services/KafkaService.js"></script>
     <script src="scripts/services/DelaService.js"></script>
     <script src="scripts/services/DelaProjectService.js"></script>
@@ -302,7 +298,6 @@
     <script src="scripts/services/KibanaService.js"></script>
     <script src="scripts/services/JupyterService.js"></script>
     <script src="scripts/services/CertService.js"></script>
-    <script src="scripts/services/ExtendedMetadataService.js"></script>
     <!-- endbuild -->
 
   </body>
