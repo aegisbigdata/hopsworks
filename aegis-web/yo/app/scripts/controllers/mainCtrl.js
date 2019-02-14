@@ -413,8 +413,10 @@ angular.module('hopsWorksApp')
             self.viewDetail = function (result) {
               if (result.localDataset) {
                 if (result.type === 'proj') {
+                    console.log(result.name)
                   ProjectService.getProjectInfo({projectName: result.name}).$promise.then(
                           function (response) {
+                              
                             ModalService.viewSearchResult('lg', response, result);
                           }, function (error) {
                     growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});

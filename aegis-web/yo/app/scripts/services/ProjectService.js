@@ -40,8 +40,11 @@
 'use strict';
 
 angular.module('hopsWorksApp')
+        
         .factory("ProjectService", ['$resource', function ($resource) {
+                
             return $resource(
+                   
                     "/api/project/:id",
                     {id: "@id", projectName: "@projectName", inodeId: "@inodeId", type: "@type"},
             {

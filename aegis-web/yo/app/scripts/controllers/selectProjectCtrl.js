@@ -91,6 +91,7 @@ angular.module('hopsWorksApp')
                 growl.error(error.data.errorMsg, {title: 'Error', ttl: 10000});
               });
             };
+            
 
             self.close = function () {
               $uibModalInstance.dismiss('cancel');

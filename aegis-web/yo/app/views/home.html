@@ -71,9 +71,19 @@
           id="{{project.project.name.substr(0, 5) === 'demo_'}}"
           title="{{project.project.name.length > 28 ? project.project.name:''}}"
         >
-          <h4 class="home-project-container-title">{{ project.project.name | limitTo: 18 }}{{project.project.name.length > 18 ? '...' : ''}}</h4>
-          <div class="home-project-container-title">5 datasets</div>
+
+          <span class="fa fa-plus" style="font-size: 30px"></span>
+          <h5 class="home-project-container-title" style="word-break: break-all">{{ project.project.name | limitTo: 15 }}{{project.project.name.length > 15 ? '...' : ''}}</h5>
+          <div class="home-project-container-title" style="font-size: 14px">
+               datasets 
+              
+              
+          </div>
+
         </a>
+
+        <h5 class="home-project-container-title newstyle-title">created on {{ project.timestamp|date:'medium' }} </h5>
+
       </div>
     </div>
     <hr style="margin-bottom: 40px">

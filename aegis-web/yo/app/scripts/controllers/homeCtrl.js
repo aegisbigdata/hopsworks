@@ -70,7 +70,8 @@ angular.module('hopsWorksApp')
                 {'name': 'Kafka', 'tip': 'Take a tour of Hopsworks by creating a project and running a Kafka job!'}
               ];
             };
-
+            
+             
             $scope.$on('$viewContentLoaded', function () {
               self.loadedView = true;
             });
@@ -391,4 +392,15 @@ angular.module('hopsWorksApp')
               $location.replace();
               self.tourService.resetTours();
             };
+            
+            self.viewDetail = function (result) {
+               ProjectService.getProjectInfo({projectName: result.name}).$promise.then(
+                       console.log('log',  result.name ),
+                      function (success) {
+                        $uibModalInstance.close(success);
+                      }, function (error) {
+                growl.error(error.data.errorMsg, {title: 'Error', ttl: 10000});
+              });
+                
+            }; 
           }]);
