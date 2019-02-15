@@ -232,7 +232,3 @@ textarea.form-control {
 .dark::placeholder {
   color: #fff !important;
 }
-
-select {
-  text-transform: uppercase;
-}

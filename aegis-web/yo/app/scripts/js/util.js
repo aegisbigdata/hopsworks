@@ -194,11 +194,3 @@ function skipTrailingSlash(path) {
 jQuery(document).on('click', '.mega-dropdown', function(e) {
   e.stopPropagation();
 });
-
-jQuery(document).on('click', '.dropdown', function(e) {
-    if($(this).hasClass('open')) {
-        $(this).removeClass('open');
-    } else {
-        $(this).addClass('open');
-    }
-});
