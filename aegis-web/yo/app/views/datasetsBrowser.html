@@ -52,7 +52,7 @@
               <div ng-include="'views/search.html'"></div>
             </div>
           </div>
-          <div class="content-wrapper" ng-if="!mainCtrl.showSearchPage" style="overflow: hidden">
+          <div class="content-wrapper" ng-if="!mainCtrl.showSearchPage">
             <h3>
               <div flex="65">
                 <a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
@@ -75,47 +75,56 @@
                     <div class="col-lg-4 col-md-6 col-sm-8">
                       <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group" role="group" aria-label="First group">
-                          <button type="button" class="btn btn-default fa fa-level-up" title="Go to parent directory" 
-                                  ng-click="datasetsCtrl.back()"></button>
-                          <button type="button" class="btn btn-default fa fa-plus" title="New folder"
+                          <div type="button" class="btn btn-default" title="Go to parent directory" 
+                                  ng-click="datasetsCtrl.back()">Go up<i class="fa fa-level-up icon-menu"></i></div>
+                          <div type="button" class="btn btn-default" title="New folder"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.newDataSetModal()"></button>
-                          <button type="button" class="btn btn-default fa fa-cloud-upload" title="Upload"
+                                  ng-click="datasetsCtrl.newDataSetModal()">New Folder<i class="fa fa-plus icon-menu"></i></div>
+                          <div type="button" class="btn btn-default" title="Upload"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.uploadFile()"></button>
+                                  ng-click="datasetsCtrl.uploadFile()">Upload<i class="fa fa-cloud-upload icon-menu"></i></div>
                         </div>
-                        <div class="btn-group" role="group" aria-label="Second group" ng-show="datasetsCtrl.isSelectedFiles() > 0">
-                          <button type="button" class="btn btn-default fa fa-files-o" title="Copy"
-                                  ng-click="datasetsCtrl.copySelected();"></button>
-                          <button type="button" class="btn btn-default fa fa-arrows" title="Move" 
+                        <button type="button" class="btn btn-link dropdown-toggle" 
+                                data-toggle="dropdown" 
+                                aria-haspopup="true" 
+                                aria-expanded="false" 
+                                ng-show="datasetsCtrl.isSelectedFiles() > 0">		
+	                        File Actions<span class="caret"></span>		
+	                </button>
+                        <div class="dropdown-menu list-menu-action"> 
+                            <div class="btn-group list-action" role="group" aria-label="Second group" ng-show="datasetsCtrl.isSelectedFiles() > 0">
+                          <div type="button" class="btn btn-link" title="Copy"
+                                  ng-click="datasetsCtrl.copySelected();">Copy<i class="fa fa-files-o icon-menu"></i></div>
+                          <div type="button" class="btn btn-link" title="Move" 
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.moveSelected();"></button>
-                          <button type="button" class="btn btn-default fa fa-edit" title="Rename"
+                                  ng-click="datasetsCtrl.moveSelected();">Move<i class="fa fa-arrows icon-menu"></i></div>
+                          <div type="button" class="btn btn-link" title="Rename"
                                   ng-click="datasetsCtrl.renameSelected();" 
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-if="datasetsCtrl.isSelectedFiles() === 1"></button>
-                          <button type="button" class="btn btn-default fa fa-trash-o" title="Delete" 
+                                  ng-if="datasetsCtrl.isSelectedFiles() === 1">Rename<i class="fa fa-edit icon-menu"></i></div>
+                          <div type="button" class="btn btn-link" title="Delete" 
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.deleteSelected();"></button>
+                                  ng-click="datasetsCtrl.deleteSelected();">Delete<i class="fa fa-trash-o icon-menu"></i></div>
                           
                         </div>
-                        <div class="btn-group" role="group" aria-label="Third group" ng-show="datasetsCtrl.isSelectedFiles() === 1 &&
+                            <div class="btn-group list-action" role="group" aria-label="Third group" ng-show="datasetsCtrl.isSelectedFiles() === 1 &&
                                                                           !datasetsCtrl.selectedFiles[datasetsCtrl.selected].dir">
-                          <button type="button" class="btn btn-default fa fa-cloud-download" title="Download file"
-                                  ng-click="datasetsCtrl.openDir(datasetsCtrl.selectedFiles[datasetsCtrl.selected])"></button>
-                          <button type="button" class="btn btn-default fa fa-camera" title="Preview"
-                                  ng-click="datasetsCtrl.filePreview(datasetsCtrl.selected, true, false)"></button>
-                          <button type="button" class="btn btn-default fa fa-file-archive-o" title="Unzip" 
+                          <div type="button" class="btn btn-link" title="Download file"
+                                  ng-click="datasetsCtrl.openDir(datasetsCtrl.selectedFiles[datasetsCtrl.selected])">Download file<i class="fa fa-cloud-download icon-menu"></i></div>
+                          <div type="button" class="btn btn-link" title="Preview"
+                                  ng-click="datasetsCtrl.filePreview(datasetsCtrl.selected, true, false)">Preview<i class="fa fa-camera icon-menu"></i></div>
+                          <div type="button" class="btn btn-link" title="Unzip" 
                                   ng-hide="datasetsCtrl.isZippedfile()===false"
-                                  ng-click="datasetsCtrl.unzip(datasetsCtrl.selected)"></button>
-                          <button type="button" class="btn btn-default fa fa-bolt" title="ConvertToPython" 
+                                  ng-click="datasetsCtrl.unzip(datasetsCtrl.selected)">Unzip<i class="fa-file-archive-o icon-menu"></i></div>
+                          <div type="button" class="btn btn-link" title="Convert to Python" 
                                   ng-hide="datasetsCtrl.isIPythonNotebook()===false"
-                                  ng-click="datasetsCtrl.convertIPythonNotebook(datasetsCtrl.selected)"></button>
+                                  ng-click="datasetsCtrl.convertIPythonNotebook(datasetsCtrl.selected)">Convert to Python<i class="fa fa-bolt icon-menu"></i></div>
                         </div>
-                        <div class="btn-group" role="group" aria-label="Third group" ng-show="datasetsCtrl.isSelectedFiles() === 1 &&
+                            <div class="btn-group list-action" role="group" aria-label="Third group" ng-show="datasetsCtrl.isSelectedFiles() === 1 &&
                                                                           datasetsCtrl.selectedFiles[datasetsCtrl.selected].dir">
-                          <button type="button" class="btn btn-default fa fa-file-archive-o" title="Zip"
-                                  ng-click="datasetsCtrl.zip(datasetsCtrl.selected)"></button>
+                          <div type="button" class="btn btn-link" title="Zip"
+                                  ng-click="datasetsCtrl.zip(datasetsCtrl.selected)">Zip<i class="fa fa-file-archive-o icon-menu"></i></div>
+                        </div>
                         </div>
                       </div>
                     </div>

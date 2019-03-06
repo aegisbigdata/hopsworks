@@ -771,3 +771,18 @@ nav[data-toggle='toc'] {
 .button-login button {
   width: 40%;
 }
+.icon-menu {
+    padding-left: 15px;
+}
+.btn-group.list-action {
+    display: block;
+    width: 100%;
+}
+.btn-group.list-action > .btn-link {
+    width: 100%;
+    text-align: right;
+}
+.dropdown-menu.list-menu-action {
+    width: 200px;
+    left: 230px;
+}
