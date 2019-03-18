@@ -38,14 +38,72 @@
   -->
 
 <div ng-controller="MainCtrl as mainCtrl">
-  <div ng-include="'nav.html'"></div>
+  <!-- <div ng-include="'nav.html'"></div> -->
 </div>
 <div ng-controller="KafkaCtrl as kafkaCtrl">
 
   <div id="wrapper" class="toggled">
     <div class="overlay"></div>
-
     <div ng-include="'navProject.html'"></div>
+
+    <div>
+      <div ng-if="mainCtrl.showSearchPage" class="container-fluid content-wrapper">
+        <div id="projectSearchResults">
+          <div ng-include="'views/search.html'"></div>
+        </div>
+      </div>
+      <div ng-if="!mainCtrl.showSearchPage" class="container-fluid content-wrapper" ng-controller="ProjectCtrl as projectCtrl">
+        <div growl reference="3" class="pull-right" ></div>
+        <div class="row content-utility-bar content-utility-bar-head">
+          <div class="col-md-5">
+            <div class="input-group">
+              <input type="text" class="form-control" ng-model="search" placeholder="Search for projects or datasets...">
+              <span class="input-group-btn">
+                <button class="btn btn-default fa fa-search icon-resize-small" type="button" title="Filter"></button>
+              </span>
+            </div>
+          </div>
+          <div class="col-md-7" style="padding-right: 30px;">
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown" ng-click="mainCtrl.getMessages()">
+                <a class="dropdown-toggle" data-toggle="dropdown" style="padding:5px 15px 0px 20px; margin-top: 7px;" aria-expanded="false">
+                  <i ng-if="mainCtrl.unreadMessages" class="fa fa-envelope fa-lg" title="Unread messages">
+                    <span class="badge" style="background-color: #f89406; font-family: sans-serif; z-index: 100; position: absolute; top: -10px; right: -18px">{{mainCtrl.unreadMessages}}</span>
+                  </i>
+                  <i ng-if="!mainCtrl.unreadMessages" class="fa fa-envelope fa-lg" title="No unread message"></i>
+                  &nbsp;Messages
+                </a>
+                <ul class="dropdown-menu dropdown-messages" >
+                  <li class="dropdown-header text-muted" ng-if="mainCtrl.messages.length"><h4>Latest messages</h4></li>
+                  <li class="dropdown-header text-muted" ng-if="!mainCtrl.messages.length"><h4>Inbox empty.</h4></li>
+                  <li ng-repeat="msg in mainCtrl.messages| limitTo:5">
+                    <div>
+                      <div ng-click="mainCtrl.openMessageModal(msg)">                    
+                        <div class="message-subject text-muted">
+                          <i ng-if="msg.unread" class="fa fa-circle pull-left" style="color:#f89406; margin-top: 4px;" title="Unread message"></i>
+                          <i ng-if="!msg.unread" class="fa fa-circle pull-left" style="color:grey; margin-top: 4px;" title="Read message"></i>
+                          {{msg.subject}}</div>
+                        <div class="text-muted">{{msg.dateSent| date:'medium'}}</div>
+                      </div>
+                      <div ng-click="mainCtrl.openMessageModal(msg)" class="message-preview">{{msg.preview| limitTo:80}} {{msg.preview.length > 80 ? ' ...' : ''}}</div>
+                      <a ng-if="msg.path" href="#!/{{msg.path}}"> go to requested path.</a>
+                    </div>
+                  </li>
+                  <a class="pull-right" ng-if="mainCtrl.messages.length" ng-click="mainCtrl.openMessageModal()" style="text-decoration:none;"> See all messages</a>
+                  <a class="pull-right" ng-if="!mainCtrl.messages.length" ng-click="mainCtrl.openMessageModal()" style="text-decoration:none;"> Goto messages</a>
+                </ul>
+              </li>          
+            </ul>
+          </div>
+        </div>
+        <!-- <div class="row content-utility-bar content-utility-bar-actions">
+          <div class="col-md-3">
+            <h4 style="margin-top: 10px; margin-bottom: 5px"> Jobs > {{ projectCtrl.currentProject.projectName}}</h4>
+          </div>
+        </div> -->
+      </div><!--content wrapper -->
+
+    </div>
 
     <section>
       <div class="content-wrapper">
@@ -58,11 +116,11 @@
               <div class="row"/>
               <div class="row">
 
-                <ul class="nav nav-tabs">
-                  <li ng-class="{'active' : kafkaCtrl.showTopics === 1}"><a
+                <ul class="nav nav-tabs kafka-tabs">
+                  <li class="kafka-nav-tabs" ng-class="{'active' : kafkaCtrl.showTopics === 1}"><a
                           ng-click="kafkaCtrl.showTopic()" id="kafkaTopic">
                     Topics</a></li>
-                  <li ng-class="{'active' : kafkaCtrl.showSchemas === 1}"><a
+                  <li  class="kafka-nav-tabs" ng-class="{'active' : kafkaCtrl.showSchemas === 1}"><a
                           ng-click="kafkaCtrl.showSchema()" id="kafkaSchema">
                     Schemas</a></li>
                 </ul>
@@ -70,19 +128,19 @@
               </div>
               <div class="row"><br></div>
               <div  ng-show="kafkaCtrl.showTopics === 1">
-                <div class="col-sm-11">
-                  <span class="text-muted" ng-show="kafkaCtrl.maxNumTopics - kafkaCtrl.numTopicsUsed > 0">     {{kafkaCtrl.numTopicsUsed}} of {{kafkaCtrl.maxNumTopics}} topics in use</span>
-                  <span style="color: red;" class="text" ng-show="kafkaCtrl.maxNumTopics - kafkaCtrl.numTopicsUsed <= 0">    All available {{kafkaCtrl.maxNumTopics}} topics are in use.</span>
-                </div>
-                <br>
                 <div class="col-sm-2">
                   <button type="button" ng-disabled="kafkaCtrl.maxNumTopics - kafkaCtrl.numTopicsUsed <= 0"
                           ng-click="kafkaCtrl.createTopic()" class="btn btn-default btn-success control-label"
                     id="newTopicBtn">
                     New Topic<i style="margin-left: 10px" class="glyphicon glyphicon-plus"></i>
                   </button>
-
                 </div>
+                <br><br>
+                <div class="col-sm-11">
+                  <span class="text-muted" ng-show="kafkaCtrl.maxNumTopics - kafkaCtrl.numTopicsUsed > 0">     {{kafkaCtrl.numTopicsUsed}} of {{kafkaCtrl.maxNumTopics}} topics in use</span>
+                  <span style="color: red;" class="text" ng-show="kafkaCtrl.maxNumTopics - kafkaCtrl.numTopicsUsed <= 0">    All available {{kafkaCtrl.maxNumTopics}} topics are in use.</span>
+                </div>
+
               </div>
 
               <div ng-show="kafkaCtrl.showSchemas === 1">
@@ -104,8 +162,8 @@
             <table st-table="rowCollection" class="table table-striped" ng-show="kafkaCtrl.topics.length > 0">
               <thead>
                 <tr>
-                  <th st-sort="topicName" class="col-sm-7">Topic Name</th>
-                  <th class="col-sm-1">Schema (v)  </th>
+                  <th st-sort="topicName" class="col-sm-5">Topic Name</th>
+                  <th class="col-sm-3">Schema (v)  </th>
                   <th class="col-sm-1">ACL</th>
                   <th class="col-sm-1">Share</th>
                   <th class="col-sm-1">Advanced</th>
@@ -361,7 +419,7 @@
               </td>
               <td class="col-sm-2">
                 <button type="button"
-                        ng-click="kafkaCtrl.viewSchemaContent(row.name, $index)" class="btn btn-sm btn-primary">
+                        ng-click="kafkaCtrl.viewSchemaContent(row.name, $index)" class="btn btn-sm btn-default">
                   View<i style="margin-left: 10px"></i>
                 </button>
               </td>
