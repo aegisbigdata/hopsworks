@@ -771,3 +771,28 @@ nav[data-toggle='toc'] {
 .button-login button {
   width: 40%;
 }
+
+nav .dropdown-search-header{
+  color: #0492b3;
+  font-weight: bold;
+}
+.container-fluid ul {
+  padding-left: 0px;
+}
+.container-fluid ul:first-child {
+  padding-top: 20px;
+}
+.container-fluid ul li {
+  list-style: none;
+}
+.container-fluid ul li:nth-child(odd) {
+  padding-bottom: 5px;
+}
+.container-fluid ul li:nth-child(even) {
+  padding-bottom: 10px;
+}
+.filter-menu {
+  margin-bottom: 0px;
+  font-weight: 700;
+  color: #999;
+}
