@@ -41,22 +41,19 @@
   <div class="row-fluid">
     <div class="col-md-offset-3 col-md-6">
       <!-- START panel-->
-      <div class="panel">
+      <div class="panel-login">
         <div class="panel-heading text-center">
-          <a style="text-decoration:none; font-family: Lobster; font-size: 30px; margin-left: 5px; color: #fff;">Hopsworks
-            <img alt="" style="margin-left:10px"
-                 width="30"
-                 src="images/hops.png">
+          <a style="text-decoration:none; font-family: Lobster; font-size: 30px; margin-left: 5px; color: #fff;">
+            <img alt="" class="block-center img-rounded img-login" src="images/aegis_logo.png">
           </a>
         </div>
         <div class="panel-body">
-          <p class="text-center">SIGN UP TO GET ACCESS.</p>
+          <p class="text-center mrg">SIGN UP TO GET ACCESS</p>
 
           <form role="form" name="registerForm" ng-submit="regCtrl.register()" novalidate class="form-validate">
             <div class="row">
               <div class="col-xs-12 col-sm-6 col-md-6">
                 <div class="form-group has-feedback">
-                  <label class="text-muted">First Name</label>
                   <input name="first_name" placeholder="First Name" autocomplete="off"
                          ng-model="regCtrl.newUser.firstName" required class="form-control "
                          type="text">
@@ -66,7 +63,6 @@
               </div>
               <div class="col-xs-12 col-sm-6 col-md-6">
                 <div class="form-group has-feedback">
-                  <label class="text-muted">Last Name</label>
                   <input name="last_name" placeholder="Last Name" autocomplete="off"
                          ng-model="regCtrl.newUser.lastName" required class="form-control "
                          type="text">
@@ -78,7 +74,6 @@
             <div class="row"> 
               <div class="col-xs-12 col-sm-6 col-md-6">
                 <div class="form-group has-feedback">
-                  <label class="text-muted">Email address</label>
                   <input name="user_email" placeholder="Email" autocomplete="off"
                          ng-model="regCtrl.newUser.email" required
                          class="form-control"
@@ -92,8 +87,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6">
                 <div class="form-group has-feedback">
-                  <label class="text-muted">Phone Number</label>
-                  <input name="phone_number" placeholder="Phone" autocomplete="on"
+                  <input name="phone_number" placeholder="Phone number" autocomplete="on"
                          ng-model="regCtrl.newUser.telephoneNum"
                          ng-pattern="/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/"
                          class="form-control "
@@ -104,30 +98,6 @@
                   </div>
             </div>
             
-            <div class="row">
-              <div class="col-xs-12 col-sm-6 col-md-6">
-                <div class="form-group has-feedback">
-                  <label class="text-muted">Password</label>
-                  <input id="id-password" name="user_password"
-                         ng-model="regCtrl.newUser.chosenPassword"
-                         ng-minlength="6"
-                         ng-pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W]).*$/"
-                         required
-                         class="form-control"
-                         type="password">
-                  <span class="fa fa-lock form-control-feedback text-muted"></span>
-                </div>
-              </div>
-              <div class="col-xs-12 col-sm-6 col-md-6">
-                <div class="form-group has-feedback">
-                  <label class="text-muted">Confirm Password</label>
-                  <input name="user_password_confirm" ng-model="regCtrl.newUser.repeatedPassword"
-                         match="id-password"
-                         class="form-control" type="password">
-                  <span class="fa fa-lock form-control-feedback text-muted"></span>               
-                </div>
-              </div>
-            </div>
             <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12">
                     <span ng-show="(registerForm.$submitted || registerForm.user_password.$dirty) &amp;&amp; registerForm.user_password.$error.required"
@@ -140,10 +110,33 @@
                           class="text-danger ng-hide">The two passwords you entered do not match</span>
                   </div>
             </div>
+              
+            <div class="row">
+              <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group has-feedback">
+                  <input id="id-password" name="user_password" placeholder="Password"
+                         ng-model="regCtrl.newUser.chosenPassword"
+                         ng-minlength="6"
+                         ng-pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W]).*$/"
+                         required
+                         class="form-control"
+                         type="password">
+                  <span class="fa fa-lock form-control-feedback text-muted"></span>
+                </div>
+              </div>
+              <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group has-feedback">
+                  <input name="user_password_confirm" placeholder="Confirm Password" ng-model="regCtrl.newUser.repeatedPassword"
+                         match="id-password"
+                         class="form-control" type="password">
+                  <span class="fa fa-lock form-control-feedback text-muted"></span>               
+                </div>
+              </div>
+            </div>
+            
              <div class="row">
               <div class="col-xs-12 col-sm-6 col-md-6">
                 <div class="form-group has-feedback">
-                    <label class="text-muted">Security question</label>
                     <select name="sec_question" placeholder="Security question"
                           ng-model="regCtrl.newUser.securityQuestion" required
                           class="form-control ">
@@ -156,7 +149,6 @@
               </div>
                <div class="col-xs-12 col-sm-6 col-md-6">
                 <div class="form-group has-feedback">
-                  <label class="text-muted">Security answer</label>
                   <input name="sec_answer" placeholder="Security answer"
                          autocomplete="off"
                          ng-model="regCtrl.newUser.securityAnswer" required
@@ -171,7 +163,7 @@
             </div>
             <div class="row"> 
               <div class="col-md-6">
-                <div class="checkbox c-checkbox">
+                <div class="checkbox c-checkbox c-checkbox-mrg">
                   <label>
                     <input required="" name="user_agreed" ng-model="regCtrl.newUser.ToS"
                            type="checkbox">
@@ -184,7 +176,7 @@
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="checkbox c-checkbox" ng-if="regCtrl.otp === 'true'">
+                <div class="checkbox c-checkbox c-checkbox-mrg" ng-if="regCtrl.otp === 'true'">
                   <label>
                     <input name="2FactorAuth" ng-model="regCtrl.newUser.twoFactor"
                            type="checkbox">
@@ -192,22 +184,22 @@
                   </label>
                 </div>
               </div>              
-            </div>            
-            <div class="row">
-              <div class="col-md-12">
-                <button type="submit" class="btn btn-block btn-primary mt-lg" data-ng-disabled="regCtrl.working">Create account
-                </button>
-              </div>
-            </div>
+            </div>  
+              
+            <div class="button-login">
+              <button type="submit" class="btn btn-primary" data-ng-disabled="regCtrl.working">Create account</button>
+              <button class="btn btn-default" onclick="location.href='#!/login'">Sign in</button>
+            </div>   
+
           </form>
+          
+          
           <div style="text-align: center" class="text-muted" ng-show="regCtrl.working">
             <i class="fa fa-spinner fa-spin"></i> 
             Registering your new account.
           </div>
           <div ng-show="regCtrl.successMessage" class="alert  alert-success text-center ng-binding ng-hide">{{regCtrl.successMessage}}</div>
           <div ng-show="regCtrl.errorMessage" class="alert alert-danger text-center ng-binding ng-hide">{{regCtrl.errorMessage}}</div>
-          <p class="pt-lg text-center">Have an account?</p>
-          <a href="#!/login" class="btn btn-block btn-default">Sign in</a>
         </div>
       </div>
       <!-- END panel-->
