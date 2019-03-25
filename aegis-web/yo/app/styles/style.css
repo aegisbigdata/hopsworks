@@ -760,14 +760,3 @@ nav[data-toggle='toc'] {
   border-left-width: 5px;
   border-radius: 3px;
 }
-.img-login {
-  width: 50%;
-}
-.button-login {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 30px;
-}
-.button-login button {
-  width: 40%;
-}
