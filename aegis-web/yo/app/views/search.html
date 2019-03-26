@@ -41,6 +41,49 @@
     <section class="col-md-4 navbar-default">
         <nav class="navbar">
         <div class="container-fluid">
+            <ul>
+                <li class="dropdown-search-header">Type</li>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='proj';">Project</a><br/>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='ds';">Dataset</a><br/>
+                    <a class="filter-menu"
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchType=undefined; searchTypePub='true'">Files</a><br/>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Ownership</li>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='proj';">My Assets</a><br/>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='ds';">Assets shared with me</a><br/>
+                    <a class="filter-menu"
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchType=undefined; searchTypePub='true'">No access</a><br/>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Date added to AEGIS</li>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='proj';">AS RANGE</a><br/>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">File Types</li>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Spatial</li>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">License</li>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Price/Sellable</li>
+            </ul>
+            <!--
           <ul>
                 <li class="dropdown-search-header">Type</li>
                 <a class="filter-menu"
@@ -106,6 +149,7 @@
                   </select>
             </div>
            </ul>
+            -->
         </div>
         <div class="row result-filter-body">
           <div class="pull-right col-md-4">
