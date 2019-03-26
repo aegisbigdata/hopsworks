@@ -270,6 +270,9 @@ angular.module('hopsWorksApp')
                 },
                 fetchMetadata: function (inodePid, inodeName, tableId) {
                   return $http.get('/api/metadata/fetchmetadata/' + inodePid + '/' + inodeName + '/' + tableId);
+                },
+                haveAccess: function (inodeId) {
+                  return $http.get('/api/project/' + id + '/dataset/' + inodeId + '/access');
                 }
               };
               return services;
