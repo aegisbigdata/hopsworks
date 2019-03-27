@@ -121,7 +121,7 @@ a:focus {
   margin-right: 0px;
 }
 .panel-heading {
-  background-color: #3a3f51;		
+  background-color: #0492b3;		
   color: #fff;
   font-size: 14px;
   border-radius: 0;
@@ -759,41 +759,4 @@ nav[data-toggle='toc'] {
   border: 1px solid #eee;
   border-left-width: 5px;
   border-radius: 3px;
-}
-.img-login {
-  width: 50%;
-}
-.button-login {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 30px;
-}
-.button-login button {
-  width: 40%;
-}
-
-nav .dropdown-search-header{
-  color: #0492b3;
-  font-weight: bold;
-}
-.container-fluid ul {
-  padding-left: 0px;
-}
-.container-fluid ul:first-child {
-  padding-top: 20px;
-}
-.container-fluid ul li {
-  list-style: none;
-}
-.container-fluid ul li:nth-child(odd) {
-  padding-bottom: 5px;
-}
-.container-fluid ul li:nth-child(even) {
-  padding-bottom: 10px;
-}
-.filter-menu {
-  margin-bottom: 0px;
-  font-weight: 700;
-  color: #999;
-  padding-left: 15px;
 }

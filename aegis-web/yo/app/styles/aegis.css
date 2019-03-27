@@ -1,0 +1,68 @@
+.img-login {
+  width: 50%;
+}
+.button-login {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+.button-login button {
+  width: 40%;
+}
+.icon-menu {
+    padding-left: 15px;
+}
+.btn-group.list-action {
+    display: block;
+    width: 100%;
+}
+.btn-group.list-action > .btn-link {
+    width: 100%;
+    text-align: right;
+}
+.dropdown-menu.list-menu-action {
+    width: 200px;
+    left: 230px;
+}
+.panel-register {
+    margin-top: 75px;
+    border-bottom: 1px solid #2e353d;
+    border-bottom-style: double;
+    background-color: #fafafa;
+    border-width: medium;
+}
+.panel-register-img {
+    background-color: #0492b3;
+    padding: 10px;
+    height: 70px;
+}
+.img-register {
+    width: 30%;
+}
+
+.c-checkbox-mrg {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+/* For tabs not to be gradient -- projectSettings.html*/
+.ng-isolate-scope > .nav-tabs {
+    background: #fff;
+    height: 80px;
+    box-shadow: 0 2em 3em #ddd;
+  }
+  
+  a.nav-link.ng-binding {
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  li.uib-tab.nav-item.ng-scope.ng-isolate-scope.active {
+    font-weight: bold;
+  }
+  
+  .panel {
+    box-shadow: none;
+  }
