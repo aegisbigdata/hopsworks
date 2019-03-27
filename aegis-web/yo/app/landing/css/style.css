@@ -72,6 +72,10 @@ body {
   text-decoration: none;
 }
 
+nav {
+  width: 100%;
+}
+
 .navbar__components--actions li {
   font-size: 1.8rem;
   -ms-flex-item-align: center;
@@ -347,6 +351,17 @@ section {
           justify-content: center;
 }
 
+.features__list .row,
+.objectives__list .row {
+  flex-wrap: nowrap;
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .features__card {
   width: 50rem;
   height: 60rem;
@@ -358,7 +373,7 @@ section {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  margin: 4rem;
+  margin: 2rem;
 }
 
 .features__card__image, 
@@ -408,6 +423,7 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 2rem;
 }
 
 .btn--black {
