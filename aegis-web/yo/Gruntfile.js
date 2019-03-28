@@ -49,7 +49,26 @@
 module.exports = function (grunt) {
 
   var serveStatic = require('serve-static');
-  var proxyRequestMiddleware = require('grunt-connect-proxy/lib/utils').proxyRequest;
+  var proxyUtils = require('grunt-connect-proxy/lib/utils');
+  var proxyRequestMiddleware = proxyUtils.proxyRequest;
+  // Store localy the original register Proxy
+  var _registerProxy = proxyUtils.registerProxy;
+  // Overwrite registerProxy with our custom function that checks responses and removes Secure attribute from cookies.
+  // Cookies with Secure attribute are not saved/used if the site is not in https. localhost development isn't.
+  proxyUtils.registerProxy = function (proxy) {
+    _registerProxy(proxy);
+    if (proxy.server.options.secure) {;
+      grunt.log.ok("All secure cookies send from server will be transformed to non-secure.");
+      proxy.server.on('proxyRes', function (proxyRes) {
+        if (proxyRes.headers["set-cookie"]) {
+          proxyRes.headers["set-cookie"] = proxyRes.headers["set-cookie"].map(function (v) {
+            grunt.log.verbose.writeln("Secure cookie found:", v);
+            return v.replace(/\s*Secure\s*;?/gi, "");
+          })
+        }
+      });
+    }
+  };
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
 
@@ -114,9 +133,14 @@ module.exports = function (grunt) {
         {
           context: '/hopsworks-api',
           host: 'bbc6.sics.se',
-          port: 8080,
-          https: false,
+          port: 8181,
+          https: true, // for https endpoints, we need to set https, secure, protocol and headers.host.
           xforward: false,
+          secure: true,
+          protocol: 'https:',
+          headers: {
+            host: 'bbc6.sics.se:8181' // without this while on https, it will complain about ssl validity
+          }
         }
       ],
       livereload: {
