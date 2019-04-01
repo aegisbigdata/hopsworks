@@ -89,7 +89,9 @@ a:focus {
   border-radius: 0;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
-.panel-login {
+.panel-login,
+.panel-register  {
+  margin-top: 75px;
   background-color: #fafafa;
   border-bottom: 1px solid #2e353d;
   border-bottom-style: double;

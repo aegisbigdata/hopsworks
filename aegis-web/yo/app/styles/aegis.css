@@ -1,5 +1,5 @@
-.img-login {
-  width: 50%;
+.panel-logo-img {
+  height: 50px;
 }
 .button-login {
   display: flex;
@@ -24,25 +24,9 @@
     width: 200px;
     left: 230px;
 }
-.panel-register {
-    margin-top: 75px;
-    border-bottom: 1px solid #2e353d;
-    border-bottom-style: double;
-    background-color: #fafafa;
-    border-width: medium;
-}
-.panel-register-img {
-    background-color: #0492b3;
-    padding: 10px;
-    height: 70px;
-}
-.img-register {
-    width: 30%;
-}
-
 .c-checkbox-mrg {
-  margin-top: 40px;
-  margin-bottom: 40px;
+  margin-top: 6px;
+  margin-bottom: 21px;
 }
 
 /* For tabs not to be gradient -- projectSettings.html*/
