@@ -56,11 +56,14 @@
 .card-item-content {
     background: #FFFFFF;
     display: flex;
-    flex-direction: column;
+    /*flex-direction: column;*/
     height: 175px;
     max-height: 175px;
     padding: 10px 15px 15px;
     position: relative;
+}
+.card-modal .card-item-content {
+    flex-direction: column;
 }
 
 .col-sm-4.col-md-4 .card-item-content {
@@ -113,7 +116,7 @@
 .card-item-content .header > label {
     margin-bottom: 0px;
     font-weight: 700;
-    text-transform: uppercase;
+    text-transform: capitalize;
 }
 
 .card-item-content .header {
@@ -157,12 +160,12 @@
     line-height: 1;
 }
 
-.card-item-content .card-body {
-    height: 100px;
+.card-modal .card-item-content .card-body {
+    height: 100%;
     width: 100%;
 }
 
-.card-item-content .card-footer {
+.card-modal .card-item-content .card-footer {
     height: 15px;
     width: 100%;
 }
@@ -185,20 +188,19 @@
 }
 .card-item-content .details {
     bottom: 30px;
-    top:50px;
-    position: absolute;
+    /*top:50px;
+    position: absolute;*/
     width: 95%;
 }
-
 .card-item-content .details label {
-    color: #8A8A8A;
-    font-size: 10px;
+    color: #0492b3;
+    font-size: 12px;
     letter-spacing: 1.25px;
     text-transform: uppercase;
-    margin-bottom: 0px; 
+    margin-bottom: 5px; 
 }
 .card-item-content .details .desc {
-  margin: 5px;
+  margin-bottom: 5px;
   min-height: 20px;
 }
 
@@ -216,6 +218,7 @@
     font-size: 12px;
     font-weight: 700;
     line-height: 1;
+    margin-bottom: 15px;
 }
 
 .card-footer .progress {
@@ -230,4 +233,7 @@
   background: white;
 }
 
-
+.modal-blue{
+  background-color: #245580;
+  border-radius: 5px;
+}

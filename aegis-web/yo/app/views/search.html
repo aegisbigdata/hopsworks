@@ -38,165 +38,140 @@
   -->
 
 <div class="" ng-class="{'container content-wrapper': !projectView, 'container-fluid project-content-wrapper': projectView}">
-  <nav class="navbar navbar-default">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header col-md-6">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#search-navbar" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" >Search results</a>
-      </div>
-      <div class="collapse navbar-collapse pull-right col-md-6" id="search-navbar">
-        <ul class="nav navbar-nav navbar-right search-result-menu">
-          <li>
-            <a data-toggle="collapse" data-target="#filterdropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter</a>         
-          </li>
-          <li>
-            <a ng-click="listView =! listView; mainCtrl.viewType(listView)"
-               data-toggle="view-type" role="button" aria-haspopup="true" aria-expanded="false">
-              <span class="glyphicon" ng-class="{'glyphicon-th-list' : !listView, 'glyphicon-th': listView}" 
-                    aria-hidden="true" style="font-size: 20px;"></span></a>
-          </li>
-          <li>
-            <a ng-click="mainCtrl.clearSearch()"
-               data-toggle="view-type" role="button" aria-haspopup="true" aria-expanded="false">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true" style="font-size: 20px;"></span></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  <section id="filterdropdown" class="collapse search-result-filter">
-    <div class="row result-filter-body">
-        <li class="col-md-3">
-        <ul>
-        <div>
-            <span>Type</span>
-                <ul>
-                    <li><a class="filter-menu-uppercase"
-                 data-toggle="collapse" data-target="#filterdropdown"
-                 ng-click="searchTypePub=undefined; searchType=undefined;">all</a></li>
-                    <li><a class="filter-menu-uppercase"
-                           data-toggle="collapse" data-target="#filterdropdown"
-                           style="color: #FC5120;"
-                           ng-click="searchType=undefined; searchTypePub='true'">public</a></li>
-                    <li><a class="filter-menu-uppercase" 
-                           data-toggle="collapse" data-target="#filterdropdown"
-                           style="color: #4178BE;"
-                           ng-click="searchTypePub=undefined; searchType='proj';">project</a></li>
-                    <li><a class="filter-menu-uppercase" 
-                           data-toggle="collapse" data-target="#filterdropdown"
-                           style="color: #5DA51D; "
-                           ng-click="searchTypePub=undefined; searchType='ds';">dataset</a></li>
-                </ul>
+    <section class="col-md-4 navbar-default">
+        <nav class="navbar">
+        <div class="container-fluid">
+            <ul>
+                <li class="dropdown-search-header">Type</li>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='proj';">Project</a><br/>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='ds';">Dataset</a><br/>
+                    <a class="filter-menu"
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="">Files</a><br/>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Ownership</li>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="">My Assets</a><br/>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="">Assets shared with me</a><br/>
+                    <a class="filter-menu"
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="">No access</a><br/>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Date added to AEGIS</li>
+                    <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="">AS RANGE</a><br/>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">File Types</li>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Spatial</li>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">License</li>
+            </ul>
+            <ul>
+                <li class="dropdown-search-header">Price/Sellable</li>
+            </ul>
+            <!--
+          <ul>
+                <li class="dropdown-search-header">Type</li>
+                <a class="filter-menu"
+             data-toggle="collapse" data-target="#filterdropdown"
+             ng-click="searchTypePub=undefined; searchType=undefined;">All</a><br/>
+                <a class="filter-menu"
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchType=undefined; searchTypePub='true'">Public</a><br/>
+                <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='proj';">Project</a><br/>
+                <a class="filter-menu" 
+                       data-toggle="collapse" data-target="#filterdropdown"
+                       ng-click="searchTypePub=undefined; searchType='ds';">Dataset</a><br/>
+          </ul>
+          <ul>
+            <li class="dropdown-search-header">Size</li>
+            <li>
+              <div class="input-group">
+                <label class="sr-only" for="from">From</label>
+                <input type="number" class="form-control" id="from" placeholder="From size">
+                   <span class="input-group-addon">-</span>
+                <label class="sr-only" for="to">To</label>
+                <input type="number" class="form-control" id="to" placeholder="To size">
+              </div>
+            </li>
+            <li class="divider"></li>
+            <li class="dropdown-search-header">Date Created</li>
+            <li> 
+              <div class="input-group">
+                <label class="sr-only" for="from">From</label>
+                <input type="datepicker" class="form-control" id="datepicker1" placeholder="From date">
+                <span  class="input-group-addon">-</span>
+                <label class="sr-only" for="to">To</label>
+                <input type="datepicker" class="form-control" id="datepicker2" placeholder="To date">
+              </div>
+            </li>
+          </ul>
+          <ul>
+            <li class="dropdown-search-header">Owner</li> 
+            <li>
+              <div>
+                <label class="sr-only" for="email">Email address</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter name" ng-model="searchOwner">
+              </div>
+            </li>
+            <li class="divider"></li>
+            <li class="dropdown-search-header">Name</li> 
+            <li>
+              <div>
+                <label class="sr-only" for="filter">Filter</label>
+                <input type="text" class="form-control" id="filter" placeholder="Filter result..." ng-model="searchName">
+              </div>
+            </li>
+            <li class="divider"></li>
+            <div class="form-group">
+                <label class="dropdown-search-header" for="selectSort">Sort by</label>
+                  <select class="form-control" id="selectSort">
+                      <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='name'">Name</a></option>
+                      <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='user'">Owner</a></option>
+                      <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='createDate'">Date</a></option>
+                      <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='size'">Size</a></option>
+                  </select>
             </div>
-      
-          
-        <!--  <li class="dropdown-header">Tops</li>
-          <li><a >Votes </a>
-            <div class="input-group">
-              <label class="sr-only" for="email">At list</label>
-              <input type="number" class="form-control" id="email" placeholder="Votes">
-            </div>
-          </li>
-          <li><a >Downloads </a>            
-            <div class="input-group">
-              <label class="sr-only" for="email">At list</label>
-              <input type="number" class="form-control" id="email" placeholder="Downloads">
-            </div>
-          </li>-->
-        </ul>
-      </li>
-      <li class="col-md-5">
-        <ul>
-          <li class="dropdown-header">Size</li>
-          <li>
-            <div class="input-group">
-              <label class="sr-only" for="from">From</label>
-              <input type="number" class="form-control" id="from" placeholder="From size">
-                 <span class="input-group-addon">-</span>
-              <label class="sr-only" for="to">To</label>
-              <input type="number" class="form-control" id="to" placeholder="To size">
-            </div>
-          </li>
-          <li class="divider"></li>
-          <li class="dropdown-header">Date Created</li>
-          <li> 
-            <div class="input-group">
-              <label class="sr-only" for="from">From</label>
-              <input type="datepicker" class="form-control" id="datepicker1" placeholder="From date">
-              <span  class="input-group-addon">-</span>
-              <label class="sr-only" for="to">To</label>
-              <input type="datepicker" class="form-control" id="datepicker2" placeholder="To date">
-            </div>
-          </li>
-
-<!--          <li><a>Uploaded</a>
-            <div class="input-group">
-              <label class="sr-only" for="from">From</label>
-              <input type="datepicker" class="form-control" id="datepicker3" placeholder="From date">
-              <span  class="input-group-addon">-</span>
-              <label class="sr-only" for="to">To</label>
-              <input type="datepicker" class="form-control" id="datepicker4" placeholder="To date">
-            </div>
-          </li>-->
-        </ul>
-      </li>
-       <li class="col-sm-4">
-        <ul>
-          <li class="dropdown-header">Owner</li> 
-          <li>
-            <div>
-              <label class="sr-only" for="email">Email address</label>
-              <input type="email" class="form-control" id="email" placeholder="Enter name" ng-model="searchOwner">
-            </div>
-          </li>
-          <li class="divider"></li>
-          <li class="dropdown-header">Name</li> 
-          <li>
-            <div>
-              <label class="sr-only" for="filter">Filter</label>
-              <input type="text" class="form-control" id="filter" placeholder="Filter result..." ng-model="searchName">
-            </div>
-          </li>
-          <li class="divider"></li>
-          <div class="form-group">
-              <label class="dropdown-header" for="selectSort">Sort by</label>
-                <select class="form-control" id="selectSort">
-                    <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='name'">Name</a></option>
-                    <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='user'">Owner</a></option>
-                    <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='createDate'">Date</a></option>
-                    <option><a data-toggle="collapse" data-target="#filterdropdown" ng-click="sortKey='size'">Size</a></option>
-                </select>
+           </ul>
+            -->
+        </div>
+        <div class="row result-filter-body">
+          <div class="pull-right col-md-4">
+            <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-primary btn-block"
+                  ng-click="searchTypePub=undefined; 
+                            searchType=undefined; 
+                            sortKey=undefined;
+                            searchName=undefined; 
+                            searchOwner=undefined;">Clear</button>
           </div>
-        </ul>
-      </li>
-    </div>
-    <div class="row result-filter-body">
-      <div class="pull-right col-md-1">
-        <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-primary btn-block"
-              ng-click="searchTypePub=undefined; 
-                        searchType=undefined; 
-                        sortKey=undefined;
-                        searchName=undefined; 
-                        searchOwner=undefined;">Clear</button>
-      </div>
-    </div>
-  </section> 
-  <section class="search-result">
+        </div>
+        </nav>
+    </section>
+    <section class="col-md-8">
     
     <div class="row search-result-header">
-      <div class="col-md-11 pull-left">
+      <div class="col-md-10 pull-left">
         <h3>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
             {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h3>
       </div>
-      <div class="col-xs-1 col-sm-1 col-md-1 pull-right">
-        <div class="input-group spinner">  
+      <div class="col-xs-2 pull-right">
+        <div class="input-group spinner"> 
           <input type="text" class="form-control" ng-model="mainCtrl.pageSize">
           <div class="input-group-btn-vertical">
             <button class="btn btn-default" ng-click="mainCtrl.incrementPage()" type="button"><i class="fa fa-caret-up"></i></button>
@@ -209,7 +184,7 @@
       <div class="loader loader-md" ng-show="mainCtrl.searching"></div>
       <div ng-if="!mainCtrl.searching" ng-init="searchResultCtrl.init(mainCtrl.searchResult)"></div>
       <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: searchType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize">
-        <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12" ng-class="{'col-sm-4 col-md-4': !listView, 'col-sm-12 col-md-12': listView}">
+        <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
                    details-fn="mainCtrl.viewDetail(result)" 
                    download-fn="mainCtrl.downloadPublicDataset(result)"

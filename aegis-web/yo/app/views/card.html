@@ -38,12 +38,8 @@
   -->
 
 <div id="card-{{pageNo}}-{{cardIndex}}" class="card-item">
-  <div class="card-item-content 
-       {{content.type === 'proj'? 'red': ''}}
-       {{content.type === 'ds' && !content.public_ds ? 'green': ''}} 
-       {{content.type === 'ds' && content.public_ds && content.localDataset ? 'blue': ''}}
-       {{content.type === 'ds' && content.public_ds && !content.localDataset ? 'darkblue': ''}}">
-    <div class="header">
+  <div class="card-item-content">
+    <div class="header col-md-3">
       <label>
         {{content.type === 'proj'? 'project': ''}}
         {{content.type === 'ds' && !content.public_ds ? 'dataset': ''}} 
@@ -54,13 +50,13 @@
         <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
       </h3>
     </div>
-    <div class="card-body">
+    <div class="card-body col-md-8">
       <div class="details">
         <div class="desc">{{content.description | limitTo: limit}}
           {{content.description.length > limit ? '...':''}}</div>
         
         <div class="row">
-          <div class="col-sm-6 col-md-6">
+          <div class="col-sm-6 col-md-8">
             <label>owner</label>
             <div class="value">{{content.user || '--'}}</div>            
           </div>
@@ -92,7 +88,7 @@
         
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer col-md-1">
       <div class="card-footer-icons">
         <!--span data-placement="bottom" data-toggle="tooltip" title="Reviews">
           <i class="card-footer-icon fa fa-heart" aria-hidden="true"
@@ -115,7 +111,7 @@
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}" style="color: green;"></i> 
         </span> 
         <span data-placement="bottom" data-toggle="tooltip" title="Detail"
-              ng-click="detailsFn(content)">
+              ng-click="detailsFn(content)" class="modal-blue">
           <i class="card-footer-icon fa fa-bars" aria-hidden="true"
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}"></i>
         </span>
