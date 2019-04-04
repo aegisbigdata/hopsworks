@@ -131,9 +131,9 @@
               <div class="ds-content col-lg-12" ng-class="{'sidenav-open': datasetsCtrl.tgState == true}" style="overflow: hidden;">
                 <div class="row" resizable r-directions="['bottom']" ng-class="{'rg-row-top-ds': readme !== null}">
                   <div class="col-lg-12 ds-box thin-scrollbar" style="margin-top: 20px; padding-left: 20px">                    
-                    <div class="file-box" ng-click="datasetsCtrl.newDatasetModal()">
-                      <div class="file">
-                        <div class="icon">
+                    <div class="file-box file-box-height" ng-click="datasetsCtrl.newDatasetModal()">
+                      <div class="file file-height">
+                        <div class="icon file-box-icon">
                           <i class="fa fa-plus"></i>
                         </div>
                         <div class="file-name ng-binding">
@@ -148,30 +148,32 @@
                     <div ng-repeat="dataset in datasetsCtrl.files | filter:{shared: datasetsCtrl.shared, status: datasetsCtrl.status, publicDs: datasetsCtrl.isPublic} | filter:search | orderBy: 'name'">
                       <div>
                         <div ng-init="(iscollapsed$index) = true"
-                           class="file-box" ng-class="{disabled: dataset.downloading}"
+                           class="file-box file-box-height" ng-class="{disabled: dataset.downloading}"
                            context-menu
                            data-target="menu-{{ dataset.name}}">
-                        <div class="file" ng-class="{'greyed' : datasetsCtrl.selected === dataset.name,
+                        <div class="file file-height" ng-class="{'greyed' : datasetsCtrl.selected === dataset.name,
                                   'notAccepted' : dataset.status === false}">
                           <a>
-                            <div ng-if="dataset.status === false" data-toggle="tooltip" title="Shared Dataset. Click on this dataset to accept/reject it." class="icon" ng-click="projectCtrl.browseDataset(dataset)">
+                            <div ng-if="dataset.status === false" data-toggle="tooltip" title="Shared Dataset. Click on this dataset to accept/reject it." class="icon file-box-icon" ng-click="projectCtrl.browseDataset(dataset)">
                               <i class="fa" ng-class="{'fa-folder-open' : datasetsCtrl.selected !== dataset.name}"></i>
                             </div>
-                            <div ng-if="dataset.status === true" data-toggle="tooltip" title="Click here to enter this dataset" class="icon" ng-click="datasetsCtrl.select(dataset.name, dataset, $event); metadataCtrl.setMetadataTemplate(dataset); datasetsCtrl.filePreview(dataset, false, true);" ng-dblclick="projectCtrl.browseDataset(dataset)">
+                            <div ng-if="dataset.status === true" data-toggle="tooltip" title="Click here to enter this dataset" class="icon file-box-icon" ng-click="datasetsCtrl.select(dataset.name, dataset, $event); metadataCtrl.setMetadataTemplate(dataset); datasetsCtrl.filePreview(dataset, false, true);" ng-dblclick="projectCtrl.browseDataset(dataset)">
                               <i ng-show="!dataset.downloading" class="fa" ng-class="{'fa-folder-open': datasetsCtrl.selected === dataset.name, 'fa-folder' : datasetsCtrl.selected !== dataset.name}"></i>
                               <i ng-show="dataset.downloading"  class="glyphicon glyphicon-cloud-download"></i>
                             </div>
                             <div class="file-name" data-toggle="tooltip" title="Click on the bottom section to view metadata for this dataset."
                                  ng-click="datasetsCtrl.select(dataset.name, dataset, $event); metadataCtrl.setMetadataTemplate(dataset); datasetsCtrl.filePreview(dataset, false, true);">
-                              <span data-toggle="tooltip"
+                              <div class="content-text">
+                                    <span class="content-text-icon" data-toggle="tooltip"
                                     title="{{dataset.name.length > 17 ? dataset.name:''}}">
-                                <b>{{dataset.name| cut:true:17:'...'}}</b>
-                              </span>
-                              <span class="fa fa-user pull-right" ng-if="dataset.permission === 'rwxrwx--T'" data-toggle="tooltip"
-                                    title="This dataset is group writable and sticky bit is set."></span>
-                              <span class="fa fa-users pull-right" ng-if="dataset.permission === 'rwxrwx---'" data-toggle="tooltip"
-                                    title="This dataset is group writable."></span>
-                              <br/>
+                                        <b>{{dataset.name| cut:true:17:'...'}}</b>
+                                    </span>
+                                    <span class="fa fa-user pull-right" ng-if="dataset.permission === 'rwxrwx--T'" data-toggle="tooltip"
+                                          title="This dataset is group writable and sticky bit is set."></span>
+                                    <span class="fa fa-users pull-right" ng-if="dataset.permission === 'rwxrwx---'" data-toggle="tooltip"
+                                          title="This dataset is group writable."></span>
+                                    <br/>
+                              </div>
                               <small><b>Owner:</b>
                                 <span data-toggle="tooltip"
                                       title="{{dataset.owner.length > 17 ? dataset.owner:''}}">
