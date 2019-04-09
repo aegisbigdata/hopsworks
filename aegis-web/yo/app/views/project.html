@@ -87,7 +87,10 @@
 
                 <div class="mid-line"></div>
 
-                <div dir-paginate="activity in projectCtrl.activities | itemsPerPage:projectCtrl.pageSize">
+                <div dir-paginate="activity in projectCtrl.activities | itemsPerPage:projectCtrl.pageSize"
+                         pagination-id="project_activity_pagination"
+                         current-page="projectCtrl.curentPage"
+                         total-items="projectCtrl.totalItems">
 
                   <div class="right">
                     <div class="r-arrow"></div>
@@ -104,7 +107,10 @@
                     </div>
                   </div>
                 </div>
-                <dir-pagination-controls 
+                <dir-pagination-controls class="pagination-sm" 
+                                boundary-links="true" 
+                                rotate="false"
+                                pagination-id="project_activity_pagination"
                                 max-size="projectCtrl.pageSize"
                                 class="pagination-sm"
                                 boundary-links="true"
