@@ -52,24 +52,46 @@
               <div ng-include="'views/search.html'"></div>
             </div>
           </div>
-          <div class="content-wrapper" ng-if="!mainCtrl.showSearchPage">
-            <h3>
-              <div flex="65">
-                <a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
+            
+          <div class="content-wrapper content-utility-bar content-utility-bar-actions" ng-if="!mainCtrl.showSearchPage">
+              <div class="col-md-3">
+                <h4 style="margin-top: 10px; margin-bottom: 5px"><a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
                 <span ng-show="datasetsCtrl.pathArray.length > 10">...</span>
                 <span data-ng-repeat="path in datasetsCtrl.pathArray.slice(datasetsCtrl.pathArray.length - 1 - datasetsCtrl.breadcrumbLen()) track by $index">
-                  <span> / </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 16 }}{{path.length > 16 ? '..' : ' '}}</a>
+                  <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 16 }}{{path.length > 16 ? '..' : ' '}}</a>
                 </span>
-                <span> &nbsp; <a ng-click="datasetsCtrl.goToFolder(datasetsCtrl.pathArray.length)"> <span class="fa fa-refresh"></span></a></span>
-              </div>               
-              <div class="pull-right" style="margin-right:30px;  margin-top:-25px;">
+                <span><a ng-click="datasetsCtrl.goToFolder(datasetsCtrl.pathArray.length)"> <span class="fa fa-refresh"></span></a></span>
+                </h4>
+              </div>
+              <div class="col-md-4" ng-show="datasetsCtrl.isSelectedFiles() === 1">
+                <div class=" input-group">
+                  <input id="fileRef" type="text" class="form-control" 
+                         value="{{datasetsCtrl.getSelectedPath(datasetsCtrl.selectedFiles[datasetsCtrl.selected])}}">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default fa fa-clipboard icon-resize-small" type="button"
+                            ngclipboard ngclipboard-success="datasetsCtrl.onSuccess(e);"
+                            data-clipboard-target="#fileRef" title="Copy hdfs path">
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="input-group">
+                  <input type="text" class="form-control" 
+                         ng-model="search" placeholder="Filter...">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default fa fa-filter icon-resize-small" type="button" title="Filter"></button>
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-1 pull-right">
                 <hamburger-toggle state="datasetsCtrl.tgState" class="hamburger-toggle" ng-click="datasetsCtrl.deselectAll()"></hamburger-toggle>
               </div>
-            </h3>
-            <div growl reference="4" class="pull-right" ></div>
+          
+            
             <div style="margin-top: 15px;">
               <div class="row row-no-margin-left col-md-12" ng-init="(iscollapsed$index) = true;" >
-                <div class="ds-content" ng-class="{'sidenav-open': datasetsCtrl.tgState}"  style="margin-top: -5px; margin-left:-7px;">
+                <div class="ds-content" ng-class="{'sidenav-open': datasetsCtrl.tgState}"  style="margin-top: 35px; margin-left:-7px;">
                   <!--Tool bar -->
                   <div class="row"  style="padding-right:30px;">
                     <div class="col-lg-4 col-md-6 col-sm-8">
@@ -127,32 +149,7 @@
                         </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-lg-6 col-lg-offset-2 col-md-6 col-sm-4">
-                      <div class="row">
-                        <div class="col-md-6 pull-right">
-                          <div class="input-group">
-                            <input type="text" class="form-control" 
-                                   ng-model="search" placeholder="Filter...">
-                            <span class="input-group-btn">
-                              <button class="btn btn-default fa fa-filter icon-resize-small" type="button" title="Filter"></button>
-                            </span>
-                          </div>
-                        </div>
-                        <div class="col-md-6 pull-right" ng-show="datasetsCtrl.isSelectedFiles() === 1">
-                          <div class=" input-group">
-                            <input id="fileRef" type="text" class="form-control" 
-                                   value="{{datasetsCtrl.getSelectedPath(datasetsCtrl.selectedFiles[datasetsCtrl.selected])}}">
-                            <span class="input-group-btn">
-                              <button class="btn btn-default fa fa-clipboard icon-resize-small" type="button"
-                                      ngclipboard ngclipboard-success="datasetsCtrl.onSuccess(e);"
-                                      data-clipboard-target="#fileRef" title="Copy hdfs path">
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>              
+                    </div>             
                   </div>            
                   <!--end Tool bar -->
                   <div class="table-responsive" style="overflow: hidden; padding-right: 30px;">

@@ -50,3 +50,24 @@
   .panel {
     box-shadow: none;
   }
+  .file-box-height{
+    height: 215px;
+    margin-bottom: 25px;
+  }
+  .file-height{
+    height: 215px;
+    background-color: #f8f8f8;
+    margin-bottom: 0px;
+  }
+  .file-box-icon{
+    background-color: #fff;
+  }
+  .content-text{
+    display: flex;
+  }
+  .content-text-icon{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 80%;
+    padding-right: 10px;
+  }
