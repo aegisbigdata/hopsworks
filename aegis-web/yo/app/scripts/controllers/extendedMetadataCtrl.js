@@ -72,13 +72,38 @@ angular.module('hopsWorksApp')
             self.projectInodeid = -1;
             self.noTemplates = false;
 
+            self.rdf = {
+
+              context: {}
+            }
+
             $scope.data = {
-              languageSelect: {
-                model: null,
-                options: [
-                  {id: 'EN', name: 'English'},
-                  {id: 'DE', name: 'German'}
-                ]
+              fields: {
+                title: {
+                  model: null
+                },
+                description: {
+                  model: null
+                },
+                publisher: {
+                  model: null
+                },
+                homepage: {
+                  model: null
+                },
+                license: {
+                  model: null
+                },
+                spatial: {
+                  model: null
+                },
+                language: {
+                  model: null,
+                  options: [
+                    {id: 'EN', name: 'English'},
+                    {id: 'DE', name: 'German'}
+                  ]
+                }
               }
             };
 
