@@ -80,25 +80,47 @@ angular.module('hopsWorksApp')
             $scope.data = {
               fields: {
                 title: {
-                  model: null
+                  label: 'Title',
+                  placeholder: '',
+                  model: null,
+                  required: true
                 },
                 description: {
-                  model: null
+                  label: 'Description',
+                  placeholder: '',
+                  model: null,
+                  required: true
                 },
                 publisher: {
-                  model: null
+                  label: 'Publisher',
+                  placeholder: '',
+                  model: null,
+                  required: true
                 },
                 homepage: {
-                  model: null
+                  label: 'Homepage',
+                  placeholder: '',
+                  model: null,
+                  required: true
                 },
                 license: {
-                  model: null
+                  label: 'License',
+                  placeholder: '',
+                  model: null,
+                  required: true
                 },
                 spatial: {
-                  model: null
+                  label: 'Spatial',
+                  placeholder: '',
+                  model: null,
+                  required: true
                 },
                 language: {
+                  label: 'Language',
+                  placeholder: '',
                   model: null,
+                  required: true,
+                  type: 'select',
                   options: [
                     {id: 'EN', name: 'English'},
                     {id: 'DE', name: 'German'}
@@ -145,7 +167,13 @@ angular.module('hopsWorksApp')
 
             self.saveExtendedMetadata = function () {
               console.log('Saving extended Metadata ...');
+              console.log($scope.data.fields);
+              console.log(self.generateRDFString());
             };
+
+            self.generateRDFString = function () {
+              console.log($scope.data.fields);
+            }
 
             self.submitMetadata = function () {
               if (!self.metaData) {
