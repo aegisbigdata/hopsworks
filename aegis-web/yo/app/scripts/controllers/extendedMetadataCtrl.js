@@ -73,9 +73,90 @@ angular.module('hopsWorksApp')
             self.noTemplates = false;
 
             self.rdf = {
+              
+              secondary_context: {
+                "dcat": "http://www.w3.org/ns/dcat#",
+                "dcatde": "http://dcat-ap.de/def/dcatde/",
+                "dcterms": "http://purl.org/dc/terms/",
+                "foaf": "http://xmlns.com/foaf/0.1/",
+                "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+                "spdx": "http://spdx.org/rdf/terms#",
+                "vcard": "http://www.w3.org/2006/vcard/ns#",
+                "xsd": "http://www.w3.org/2001/XMLSchema#"
+              },
 
-              context: {}
-            }
+              context: {
+                description: {
+                  type: 'rdfs:Literal',
+                  uri: 'dct:description'
+                },
+                title: {
+                  type: 'rdfs:Literal',
+                  uri: 'dct:title'
+                },
+                publisher: {
+                  type: 'foaf:Agent',
+                  uri: 'dct:publisher'
+                },
+                homepage: {
+                  type: 'foaf:Document',
+                  uri: 'foaf:homepage'
+                },
+                spatial: {
+                  type: 'dct:Location',
+                  uri: 'dct:spatial'
+                },
+                language: {
+                  type: 'dct:LinguisticSystem',
+                  uri: 'dct:language'
+                },
+                license: {
+                  '@id': 'https://www.dcat-ap.de/def/licenses/',
+                  'type': '@id'
+                }
+              },
+
+              data: {
+                "@id" : "https://europeandataportal.eu/id/catalogue/edp",
+                "@type" : "http://www.w3.org/ns/dcat#Catalog",
+                description: {
+                  type: 'rdfs:Literal',
+                  uri: 'dct:description',
+                  value: null
+                },
+                title: {
+                  type: 'rdfs:Literal',
+                  uri: 'dct:title',
+                  value: null
+                },
+                publisher: {
+                  type: 'foaf:Agent',
+                  uri: 'dct:publisher',
+                  value: null
+                },
+                homepage: {
+                  type: 'foaf:Document',
+                  uri: 'foaf:homepage',
+                  value: null
+                },
+                license: {
+                  type: 'dct:LicenseDocument',
+                  uri: 'dct:license',
+                  value: null
+                },
+                spatial: {
+                  type: 'dct:Location',
+                  uri: 'dct:spatial',
+                  value: null
+                },
+                language: {
+                  type: 'dct:LinguisticSystem',
+                  uri: 'dct:language',
+                  value: null
+                }
+              }
+            };
 
             $scope.data = {
               fields: {
@@ -167,12 +248,17 @@ angular.module('hopsWorksApp')
 
             self.saveExtendedMetadata = function () {
               console.log('Saving extended Metadata ...');
-              console.log($scope.data.fields);
               console.log(self.generateRDFString());
             };
 
             self.generateRDFString = function () {
               console.log($scope.data.fields);
+              // temporarily removed, didnt work
+              
+              // jsonld.compact(self.rdf.data, self.rdf.context, function(err, compacted) {
+              //  console.log(JSON.stringify(compacted, null, 2));
+              //  return compacted;
+              // });
             }
 
             self.submitMetadata = function () {
