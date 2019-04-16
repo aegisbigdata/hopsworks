@@ -1,7 +1,9 @@
 {
   "name": "aegis",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "jsonld": "^1.5.4"
+  },
   "repository": {},
   "devDependencies": {
     "bower-npm-resolver": "^0.9.1",

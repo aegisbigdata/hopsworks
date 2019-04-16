@@ -73,8 +73,31 @@ angular.module('hopsWorksApp')
             self.noTemplates = false;
 
             self.rdf = {
+
+              doc: {
+                'http://www.w3.org/ns/dcat#title': {'@id': ''},
+                'http://www.w3.org/ns/dcat#description': {'@id': ''},
+                'http://www.w3.org/ns/dcat#publisher': {'@id': ''},
+                'http://www.w3.org/ns/dcat#homepage': {'@id': ''},
+                'http://www.w3.org/ns/dcat#spatial': {'@id': ''},
+                'http://www.w3.org/ns/dcat#language': {'@id': ''},
+                'http://www.w3.org/ns/dcat#license': {'@id': ''},
+                'http://purl.org/dc/terms/modified': {'@id': ''}
+              },
+
+              context: {
+                "title": {'@id': 'http://www.w3.org/ns/dcat#title', "@type": '@id'},
+                "homepage": {"@id": "http://www.w3.org/ns/dcat#homepage", "@type": "@id"},
+                "description": {"@id": 'http://www.w3.org/ns/dcat#description', "@type": "@id"},
+                "publisher": {"@id": 'http://www.w3.org/ns/dcat#publisher', "@type": "@id"},
+                "homepage": {"@id": 'http://www.w3.org/ns/dcat#homepage', "@type": "@id"},
+                "spatial": {"@id": 'http://www.w3.org/ns/dcat#spatial', "@type": "@id"},
+                "language": {"@id": 'http://www.w3.org/ns/dcat#language', "@type": "@id"},
+                "license": {"@id": 'http://www.w3.org/ns/dcat#license', "@type": "@id"},
+                "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
+              },
               
-              secondary_context: {
+              resources: {
                 "dcat": "http://www.w3.org/ns/dcat#",
                 "dcatde": "http://dcat-ap.de/def/dcatde/",
                 "dcterms": "http://purl.org/dc/terms/",
@@ -86,7 +109,7 @@ angular.module('hopsWorksApp')
                 "xsd": "http://www.w3.org/2001/XMLSchema#"
               },
 
-              context: {
+              datatypes: {
                 description: {
                   type: 'rdfs:Literal',
                   uri: 'dct:description'
@@ -118,41 +141,46 @@ angular.module('hopsWorksApp')
               },
 
               data: {
-                "@id" : "https://europeandataportal.eu/id/catalogue/edp",
-                "@type" : "http://www.w3.org/ns/dcat#Catalog",
                 description: {
                   type: 'rdfs:Literal',
                   uri: 'dct:description',
+                  mapping: 'http://www.w3.org/ns/dcat#description',
                   value: null
                 },
                 title: {
                   type: 'rdfs:Literal',
                   uri: 'dct:title',
+                  mapping: 'http://www.w3.org/ns/dcat#title',
                   value: null
                 },
                 publisher: {
                   type: 'foaf:Agent',
                   uri: 'dct:publisher',
+                  mapping: 'http://www.w3.org/ns/dcat#publisher',
                   value: null
                 },
                 homepage: {
                   type: 'foaf:Document',
                   uri: 'foaf:homepage',
+                  mapping: 'http://www.w3.org/ns/dcat#homepage',
                   value: null
                 },
                 license: {
                   type: 'dct:LicenseDocument',
                   uri: 'dct:license',
+                  mapping: 'http://www.w3.org/ns/dcat#license',
                   value: null
                 },
                 spatial: {
                   type: 'dct:Location',
                   uri: 'dct:spatial',
+                  mapping: 'http://www.w3.org/ns/dcat#spatial',
                   value: null
                 },
                 language: {
                   type: 'dct:LinguisticSystem',
                   uri: 'dct:language',
+                  mapping: 'http://www.w3.org/ns/dcat#language',
                   value: null
                 }
               }
@@ -163,43 +191,43 @@ angular.module('hopsWorksApp')
                 title: {
                   label: 'Title',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true
                 },
                 publisher: {
                   label: 'Publisher',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true
                 },
                 homepage: {
                   label: 'Homepage',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true
                 },
                 license: {
                   label: 'License',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true
                 },
                 spatial: {
                   label: 'Spatial',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true
                 },
                 language: {
                   label: 'Language',
                   placeholder: '',
-                  model: null,
+                  model: '',
                   required: true,
                   type: 'select',
                   options: [
@@ -248,7 +276,21 @@ angular.module('hopsWorksApp')
 
             self.saveExtendedMetadata = function () {
               console.log('Saving extended Metadata ...');
-              console.log(self.generateRDFString());
+              var modifiedKey = 'http://purl.org/dc/terms/modified';
+              var data = self.rdf.data; 
+              var doc = self.rdf.doc;
+
+              for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                  var mapping = data[key].mapping;
+                  doc[mapping]['@id'] = $scope.data.fields[key].model;
+                }
+              }
+
+              doc[modifiedKey]['@id'] = (new Date()).toISOString();
+
+              console.log(doc);
+              self.generateRDFString();
             };
 
             self.generateRDFString = function () {
@@ -259,6 +301,12 @@ angular.module('hopsWorksApp')
               //  console.log(JSON.stringify(compacted, null, 2));
               //  return compacted;
               // });
+              // 
+
+
+              jsonld.compact(self.rdf.doc, self.rdf.context, function(err, compacted) {
+                console.log(JSON.stringify(compacted, null, 2));
+              });
             }
 
             self.submitMetadata = function () {
