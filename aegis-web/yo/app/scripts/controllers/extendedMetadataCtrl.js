@@ -73,114 +73,71 @@ angular.module('hopsWorksApp')
             self.noTemplates = false;
 
             self.rdf = {
-
               doc: {
-                'http://www.w3.org/ns/dcat#title': {'@id': ''},
-                'http://www.w3.org/ns/dcat#description': {'@id': ''},
-                'http://www.w3.org/ns/dcat#publisher': {'@id': ''},
-                'http://www.w3.org/ns/dcat#homepage': {'@id': ''},
-                'http://www.w3.org/ns/dcat#spatial': {'@id': ''},
-                'http://www.w3.org/ns/dcat#language': {'@id': ''},
-                'http://www.w3.org/ns/dcat#license': {'@id': ''},
-                'http://purl.org/dc/terms/modified': {'@id': ''}
+                "http://purl.org/dc/terms/title": {'@id': ''},
+                "http://purl.org/dc/terms/description": {'@id': ''},
+                "http://xmlns.com/foaf/0.1/Agent": {'@id': ''},
+                'http://xmlns.com/foaf/0.1/homepage': {'@id': ''},
+                "http://purl.org/dc/terms/spatial": {'@id': ''},
+                'http://purl.org/dc/terms/language': {'@id': ''},
+                'http://purl.org/dc/terms/license': {'@id': ''},
+                'http://purl.org/dc/terms/modified': '',
               },
-
               context: {
-                "title": {'@id': 'http://www.w3.org/ns/dcat#title', "@type": '@id'},
-                "homepage": {"@id": "http://www.w3.org/ns/dcat#homepage", "@type": "@id"},
-                "description": {"@id": 'http://www.w3.org/ns/dcat#description', "@type": "@id"},
-                "publisher": {"@id": 'http://www.w3.org/ns/dcat#publisher', "@type": "@id"},
-                "homepage": {"@id": 'http://www.w3.org/ns/dcat#homepage', "@type": "@id"},
-                "spatial": {"@id": 'http://www.w3.org/ns/dcat#spatial', "@type": "@id"},
-                "language": {"@id": 'http://www.w3.org/ns/dcat#language', "@type": "@id"},
-                "license": {"@id": 'http://www.w3.org/ns/dcat#license', "@type": "@id"},
-                "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
-              },
-              
-              resources: {
                 "dcat": "http://www.w3.org/ns/dcat#",
                 "dcatde": "http://dcat-ap.de/def/dcatde/",
                 "dcterms": "http://purl.org/dc/terms/",
                 "foaf": "http://xmlns.com/foaf/0.1/",
-                "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-                "spdx": "http://spdx.org/rdf/terms#",
-                "vcard": "http://www.w3.org/2006/vcard/ns#",
-                "xsd": "http://www.w3.org/2001/XMLSchema#"
+                "title": {"@id" : "http://purl.org/dc/terms/title"},
+                "homepage": {"@id": "http://xmlns.com/foaf/0.1/homepage", "@type": "@id"},
+                "description": {"@id" : "http://purl.org/dc/terms/description", "@type": "@id"},
+                "publisher" : { "@id": "http://xmlns.com/foaf/0.1/Agent", "@type": "@id"},
+                "spatial": {"@id" : "http://purl.org/dc/terms/spatial", "@type": "@id"},
+                "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
+                "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"},
+                "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
               },
-
-              datatypes: {
-                description: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:description'
-                },
-                title: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:title'
-                },
-                publisher: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher'
-                },
-                homepage: {
-                  type: 'foaf:Document',
-                  uri: 'foaf:homepage'
-                },
-                spatial: {
-                  type: 'dct:Location',
-                  uri: 'dct:spatial'
-                },
-                language: {
-                  type: 'dct:LinguisticSystem',
-                  uri: 'dct:language'
-                },
-                license: {
-                  '@id': 'https://www.dcat-ap.de/def/licenses/',
-                  'type': '@id'
-                }
-              },
-
               data: {
                 description: {
                   type: 'rdfs:Literal',
                   uri: 'dct:description',
-                  mapping: 'http://www.w3.org/ns/dcat#description',
+                  mapping: "http://purl.org/dc/terms/description",
                   value: null
                 },
                 title: {
                   type: 'rdfs:Literal',
                   uri: 'dct:title',
-                  mapping: 'http://www.w3.org/ns/dcat#title',
+                  mapping: "http://purl.org/dc/terms/title",
                   value: null
                 },
                 publisher: {
                   type: 'foaf:Agent',
                   uri: 'dct:publisher',
-                  mapping: 'http://www.w3.org/ns/dcat#publisher',
+                  mapping: "http://xmlns.com/foaf/0.1/Agent",
                   value: null
                 },
                 homepage: {
                   type: 'foaf:Document',
                   uri: 'foaf:homepage',
-                  mapping: 'http://www.w3.org/ns/dcat#homepage',
+                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
                   value: null
                 },
                 license: {
                   type: 'dct:LicenseDocument',
                   uri: 'dct:license',
-                  mapping: 'http://www.w3.org/ns/dcat#license',
+                  mapping: 'http://purl.org/dc/terms/license',
                   value: null
                 },
                 spatial: {
                   type: 'dct:Location',
                   uri: 'dct:spatial',
-                  mapping: 'http://www.w3.org/ns/dcat#spatial',
+                  mapping: "http://purl.org/dc/terms/spatial",
                   value: null
                 },
                 language: {
                   type: 'dct:LinguisticSystem',
                   uri: 'dct:language',
-                  mapping: 'http://www.w3.org/ns/dcat#language',
+                  mapping: 'http://purl.org/dc/terms/language',
                   value: null
                 }
               }
@@ -287,7 +244,7 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              doc[modifiedKey]['@id'] = (new Date()).toISOString();
+              doc[modifiedKey] = (new Date()).toISOString();
 
               console.log(doc);
               self.generateRDFString();
@@ -304,7 +261,7 @@ angular.module('hopsWorksApp')
               // 
 
 
-              jsonld.compact(self.rdf.doc, self.rdf.context, function(err, compacted) {
+              jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
                 console.log(JSON.stringify(compacted, null, 2));
               });
             }
