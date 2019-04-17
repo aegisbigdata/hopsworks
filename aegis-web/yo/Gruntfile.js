@@ -155,6 +155,10 @@ module.exports = function (grunt) {
                       serveStatic('./bower_components')
                       ),
               connect().use(
+                      '/node_modules',
+                      serveStatic('./node_modules')
+                      ),
+              connect().use(
                       '/app/styles',
                       serveStatic('./app/styles')
                       ),
@@ -173,6 +177,10 @@ module.exports = function (grunt) {
               connect().use(
                       '/bower_components',
                       serveStatic('./bower_components')
+                      ),
+              connect().use(
+                      '/node_modules',
+                      serveStatic('./node_modules')
                       ),
               serveStatic(appConfig.app)
             ];

@@ -85,7 +85,6 @@ angular.module('hopsWorksApp')
               },
               context: {
                 "dcat": "http://www.w3.org/ns/dcat#",
-                "dcatde": "http://dcat-ap.de/def/dcatde/",
                 "dcterms": "http://purl.org/dc/terms/",
                 "foaf": "http://xmlns.com/foaf/0.1/",
                 "title": {"@id" : "http://purl.org/dc/terms/title"},
