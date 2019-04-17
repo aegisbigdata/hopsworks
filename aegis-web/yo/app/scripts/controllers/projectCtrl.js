@@ -292,6 +292,10 @@ angular.module('hopsWorksApp')
             self.goToDatasets = function () {
               self.goToUrl('datasets');
             };
+            
+            self.goToProject = function () {
+              self.goToUrl('activities');
+            };
 
             self.goToRStudio = function () {
               self.goToUrl('rstudio');
