@@ -71,3 +71,6 @@
     width: 80%;
     padding-right: 10px;
   }
+ .card-modal .card-item-content .card-body-detail {
+    height: auto;
+}
