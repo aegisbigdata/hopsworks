@@ -293,7 +293,7 @@ angular.module('hopsWorksApp')
               self.goToUrl('datasets');
             };
             
-            self.goToProject = function () {
+            self.goToProjectActivities = function () {
               self.goToUrl('activities');
             };
 
