@@ -46,6 +46,7 @@ angular.module('hopsWorksApp')
           function ($cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService) {
+            const PROJECT_ID = $cookies.get('projectID');
 
             var self = this;
             self.metaData = {};
@@ -230,6 +231,23 @@ angular.module('hopsWorksApp')
                       });
                     });
            
+            // ExtendedMetadataService.getExtMetadataForProject(PROJECT_ID)
+            //   .then(function (response) {
+            //      self.setExtendedMetadata(response.data);
+            //   })
+            //   .catch(function (error) {
+            //     console.log(error);
+            //   });
+
+            self.setExtendedMetadata = function (data) {
+              console.log(data);
+
+              for (var key in data) {
+                if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
+                  $scope.data.fields[key].model = data[key]; 
+                }
+              }
+            };
 
             self.saveExtendedMetadata = function () {
               console.log('Saving extended Metadata ...');
