@@ -39,7 +39,7 @@
 
 <div ng-controller="MainCtrl as mainCtrl">
     <div id="wrapper" class="toggled" data-spy="scroll" data-target="#toc">
-        <div ng-controller="ExtendedMetadataCtrl as extendedMetadataCtrl">
+        <div ng-controller="MetadataCtrl as metadataCtrl">
             <div class="overlay"></div>
             <div ng-include="'navProject.html'"></div>
             <section>
@@ -158,23 +158,14 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <form>
-                                            
-                                            <div class="form-group" ng-repeat="(key, field) in data.fields">
-                                                <label for="{{ 'input' + field.label }}">{{ field.label }}</label>
-                                                
-                                                <ng-template ng-if="field.type == 'select'">
-                                                    <select name="{{ field.label }}" id="{{ 'input' + field.label }}" ng-model="field.model" class="form-control">
-                                                       <option ng-repeat="option in field.options" value="{{option.id}}">{{option.name}}</option>
-                                                    </select>
-                                                </ng-template>
-
-                                                <ng-template ng-if="!field.type || field.type == 'text'">
-                                                    <input type="{{ field.type ? field.type : 'text' }}" ng-model="field.model" ng-required="field.required" class="form-control" id="{{ 'input' + field.label }}" placeholder="{{field.placeholder !== '' ? field.placeholder : field.label}}">
-                                                </ng-template>
-
-                                                
+                                            <div class="form-group">
+                                                <label for="inputTitle3">Title*</label>
+                                                <input type="text" class="form-control" id="inputTitle3" placeholder="Title">
                                             </div>
-
+                                            <div class="form-group">
+                                                <label for="inputDescription3">Description*</label>
+                                                <textarea class="form-control" id="inputDescription3" placeholder="Description"></textarea>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
@@ -206,6 +197,11 @@
                                             <div class="form-group">
                                                 <label for="inputKeywords3">Keywords</label>
                                                 <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="inputPublisher3">Publisher</label>
+                                                <input type="text" class="form-control" id="inputPublisher3"
+                                                    placeholder="Publisher">
                                             </div>
                                             <div class="form-group">
                                                 <label for="inputTheme3">Theme/Category</label>
@@ -276,13 +272,8 @@
                                 </div-->
                             </div>
                             <!-- END Rightside tables -->
-                            <div class="col-md-2" style="position: relative;">
-                                
-                                <div id="sidebar-button-container" class="fixed" style="top: 185px;">
-                                    <button type="submit" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
-                                </div>
-
-                                <div id="sidebar-usage-note sidebar-usage-note--extmeta" class="fixed" style="top: 235px;">
+                            <div class="col-md-2">
+                                <div id="sidebar-usage-note" class="fixed">
                                     <h5>Usage note</h5>
                                     <p><small>This property contains a name given to the Dataset. This property can be
                                             repeated for 1..n parallel language versions of the name.</small></p>
