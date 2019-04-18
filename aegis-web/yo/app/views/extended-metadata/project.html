@@ -39,7 +39,7 @@
 
 <div ng-controller="MainCtrl as mainCtrl">
     <div id="wrapper" class="toggled" data-spy="scroll" data-target="#toc">
-        <div ng-controller="MetadataCtrl as metadataCtrl">
+        <div ng-controller="ExtendedMetadataCtrl as extendedMetadataCtrl">
             <div class="overlay"></div>
             <div ng-include="'navProject.html'"></div>
             <section>
@@ -144,40 +144,39 @@
                                         <h3>Mandatory</h3>
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div class="col-md-12">
                                         <form>
-                                            <div class="form-group">
-                                                <label for="inputProjectTitle" class="control-label">Project
-                                                    title*</label>
-                                                <input type="text" class="form-control" id="inputProjectTitle"
-                                                        placeholder="Project title" ng-model="vm.metadataExtendedCatalog.title">
+                                            
+                                            <div class="form-group" ng-repeat="(key, field) in data.fields">
+                                                <label for="{{ 'input' + field.label }}">{{ field.label }}</label>
+                                                
+                                                <ng-template ng-if="field.type == 'select'">
+                                                    <select name="{{ field.label }}" id="{{ 'input' + field.label }}" ng-model="field.model" class="form-control">
+                                                       <option ng-repeat="option in field.options" value="{{option.id}}">{{option.name}}</option>
+                                                    </select>
+                                                </ng-template>
+
+                                                <ng-template ng-if="!field.type || field.type == 'text'">
+                                                    <input type="{{ field.type ? field.type : 'text' }}" ng-model="field.model" ng-required="field.required" class="form-control" id="{{ 'input' + field.label }}" placeholder="{{field.placeholder !== '' ? field.placeholder : field.label}}">
+                                                </ng-template>
+                                                
                                             </div>
-                                            <div class="form-group">
-                                                <label for="inputProjectDescription" class="control-label">Project
-                                                    description*</label>
-                                                <input type="text" class="form-control" id="inputProjectDescription"
-                                                        placeholder="Project description" ng-model="vm.metadataExtendedCatalog.description">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="inputProjectPublisherName" class="control-label">Project
-                                                    publisher name*</label>
-                                                <input type="text" class="form-control" id="inputProjectPublisherName"
-                                                        placeholder="Project publisher name" ng-model="vm.metadataExtendedCatalog.publisher.name">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="inputProjectPublisherHomepage" class="control-label">Project
-                                                    publisher homepage*</label>
-                                                <input type="text" class="form-control" id="inputProjectPublisherHomepage"
-                                                        placeholder="Project publisher homepage" ng-model="vm.metadataExtendedCatalog.publisher.homepage">
-                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
+
                             </div>
                             <!-- END Rightside tables -->
                             <div class="col-md-2">
-                                <div id="sidebar-usage-note" class="fixed">
+
+                                <div id="sidebar-button-container" class="fixed" style="top: 185px;">
+                                    <button type="submit" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
+                                </div>
+
+                                <div id="sidebar-usage-note" class="fixed" style="top: 235px;">
                                     <h5>Usage note</h5>
                                     <p><small>This property contains a name given to the Dataset. This property can be
                                             repeated for 1..n parallel language versions of the name.</small></p>
