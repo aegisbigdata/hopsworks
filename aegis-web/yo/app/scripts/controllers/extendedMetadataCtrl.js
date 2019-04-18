@@ -46,32 +46,11 @@ angular.module('hopsWorksApp')
           function ($cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService) {
-            const PROJECT_ID = $cookies.get('projectID');
+            const PROJECT_ID = $routeParams.projectID;
 
             var self = this;
             self.metaData = {};
             self.metaDataDetail = {};
-            self.currentFile = MetadataHelperService.getCurrentFile();
-            self.tabs = [];
-            self.meta = [];
-            self.metainfo = [];
-            self.visibilityInfo = [];
-            self.availableTemplates = [];
-            self.newTemplateName = "";
-            self.extendedTemplateName = "";
-            self.currentTableId = -1;
-            self.currentTemplateID = -1;
-            self.currentFileTemplates = [];
-            self.selectedTemplate = {};
-            self.editedField;
-            self.toExtend = -1;
-            self.currentBoard = {};
-            self.toDownload;
-            self.blob;
-            self.templateContents = {};
-            self.editingTemplate = false;
-            self.projectInodeid = -1;
-            self.noTemplates = false;
             // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
 
             self.rdf = {
@@ -222,15 +201,12 @@ angular.module('hopsWorksApp')
               listener();
             });
 
-            //fetch all the available templates
-            MetadataHelperService.fetchAvailableTemplates()
-                    .then(function (response) {
-                      self.availableTemplates = JSON.parse(response.board).templates;
-                      angular.forEach(self.availableTemplates, function (template, key) {
-                        template.showing = false;
-                      });
-                    });
-           
+
+            /**
+             *  Initially get existing extended metadata for project with PROJECT_ID from Service
+             *  WIP until Service is working / API endpoints are defined
+             */
+
             // ExtendedMetadataService.getExtMetadataForProject(PROJECT_ID)
             //   .then(function (response) {
             //      self.setExtendedMetadata(response.data);
@@ -238,6 +214,12 @@ angular.module('hopsWorksApp')
             //   .catch(function (error) {
             //     console.log(error);
             //   });
+
+
+            /**
+             *   Receives data from ExtendedMetadataService and sets models of each available field
+             *   WIP until Service is working / API endpoints are defined
+             */
 
             self.setExtendedMetadata = function (data) {
               console.log(data);
@@ -249,8 +231,13 @@ angular.module('hopsWorksApp')
               }
             };
 
+
+            /**
+             * Entry point for saving extended metadata from fields in project-view
+             * Is triggered on clicking the "Save Metadata" button
+             */
+
             self.saveExtendedMetadata = function () {
-              console.log('Saving extended Metadata ...');
               var modifiedKey = 'http://purl.org/dc/terms/modified';
               var data = self.rdf.data; 
               var doc = self.rdf.doc;
@@ -264,76 +251,19 @@ angular.module('hopsWorksApp')
 
               doc[modifiedKey] = (new Date()).toISOString();
 
-              console.log(doc);
               self.generateRDFString();
             };
 
+
+            /**
+             * Generates RDF compliant representation in json-ld format
+             * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
+             */
+
             self.generateRDFString = function () {
-              console.log($scope.data.fields);
-              // temporarily removed, didnt work
-              
-              // jsonld.compact(self.rdf.data, self.rdf.context, function(err, compacted) {
-              //  console.log(JSON.stringify(compacted, null, 2));
-              //  return compacted;
-              // });
-              // 
-
-
               jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
                 console.log(JSON.stringify(compacted, null, 2));
               });
             }
-
-            self.submitMetadata = function () {
-              if (!self.metaData) {
-                return;
-              }
-              //after the project inodeid is available proceed to store metadata
-              MetadataRestService.addMetadataWithSchema(
-                      parseInt(self.currentFile.parentId), self.currentFile.name, self.currentTableId, self.metaData)
-                      .then(function (success) {
-                        self.fetchMetadataForTemplate();
-                      }, function (error) {
-                        growl.error("Metadata could not be saved", {title: 'Info', ttl: 1000});
-                      });
-              //truncate metaData object
-              angular.forEach(self.metaData, function (value, key) {
-                if (!angular.isArray(value)) {
-                  self.metaData[key] = "";
-                } else {
-                  self.metaData[key] = [];
-                }
-              });
-            };
-
-
-            self.hideAddTable = function () {
-              return self.currentTemplateID !== -1 && self.currentTemplateID !== undefined &&
-                      !self.editingTemplate
-            };
-
-            self.createMetadata = function (tableId, metadataId) {
-              if (!self.metaData) {
-                return;
-              }
-              var value = self.metaData[metadataId];
-              if (!value || value.length === 0) {
-                growl.info("Metadata field cannot be empty", {title: 'Info', ttl: 3000});
-                return;
-              }
-
-              var tempInput = {};
-              tempInput[metadataId] = value;
-              MetadataRestService.addMetadataWithSchema(
-                      parseInt(self.currentFile.parentId), self.currentFile.name, self.currentTableId, tempInput)
-                      .then(function (success) {
-                        self.metaData[metadataId] = '';
-                        self.fetchMetadataForTemplate();
-                      }, function (error) {
-                        growl.error("Metadata could not be saved", {title: 'Info', ttl: 1000});
-                        self.metaData[metadataId] = '';
-                        self.fetchMetadataForTemplate();
-                      });
-            };
           }
         ]);
