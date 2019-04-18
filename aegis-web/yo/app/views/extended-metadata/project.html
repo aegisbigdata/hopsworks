@@ -126,10 +126,7 @@
                                         <li class="active">
                                             <a href="#GroupA">Mandatory</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a href="#GroupASub1">Title</a></li>
-                                                <li><a href="#GroupASub2">Description</a></li>
-                                                <li><a href="#GroupASub3">Project publisher name</a></li>
-                                                <li><a href="#GroupASub4">Project publisher homepage</a></li>
+                                                <li ng-repeat="(key, field) in data.fields"><a href="#">{{ field.label }}</a></li>
                                             </ul>
                                         </li>
                                     </ul>
