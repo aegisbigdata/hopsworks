@@ -42,10 +42,10 @@
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService',
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService',
           function ($cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService) {
 
             var self = this;
             self.metaData = {};
@@ -71,6 +71,7 @@ angular.module('hopsWorksApp')
             self.editingTemplate = false;
             self.projectInodeid = -1;
             self.noTemplates = false;
+            // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
 
             self.rdf = {
               doc: {
