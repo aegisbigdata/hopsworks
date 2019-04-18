@@ -47,9 +47,20 @@ angular.module('hopsWorksApp')
             
             var service = {
 
+              /**
+               * GET existing extended metadata for project by ID (WIP)
+               */
+
               getExtMetadataForProject: function (projectId) {
                 return $http.get(EXTENDED_METADATA_GET_ENDPOINT + projectId);
               },
+
+
+              /**
+               * POST/Save extended metadata to endpoint. 
+               * Triggered when user clicks on "Save Metadata" button.
+               * WIP: Cloned from metadataRestService until API endpoints are specified
+               */
 
               saveExtMetadata: function (inodepid, inodename, metadataObj) {
                 var jsonObj = JSON.stringify({
@@ -71,5 +82,6 @@ angular.module('hopsWorksApp')
               },
               
             };
+            
             return service;
           }]);
