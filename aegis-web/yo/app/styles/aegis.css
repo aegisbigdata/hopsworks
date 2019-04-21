@@ -71,3 +71,11 @@
     width: 80%;
     padding-right: 10px;
   }
+
+  .aegis-home-page {
+    background-color: #fff;
+  }
+
+.aegis-home-page li a {
+  color: rgb(4, 146, 179);
+}
