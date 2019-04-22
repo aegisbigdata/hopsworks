@@ -71,6 +71,14 @@
     width: 80%;
     padding-right: 10px;
   }
- .card-modal .card-item-content .card-body-detail {
+.card-modal .card-item-content .card-body-detail {
     height: auto;
+}
+
+.aegis-home-page {
+    background-color: #fff;
+}
+
+.aegis-home-page li a {
+  color: rgb(4, 146, 179);
 }
