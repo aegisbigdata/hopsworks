@@ -55,16 +55,14 @@
       <div class="col-sm-3">
         <a
           ng-click="homeCtrl.newProject()"
-          class="home-project-container"
-          style="background-color: #0492b3; color: #fff; padding: 28px 15px; text-align: center; margin-bottom: 25px; display: block; box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1)"
+          class="home-project-container-new"
         >
-          <h4 class="home-project-container-title"><span class="fa fa-plus"></span> New Project</h4>
+          <h4 class="home-project-container-title"><span class="fa fa-plus"></span>New Project</h4>
         </a>
       </div>
       <div class="col-sm-3" ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
         <a
           class="home-project-container"
-          style="border-top: 4px solid #0492b3; padding: 15px; text-align: center; margin-bottom: 25px; display: block; box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1)"
           href="#!/project/{{project.project.id}}"
           context-menu
           data-target="menu-{{$index}}"
