@@ -45,6 +45,8 @@ angular.module('hopsWorksApp')
         function ($location, $anchorScroll, $scope, $rootScope, md5, ModalService,
                   HopssiteService, DelaService, ProjectService, growl) {
 
+            this.currentTabIndex = 0;
+
             this.transactionCategories = [
                 {
                     key: 'all',
