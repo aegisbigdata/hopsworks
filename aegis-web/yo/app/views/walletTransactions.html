@@ -37,8 +37,7 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
 
-<div class="container content-wrapper" ng-controller="MainCtrl as mainCtrl" id="publicdatasetWrapper"
-     style="width: 1500px;">
+<div ng-controller="MainCtrl as mainCtrl">
     <div ng-include="'nav.html'"></div>
     <div ng-if="mainCtrl.showSearchPage" class="row" ng-init="walletTransactionsCtrl.overflowYAuto()">
         <div id="projectSearchResults">
@@ -46,26 +45,44 @@
         </div>
     </div>
     <div growl reference="13" class="pull-right"></div>
-    <div ng-if="!mainCtrl.showSearchPage" class="row" ng-init="walletTransactionsCtrl.setupStyle()">
-        <nav class="transaction-nav" id="transaction">
-            <ul class=" keep-open">
-                <li class="transaction-heading">AEGIS Wallet</li>
-                <li class="dropdown" ng-repeat="transaction in walletTransactionsCtrl.transactionCategories">
-                    <a id="dLabel" ng-click="walletTransactionsCtrl.selectTransaction(transaction)">
-                        {{transaction.name}}</a>
-                </li>
+    <div ng-if="!mainCtrl.showSearchPage" class="container content-wrapper"
+         ng-init="walletTransactionsCtrl.setupStyle()">
+        <div class="bs-docs-sidebar">
+            <ul class="nav nav-stacked fixed">
+                <li class="sidebar-header-0">AEGIS Wallet</li>
+                <li class="sidebar-header-1" ng-repeat="transaction in walletTransactionsCtrl.transactionCategories">
+                    <a ng-click="walletTransactionsCtrl.selectTransaction(transaction)">{{ transaction.name }}</a></li>
             </ul>
-        </nav>
-        <article class="transactions-view" id="transactions-article">
+        </div>
+        <article class="transactions-view" id="transactions-article"
+                 style="border-left: 1px dashed lightgrey; padding-left: 15px;">
             <div class="row">
-                <h3 class="transactions-view-heading">{{walletTransactionsCtrl.selectedTransaction.name}}</h3>
+                <div class="col-sm-12">
+                    <h3 class="transactions-view-heading">{{ walletTransactionsCtrl.selectedTransaction.name }}</h3>
+                </div>
             </div>
-            <br>
-            <br>
-            <div class="row">
-                <uib-tabset active="currentTabIndex" justified="true">
-                    <uib-tab index="0" heading="Assets Sold">
-                        <div style="margin: 20px;">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col">
+                        <ul class="nav nav-tabs nav-align-center">
+                            <li ng-class="{active: walletTransactionsCtrl.currentTabIndex === 0}"
+                                ng-click="walletTransactionsCtrl.currentTabIndex = 0;">
+                                <a>
+                                    Assets Sold
+                                </a>
+                            </li>
+                            <li ng-class="{active: walletTransactionsCtrl.currentTabIndex === 1}"
+                                ng-click="walletTransactionsCtrl.currentTabIndex = 1;">
+                                <a>
+                                    Assets Bought
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row" ng-if="walletTransactionsCtrl.currentTabIndex === 0">
+                        <div class="col-sm-12" style="margin-top: 20px;">
                             <table st-table="rowCollection" class="table table-striped">
                                 <thead>
                                 <tr>
@@ -81,7 +98,8 @@
                                     <td>{{ asset.coins }}</td>
                                     <td>{{ asset.date }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary" ng-click="walletTransactionsCtrl.displayTransaction(asset)">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                ng-click="walletTransactionsCtrl.displayTransaction(asset)">
                                             <i class="glyphicon glyphicon-search glyphicon-override"></i>
                                         </button>
                                     </td>
@@ -89,13 +107,35 @@
                                 </tbody>
                             </table>
                         </div>
-                    </uib-tab>
-                    <uib-tab index="1" heading="Assets Bought">
-                        <div class="row">
-                            <h4>Assets Bought</h4>
+                    </div>
+                    <div class="row" ng-if="walletTransactionsCtrl.currentTabIndex === 1">
+                        <div class="col-sm-12" style="margin-top: 20px;">
+                            <table st-table="rowCollection" class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Dataset</th>
+                                    <th>Coins Earned</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="asset in walletTransactionsCtrl.assetsSold">
+                                    <td>{{ asset.dataset }}</td>
+                                    <td>{{ asset.coins }}</td>
+                                    <td>{{ asset.date }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                ng-click="walletTransactionsCtrl.displayTransaction(asset)">
+                                            <i class="glyphicon glyphicon-search glyphicon-override"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
-                    </uib-tab>
-                </uib-tabset>
+                    </div>
+                </div>
             </div>
         </article>
     </div>
