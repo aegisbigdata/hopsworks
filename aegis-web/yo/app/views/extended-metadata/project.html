@@ -151,13 +151,15 @@
                                                 
                                                 <ng-template ng-if="field.type == 'select'">
                                                     <select name="{{ field.label }}" id="{{ 'input' + field.label }}" ng-model="field.model" class="form-control">
-                                                       <option ng-repeat="option in field.options" value="{{option.id}}">{{option.name}}</option>
+                                                       <option ng-repeat="option in field.options" value="{{option.id}}" {{ option.default ? selected : null}} ng-focus="extendedMetadataCtrl.onFieldFocus(field)">{{option.name}}</option>
                                                     </select>
                                                 </ng-template>
 
                                                 <ng-template ng-if="!field.type || field.type == 'text'">
                                                     <input type="{{ field.type ? field.type : 'text' }}" ng-model="field.model" ng-required="field.required" class="form-control" id="{{ 'input' + field.label }}" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="{{field.placeholder !== '' ? field.placeholder : field.label}}">
                                                 </ng-template>
+
+
                                                 
                                             </div>
 
