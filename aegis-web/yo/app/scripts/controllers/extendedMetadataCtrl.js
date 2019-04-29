@@ -49,6 +49,8 @@ angular.module('hopsWorksApp')
             const PROJECT_ID = $routeParams.projectID;
 
             var self = this;
+
+            self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
             // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
@@ -127,18 +129,21 @@ angular.module('hopsWorksApp')
               fields: {
                 title: {
                   label: 'Title',
+                  description: 'Description for title field',
                   placeholder: '',
                   model: '',
                   required: true
                 },
                 description: {
                   label: 'Description',
+                  description: 'Description for description field',
                   placeholder: '',
                   model: '',
                   required: true
                 },
                 publisher: {
                   label: 'Publisher',
+                  description: 'Description for publisher field',
                   placeholder: '',
                   model: '',
                   required: true
@@ -146,24 +151,28 @@ angular.module('hopsWorksApp')
                 homepage: {
                   label: 'Homepage',
                   placeholder: '',
+                  description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   required: true
                 },
                 license: {
                   label: 'License',
                   placeholder: '',
+                  description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   required: true
                 },
                 spatial: {
                   label: 'Spatial',
                   placeholder: '',
+                  description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   required: true
                 },
                 language: {
                   label: 'Language',
                   placeholder: '',
+                  description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   required: true,
                   type: 'select',
@@ -214,6 +223,10 @@ angular.module('hopsWorksApp')
             //   .catch(function (error) {
             //     console.log(error);
             //   });
+            
+            self.onFieldFocus = function (field) {
+              self.selectedField = field;
+            }
 
 
             /**

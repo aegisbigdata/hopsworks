@@ -156,7 +156,7 @@
                                                 </ng-template>
 
                                                 <ng-template ng-if="!field.type || field.type == 'text'">
-                                                    <input type="{{ field.type ? field.type : 'text' }}" ng-model="field.model" ng-required="field.required" class="form-control" id="{{ 'input' + field.label }}" placeholder="{{field.placeholder !== '' ? field.placeholder : field.label}}">
+                                                    <input type="{{ field.type ? field.type : 'text' }}" ng-model="field.model" ng-required="field.required" class="form-control" id="{{ 'input' + field.label }}" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="{{field.placeholder !== '' ? field.placeholder : field.label}}">
                                                 </ng-template>
                                                 
                                             </div>
@@ -173,10 +173,9 @@
                                     <button type="submit" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
                                 </div>
 
-                                <div id="sidebar-usage-note" class="fixed" style="top: 235px;">
+                                <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
                                     <h5>Usage note</h5>
-                                    <p><small>This property contains a name given to the Dataset. This property can be
-                                            repeated for 1..n parallel language versions of the name.</small></p>
+                                    <p><small>{{ extendedMetadataCtrl.selectedField.description}}</small></p>
                                 </div>
                             </div>
                         </div>
