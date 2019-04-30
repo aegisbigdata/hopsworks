@@ -155,12 +155,6 @@ angular.module('hopsWorksApp')
                   model: '',
                   required: true
                 },
-                spatial: {
-                  label: 'Spatial',
-                  placeholder: '',
-                  model: '',
-                  required: true
-                },
                 language: {
                   label: 'Language',
                   placeholder: '',
