@@ -232,7 +232,13 @@ angular.module('hopsWorksApp')
             //   });
             
             self.onFieldFocus = function (field) {
+              console.log('onFieldFocus', field);
               self.selectedField = field;
+              $scope.selectedFieldDescription = null;
+
+              if ($scope.data.fields.hasOwnProperty(field)) {
+                $scope.selectedFieldDescription = $scope.data.fields[field].description;
+              }
             }
 
 
@@ -242,8 +248,6 @@ angular.module('hopsWorksApp')
              */
 
             self.setExtendedMetadata = function (data) {
-              console.log(data);
-
               for (var key in data) {
                 if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
                   $scope.data.fields[key].model = data[key]; 
@@ -284,7 +288,6 @@ angular.module('hopsWorksApp')
             self.generateRDFString = function () {
               jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
                 console.log(JSON.stringify(compacted, null, 2));
-                console.log(JSON.stringify($scope.data.bounds));
               });
             }
           }

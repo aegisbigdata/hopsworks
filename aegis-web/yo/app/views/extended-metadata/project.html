@@ -150,13 +150,13 @@
                                             <!-- Mandatory -->
                                             
                                             <div class="form-group">
-                                              <label for="input-title">title</label>
-                                              <input type="text" ng-model="data.fields.title.model" class="form-control" id="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus(title)" placeholder="Title">
+                                              <label for="input-title">Title *</label>
+                                              <input type="text" ng-model="data.fields.title.model" class="form-control" id="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" placeholder="Title">
                                             </div>
 
                                             <div class="form-group">
-                                              <label for="input-description">Description</label>
-                                              <textarea ng-model="data.fields.description.model" class="form-control" id="input-description" ng-focus="extendedMetadataCtrl.onFieldFocus(description)" placeholder="Description"></textarea>
+                                              <label for="input-description">Description *</label>
+                                              <textarea ng-model="data.fields.description.model" class="form-control" id="input-description" ng-focus="extendedMetadataCtrl.onFieldFocus('description')" placeholder="Description"></textarea>
                                             </div>
 
                                             <div class="form-group bs-callout">
@@ -165,7 +165,7 @@
                                               <div style="margin-bottom: 10px;margin-top: 10px">
                                                 <label for="publisher-type" style="font-size: 14px">Publisher Type</label>
                                                 <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" required class="form-control">
-                                                  <option value="" disabled selected hidden>Publisher Type</option>
+                                                  <option value="NULL" disabled selected hidden>Publisher Type</option>
                                                   <option value="ORGANIZATION">Organization</option>
                                                   <option value="INDIVIDUAL">Individual</option>
                                                 </select>
@@ -173,12 +173,12 @@
                                               
                                               <div style="margin-bottom: 10px;">
                                                 <label for="publisher-name" style="font-size: 14px">Publisher Name</label>
-                                                <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="Publisher Name">
+                                                <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" placeholder="Publisher Name">
                                               </div>
 
                                               <div style="margin-bottom: 10px;">
                                                 <label for="publisher-web" style="font-size: 14px">Publisher Homepage</label>
-                                                <input type="text" ng-model="data.fields.homepage.model" class="form-control" id="publisher-web" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="Publisher Homepage">
+                                                <input type="text" ng-model="data.fields.homepage.model" class="form-control" id="publisher-web" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" placeholder="Publisher Homepage">
                                               </div>
                                             </div>
 
@@ -204,8 +204,8 @@
                                     </div>
 
                                     <div class="form-group">
-                                      <label for="input-language">Licence</label>
-                                      <select name="input-language" id="input-language" ng-model="data.fields.license.model" required class="form-control">
+                                      <label for="input-licence">Licence</label>
+                                      <select name="input-licence" id="input-licence" ng-model="data.fields.license.model" required class="form-control">
                                         <option value="" disabled selected hidden>Select Licence</option>
                                         <option ng-repeat="option in data.fields.license.options" value="{{option.id}}">{{option.name}}</option>
                                       </select>
@@ -222,10 +222,10 @@
 
                                 <div class="row">
                                   <div class="col-md-12">
-                                    <div class="form-group">
+                                    <div class="form-group" style="margin-bottom: 350px;position: relative;">
                                       <label for="inputMap1">Spatial</label>
                                       <div>
-                                        <leaflet id="inputMap1" style="width: 400px; height: 300px; position: absolute;"></leaflet>
+                                        <leaflet id="inputMap1" style="width: 500px; height: 300px; position: absolute;"></leaflet>
                                       </div>
                                     </div>
                                   </div>
@@ -242,7 +242,7 @@
 
                                 <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
                                     <h5>Usage note</h5>
-                                    <p><small>{{ extendedMetadataCtrl.selectedField.description}}</small></p>
+                                    <p><small>{{ selectedFieldDescription }}</small></p>
                                 </div>
                             </div>
                         </div>
