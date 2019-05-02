@@ -77,6 +77,9 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
 
           var areaSelect = L.areaSelect({ width: 100, height: 100 });
           areaSelect.addTo(map);
+          areaSelect.on("change", function() {
+            $scope.$parent.data.bounds = this.getBounds();
+          });
 
           // If the width attribute defined update css
           // Then watch if bound property changes and update css
