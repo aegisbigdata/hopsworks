@@ -42,7 +42,7 @@
 
 
 angular.module('hopsWorksApp')
-        .controller('ExtendedMetadataCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
+        .controller('ExtendedMetadataDatasetCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
           'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService',
           function ($cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
@@ -91,6 +91,24 @@ angular.module('hopsWorksApp')
                   type: 'rdfs:Literal',
                   uri: 'dct:title',
                   mapping: "http://purl.org/dc/terms/title",
+                  value: null
+                },
+                contactpointtype: {
+                  type: 'foaf:Agent',
+                  uri: 'dct:publisher',
+                  mapping: "http://xmlns.com/foaf/0.1/Agent",
+                  value: null
+                },
+                contactpointname: {
+                  type: 'foaf:Agent',
+                  uri: 'dct:publisher',
+                  mapping: "http://xmlns.com/foaf/0.1/Agent",
+                  value: null
+                },
+                contactpointmail: {
+                  type: 'foaf:Document',
+                  uri: 'foaf:homepage',
+                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
                   value: null
                 },
                 publishertype: {
@@ -147,36 +165,81 @@ angular.module('hopsWorksApp')
                   model: '',
                   required: true
                 },
+                contactpointtype: {
+                  label: 'Contact Point Type',
+                  description: 'Description for Contact Point field',
+                  model: '',
+                  recommended: true,
+                },
+                contactpointname: {
+                  label: 'Contact Point Name',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  recommended: true,
+                },
+                contactpointmail: {
+                  label: 'Contact Point Mail',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  recommended: true
+                },
+                keywords: {
+                  label: 'Keywords',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  recommended: true
+                },
                 publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',
-                  required: true,
+                  recommended: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
                   model: '',
-                  required: true,
+                  recommended: true,
                 },
                 homepage: {
                   label: 'Publisher Homepage',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  required: true
+                  recommended: true
                 },
-                license: {
-                  label: 'Licence',
+                theme: {
+                  label: 'Theme',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  recommended: true,
-                  options: ExtendedMetadataService.LICENCES
+                  recommended: true
+                },
+                price: {
+                  label: 'Price',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  recommended: true
+                },
+                sellable: {
+                  label: 'Sellable',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  recommended: true
+                },
+                accessRights: {
+                  label: 'Access Rights',
+                  model: '',
+                  optional: true
+                },
+                documentation: {
+                  label: 'Documentation',
+                  model: '',
+                  optional: true
                 },
                 language: {
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  recommended: true,
+                  optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
                 },
@@ -184,7 +247,12 @@ angular.module('hopsWorksApp')
                   label: 'Spatial',
                   model: '',
                   optional: true
-                }
+                },
+                temporal: {
+                  label: 'Temporal',
+                  model: '',
+                  optional: true
+                },
               },
               bounds: null
             };

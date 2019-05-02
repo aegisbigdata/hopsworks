@@ -39,7 +39,7 @@
 
 <div ng-controller="MainCtrl as mainCtrl">
     <div id="wrapper" class="toggled" data-spy="scroll" data-target="#toc">
-        <div ng-controller="MetadataCtrl as metadataCtrl">
+        <div ng-controller="ExtendedMetadataDatasetCtrl as extendedMetadataCtrl">
             <div class="overlay"></div>
             <div ng-include="'navProject.html'"></div>
             <section>
@@ -121,26 +121,24 @@
                             <div class="col-md-4 col-sm-4 col-lg-3">
                                 <!--Nav Bar -->
                                 <nav class="bs-docs-sidebar">
+                                    
                                     <ul id="sidebar" class="nav nav-stacked fixed">
                                         <li class="active">
                                             <a href="#GroupA">Mandatory</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a href="#GroupASub1">Title</a></li>
-                                                <li><a href="#GroupASub2">Description</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
-                                        </li>
-                                        <li>
-                                            <a href="#GroupB">Recommended</a>
+                                          </li>
+                                          <li class="active">
+                                            <a href="#GroupA">Recommended</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a href="#GroupBSub1">Sub-Group 1</a></li>
-                                                <li><a href="#GroupBSub2">Sub-Group 2</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
-                                        </li>
-                                        <li>
-                                            <a href="#GroupC">Optional</a>
+                                          </li>
+                                          <li  class="active">
+                                            <a href="#GroupA">Optional</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a href="#GroupCSub1">Sub-Group 1</a></li>
-                                                <li><a href="#GroupCSub2">Sub-Group 2</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -157,16 +155,17 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <form>
-                                            <div class="form-group">
-                                                <label for="inputTitle3">Title*</label>
-                                                <input type="text" class="form-control" id="inputTitle3" placeholder="Title">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="inputDescription3">Description*</label>
-                                                <textarea class="form-control" id="inputDescription3" placeholder="Description"></textarea>
-                                            </div>
-                                        </form>
+
+                                      <div class="form-group">
+                                        <label for="input-title">Title *</label>
+                                        <input type="text" ng-model="data.fields.title.model" class="form-control" id="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" ng-required="true" placeholder="Title">
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label for="input-description">Description *</label>
+                                        <textarea ng-model="data.fields.description.model" class="form-control" id="input-description" ng-focus="extendedMetadataCtrl.onFieldFocus('description')" ng-required="true" placeholder="Description"></textarea>
+                                      </div>
+
                                     </div>
                                 </div>
                                 <hr>
@@ -179,13 +178,22 @@
                                     <div class="col-md-12">
                                         <form class="bs-callout">
                                             <h4 style="margin-top: 5px; margin-bottom: 25px">Contact point</h4>
+
+                                            <div style="margin-bottom: 10px;margin-top: 10px">
+                                                <label for="publisher-type" style="font-size: 14px">Contact point Type</label>
+                                                <select name="publisher-type" id="publisher-type" ng-model="data.fields.contactpointtype.model" required class="form-control">
+                                                  <option value="ORGANIZATION">Organization</option>
+                                                  <option value="INDIVIDUAL">Individual</option>
+                                                </select>
+                                              </div>
+
                                             <div class="form-group">
                                                 <label for="inputName3">Name</label>
-                                                <input type="text" class="form-control" id="inputName3" placeholder="Name">
+                                                <input type="text" class="form-control" id="inputName3" placeholder="Name" ng-model="data.fields.contactpointname.model">
                                             </div>
                                             <div class="form-group">
-                                                <label for="inputEmail3">Email*</label>
-                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+                                                <label for="inputEmail3">Email</label>
+                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email" ng-model="data.fields.contactpointmail.model">
                                             </div>
                                         </form>
                                     </div>
@@ -197,29 +205,6 @@
                                             <div class="form-group">
                                                 <label for="inputKeywords3">Keywords</label>
                                                 <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="inputPublisher3">Publisher</label>
-                                                <input type="text" class="form-control" id="inputPublisher3"
-                                                    placeholder="Publisher">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="inputTheme3">Theme/Category</label>
-                                                <select multiple id="inputTheme" class="form-control" size="13">
-                                                    <option value="AGRI">Agriculture, fisheries, forestry and food</option>
-                                                    <option value="ECON">Economy and finance</option>
-                                                    <option value="EDUC">Education, culture and sport</option>
-                                                    <option value="ENER">Energy</option>
-                                                    <option value="ENVI">Environment</option>
-                                                    <option value="GOVE">Government and public sector</option>
-                                                    <option value="HEAL">Health</option>
-                                                    <option value="INTR">International issues</option>
-                                                    <option value="JUST">Justice, legal system and public safety</option>
-                                                    <option value="REGI">Regions and cities</option>
-                                                    <option value="SOCI">Population and society</option>
-                                                    <option value="TECH">Science and technology</option>
-                                                    <option value="TRAN">Transport</option>
-                                                </select>
                                             </div>
 
                                             <div class="form-group bs-callout">
@@ -245,6 +230,30 @@
                                               </div>
                                             </div>
 
+                                            <div class="form-group">
+                                                <label for="inputTheme3">Theme/Category</label>
+                                                <select multiple id="inputTheme" class="form-control" size="13">
+                                                    <option value="AGRI">Agriculture, fisheries, forestry and food</option>
+                                                    <option value="ECON">Economy and finance</option>
+                                                    <option value="EDUC">Education, culture and sport</option>
+                                                    <option value="ENER">Energy</option>
+                                                    <option value="ENVI">Environment</option>
+                                                    <option value="GOVE">Government and public sector</option>
+                                                    <option value="HEAL">Health</option>
+                                                    <option value="INTR">International issues</option>
+                                                    <option value="JUST">Justice, legal system and public safety</option>
+                                                    <option value="REGI">Regions and cities</option>
+                                                    <option value="SOCI">Population and society</option>
+                                                    <option value="TECH">Science and technology</option>
+                                                    <option value="TRAN">Transport</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="input-price">Price</label>
+                                                <input type="text" class="form-control" id="input-price" placeholder="Price (Currency)">
+                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
@@ -259,9 +268,27 @@
                                         <form>
                                             
                                             <div class="form-group">
+                                                <label for="input-accessRights">Access Rights</label>
+                                                <input type="text" class="form-control" id="input-accessRights" placeholder="Access Rights">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="input-documentation">Documentation</label>
+                                                <input type="text" class="form-control" id="input-documentation" placeholder="Documentation">
+                                            </div>
+
+                                            <div class="form-group">
+                                              <label for="input-language">Language</label>
+                                              <select name="input-language" id="input-language" ng-model="data.fields.language.model" class="form-control">
+                                                <!-- <option value="" disabled selected hidden>Select Language</option> -->
+                                                <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
+                                              </select>
+                                            </div>
+
+<!--                                             <div class="form-group">
                                                 <label for="inputIdentifier3">Identifier</label>
                                                 <input type="text" class="form-control" id="inputIdentifier3" placeholder="Identifier">
-                                            </div>
+                                            </div> -->
 
                                             <div class="form-group" style="margin-bottom: 350px;position: relative;">
                                               <label for="inputMap1">Spatial</label>
@@ -270,6 +297,10 @@
                                               </div>
                                             </div>
 
+                                            <div class="form-group">
+                                              <label for="input-temporal">Temporal</label>
+                                              
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
