@@ -122,11 +122,24 @@
                             <div class="col-md-4 col-sm-4 col-lg-3">
                                 <!--Nav Bar -->
                                 <nav class="bs-docs-sidebar">
+                                    
                                     <ul id="sidebar" class="nav nav-stacked fixed">
                                         <li class="active">
                                             <a href="#GroupA">Mandatory</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, field) in data.fields"><a href="#">{{ field.label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                            </ul>
+                                          </li>
+                                          <li class="active">
+                                            <a href="#GroupA">Recommended</a>
+                                            <ul class="nav nav-stacked">
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                            </ul>
+                                          </li>
+                                          <li  class="active">
+                                            <a href="#GroupA">Optional</a>
+                                            <ul class="nav nav-stacked">
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -165,7 +178,7 @@
                                               <div style="margin-bottom: 10px;margin-top: 10px">
                                                 <label for="publisher-type" style="font-size: 14px">Publisher Type</label>
                                                 <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" required class="form-control">
-                                                  <option value="NULL" disabled selected hidden>Publisher Type</option>
+                                                  <option value="" disabled selected hidden>Select Publisher Type</option>
                                                   <option value="ORGANIZATION">Organization</option>
                                                   <option value="INDIVIDUAL">Individual</option>
                                                 </select>

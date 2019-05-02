@@ -221,6 +221,30 @@
                                                     <option value="TRAN">Transport</option>
                                                 </select>
                                             </div>
+
+                                            <div class="form-group bs-callout">
+                                              <label for="input-publisher">Publisher *</label>
+                                              
+                                              <div style="margin-bottom: 10px;margin-top: 10px">
+                                                <label for="publisher-type" style="font-size: 14px">Publisher Type</label>
+                                                <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" required class="form-control">
+                                                  <option value="" disabled selected hidden>Select Publisher Type</option>
+                                                  <option value="ORGANIZATION">Organization</option>
+                                                  <option value="INDIVIDUAL">Individual</option>
+                                                </select>
+                                              </div>
+                                              
+                                              <div style="margin-bottom: 10px;">
+                                                <label for="publisher-name" style="font-size: 14px">Publisher Name</label>
+                                                <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" placeholder="Publisher Name">
+                                              </div>
+
+                                              <div style="margin-bottom: 10px;">
+                                                <label for="publisher-web" style="font-size: 14px">Publisher Homepage</label>
+                                                <input type="text" ng-model="data.fields.homepage.model" class="form-control" id="publisher-web" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" placeholder="Publisher Homepage">
+                                              </div>
+                                            </div>
+
                                         </form>
                                     </div>
                                 </div>
@@ -233,10 +257,19 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <form>
+                                            
                                             <div class="form-group">
                                                 <label for="inputIdentifier3">Identifier</label>
                                                 <input type="text" class="form-control" id="inputIdentifier3" placeholder="Identifier">
                                             </div>
+
+                                            <div class="form-group" style="margin-bottom: 350px;position: relative;">
+                                              <label for="inputMap1">Spatial</label>
+                                              <div>
+                                                <leaflet id="inputMap1" style="width: 500px; height: 300px; position: absolute;"></leaflet>
+                                              </div>
+                                            </div>
+
                                         </form>
                                     </div>
                                 </div>

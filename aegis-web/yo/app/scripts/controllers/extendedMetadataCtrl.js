@@ -170,22 +170,25 @@ angular.module('hopsWorksApp')
                   required: true
                 },
                 license: {
-                  label: 'License',
+                  label: 'Licence',
                   placeholder: '',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  type: 'select',
-                  required: true,
+                  recommended: true,
                   options: ExtendedMetadataService.LICENCES
                 },
                 language: {
                   label: 'Language',
-                  placeholder: '',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  required: true,
+                  recommended: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
+                },
+                spatial: {
+                  label: 'Spatial',
+                  model: '',
+                  optional: true
                 }
               },
               bounds: null
@@ -239,8 +242,17 @@ angular.module('hopsWorksApp')
               if ($scope.data.fields.hasOwnProperty(field)) {
                 $scope.selectedFieldDescription = $scope.data.fields[field].description;
               }
-            }
+            };
 
+            /**
+             * Helper function to filter fields by type
+             * @param  {[type]} filter [description]
+             * @return {[type]}        [description]
+             */
+            
+            $scope.fieldFilter = function (filter) {
+              return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
+            }
 
             /**
              *   Receives data from ExtendedMetadataService and sets models of each available field
