@@ -279,7 +279,9 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              //doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.bounds);
+              console.log($scope.data.bounds);
+
+              doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.data.bounds);
               doc[modifiedKey] = (new Date()).toISOString();
               self.generateRDFString();
             };

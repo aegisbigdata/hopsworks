@@ -78,6 +78,7 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
           var areaSelect = L.areaSelect({ width: 100, height: 100 });
           areaSelect.addTo(map);
           areaSelect.on("change", function() {
+            $scope.bounds = this.getBounds();
             $scope.$parent.data.bounds = this.getBounds();
           });
 
