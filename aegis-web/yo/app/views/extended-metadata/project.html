@@ -136,6 +136,7 @@
 
                             <!-- Rightside tables -->
                             <div class="col-md-8 col-sm-8 col-lg-6" style="border-right: 1px dashed lightgrey; border-left: 1px dashed lightgrey;">
+                                
                                 <div class="row" style="margin-bottom: 15px">
                                     <div class="col-md-12">
                                         <h3>Mandatory</h3>
@@ -144,37 +145,92 @@
 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <form>
+                                        <form name="extendedMetadataProject">
                                             
-                                            <div class="form-group" ng-repeat="(key, field) in data.fields">
-                                                <label for="{{ 'input' + field.label }}">{{ field.label }}</label>
-                                                
-                                                <ng-template ng-if="field.type == 'select'">
-                                                    <select name="{{ field.label }}" id="{{ 'input' + field.label }}" ng-model="field.model" class="form-control">
-                                                       <option ng-repeat="option in field.options" value="{{option.id}}" {{ option.default ? selected : null}} ng-focus="extendedMetadataCtrl.onFieldFocus(field)">{{option.name}}</option>
-                                                    </select>
-                                                </ng-template>
+                                            <!-- Mandatory -->
+                                            
+                                            <div class="form-group">
+                                              <label for="input-title">title</label>
+                                              <input type="text" ng-model="data.fields.title.model" class="form-control" id="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus(title)" placeholder="Title">
+                                            </div>
 
-                                                <ng-template ng-if="!field.type || field.type == 'text'">
-                                                    <input type="{{ field.type ? field.type : 'text' }}" ng-model="field.model" ng-required="field.required" class="form-control" id="{{ 'input' + field.label }}" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="{{field.placeholder !== '' ? field.placeholder : field.label}}">
-                                                </ng-template>
+                                            <div class="form-group">
+                                              <label for="input-description">Description</label>
+                                              <textarea ng-model="data.fields.description.model" class="form-control" id="input-description" ng-focus="extendedMetadataCtrl.onFieldFocus(description)" placeholder="Description"></textarea>
+                                            </div>
 
+                                            <div class="form-group bs-callout">
+                                              <label for="input-publisher">Publisher *</label>
+                                              
+                                              <div style="margin-bottom: 10px;margin-top: 10px">
+                                                <label for="publisher-type" style="font-size: 14px">Publisher Type</label>
+                                                <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" required class="form-control">
+                                                  <option value="" disabled selected hidden>Publisher Type</option>
+                                                  <option value="ORGANIZATION">Organization</option>
+                                                  <option value="INDIVIDUAL">Individual</option>
+                                                </select>
+                                              </div>
+                                              
+                                              <div style="margin-bottom: 10px;">
+                                                <label for="publisher-name" style="font-size: 14px">Publisher Name</label>
+                                                <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="Publisher Name">
+                                              </div>
 
-                                                
+                                              <div style="margin-bottom: 10px;">
+                                                <label for="publisher-web" style="font-size: 14px">Publisher Homepage</label>
+                                                <input type="text" ng-model="data.fields.homepage.model" class="form-control" id="publisher-web" ng-focus="extendedMetadataCtrl.onFieldFocus(field)" placeholder="Publisher Homepage">
+                                              </div>
                                             </div>
 
                                         </form>
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                <div class="row" style="margin-bottom: 15px">
                                     <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="inputMap1">Spatial</label>
-                                            <leaflet id="inputMap1" style="width: 400px; height: 300px; position: absolute;"></leaflet>
-                                        </div>
+                                        <h3>Recommended</h3>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    
+                                    <div class="form-group">
+                                      <label for="input-language">Language</label>
+                                      <select name="input-language" id="input-language" ng-model="data.fields.language.model" required class="form-control">
+                                        <option value="" disabled selected hidden>Select Language</option>
+                                        <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
+                                      </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="input-language">Licence</label>
+                                      <select name="input-language" id="input-language" ng-model="data.fields.license.model" required class="form-control">
+                                        <option value="" disabled selected hidden>Select Licence</option>
+                                        <option ng-repeat="option in data.fields.license.options" value="{{option.id}}">{{option.name}}</option>
+                                      </select>
+                                    </div>
+
+                                  </div>
+                                </div>
+
+                                <div class="row" style="margin-bottom: 15px">
+                                    <div class="col-md-12">
+                                        <h3>Optional</h3>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="form-group">
+                                      <label for="inputMap1">Spatial</label>
+                                      <div>
+                                        <leaflet id="inputMap1" style="width: 400px; height: 300px; position: absolute;"></leaflet>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
 
                             </div>
                             <!-- END Rightside tables -->

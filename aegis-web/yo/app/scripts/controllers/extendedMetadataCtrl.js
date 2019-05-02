@@ -93,7 +93,13 @@ angular.module('hopsWorksApp')
                   mapping: "http://purl.org/dc/terms/title",
                   value: null
                 },
-                publisher: {
+                publishertype: {
+                  type: 'foaf:Agent',
+                  uri: 'dct:publisher',
+                  mapping: "http://xmlns.com/foaf/0.1/Agent",
+                  value: null
+                },
+                publishername: {
                   type: 'foaf:Agent',
                   uri: 'dct:publisher',
                   mapping: "http://xmlns.com/foaf/0.1/Agent",
@@ -142,21 +148,19 @@ angular.module('hopsWorksApp')
                   model: '',
                   required: true
                 },
-                publisher: {
-                  label: 'Publisher',
+                publishertype: {
+                  label: 'Publisher Type',
                   description: 'Description for publisher field',
                   placeholder: '',
                   model: '',
                   required: true,
-                  fields: {
-                    publisher: {
-                      label: 'Publisher',
-                      description: 'Description for publisher field',
-                      placeholder: '',
-                      model: '',
-                      required: true
-                    }
-                  }
+                },
+                publishername: {
+                  label: 'Publisher Name',
+                  description: 'Description for publisher field',
+                  placeholder: '',
+                  model: '',
+                  required: true,
                 },
                 homepage: {
                   label: 'Homepage',
@@ -183,7 +187,8 @@ angular.module('hopsWorksApp')
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
                 }
-              }
+              },
+              bounds: null
             };
 
             self.attachedDetailedTemplateList = [];
@@ -265,6 +270,7 @@ angular.module('hopsWorksApp')
                 }
               }
 
+              //doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.bounds);
               doc[modifiedKey] = (new Date()).toISOString();
               self.generateRDFString();
             };
@@ -278,6 +284,7 @@ angular.module('hopsWorksApp')
             self.generateRDFString = function () {
               jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
                 console.log(JSON.stringify(compacted, null, 2));
+                console.log(JSON.stringify($scope.data.bounds));
               });
             }
           }
