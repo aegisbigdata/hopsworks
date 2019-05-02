@@ -137,41 +137,35 @@ angular.module('hopsWorksApp')
                 title: {
                   label: 'Title',
                   description: 'Description for title field',
-                  placeholder: '',
                   model: '',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
-                  placeholder: '',
                   model: '',
                   required: true
                 },
                 publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
-                  placeholder: '',
                   model: '',
                   required: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
-                  placeholder: '',
                   model: '',
                   required: true,
                 },
                 homepage: {
-                  label: 'Homepage',
-                  placeholder: '',
+                  label: 'Publisher Homepage',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   required: true
                 },
                 license: {
                   label: 'Licence',
-                  placeholder: '',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   recommended: true,
@@ -235,7 +229,6 @@ angular.module('hopsWorksApp')
             //   });
             
             self.onFieldFocus = function (field) {
-              console.log('onFieldFocus', field);
               self.selectedField = field;
               $scope.selectedFieldDescription = null;
 
