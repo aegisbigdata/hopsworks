@@ -67,6 +67,7 @@
     <link rel="stylesheet" href="bower_components/angularjs-slider/dist/rzslider.css" />
     <link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css" />
     <link rel="stylesheet" href="bower_components/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.css" />
+    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -97,6 +98,8 @@
     <link rel="stylesheet" href="styles/get-started.css">
     <link rel="stylesheet" href="styles/jupyter-tool.css">
     <link rel="stylesheet" href="styles/tools-jupyter-overview.css">
+    <link rel="stylesheet" href="styles/leaflet-areaselect.css">
+
     <!-- endbuild -->
   </head>
   <body  ng-app="hopsWorksApp">
@@ -177,6 +180,8 @@
     <script src="bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
     <script src="bower_components/angular-google-chart/ng-google-chart.js"></script>
     <script src="bower_components/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="bower_components/jsonld/lib/index.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <script src="bower_components/jsonld/dist/jsonld.min.js"></script>
@@ -187,12 +192,14 @@
     <script src="scripts/js/hamburger.js"></script>
     <script src="scripts/js/ace/ace.js"></script>
     <script src="scripts/js/ace/mode-json.js"></script>
+    <script src="scripts/js/leaflet-areaselect.js"></script>
 
     <script src="scripts/directives/switch.js"></script>
     <script src="scripts/directives/modal.js"></script>
     <script src="scripts/directives/passwordMatch.js"></script>
     <script src="scripts/directives/hwcard.js"></script>
     <script src="scripts/directives/hwPanel.js"></script>
+    <script src="scripts/directives/leaflet.js"></script>
     <script src="scripts/directives/filemgr/directives.js"></script>
 
     <script src="scripts/controllers/dataSetCreatorCtrl.js"></script>
@@ -288,6 +295,7 @@
     <script src="scripts/controllers/featurestoreStatisticModalCtrl.js"></script>
     <script src="scripts/controllers/trainingDatasetDependenciesCtrl.js"></script>
     <script src="scripts/controllers/extendedMetadataCtrl.js"></script>
+    <script src="scripts/controllers/extendedMetadataFileCtrl.js"></script>
 
     <!-- Services -->
     <script src="scripts/services/AuthInterceptorService.js"></script>
@@ -349,6 +357,6 @@
     <script src="scripts/entities/filemgr/chmod.js"></script>
     <script src="scripts/entities/filemgr/item.js"></script>
     <!-- endbuild -->
-    
+
   </body>
 </html>

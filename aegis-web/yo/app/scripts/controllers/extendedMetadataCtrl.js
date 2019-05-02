@@ -174,13 +174,6 @@ angular.module('hopsWorksApp')
                   required: true,
                   options: ExtendedMetadataService.LICENCES
                 },
-                spatial: {
-                  label: 'Spatial',
-                  placeholder: '',
-                  description: 'Lorem ipsum dolor sit amet.',
-                  model: '',
-                  required: true
-                },
                 language: {
                   label: 'Language',
                   placeholder: '',
@@ -267,12 +260,12 @@ angular.module('hopsWorksApp')
               for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                   var mapping = data[key].mapping;
-                  doc[mapping]['@id'] = $scope.data.fields[key].model;
+
+                  if ($scope.data.fields.hasOwnProperty(key)) doc[mapping]['@id'] = $scope.data.fields[key].model;
                 }
               }
 
               doc[modifiedKey] = (new Date()).toISOString();
-
               self.generateRDFString();
             };
 

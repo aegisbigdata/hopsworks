@@ -465,8 +465,7 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
-                    // TODO: use distribution id
-                    .when('/project/:projectID/extended-metadata-distribution', {
+                    .when('/project/:projectID/:distributionID/extended-metadata-distribution', {
                       templateUrl: 'views/extended-metadata/distribution.html',
                       controller: 'ProjectCtrl as projectCtrl',
                       resolve: {
