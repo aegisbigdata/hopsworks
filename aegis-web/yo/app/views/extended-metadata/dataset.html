@@ -204,7 +204,7 @@
                                         <form>
                                             <div class="form-group">
                                                 <label for="inputKeywords3">Keywords</label>
-                                                <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated" ng-model="data.fields.keywords">
+                                                <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated" ng-model="data.fields.keywords.model">
                                             </div>
 
                                             <div class="form-group bs-callout">
@@ -275,12 +275,12 @@
                                             
                                             <div class="form-group">
                                                 <label for="input-accessRights">Access Rights</label>
-                                                <input type="text" class="form-control" id="input-accessRights" placeholder="Access Rights" ng-model="data.fields.accessRights">
+                                                <input type="text" class="form-control" id="input-accessRights" placeholder="Access Rights" ng-model="data.fields.accessRights.model">
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="input-documentation">Documentation</label>
-                                                <input type="text" class="form-control" id="input-documentation" placeholder="Documentation" ng-model="data.fields.documentation">
+                                                <input type="text" class="form-control" id="input-documentation" placeholder="Documentation" ng-model="data.fields.documentation.model">
                                             </div>
 
                                             <div class="form-group">
@@ -305,7 +305,13 @@
 
                                             <div class="form-group">
                                               <label for="input-temporal">Temporal</label>
-                                              
+                                              <input class="form-control"
+                                                     placeholder="Select a date..."
+                                                     moment-picker="data.temporal"
+                                                     locale="en"
+                                                     format="YYYY-MM-DD"
+                                                     ng-model="data.temporal"
+                                                     ng-model-options="{ updateOn: 'blur' }">
                                             </div>
                                         </form>
                                     </div>
