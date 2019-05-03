@@ -189,11 +189,11 @@
 
                                             <div class="form-group">
                                                 <label for="inputName3">Name</label>
-                                                <input type="text" class="form-control" id="inputName3" placeholder="Name" ng-model="data.fields.contactpointname.model">
+                                                <input type="text" class="form-control" id="inputName3" placeholder="Name" ng-model="data.fields.contactpointname.model" ng-focus="extendedMetadataCtrl.onFieldFocus('contactpointname')">
                                             </div>
                                             <div class="form-group">
                                                 <label for="inputEmail3">Email</label>
-                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email" ng-model="data.fields.contactpointmail.model">
+                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email" ng-model="data.fields.contactpointmail.model" ng-focus="extendedMetadataCtrl.onFieldFocus('contactpointmail')">
                                             </div>
                                         </form>
                                     </div>
@@ -204,7 +204,7 @@
                                         <form>
                                             <div class="form-group">
                                                 <label for="inputKeywords3">Keywords</label>
-                                                <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated" ng-model="data.fields.keywords.model">
+                                                <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated" ng-model="data.fields.keywords.model" ng-focus="extendedMetadataCtrl.onFieldFocus('keywords')">
                                             </div>
 
                                             <div class="form-group bs-callout">
@@ -251,7 +251,7 @@
 
                                             <div class="form-group">
                                                 <label for="input-price">Price</label>
-                                                <input type="text" class="form-control" id="input-price" placeholder="Price (Currency)" ng-model="data.fields.price.model">
+                                                <input type="text" class="form-control" id="input-price" placeholder="Price (Currency)" ng-model="data.fields.price.model" ng-focus="extendedMetadataCtrl.onFieldFocus('price')">
                                             </div>
 
                                             <div class="form-group">
@@ -275,12 +275,12 @@
                                             
                                             <div class="form-group">
                                                 <label for="input-accessRights">Access Rights</label>
-                                                <input type="text" class="form-control" id="input-accessRights" placeholder="Access Rights" ng-model="data.fields.accessRights.model">
+                                                <input type="text" class="form-control" id="input-accessRights" placeholder="Access Rights" ng-model="data.fields.accessRights.model" ng-focus="extendedMetadataCtrl.onFieldFocus('accessRights')">
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="input-documentation">Documentation</label>
-                                                <input type="text" class="form-control" id="input-documentation" placeholder="Documentation" ng-model="data.fields.documentation.model">
+                                                <input type="text" class="form-control" id="input-documentation" placeholder="Documentation" ng-model="data.fields.documentation.model" ng-focus="extendedMetadataCtrl.onFieldFocus('documentation')">
                                             </div>
 
                                             <div class="form-group">
@@ -322,8 +322,7 @@
                             <div class="col-md-2">
                                 <div id="sidebar-usage-note" class="fixed">
                                     <h5>Usage note</h5>
-                                    <p><small>This property contains a name given to the Dataset. This property can be
-                                            repeated for 1..n parallel language versions of the name.</small></p>
+                                    <p><small>{{ selectedFieldDescription }}</small></p>
                                 </div>
                             </div>
                         </div>
