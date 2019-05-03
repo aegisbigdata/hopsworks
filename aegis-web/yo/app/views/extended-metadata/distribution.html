@@ -336,20 +336,19 @@
                                         </div>
                                     </div>
                                 </form>
-                                <hr>
-                                <div class="row">
+                            </div>
+                            <!-- END Rightside tables -->
+                            <div class="col-md-2">
+
+                                <div id="sidebar-button-container" class="fixed" style="top: 185px;">
                                     <div class="col-md-12" ng-controller="ExtendedMetadataFileCtrl as extendedMetadataFileCtrl">
                                         <button type="submit" class="btn btn-default" ng-click="extendedMetadataFileCtrl.saveExtendedDistroMetadata()">Save Metadata</button>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- END Rightside tables -->
-                            <div class="col-md-2">
-                                <div id="sidebar-usage-note" class="fixed">
+
+                                <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
                                     <h5>Usage note</h5>
-                                    <p><small>This property contains a URL that gives access to a Distribution of the
-                                            Dataset. The resource at the access URL may contain information about how
-                                            to get the Dataset.</small></p>
+                                    <p><small>{{ selectedFieldDescription }}</small></p>
                                 </div>
                             </div>
                         </div>
