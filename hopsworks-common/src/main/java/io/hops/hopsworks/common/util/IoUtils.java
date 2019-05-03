@@ -64,6 +64,10 @@ public class IoUtils {
     return Resources.toString(url, Charsets.UTF_8);
   }
 
+  public static byte[] readContentFromClasspathasByteArray(String path) throws IOException {
+    return Resources.toByteArray(Resources.getResource(path));
+  }
+    
   public static String readContentFromPath(String path) throws IOException {
     return Files.toString(new File(path), Charsets.UTF_8);
   }
