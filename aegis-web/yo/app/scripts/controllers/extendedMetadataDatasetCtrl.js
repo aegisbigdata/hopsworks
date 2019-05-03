@@ -227,11 +227,13 @@ angular.module('hopsWorksApp')
                 },
                 accessRights: {
                   label: 'Access Rights',
+                  description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   optional: true
                 },
                 documentation: {
                   label: 'Documentation',
+                  description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   optional: true
                 },
@@ -336,7 +338,7 @@ angular.module('hopsWorksApp')
              */
 
             self.saveExtendedMetadata = function () {
-              if (!$scope.form.extendedMetadataProject.$valid) {
+              if (!$scope.form.extendedMetadataDataset.$valid) {
                 console.warn("Can't submit form - missing or invalid fields!");
                 return;
               }
