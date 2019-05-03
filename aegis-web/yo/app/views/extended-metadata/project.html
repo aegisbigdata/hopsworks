@@ -125,21 +125,21 @@
                                     
                                     <ul id="sidebar" class="nav nav-stacked fixed">
                                         <li class="active">
-                                            <a href="#GroupA">Mandatory</a>
+                                            <a>Mandatory</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                           </li>
                                           <li class="active">
-                                            <a href="#GroupA">Recommended</a>
+                                            <a>Recommended</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                           </li>
                                           <li  class="active">
-                                            <a href="#GroupA">Optional</a>
+                                            <a>Optional</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -244,10 +244,10 @@
                                         <leaflet id="inputMap1" style="width: 500px; height: 300px; position: absolute;"></leaflet>
                                       </div>
 
-                                      <div class="form-group" style="margin-bottom: 350px;position: relative;">
+                                      <div class="form-group" style="display: none;">
                                         <label for="coordinates_ne">Coordinates</label>
-                                        <input type="text" name="coordinates_nw" disabled="true" ng-model="">
-                                        <input type="text" name="coordinates_se" disabled="true" ng-model="">
+                                        <input type="text" class="form-control" name="coordinates_sw" disabled="true" ng-model="extendedMetadataCtrl.boundingBox._southWest.lat">
+                                        <input type="text" class="form-control" name="coordinates_ne" disabled="true">
                                       </div>
 
                                     </div>

@@ -124,21 +124,21 @@
                                     
                                     <ul id="sidebar" class="nav nav-stacked fixed">
                                         <li class="active">
-                                            <a href="#GroupA">Mandatory</a>
+                                            <a>Mandatory</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                           </li>
                                           <li class="active">
-                                            <a href="#GroupA">Recommended</a>
+                                            <a>Recommended</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                           </li>
-                                          <li  class="active">
-                                            <a href="#GroupA">Optional</a>
+                                          <li class="active">
+                                            <a>Optional</a>
                                             <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a href="#input-{{fieldname}}">{{ data.fields[fieldname].label }}</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                         </li>
                                     </ul>
