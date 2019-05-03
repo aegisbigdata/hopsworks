@@ -824,14 +824,10 @@ public class ProjectController {
 
         notebookfilePath = notebookfileSB.toString();
 
-        List<String> content = IoUtils.readLinesFromClasspath(Settings.getAEGISNotebookResouceFile(notebook));
-
-        long size = 0;
+        byte[] content = IoUtils.readContentFromClasspathasByteArray(Settings.getAEGISNotebookResouceFile(notebook));
+        long size = content.length;
         try (FSDataOutputStream fsOut = udfso.create(notebookfilePath)) {
-          for(String line : content){
-            fsOut.writeBytes(line);
-            size += line.length();
-          }
+          fsOut.write(content);
         }
         
         LOGGER.log(Level.INFO, "Notebook {0} of size {1} added to project ({2})", new Object[]{notebook,
