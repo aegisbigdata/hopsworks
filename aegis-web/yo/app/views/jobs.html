@@ -99,7 +99,11 @@
         </div>
         <div class="row content-utility-bar content-utility-bar-actions">
           <div class="col-md-3">
-            <h4 style="margin-top: 10px; margin-bottom: 5px"> Jobs > {{ projectCtrl.currentProject.projectName}}</h4>
+            <h4 style="margin-top: 10px; margin-bottom: 5px"> 
+                <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                title="{{projectCtrl.currentProject.projectName}}">
+                {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+              > Jobs</h4>
           </div>
         </div>
       </div><!--content wrapper -->
@@ -111,8 +115,8 @@
     </div>
     <div class="">
       <!-- Page Content -->
-      <div class="content" style="height:100%; overflow: hidden; ;" >
-        <div class="row rg-row-top" resizable r-directions="['bottom']">
+      <div class="content" style="height:100%; overflow: hidden; padding: 0;" >
+        <div class="row rg-row-top" style="margin: 0;" resizable r-directions="['bottom']">
           <div class="row">
             <div class=" col-md-6"
                  style="margin-bottom: 20px;" id="buttonCreateJob">
@@ -396,7 +400,7 @@
         </div>
 
         <!-- right side -->
-        <div class="row rg-row-bottom" style="overflow-y: auto;">
+        <div class="row rg-row-bottom" style="margin-left: 0; margin-right: 0;">
           <h3 class="text-muted" style="text-align: center;" ng-show="!jobsCtrl.hasSelectJob">
             Click on a job to see execution logs.
           </h3>
