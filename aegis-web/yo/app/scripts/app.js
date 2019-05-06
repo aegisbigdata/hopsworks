@@ -77,7 +77,8 @@ angular.module('hopsWorksApp', [
   'ui.toggle',
   'ngFileSaver',
   'ngFileUpload',
-  'googlechart'
+  'googlechart',
+  'moment-picker'
 ])
         .config(['$routeProvider', '$httpProvider', '$compileProvider', 'flowFactoryProvider', 'accordionConfig',
           function ($routeProvider, $httpProvider, $compileProvider, flowFactoryProvider, accordionConfig) {
@@ -465,8 +466,7 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
-                    // TODO: use distribution id
-                    .when('/project/:projectID/extended-metadata-distribution', {
+                    .when('/project/:projectID/:distributionID/extended-metadata-distribution', {
                       templateUrl: 'views/extended-metadata/distribution.html',
                       controller: 'ProjectCtrl as projectCtrl',
                       resolve: {

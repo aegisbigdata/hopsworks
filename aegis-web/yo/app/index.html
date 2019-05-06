@@ -47,6 +47,7 @@
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/v4-shims.css">
+    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
@@ -69,6 +70,7 @@
     <link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css" />
     <link rel="stylesheet" href="bower_components/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.css" />
     <link rel="stylesheet" href="bower_components/css-hamburgers/dist/hamburgers.css" />
+    <link rel="stylesheet" href="bower_components/angular-moment-picker/dist/angular-moment-picker.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -99,6 +101,7 @@
     <link rel="stylesheet" href="styles/get-started.css">
     <link rel="stylesheet" href="styles/jupyter-tool.css">
     <link rel="stylesheet" href="styles/tools-jupyter-overview.css">
+    <link rel="stylesheet" href="styles/leaflet-areaselect.css">
     <!-- endbuild -->
   </head>
   <body  ng-app="hopsWorksApp">
@@ -174,12 +177,17 @@
     <script src="bower_components/nvd3/build/nv.d3.js"></script>
     <script src="bower_components/angular-nvd3/dist/angular-nvd3.js"></script>
     <script src="bower_components/angular-bootstrap-toggle/dist/angular-bootstrap-toggle.min.js"></script>
-    <script src="bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
     <script src="bower_components/ng-file-upload/ng-file-upload-all.min.js"></script>
+    <script src="bower_components/blob-polyfill/Blob.js"></script>
+    <script src="bower_components/file-saver.js/FileSaver.js"></script>
+    <script src="bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
     <script src="bower_components/angular-google-chart/ng-google-chart.js"></script>
     <script src="bower_components/apexcharts/dist/apexcharts.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
+    <script src="bower_components/angular-moment-picker/dist/angular-moment-picker.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
+    <script src="bower_components/jsonld/dist/jsonld.min.js"></script>
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/js/util.js"></script>
@@ -187,12 +195,14 @@
     <script src="scripts/js/hamburger.js"></script>
     <script src="scripts/js/ace/ace.js"></script>
     <script src="scripts/js/ace/mode-json.js"></script>
+    <script src="scripts/js/leaflet-areaselect.js"></script>
 
     <script src="scripts/directives/switch.js"></script>
     <script src="scripts/directives/modal.js"></script>
     <script src="scripts/directives/passwordMatch.js"></script>
     <script src="scripts/directives/hwcard.js"></script>
     <script src="scripts/directives/hwPanel.js"></script>
+    <script src="scripts/directives/leaflet.js"></script>
     <script src="scripts/directives/filemgr/directives.js"></script>
 
     <script src="scripts/controllers/dataSetCreatorCtrl.js"></script>
@@ -287,6 +297,9 @@
     <script src="scripts/controllers/featuregroupDependenciesCtrl.js"></script>
     <script src="scripts/controllers/featurestoreStatisticModalCtrl.js"></script>
     <script src="scripts/controllers/trainingDatasetDependenciesCtrl.js"></script>
+    <script src="scripts/controllers/extendedMetadataCtrl.js"></script>
+    <script src="scripts/controllers/extendedMetadataFileCtrl.js"></script>
+    <script src="scripts/controllers/extendedMetadataDatasetCtrl.js"></script>
 
     <!-- Services -->
     <script src="scripts/services/AuthInterceptorService.js"></script>
@@ -338,6 +351,8 @@
     <script src="scripts/services/filemgr/apimiddleware.js"></script>
     <script src="scripts/services/filemgr/filenavigator.js"></script>
     <script src="scripts/services/FeaturestoreService.js"></script>
+    <script src="scripts/services/ExtendedMetadataService.js"></script>
+    <script src="scripts/services/ExtendedMetadataAPIService.js"></script>
     <!-- Providers -->
     <script src="scripts/providers/filemgr/config.js"></script>
     <!-- Filters -->
