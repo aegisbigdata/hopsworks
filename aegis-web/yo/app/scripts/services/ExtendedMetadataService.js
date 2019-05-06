@@ -46,9 +46,26 @@ angular.module('hopsWorksApp')
        * Generates RDF compliant representation in json-ld format
        * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
        */
+      saveExtendedMetadata  (data, doc, context) {
+        var modifiedKey = 'http://purl.org/dc/terms/modified';
+
+        // Map model of each field to RDF doc structure
+        for (var key in data.fields) {
+          var field = data.fields[key];
+          if (field.hasOwnProperty('mapping')) {
+            var mapping = field.mapping;
+            if (field.hasOwnProperty('model')) doc[mapping]['@id'] = field.model;
+          }
+        }
+
+        // Set modified, spatial properties
+        doc[data.fields.spatial.mapping]['@id'] = JSON.stringify(data.bounds);
+        doc[modifiedKey] = (new Date()).toISOString();
+        this.generateRDFString(doc, context);
+      },
       generateRDFString (doc, context) {
-        jsonld.flatten(doc, context, function(err, compacted) {
-          console.log(JSON.stringify(compacted, null, 2));
+        jsonld.flatten(doc, context, function(err, result) {
+          console.log(JSON.stringify(result, null, 2));
         });
       },
 
