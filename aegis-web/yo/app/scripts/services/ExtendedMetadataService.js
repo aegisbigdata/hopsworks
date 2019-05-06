@@ -64,13 +64,25 @@ angular.module('hopsWorksApp')
         }
 
         doc[modifiedKey] = (new Date()).toISOString();
-        this.generateRDFString(doc, context);
+        return this.generateRDFString(doc, context);
       },
       generateRDFString (doc, context) {
-        jsonld.flatten(doc, context, function(err, result) {
-          console.log(JSON.stringify(result, null, 2));
+        return new Promise(function (resolve, reject) {
+          jsonld.flatten(doc, context, function(err, result) {
+            if (err) {
+              return reject(err);
+            }
+
+            const jsonldData = JSON.stringify(result);
+            resolve(jsonldData);
+          });
         });
       },
+
+      FILE_FORMATS: [
+        { id: 'TAR', name: 'TAR' },
+        { id: 'ZIP', name: 'ZIP' }
+      ],
 
       LANGUAGES: [
         { id: 'BUL', name: 'Bulgarian' },
@@ -96,7 +108,7 @@ angular.module('hopsWorksApp')
         { id: 'SLK', name: 'Slovak' },
         { id: 'SLV', name: 'Slovenian' },
         { id: 'SPA', name: 'Spanish' },
-        { id: 'SWE', name: 'Swedish' },
+        { id: 'SWE', name: 'Swedish' }
       ],
 
       LICENCES: [
