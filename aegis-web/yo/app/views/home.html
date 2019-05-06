@@ -48,23 +48,21 @@
   <div class="container content-wrapper" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl">
     <div class="row">
       <div class="col-md-12">
-        <h1 style="margin-top: 40px; margin-bottom: 30px">Projects</h1>
+        <h1 style="margin-top: 40px; margin-bottom: 30px">My Projects ({{homeCtrl.projects.length}})</h1>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-3">
         <a
           ng-click="homeCtrl.newProject()"
-          class="home-project-container"
-          style="background-color: #0492b3; color: #fff; padding: 28px 15px; text-align: center; margin-bottom: 25px; display: block; box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1)"
+          class="home-project-container-new"
         >
-          <h4 class="home-project-container-title"><span class="fa fa-plus"></span> New Project</h4>
+          <h4 class="home-project-container-title"><span class="fa fa-plus"></span>New Project</h4>
         </a>
       </div>
       <div class="col-sm-3" ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
         <a
           class="home-project-container"
-          style="border-top: 4px solid #0492b3; padding: 15px; text-align: center; margin-bottom: 25px; display: block; box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1)"
           href="#!/project/{{project.project.id}}"
           context-menu
           data-target="menu-{{$index}}"
@@ -75,7 +73,9 @@
           <div class="home-project-container-title">5 datasets</div>
         </a>
       </div>
+
     </div>
+    <ul uib-pager items-per-page="11" total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" class="aegis-home-page" ></ul>
     <hr style="margin-bottom: 40px">
     <div class="row">
       <div class="col-md-4" style="text-align: center">
@@ -94,173 +94,18 @@
         <img src="https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F52230452%2F233567016891%2F1%2Foriginal.jpg?h=512&w=512&auto=compress&rect=0%2C0%2C800%2C400&s=aa46ba847eca4cc1beb9e6b79ccf6571" height="130px" style="padding-bottom: 10px">
         <h2 style="margin-bottom: 20px">What's New</h2>
         <p>October 2018 Report Published: An In-Depth Look at Big Data Trends and Challenges in Insurance</p>
-        <a href="#">&raquo; Read more</a>
+        <a href="https://www.aegis-bigdata.eu/blog/" target="_blank">&raquo; Read more</a>
       </div>
     </div>
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+
+
     <div class="alert alert-warning alert-dismissable" ng-if="mainCtrl.userNotification !== ''">
       <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
       <p align="center"><i class="fa fa-bullhorn"></i> <strong>Notification!</strong> {{mainCtrl.userNotification}}
         <a class="alert-link" data-dismiss="alert" ng-click="mainCtrl.profileModal()" aria-label="Profile">Change now.</a>
       </p>
     </div>
-    <div class="pull-left" id="toursBox">
-      <div class="pull-left" style="min-width: 220px; max-width: 220px">
-        <div class="list-group">
-          <a href="" class="list-group-item active">Help</a>
-          <a href=""
-             ng-click="homeCtrl.showTours = !homeCtrl.showTours; homeCtrl.getTours();" class="list-group-item"
-             ng-class="{'tour-highlight': homeCtrl.showGettingStarted()}">
-            <span class="glyphicon" ng-class="{'glyphicon-triangle-right':!homeCtrl.showTours, 'glyphicon-triangle-bottom':homeCtrl.showTours}"></span>
-            Tours
-
-            <span class="glyphicon glyphicon-expand pull-right"></span>
-
-            <div ng-show="homeCtrl.showTours" ng-init="homeCtrl.initCheckBox()" style="margin-top: 10px">
-              <md-checkbox md-no-ink aria-label="Tour tips" class="md-primary"
-                ng-model="homeCtrl.showTourTips" ng-change="homeCtrl.toggleTourTips()"
-                ng-click="homeCtrl.showTours = !homeCtrl.showTours">
-                        Tour tips
-              </md-checkbox>
-            </div>
-            <div ng-show="homeCtrl.showTours" ng-repeat="tour in homeCtrl.tours">
-              <button style="margin: 0px; padding-bottom: 5px; padding-top: 5px; padding-left: 0px; padding-right: 0px;" uib-popover="Take a tour of Hopsworks by creating a project and running a Spark job!"
-                      type="button" class="btn btn-default btn-block" ng-click="homeCtrl.showTours = !homeCtrl.showTours; homeCtrl.createExampleProject(tour.name)">
-                <span style="margin-right: 5px" class="glyphicon glyphicon-play-circle pull-right" ng-hide="isCreating(tour.name) === true"></span>
-                <span style="margin-right: 5px" class="fa fa-spinner fa-spin pull-right" ng-hide="isCreating(tour.name) === false"></span>
-                <span class="button-text">{{tour.name}}</span>
-              </button>
-            </div>
-
-          </a>
-          <a ng-if="isDelaEnabled" href="#!/delahopsDataset" class="list-group-item">
-            <span class="fa fa-globe"></span>
-            Hops Datasets</a>
-          <a href="#!/delaclusterDataset" class="list-group-item">
-            <span class="fa fa-server"></span>
-            Cluster Datasets</a>
-          <a href="https://groups.google.com/forum/#!forum/hopshadoop" class="list-group-item">
-            <span class="glyphicon glyphicon-user"></span>
-            Need support?
-            <span class="glyphicon glyphicon-earphone pull-right" style="margin-right: 1px;"></span>
-          </a>
-            </div>
-        </div>
-    </div>
-    <div class="pull-right">
-      <div class="pull-left" style="min-width: 330px; max-width: 330px">
-        <span class="list-group-item active">
-          <span class="badge pull-left" style="margin-right: 10px;">{{homeCtrl.projects.length}}</span> Projects
-
-          <button class="btn btn-success pull-right" id="buttonCreateProject"
-                  style="height: 43px;margin-right: -16px;margin-top: -11px;width: 70px; border-radius: 0px;"
-                  ng-click="homeCtrl.newProject()">
-            <i class="fa fa-plus-circle fa-lg"></i>
-            <span style="margin-left:3px;">New</span>
-          </button>
-
-        </span>
-        <div class="list-group-item" style="background-color: #f5f5f5;">
-          <div class="input-group">
-            <div class="input-group-btn">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-                <span id="search_concept">Sort by</span>
-                <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="" ng-click="homeCtrl.sortBy='-project.name'"><i class="pull-right fa fa-sort-alpha-desc text-muted" aria-hidden="true"></i>Name Desc</a></li>
-                <li><a class="dropdown-item" href="" ng-click="homeCtrl.sortBy='project.name'"><i class="pull-right fa fa-sort-alpha-asc text-muted" aria-hidden="true"></i>Name Asc</a></li>
-                <li><a class="dropdown-item" href="" ng-click="homeCtrl.sortBy='project.created'"><i class="pull-right fa fa-sort-numeric-desc text-muted" aria-hidden="true"></i>Created Desc</a></li>
-                <li><a class="dropdown-item" href="" ng-click="homeCtrl.sortBy='-project.created'"><i class="pull-right fa fa-sort-numeric-asc text-muted" aria-hidden="true"></i>Created Asc</a></li>
-              </ul>
-            </div>
-            <input type="hidden" name="search_param" value="all" id="search_param">
-            <input type="text" class="form-control pull-left" ng-model="searchProject"  name="x" placeholder="Find project...">
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button" style="height:34px;">
-                <i class="fa fa-search" aria-hidden="true"></i>
-              </button>
-            </span>
-          </div>
-        </div>
-        
-        <div ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
-          <a ng-class="{disabled: project.project.archived, disabled: homeCtrl.working[project.project.id]}"
-             href="#!/project/{{project.project.id}}"
-             class="list-group-item"
-             context-menu
-             data-target="menu-{{$index}}"
-             id="{{project.project.name.substr(0, 5) === 'demo_'}}"
-             title="{{project.project.name.length > 28 ? project.project.name:''}}">
-            <div ng-if="project.teamRole === 'Data scientist'">
-              <i style="width: 20px; margin-right: 10px; font-size: 20px;" class="fa fa-lock fa-2 pull-left"></i>
-            </div>
-            <div ng-if="project.teamRole === 'Data owner'">
-              <i style="width: 20px; margin-right: 10px; font-size: 20px;" class="fa fa-unlock fa-2 pull-left"></i>
-            </div>
-            <div ng-if="project.project.archived">
-              <i style="width: 20px; margin-right: 10px; font-size: 20px; color: #9d261d"
-                 class="fa fa-ban fa-2 pull-left"></i>
-            </div>
-            {{ project.project.name | limitTo: 28 }}{{project.project.name.length > 28 ? '...' : ''}}
-            <span ng-if="project.project.name.substr(0, 5) === 'demo_'" class="glyphicon glyphicon-play-circle pull-right" style="margin-top: 5px;"></span>
-            <i class="fa fa-cog fa-spin fa-2x  fa-fw pull-right" ng-show="homeCtrl.working[project.project.id]"></i>
-          </a>
-          <div uib-dropdown class="dropdown position-fixed" id="menu-{{$index}}">
-            <ul uib-dropdown-menu class="dropdown-amore">
-              <!--            <li>
-                            <a class="pointer"
-                               role="menuitem"
-                               tabindex="1"
-                               ng-click="">
-                              <span><i class="fa fa-share-alt"></i>
-                                Share...</span>
-                            </a>
-                          </li>-->
-              <li>
-                <a class="pointer"
-                   role="menuitem"
-                   tabindex="2"
-                   ng-click="homeCtrl.deleteProjectAndDatasets(project.project.id)">
-                  <span><i class="fa fa-trash"></i>
-                    Remove and delete DataSets </span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <ul uib-pager total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" ></ul>
-    </div>
   </div>
-  <tour class="ng-scope" step="homeCtrl.tourService.currentStep_TourOne" post-tour="closeTour()" ng-if="homeCtrl.loadedView">
-    <virtual-step
-      class="ng-scope"
-      tourtip="Begin the tour by clicking Next, OR when {{homeCtrl.tourService.alive_TourOne}} seconds passed, click on the project"
-      tourtip-step="0"
-      tourtip-element="#true.list-group-item"
-      tourtip-placement="left"
-      tourtip-next-label="Next"
-      on-proceed="homeCtrl.EnterExampleProject(homeCtrl.exampleProjectID)"
-      tourtip-offset-vertical="-17"
-      tourtip-offset-horizontal="13"
-      ></virtual-step>
-  </tour>
-
-  <tour class="ng-scope" step="homeCtrl.tourService.toursInfoStep"
-        post-tour="closeTour()"
-        ng-if="homeCtrl.loadedView
-          && (homeCtrl.tourService.informAndTips
-            || homeCtrl.tourService.informOnly)">
-    <virtual-step
-            class="ng-scope"
-            tourtip="Follow our guided tours"
-            tourtip-step="0"
-            tourtip-element="#toursBox"
-            tourtip-placement="right"
-            tourtip-next-label="Got it!"
-            on-proceed="homeCtrl.disableInformBalloon()"
-            tourtip-offset-horizontal="50"
-    ></virtual-step>
-  </tour>
 </div>

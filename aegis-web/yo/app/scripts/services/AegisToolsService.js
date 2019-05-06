@@ -9,7 +9,7 @@ angular.module('hopsWorksApp')
             {
                 name: "Query Builder",
                 notebook: "QueryBuilder_v1.ipynb",
-                img: "images/tools-jupyter.png", 
+                img: "images/tools-query.png", 
                 description: "Design queries, combine and process data in AEGIS with ease and clarity.",
                 documentationUrl: "https://github.com/aegisbigdata/documentation/wiki/Query-Builder",
                 sourceUrl: "https://github.com/aegisbigdata/query-builder"

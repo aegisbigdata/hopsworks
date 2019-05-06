@@ -98,7 +98,12 @@
             </div>
             <div class="row content-utility-bar content-utility-bar-actions">
               <div class="col-md-3">
-                <h4 style="margin-top: 10px; margin-bottom: 5px">Projects > Datasets</h4>
+                <h4 style="margin-top: 10px; margin-bottom: 5px">
+                    <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                        title="{{projectCtrl.currentProject.projectName}}">
+                        {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+                    > Datasets
+                </h4>
               </div>
               <div class="col-md-5">
                 <div style="padding: 6px 0; padding-top: 11px;"">
@@ -127,7 +132,7 @@
                 </div>
               </div>
             </div>
-            <div class="row row-no-margin-left" ng-controller="SearchResultCtrl as searchResultCtrl">
+            <div class="row" ng-controller="SearchResultCtrl as searchResultCtrl">
               <div class="ds-content col-lg-12" ng-class="{'sidenav-open': datasetsCtrl.tgState == true}" style="overflow: hidden;">
                 <div class="row" resizable r-directions="['bottom']" ng-class="{'rg-row-top-ds': readme !== null}">
                   <div class="col-lg-12 ds-box thin-scrollbar" style="margin-top: 20px; padding-left: 20px">                    

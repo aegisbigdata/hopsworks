@@ -917,7 +917,7 @@ angular.module('hopsWorksApp')
                 if (typeof callback !== "function") 
                     throw new TypeError("callback is not a function");
 
-                // Check if jupiter has started
+                // Check if Jupyter has started
                 if (self.ui !== "") {
                     callback(true);
                 } else {
