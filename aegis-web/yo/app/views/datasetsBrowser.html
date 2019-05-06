@@ -97,7 +97,7 @@
             </div>
           <div class="row content-utility-bar content-utility-bar-actions" ng-if="!mainCtrl.showSearchPage">
               <div class="col-md-3">
-                <h4 style="margin-top: 10px; margin-bottom: 5px"><a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
+                <h4 class="content-utility-bar-h4"><a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
                 <span ng-show="datasetsCtrl.pathArray.length > 10">...</span>
                 <span data-ng-repeat="path in datasetsCtrl.pathArray.slice(datasetsCtrl.pathArray.length - 1 - datasetsCtrl.breadcrumbLen()) track by $index">
                   <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 16 }}{{path.length > 16 ? '..' : ' '}}</a>
