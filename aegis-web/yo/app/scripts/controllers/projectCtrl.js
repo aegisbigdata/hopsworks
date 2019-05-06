@@ -424,12 +424,12 @@ angular.module('hopsWorksApp')
               self.goToUrl('extended-metadata');
             };
 
-            self.goToDatasetExtendedMetadata = function () {
-              self.goToUrl('extended-metadata-dataset');
+            self.goToDatasetExtendedMetadata = function (dataset) {
+              self.goToUrl('dataset/' + dataset.id + '/extended-metadata-dataset');
             };
 
             self.goToDistributionExtendedMetadata = function (file) {
-              self.goToUrl(file.id + '/extended-metadata-distribution');
+              self.goToUrl('dist/' + file.id + '/extended-metadata-distribution');
             };
 
             /**
