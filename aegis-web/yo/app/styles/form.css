@@ -198,6 +198,11 @@ textarea.form-control {
   box-shadow: 0 2em 3em #ddd;
 }
 
+.content-utility-bar-h4 {
+  margin-top: 10px; 
+  margin-bottom: 5px
+}
+
 .wrapper>section {
   background-color: #f5f7fa;
   height: 100%;

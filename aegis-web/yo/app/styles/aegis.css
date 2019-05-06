@@ -123,3 +123,7 @@ div.job-content--page {
 #buttonCreateJob {
   margin-bottom: 20px;
 }
+
+.job-content--text-muted {
+  text-align: center;
+}
