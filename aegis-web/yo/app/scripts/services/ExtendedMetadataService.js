@@ -59,7 +59,10 @@ angular.module('hopsWorksApp')
         }
 
         // Set modified, spatial properties
-        doc[data.fields.spatial.mapping]['@id'] = JSON.stringify(data.bounds);
+        if (data.bounds) {
+          doc[data.fields.spatial.mapping]['@id'] = JSON.stringify(data.bounds);
+        }
+
         doc[modifiedKey] = (new Date()).toISOString();
         this.generateRDFString(doc, context);
       },
