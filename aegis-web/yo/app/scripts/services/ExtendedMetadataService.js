@@ -54,7 +54,7 @@ angular.module('hopsWorksApp')
           var field = data.fields[key];
           if (field.hasOwnProperty('mapping')) {
             var mapping = field.mapping;
-            if (field.hasOwnProperty('model')) doc[mapping]['@id'] = field.model;
+            if (field.hasOwnProperty('model') && doc.hasOwnProperty(mapping)) doc[mapping]['@id'] = field.model;
           }
         }
 
