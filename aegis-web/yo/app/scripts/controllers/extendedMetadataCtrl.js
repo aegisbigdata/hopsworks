@@ -222,8 +222,6 @@ angular.module('hopsWorksApp')
              * Entry point for saving extended metadata from fields in project-view
              * Is triggered on clicking the "Save Metadata" button
              */
-            
-            ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context);
 
             self.saveExtendedMetadata = function () {
               if (!$scope.form.extendedMetadata.$valid) {
