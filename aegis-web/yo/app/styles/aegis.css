@@ -103,3 +103,29 @@
     box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1);
     height: 97px;
 }
+
+.navbar-search {
+  padding: 12px 0px;
+}
+
+.navbar-ul-search {
+  list-style-type: none;
+  margin-left: -55px;
+}
+
+.search-result-header {
+  padding-top: 20px;
+}
+
+.search-result-border {
+  border-left: 1px dashed lightgrey;
+}
+
+.search-result-sort {
+  display: flex;
+}
+
+.search-form-control {
+  border: none;
+  margin: 10px 0px 10px 10px; 
+}

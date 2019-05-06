@@ -38,10 +38,23 @@
   -->
 
 <div class="" ng-class="{'container content-wrapper': !projectView, 'container-fluid project-content-wrapper': projectView}">
-    <section class="col-md-4 navbar-default">
+    <section class="col-md-4 navbar-search">
         <nav class="navbar">
+         <div class="row navbar-search">
+            <div class="col-md-4">
+                <h4 class="ng-bindings">Filters</h4>
+            </div>  
+            <div class="pull-right col-md-4">
+              <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block"
+                    ng-click="searchTypePub=undefined; 
+                              searchType=undefined; 
+                              sortKey=undefined;
+                              searchName=undefined; 
+                              searchOwner=undefined;">RESET ALL</button>
+            </div>
+        </div>
         <div class="container-fluid">
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">Type</li>
                     <a class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
@@ -53,7 +66,7 @@
                        data-toggle="collapse" data-target="#filterdropdown"
                        ng-click="">Files</a><br/>
             </ul>
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">Ownership</li>
                     <a class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
@@ -65,22 +78,22 @@
                        data-toggle="collapse" data-target="#filterdropdown"
                        ng-click="">No access</a><br/>
             </ul>
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">Date added to AEGIS</li>
                     <a class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
                        ng-click="">AS RANGE</a><br/>
             </ul>
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">File Types</li>
             </ul>
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">Spatial</li>
             </ul>
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">License</li>
             </ul>
-            <ul>
+            <ul class="navbar-ul-search">
                 <li class="dropdown-search-header">Price/Sellable</li>
             </ul>
             <!--
@@ -151,26 +164,29 @@
            </ul>
             -->
         </div>
-        <div class="row result-filter-body">
-          <div class="pull-right col-md-4">
-            <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-primary btn-block"
-                  ng-click="searchTypePub=undefined; 
-                            searchType=undefined; 
-                            sortKey=undefined;
-                            searchName=undefined; 
-                            searchOwner=undefined;">Clear</button>
-          </div>
-        </div>
         </nav>
     </section>
-    <section class="col-md-8">
+    <section class="col-md-8 search-result-border">
     
     <div class="row search-result-header">
-      <div class="col-md-10 pull-left">
-        <h3>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
-            {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h3>
+      <div class="col-md-6 pull-left">
+        <h4>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
+            {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h4>
       </div>
-      <div class="col-xs-2 pull-right">
+        <div class="col-md-6 search-result-sort pull-right">
+            <h4 class="ng-binding">Sort by:</h4>
+            <div>
+                <select class="search-form-control">
+                  <option value="RASC" selected>Relevance ascending</option>
+                  <option value="RDESC">Relevance decreasing</option>
+                  <option value="LASC" selected>Latest ascending</option>
+                  <option value="LDESC">Latest descending</option>
+                  <option value="TASC" selected>Title ascending</option>
+                  <option value="TDESC">Title descending</option>
+                </select>
+              </div>
+        </div>
+      <!-- <div class="col-xs-2 pull-right">
         <div class="input-group spinner"> 
           <input type="text" class="form-control" ng-model="mainCtrl.pageSize">
           <div class="input-group-btn-vertical">
@@ -178,7 +194,7 @@
             <button class="btn btn-default" ng-click="mainCtrl.decrementPage()" type="button"><i class="fa fa-caret-down"></i></button>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="search-result-body row thin-scrollbar" ng-controller="SearchResultCtrl as searchResultCtrl">
       <div class="loader loader-md" ng-show="mainCtrl.searching"></div>
