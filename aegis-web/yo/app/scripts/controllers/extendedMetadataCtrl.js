@@ -287,19 +287,7 @@ angular.module('hopsWorksApp')
 
               doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.data.bounds);
               doc[modifiedKey] = (new Date()).toISOString();
-              self.generateRDFString();
+              ExtendedMetadataService.generateRDFString(self.rdf.doc, self.rdf.context);
             };
-
-
-            /**
-             * Generates RDF compliant representation in json-ld format
-             * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
-             */
-
-            self.generateRDFString = function () {
-              jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
-                console.log(JSON.stringify(compacted, null, 2));
-              });
-            }
           }
         ]);
