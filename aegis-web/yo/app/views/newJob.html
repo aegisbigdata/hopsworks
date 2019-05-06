@@ -99,8 +99,12 @@
         </div>
         <div class="row content-utility-bar content-utility-bar-actions">
           <div class="col-md-3">
-            <h4 style="margin-top: 10px; margin-bottom: 5px">Jobs > {{ projectCtrl.currentProject.projectName}} > New job
-              <i class="fa fa-times-circle" uib-tooltip="Clear the current state." style="margin-left: 10px" ng-click="newJobCtrl.exitToJobs()"></i>
+            <h4 class="content-utility-bar-h4">
+                <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                title="{{projectCtrl.currentProject.projectName}}">
+                {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+               > New job
+              <i class="fa fa-times-circle" uib-tooltip="Clear the current state." style="margin-left: 10px; display: inline;" ng-click="newJobCtrl.exitToJobs()"></i>
             </h4>
           </div>
 

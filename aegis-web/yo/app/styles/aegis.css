@@ -30,20 +30,20 @@
 }
 
 /* For tabs not to be gradient -- projectSettings.html*/
-.ng-isolate-scope > .nav-tabs {
+.ng-isolate-scope > .nav-tabs, .kafka-tabs {
     background: #fff;
     height: 80px;
     box-shadow: 0 2em 3em #ddd;
   }
   
-  a.nav-link.ng-binding {
+  a.nav-link.ng-binding, .kafka-tabs li a {
     height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
   }
   
-  li.uib-tab.nav-item.ng-scope.ng-isolate-scope.active {
+  li.uib-tab.nav-item.ng-scope.ng-isolate-scope.active , .kafka-tabs li.active{
     font-weight: bold;
   }
   
@@ -102,4 +102,28 @@
     display: block;
     box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1);
     height: 97px;
+}
+
+/* Layout for jobs.html */
+
+.job-layout {
+  margin-top: 80px;
+}
+
+div.job-content--page {
+  height:100%; 
+  overflow: hidden; 
+  padding: 0 !important;
+}
+
+.job-content--row {
+  margin: 0 !important;
+}
+
+#buttonCreateJob {
+  margin-bottom: 20px;
+}
+
+.job-content--text-muted {
+  text-align: center;
 }

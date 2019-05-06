@@ -99,30 +99,32 @@
         </div>
         <div class="row content-utility-bar content-utility-bar-actions">
           <div class="col-md-3">
-            <h4 style="margin-top: 10px; margin-bottom: 5px"> Jobs > {{ projectCtrl.currentProject.projectName}}</h4>
+            <h4 class="content-utility-bar-h4"> 
+                <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                title="{{projectCtrl.currentProject.projectName}}">
+                {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+              > Jobs</h4>
           </div>
         </div>
       </div><!--content wrapper -->
-
     </div>
 
-    <div class="job-content-wrapper" >
+    <div class="job-content-wrapper job-layout" >
       <h3 id="projectBread" style="display: none;"> {{ projectCtrl.currentProject.projectName}} / Jobs</h3>
     </div>
     <div class="">
       <!-- Page Content -->
-      <div class="content" style="height:100%; overflow: hidden; ;" >
-        <div class="row rg-row-top" resizable r-directions="['bottom']">
+      <div class="content job-content--page">
+        <div class="row rg-row-top job-content--row" resizable r-directions="['bottom']">
           <div class="row">
-            <div class=" col-md-6"
-                 style="margin-bottom: 20px;" id="buttonCreateJob">
+            <div class=" col-md-6" id="buttonCreateJob">
               <button
                 ng-click="jobsCtrl.newJob()"
                 class="btn btn-success">
                 New job
             </div>
           </div>
-          <h3 class="text-muted" style="text-align: center;" ng-show="jobsCtrl.jobs.length < 1">
+          <h3 class="text-muted job-content--text-muted" ng-show="jobsCtrl.jobs.length < 1">
             No Job to show.
           </h3>
           <div ng-show="jobsCtrl.jobs.length > 0">
@@ -396,7 +398,7 @@
         </div>
 
         <!-- right side -->
-        <div class="row rg-row-bottom" style="overflow-y: auto;">
+        <div class="row rg-row-bottom" style="margin-left: 0; margin-right: 0;">
           <h3 class="text-muted" style="text-align: center;" ng-show="!jobsCtrl.hasSelectJob">
             Click on a job to see execution logs.
           </h3>
