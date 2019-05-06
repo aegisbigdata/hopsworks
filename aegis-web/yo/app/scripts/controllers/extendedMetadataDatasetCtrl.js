@@ -278,8 +278,6 @@ angular.module('hopsWorksApp')
              * Is triggered on clicking the "Save Metadata" button
              */
 
-            ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context);
-
             self.saveExtendedMetadata = function () {
               if (!$scope.form.extendedMetadata.$valid) {
                 console.warn("Can't submit form - missing or invalid fields!");
