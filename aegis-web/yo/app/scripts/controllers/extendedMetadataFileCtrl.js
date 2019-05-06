@@ -58,14 +58,14 @@ angular.module('hopsWorksApp')
             self.saveExtendedDistroMetadata = function () {
               let data = {
                 templateId: 14, // hardcoded, needs to exist
-                inodePath: '', // TODO: needs file path, use DISTRIBUTION_ID to get file metadata
+                inodePath: '' // TODO: needs file path, use DISTRIBUTION_ID to get file metadata
               };
               dataSetService.attachTemplate(data).then(function (success) {
                 growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
               }, function (error) {
                 growl.info(
                   'Could not attach template to file ' + file.name + '.',
-                  {title: 'Info', ttl: 5000},
+                  {title: 'Info', ttl: 5000}
                 );
               }).then(function () {
                 const parentId = '9696'; // TODO: needs file parent id, use DISTRIBUTION_ID to get file metadata
