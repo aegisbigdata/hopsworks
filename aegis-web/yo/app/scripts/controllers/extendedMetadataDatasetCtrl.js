@@ -79,74 +79,6 @@ angular.module('hopsWorksApp')
                 "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
                 "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"},
                 "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
-              },
-              data: {
-                description: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:description',
-                  mapping: "http://purl.org/dc/terms/description",
-                  value: null
-                },
-                title: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:title',
-                  mapping: "http://purl.org/dc/terms/title",
-                  value: null
-                },
-                contactpointtype: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                contactpointname: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                contactpointmail: {
-                  type: 'foaf:Document',
-                  uri: 'foaf:homepage',
-                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
-                  value: null
-                },
-                publishertype: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                publishername: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                homepage: {
-                  type: 'foaf:Document',
-                  uri: 'foaf:homepage',
-                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
-                  value: null
-                },
-                license: {
-                  type: 'dct:LicenseDocument',
-                  uri: 'dct:license',
-                  mapping: 'http://purl.org/dc/terms/license',
-                  value: null
-                },
-                spatial: {
-                  type: 'dct:Location',
-                  uri: 'dct:spatial',
-                  mapping: "http://purl.org/dc/terms/spatial",
-                  value: null
-                },
-                language: {
-                  type: 'dct:LinguisticSystem',
-                  uri: 'dct:language',
-                  mapping: 'http://purl.org/dc/terms/language',
-                  value: null
-                }
               }
             };
 
@@ -157,24 +89,28 @@ angular.module('hopsWorksApp')
                   label: 'Title',
                   description: 'Description for title field',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/title',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/description',
                   required: true
                 },
                 contactpointtype: {
                   label: 'Contact Point Type',
                   description: 'Description for Contact Point field',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointname: {
                   label: 'Contact Point Name',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointmail: {
@@ -193,18 +129,21 @@ angular.module('hopsWorksApp')
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 homepage: {
                   label: 'Publisher Homepage',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
                   recommended: true
                 },
                 theme: {
@@ -241,6 +180,7 @@ angular.module('hopsWorksApp')
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/language',
                   optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
@@ -248,6 +188,7 @@ angular.module('hopsWorksApp')
                 spatial: {
                   label: 'Spatial',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/spatial',
                   optional: true
                 },
                 temporal: {
@@ -337,27 +278,15 @@ angular.module('hopsWorksApp')
              * Is triggered on clicking the "Save Metadata" button
              */
 
+            ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context);
+
             self.saveExtendedMetadata = function () {
-              if (!$scope.form.extendedMetadataDataset.$valid) {
+              if (!$scope.form.extendedMetadata.$valid) {
                 console.warn("Can't submit form - missing or invalid fields!");
                 return;
               }
 
-              var modifiedKey = 'http://purl.org/dc/terms/modified';
-              var data = self.rdf.data; 
-              var doc = self.rdf.doc;
-
-              for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                  var mapping = data[key].mapping;
-
-                  if ($scope.data.fields.hasOwnProperty(key)) doc[mapping]['@id'] = $scope.data.fields[key].model;
-                }
-              }
-
-              doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.data.bounds);
-              doc[modifiedKey] = (new Date()).toISOString();
-              ExtendedMetadataService.generateRDFString(self.rdf.doc, self.rdf.context);
+              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context);
             };
           }
         ]);
