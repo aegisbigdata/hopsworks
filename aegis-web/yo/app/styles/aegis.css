@@ -103,3 +103,23 @@
     box-shadow: 1px 2px 7px 1px rgba(0, 0, 0, 0.1);
     height: 97px;
 }
+
+/* Layout for jobs.html */
+
+.job-layout {
+  margin-top: 80px;
+}
+
+div.job-content--page {
+  height:100%; 
+  overflow: hidden; 
+  padding: 0 !important;
+}
+
+.job-content--row {
+  margin: 0 !important;
+}
+
+#buttonCreateJob {
+  margin-bottom: 20px;
+}

@@ -107,19 +107,17 @@
           </div>
         </div>
       </div><!--content wrapper -->
-
     </div>
 
-    <div class="job-content-wrapper" style="margin-top: 100px" >
+    <div class="job-content-wrapper job-layout" >
       <h3 id="projectBread" style="display: none;"> {{ projectCtrl.currentProject.projectName}} / Jobs</h3>
     </div>
     <div class="">
       <!-- Page Content -->
-      <div class="content" style="height:100%; overflow: hidden; padding: 0;" >
-        <div class="row rg-row-top" style="margin: 0;" resizable r-directions="['bottom']">
+      <div class="content job-content--page">
+        <div class="row rg-row-top job-content--row" resizable r-directions="['bottom']">
           <div class="row">
-            <div class=" col-md-6"
-                 style="margin-bottom: 20px;" id="buttonCreateJob">
+            <div class=" col-md-6" id="buttonCreateJob">
               <button
                 ng-click="jobsCtrl.newJob()"
                 class="btn btn-success">
