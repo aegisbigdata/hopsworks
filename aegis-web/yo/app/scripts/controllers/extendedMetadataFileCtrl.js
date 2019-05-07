@@ -112,7 +112,7 @@ angular.module('hopsWorksApp')
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   mapping: 'http://purl.org/dc/terms/language',
-                  recommended: true,
+                  optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
                 }
@@ -202,6 +202,14 @@ angular.module('hopsWorksApp')
               });
 
             };
+
+            /**
+             * Helper function to filter fields by type
+             */
+            
+            $scope.fieldFilter = function (filter) {
+              return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
+            }
 
             self.onFieldFocus = function (field) {
               self.selectedField = field;

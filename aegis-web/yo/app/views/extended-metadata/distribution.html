@@ -123,19 +123,19 @@
                                 <!--Nav Bar -->
                                 <nav class="bs-docs-sidebar">
                                     <ul id="sidebar" class="nav nav-stacked fixed">
-                                        <li class="active">
+                                        <li class="active" ng-if="fieldFilter('required').length > 0">
                                             <a>Mandatory</a>
                                             <ul class="nav nav-stacked">
                                                 <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                           </li>
-                                          <li class="active">
+                                          <li class="active" ng-if="fieldFilter('recommended').length > 0">
                                             <a>Recommended</a>
                                             <ul class="nav nav-stacked">
                                                 <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                           </li>
-                                          <li class="active">
+                                          <li class="active" ng-if="fieldFilter('optional').length > 0">
                                             <a>Optional</a>
                                             <ul class="nav nav-stacked">
                                                 <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a>{{ data.fields[fieldname].label }}</a></li>
