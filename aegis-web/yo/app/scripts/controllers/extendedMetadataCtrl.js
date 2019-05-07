@@ -194,6 +194,7 @@ angular.module('hopsWorksApp')
               }
             };
 
+
             /**
              * Helper function to filter fields by type
              * @param  {[type]} filter [description]
@@ -203,6 +204,7 @@ angular.module('hopsWorksApp')
             $scope.fieldFilter = function (filter) {
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
             }
+
 
             /**
              *   Receives data from ExtendedMetadataService and sets models of each available field
@@ -229,7 +231,10 @@ angular.module('hopsWorksApp')
                 return;
               }
 
-              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context);
+              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context)
+                .then((result) => {
+                  console.log(JSON.stringify(JSON.parse(result), null, 2));
+                })
             };
           }
         ]);
