@@ -181,10 +181,10 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="inputFormat3">Format</label>
-                                            <select name="inputFormat3" id="inputFormat3" ng-model="data.fields.format.model" class="form-control">
-                                                <!-- <option value="" disabled selected hidden>Select Format</option> -->
+                                            <input type="text" list="formats3" name="inputFormat3" id="inputFormat3" ng-model="data.fields.format.model" class="form-control">
+                                            <datalist id="formats3">
                                                 <option ng-repeat="option in data.fields.format.options" value="{{option.id}}">{{option.name}}</option>
-                                            </select>
+                                            </datalist>
                                           </div>
                                         <div class="form-group">
                                             <label for="inputLicence3">Licence</label>
