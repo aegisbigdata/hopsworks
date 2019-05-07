@@ -16,6 +16,12 @@ aegis-web/yo/app/karma.conf.js
 
 glassfish-resources.xml
 
+# MacOS
+.DS_Store
+
+# vscode
+.vscode
+
 *~
 ### NetBeans ###
 */nbproject/
