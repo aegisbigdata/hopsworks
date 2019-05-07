@@ -39,7 +39,8 @@
 
 'use strict';
 
-
+const AEGIS_DATASET_TEMPLATE_ID = 14;
+const AEGIS_DATASET_TEMPLATE_NAME = 'aegis-dataset';
 
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataDatasetCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
@@ -49,6 +50,8 @@ angular.module('hopsWorksApp')
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
+            const DATASET_ID = $routeParams.dataSetID;
+
             var self = this;
 
             self.selectedField = null;
@@ -273,19 +276,85 @@ angular.module('hopsWorksApp')
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
             }
 
-            /**
-             *   Receives data from ExtendedMetadataService and sets models of each available field
-             *   WIP until Service is working / API endpoints are defined
-             */
 
-            self.setExtendedMetadata = function (data) {
-              for (var key in data) {
-                if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
-                  $scope.data.fields[key].model = data[key]; 
+            /**
+             * Loads from data from JSON-LD format into page
+             */
+            self.loadExtendedDistroMetadata = function () {
+              MetadataRestService.getMetadata(DATASET_ID).then(function (datasetMetadata) {
+                if (!datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME] ||
+                    !datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME].metadata.payload) {
+                  return;
                 }
-              }
+
+                let data = datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME].metadata.payload[0];
+                data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
+
+                for (var key in data) {
+                  if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
+                    if (data[key] === './') continue;
+                    $scope.data.fields[key].model = data[key].substr(1);
+                  }
+                }
+              });
             };
 
+            // self.loadExtendedDistroMetadata();
+
+            /**
+             * Saves form data in JSON-LD format as metadata with hopsworks
+             */
+            self.saveExtendedDatasetMetadata = function () {
+              dataSetService.getAllDatasets().then(function (allDatasets) {
+                const tasks = allDatasets.data.map(function (dataset) {
+                  return dataSetService.getContents(dataset.name);
+                });
+                Promise.all(tasks).then(function (contents) {
+                  let dataset;
+
+                  contents = contents.map(function (content) {
+                    return content.data;
+                  }).reduce(function (acc, val) {
+                    // flatten result array
+                    return acc.concat(val);
+                  }, []);
+
+                  // find metadata object for this dataset id
+                  for (let i = 0; i < contents.length; i++) {
+                    if (contents[i].id == DATASET_ID) {
+                      dataset = contents[i];
+                      break;
+                    }
+                  }
+
+                  let template = {
+                    templateId: AEGIS_DATASET_TEMPLATE_ID,
+                    inodePath: dataset.path
+                  };
+                  dataSetService.detachTemplate(DATASET_ID, AEGIS_DATASET_TEMPLATE_ID).finally(function () {
+                    dataSetService.attachTemplate(template).then(function (success) {
+                      growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
+                    }, function (error) {
+                      growl.info(
+                        'Could not attach template to file ' + file.name + '.',
+                        {title: 'Info', ttl: 5000}
+                      );
+                    }).then(function () {
+                      ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                        console.log(jsonldData);
+                        const metaData = { 5: jsonldData };
+                        MetadataRestService.addMetadataWithSchema(
+                          parseInt(dataset.parentId), dataset.name, -1, metaData).then(function () {
+                            console.log('done?')
+                          }, function (error) {
+                            growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+                          });
+                      });
+                    });
+                  });
+                });
+              });
+            };
 
             /**
              * Entry point for saving extended metadata from fields in project-view
