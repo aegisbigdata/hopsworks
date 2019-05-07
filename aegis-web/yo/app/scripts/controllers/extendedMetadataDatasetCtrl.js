@@ -22,7 +22,7 @@
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
+ * software and associated documentation files (the 'Software'), to deal in the Software
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
  * persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -30,7 +30,7 @@
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
  * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -58,27 +58,36 @@ angular.module('hopsWorksApp')
 
             self.rdf = {
               doc: {
-                "http://purl.org/dc/terms/title": {'@id': ''},
-                "http://purl.org/dc/terms/description": {'@id': ''},
-                "http://xmlns.com/foaf/0.1/Agent": {'@id': ''},
+                'http://purl.org/dc/terms/title': {'@id': ''},
+                'http://purl.org/dc/terms/description': {'@id': ''},
+                'http://xmlns.com/foaf/0.1/Agent': {'@id': ''},
                 'http://xmlns.com/foaf/0.1/homepage': {'@id': ''},
-                "http://purl.org/dc/terms/spatial": {'@id': ''},
+                'http://purl.org/dc/terms/spatial': {'@id': ''},
                 'http://purl.org/dc/terms/language': {'@id': ''},
                 'http://purl.org/dc/terms/license': {'@id': ''},
+                'http://xmlns.com/foaf/0.1/currency:': {'@id': ''},
+                'http://xmlns.com/foaf/0.1/keywords': {'@id': ''},
+                'http://purl.org/dc/terms/email': {'@id': ''},
+                'http://purl.org/dc/terms/theme': {'@id': ''},
                 'http://purl.org/dc/terms/modified': '',
               },
               context: {
-                "dcat": "http://www.w3.org/ns/dcat#",
-                "dcterms": "http://purl.org/dc/terms/",
-                "foaf": "http://xmlns.com/foaf/0.1/",
-                "title": {"@id" : "http://purl.org/dc/terms/title"},
-                "homepage": {"@id": "http://xmlns.com/foaf/0.1/homepage", "@type": "@id"},
-                "description": {"@id" : "http://purl.org/dc/terms/description", "@type": "@id"},
-                "publisher" : { "@id": "http://xmlns.com/foaf/0.1/Agent", "@type": "@id"},
-                "spatial": {"@id" : "http://purl.org/dc/terms/spatial", "@type": "@id"},
-                "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
-                "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"},
-                "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
+                'dcat': 'http://www.w3.org/ns/dcat#',
+                'dcterms': 'http://purl.org/dc/terms/',
+                'foaf': 'http://xmlns.com/foaf/0.1/',
+                'title': {'@id' : 'http://purl.org/dc/terms/title'},
+                'homepage': {'@id': 'http://xmlns.com/foaf/0.1/homepage', '@type': '@id'},
+                'description': {'@id' : 'http://purl.org/dc/terms/description', '@type': '@id'},
+                'publisher' : { '@id': 'http://xmlns.com/foaf/0.1/Agent', '@type': '@id'},
+                'spatial': {'@id' : 'http://purl.org/dc/terms/spatial', '@type': '@id'},
+                'language': {'@id': 'http://purl.org/dc/terms/language', '@type': '@id'},
+                'license': {'@id': 'http://purl.org/dc/terms/license', '@type': '@id'},
+                'keywords': {'@id': 'http://xmlns.com/foaf/0.1/keywords', '@type': '@id'},
+                'contactpointmail': {'@id': 'http://purl.org/dc/terms/email', '@type': '@id'},
+                'price': {'@id': 'http://xmlns.com/foaf/0.1/currency', '@type': '@id'},
+                'theme': {'@id': 'http://purl.org/dc/terms/theme', '@type': '@id'},
+                'sellable': {'@id': 'http://purl.org/dc/terms/sellable', '@type': '@id'},
+                'modified' : {'@id' : 'http://purl.org/dc/terms/modified', '@type' : 'http://www.w3.org/2001/XMLSchema#dateTime'}
               }
             };
 
@@ -116,6 +125,7 @@ angular.module('hopsWorksApp')
                 contactpointmail: {
                   label: 'Contact Point Mail',
                   description: 'Lorem ipsum dolor sit amet.',
+                  mapping: 'http://purl.org/dc/terms/email',
                   model: '',
                   recommended: true
                 },
@@ -123,6 +133,7 @@ angular.module('hopsWorksApp')
                   label: 'Keywords',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
                 publishertype: {
@@ -150,17 +161,20 @@ angular.module('hopsWorksApp')
                   label: 'Theme',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/theme',
                   recommended: true
                 },
                 price: {
                   label: 'Price',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/currency',
                   recommended: true
                 },
                 sellable: {
                   label: 'Sellable',
                   description: 'Lorem ipsum dolor sit amet.',
+                  mapping: 'http://xmlns.com/foaf/0.1/sellable',
                   model: '',
                   recommended: true
                 },
@@ -205,7 +219,7 @@ angular.module('hopsWorksApp')
             var dataSetService = DataSetService($routeParams.projectID);
 
             //update the current template whenever other users make changes
-            var listener = $rootScope.$on("template.change", function (event, response) {
+            var listener = $rootScope.$on('template.change', function (event, response) {
               try {
                 var incomingTemplateId = JSON.parse(response.board).templateId;
 
@@ -222,7 +236,7 @@ angular.module('hopsWorksApp')
              * So on the controller destroy event deregister the rootscope listener manually.
              * @returns {undefined}
              */
-            $scope.$on("$destroy", function () {
+            $scope.$on('$destroy', function () {
               listener();
             });
 
@@ -275,16 +289,19 @@ angular.module('hopsWorksApp')
 
             /**
              * Entry point for saving extended metadata from fields in project-view
-             * Is triggered on clicking the "Save Metadata" button
+             * Is triggered on clicking the 'Save Metadata' button
              */
 
             self.saveExtendedMetadata = function () {
               if (!$scope.form.extendedMetadata.$valid) {
-                console.warn("Can't submit form - missing or invalid fields!");
+                console.warn('Can"t submit form - missing or invalid fields!');
                 return;
               }
 
-              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context);
+              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context)
+                .then((result) => {
+                  console.log(JSON.stringify(JSON.parse(result), null, 2));
+                })
             };
           }
         ]);
