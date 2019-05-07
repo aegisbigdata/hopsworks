@@ -352,6 +352,7 @@ angular.module('hopsWorksApp')
 
             var datePicker = function () {
               $(function () {
+                $('body').on('click', function(){console.log('yeah')})
                 $('[type="datepicker"]').datetimepicker({format: 'DD/MM/YYYY'});
                 $("#datepicker1").on("dp.change", function (e) {
                   $('#datepicker2').data("DateTimePicker").minDate(e.date);

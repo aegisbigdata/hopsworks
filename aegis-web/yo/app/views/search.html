@@ -39,10 +39,10 @@
 
 <div class="" ng-class="{'container content-wrapper': !projectView, 'container-fluid project-content-wrapper': projectView}">
     <section class="col-md-4 navbar-search">
-        <nav class="navbar">
-         <div class="row navbar-search">
+        <nav class="navbar col-md-12">
+         <div class="row navbar-search col-md-12">
             <div class="col-md-4">
-                <h4 class="ng-bindings">Filters</h4>
+                <h3 class="ng-bindings no-mrg">Filters</h4>
             </div>  
             <div class="pull-right col-md-4">
               <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block"
@@ -53,49 +53,117 @@
                               searchOwner=undefined;">RESET ALL</button>
             </div>
         </div>
-        <div class="container-fluid">
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">Type</li>
-                    <a class="filter-menu" 
+        <div class="navbar-container col-md-11">
+            <form action="" class="navbar-form-search">
+                <div class="navbar-search-header">Type</div>
+                <div class="navbar-search-radio">
+                    <div><input type="radio" id="Project" name="type" value="Project"
+                       class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='proj';">Project</a><br/>
-                    <a class="filter-menu" 
+                       ng-click="searchTypePub=undefined; searchType='proj';"><label for="Project">Project</label></div>
+                    <div><input type="radio" id="Dataset" name="type" value="Dataset"
+                       class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='ds';">Dataset</a><br/>
-                    <a class="filter-menu"
+                       ng-click="searchTypePub=undefined; searchType='ds';"><label for="Dataset">Dataset</label></div>
+                    <div><input type="radio" id="Files" name="type" value="Files"
+                       class="filter-menu"
                        data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="">Files</a><br/>
-            </ul>
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">Ownership</li>
-                    <a class="filter-menu" 
+                       ng-click=""><label for="Files">Files</label></div>
+                </div>
+            </form>
+            <form action="" class="navbar-form-search">
+                <div class="navbar-search-header">Ownership</div>
+                <div class="navbar-search-radio">
+                    <div><input type="radio" id="MyAssets" name="ownership" value="MyAssets"
+                       class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="">My Assets</a><br/>
-                    <a class="filter-menu" 
+                       ng-click="searchTypePub=undefined; searchType='proj';"><label for="MyAssets">My Assets</label></div>
+                    <div><input type="radio" id="Assetssharedwithme" name="ownership" value="Dataset"
+                       class="filter-menu" 
                        data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="">Assets shared with me</a><br/>
-                    <a class="filter-menu"
+                       ng-click="searchTypePub=undefined; searchType='ds';"><label for="Assetssharedwithme">Assets shared with me</label></div>
+                    <div><input type="radio" id="Noaccess" name="ownership" value="Noaccess"
+                       class="filter-menu"
                        data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="">No access</a><br/>
-            </ul>
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">Date added to AEGIS</li>
-                    <a class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="">AS RANGE</a><br/>
-            </ul>
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">File Types</li>
-            </ul>
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">Spatial</li>
-            </ul>
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">License</li>
-            </ul>
-            <ul class="navbar-ul-search">
-                <li class="dropdown-search-header">Price/Sellable</li>
-            </ul>
+                       ng-click=""><label for="Noaccess">No access</label></div>
+                </div>
+            </form>
+            <form action="" class="navbar-form-search">
+                <div class="navbar-search-header">Date added to AEGIS</div>
+                <div class="input-date-group">
+                      <div class="input-date"><i class="far fa-calendar" for="datepicker1"></i><input type="datepicker" class="form-date-control" id="datepicker1" placeholder="From date"><i class="fas fa-chevron-down" for="datepicker1" style="position: absolute; right: 10px"></i></div>
+                      <div class="input-date"><i class="far fa-calendar" for="datepicker1"></i><input type="datepicker" class="form-date-control" id="datepicker2" placeholder="To date"><i class="fas fa-chevron-down" for="datepicker1" style="position: absolute; right: 10px"></i></div>
+                </div>
+            </form> 
+            <form action="" class="navbar-form-search">
+                <div  class="navbar-search-header">
+                    <div class="search-header">File Types</div>
+                    <button class="btn btn-link"
+                               ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
+                        SELECT ALL
+                    </button>
+                </div>
+                <div class="navbar-search-radio">
+                    <div><input type="radio" id="CSV" name="filetypes" value="CSV"><label for="CSV">CSV</label></div>
+                    <div><input type="radio" id="WMS" name="filetypes" value="WMS"><label for="WMS">WMS</label></div>
+                    <div><input type="radio" id="WFS" name="filetypes" value="WFS"><label for="WFS">WFS</label></div>
+                    <div><input type="radio" id="TXT" name="filetypes" value="TXT"><label for="TXT">TXT</label></div>
+                    <div><input type="radio" id="HTML" name="filetypes" value="HTML"><label for="HTML">HTML</label></div>
+                    <div class="navbar-search-radio-more">
+                        <span>More</span>
+                        <span type="button" class="btn btn-xs fas fa-sort-down pull-right"
+                              data-toggle="collapse" 
+                              data-target="""> </span>
+                    </div>
+                </div>
+            </form>
+            <form action="" class="navbar-form-search">
+                <div  class="navbar-search-header">
+                    <div class="search-header">License</div>
+                    <button class="btn btn-link"
+                               ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
+                        SELECT ALL
+                    </button>
+                </div>
+                <div class="navbar-search-radio">
+                    <div><input type="radio" id="license1" name="license" value="license1"><label for="license1">CC BT 3.0 Austria</label></div>
+                    <div><input type="radio" id="license2" name="license" value="license2"><label for="license2">CC-BY 4.0</label></div>
+                    <div><input type="radio" id="license3" name="license" value="license3"><label for="license3">CC-BY 3.0 NL</label></div>
+                    <div><input type="radio" id="license4" name="license" value="license4"><label for="license4">CC-BY-NC 4.0</label></div>
+                    <div><input type="radio" id="license5" name="license" value="license5"><label for="license5">CC-BY-NC-ND 4.0</label></div>
+                    <div class="navbar-search-radio-more">
+                        <span>More</span>
+                        <span type="button" class="btn btn-xs fas fa-sort-down pull-right"
+                              data-toggle="collapse" 
+                              data-target="""> </span>
+                    </div>
+                </div>
+            </form>
+            <form action="" class="navbar-form-search">
+                <div class="navbar-search-header-slider">Price/Sellable</div>
+                <div class="col-md-12 navbar-search-slider">
+                    <div class="slider-space">
+                            <rzslider id="dynexecslider" style="margin-top: 30px;"
+                                rz-slider-model="1" rz-slider-high="1000">
+                            </rzslider>
+                        </div>
+                </div>
+            </form>
+            <form action="" class="navbar-form-search">
+                <div class="navbar-search-header">Spatial</div>
+                
+            </form>
+            
+            <!-- <li class="dropdown-search-header">Date Created</li>
+            <li> 
+              <div class="input-group">
+                <label class="sr-only" for="from">From</label>
+                <input type="datepicker" class="form-control" id="datepicker1" placeholder="From date">
+                <span  class="input-group-addon">-</span>
+                <label class="sr-only" for="to">To</label>
+                <input type="datepicker" class="form-control" id="datepicker2" placeholder="To date">
+              </div>
+            </li> -->
             <!--
           <ul>
                 <li class="dropdown-search-header">Type</li>
