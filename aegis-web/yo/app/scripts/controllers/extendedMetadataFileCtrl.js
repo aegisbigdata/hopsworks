@@ -177,23 +177,24 @@ angular.module('hopsWorksApp')
                     inodePath: distribution.path
                   };
                   dataSetService.detachTemplate(DISTRIBUTION_ID, AEGIS_DISTRIBUTION_TEMPLATE_ID).finally(function () {
-                    dataSetService.attachTemplate(template).then(function (success) {
-                      growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
-                    }, function (error) {
-                      growl.info(
-                        'Could not attach template to file ' + file.name + '.',
-                        {title: 'Info', ttl: 5000}
-                      );
-                    }).then(function () {
-                      ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                    dataSetService.attachTemplate(template).then(function () {
+                      ExtendedMetadataService.saveExtendedMetadata(data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
                         const metaData = { 5: jsonldData };
                         MetadataRestService.addMetadataWithSchema(
                           parseInt(distribution.parentId), distribution.name, -1, metaData).then(function () {
-                            console.log('done?')
+                            growl.success(
+                              'Done saving.',
+                              {title: 'Success', ttl: 1000}
+                            );
                           }, function (error) {
-                            growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+                            growl.error('Metadata could not be saved', {title: 'Error', ttl: 1000});
                           });
                       });
+                    }).catch(function (error) {
+                      growl.error(
+                        'Could not save. Attach template failed.',
+                        {title: 'Error', ttl: 5000}
+                      );
                     });
                   });
 
