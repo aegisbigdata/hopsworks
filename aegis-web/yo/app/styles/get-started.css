@@ -1,3 +1,7 @@
+.getStarted .nav {
+    margin-top: 20px;
+}
+
 .wiki-navigation{
     position: absolute;
     left: 30px;
@@ -13,11 +17,6 @@
     border-left: 5px solid #0492b3;
     overflow-y: auto;
     height: 100%;
-}
-
-.wiki-main{
-    width: 50%;
-    margin-left: 25%;
 }
 
 .sidebar-selected{
