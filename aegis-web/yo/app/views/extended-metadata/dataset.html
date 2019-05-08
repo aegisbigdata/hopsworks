@@ -205,7 +205,11 @@
 
                                             <div class="form-group">
                                                 <label for="inputKeywords3">Keywords</label>
-                                                <input type="text" class="form-control" id="inputKeywords3" placeholder="Keywords, comma-separated" ng-model="data.fields.keywords.model" ng-focus="extendedMetadataCtrl.onFieldFocus('keywords')">
+                                                <tags-input 
+                                                  ng-model="data.fields.keywords.tags"
+                                                  placeholder="Add a keyword"
+                                                  on-tag-added="updateTags($tag)" on-tag-removed="updateTags($tag)">
+                                                </tags-input>
                                             </div>
 
                                             <div class="form-group bs-callout">
