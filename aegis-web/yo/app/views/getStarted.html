@@ -6,22 +6,25 @@
     </div>
   </div>
 
-  <div class="container-fluid" ng-if="!mainCtrl.showSearchPage">
-    <div class="row-fluid">
-      <div class="bs-docs-sidebar">
-        <ul class="nav nav-stacked fixed">
-          <li class="sidebar-header-0">Table of Contents</li>
-          <li class="sidebar-header-1"><a href="/#!/getStarted#a.-quick-introduction-to-the-aegis-tools"
-              target="_self">A. Quick Introduction to the AEGIS tools</a></li>
-          <li class="sidebar-header-1"><a href="/#!/getStarted#b.-getting-started-workflow">B. Getting started
-              workflow</a></li>
-          <li class="sidebar-header-2"><a href="/#!/getStarted#part-1---first-visit-step-by-step">Part 1 - First visit
-              step by step</a></li>
-          <li class="sidebar-header-2"><a href="/#!/getStarted#part-2---advanced-options">Part 2 - Advanced options</a>
-          </li>
-        </ul>
+  <div class="container getStarted" ng-if="!mainCtrl.showSearchPage">
+    <div class="row">
+      <div class="col-md-3">
+          <div class="home-sidebar">
+              <ul class="nav nav-stacked">
+                <li class="sidebar-header-0">Table of Contents</li>
+                <li class="sidebar-header-1"><a href="#!/getStarted#a.-quick-introduction-to-the-aegis-tools"
+                    target="_self">A. Quick Introduction to the AEGIS tools</a></li>
+                <li class="sidebar-header-1"><a href="#!/getStarted#b.-getting-started-workflow">B. Getting started
+                    workflow</a></li>
+                <li class="sidebar-header-2"><a href="#!/getStarted#part-1---first-visit-step-by-step">Part 1 - First visit
+                    step by step</a></li>
+                <li class="sidebar-header-2"><a href="#!/getStarted#part-2---advanced-options">Part 2 - Advanced options</a>
+                </li>
+              </ul>
+            </div>
       </div>
-      <div class="span9 wiki-main" style="border-left: 1px dashed lightgrey; padding-left: 15px;">
+      
+      <div class="col-md-9 home-content-dashed">
         <h1 id="a.-quick-introduction-to-the-aegis-tools"><a class="header-link"
             href="#a.-quick-introduction-to-the-aegis-tools"></a>A. Quick Introduction to the AEGIS tools</h1>
         <p>AEGIS offers various tools to address the diverse needs of its users:</p>
