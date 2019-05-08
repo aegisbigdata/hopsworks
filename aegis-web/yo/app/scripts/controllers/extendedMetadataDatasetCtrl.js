@@ -94,7 +94,6 @@ angular.module('hopsWorksApp')
               }
             };
 
-            $scope.tags = [{text: 'tag'}, {text: 'B'}, {text: 'C'}];
             $scope.form = {};
             $scope.data = {
               fields: {
@@ -317,53 +316,61 @@ angular.module('hopsWorksApp')
              */
             self.saveExtendedDatasetMetadata = function () {
               dataSetService.getAllDatasets().then(function (allDatasets) {
-                const tasks = allDatasets.data.map(function (dataset) {
-                  return dataSetService.getContents(dataset.name);
-                });
-                Promise.all(tasks).then(function (contents) {
-                  let dataset;
+                // const tasks = allDatasets.data.map(function (dataset) {
+                //   console.log('tasks:', dataset);
+                //   return dataSetService.getContents(dataset.name);
+                // });
+                // 
+                console.log('allDatasets', allDatasets);
+                let dataset = allDatasets.data.filter(ds => ds.id == DATASET_ID)[0];
 
-                  contents = contents.map(function (content) {
-                    return content.data;
-                  }).reduce(function (acc, val) {
-                    // flatten result array
-                    return acc.concat(val);
-                  }, []);
+                if (!dataset) return;
+                // contents = contents.map(function (content) {
+                //   return content.data;
+                // }).reduce(function (acc, val) {
+                //   // flatten result array
+                //   return acc.concat(val);
+                // }, []);
 
-                  // find metadata object for this dataset id
-                  for (let i = 0; i < contents.length; i++) {
-                    if (contents[i].id == DATASET_ID) {
-                      dataset = contents[i];
-                      break;
-                    }
-                  }
+                // console.log(DATASET_ID);
+                // console.log('contents', contents);
 
-                  let template = {
-                    templateId: AEGIS_DATASET_TEMPLATE_ID,
-                    inodePath: dataset.path
-                  };
-                  dataSetService.detachTemplate(DATASET_ID, AEGIS_DATASET_TEMPLATE_ID).finally(function () {
-                    dataSetService.attachTemplate(template).then(function (success) {
-                      growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
-                    }, function (error) {
-                      growl.info(
-                        'Could not attach template to file ' + file.name + '.',
-                        {title: 'Info', ttl: 5000}
-                      );
-                    }).then(function () {
-                      ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
-                        console.log(jsonldData);
-                        const metaData = { 5: jsonldData };
-                        MetadataRestService.addMetadataWithSchema(
-                          parseInt(dataset.parentId), dataset.name, -1, metaData).then(function () {
-                            console.log('done?')
-                          }, function (error) {
-                            growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
-                          });
-                      });
+                // find metadata object for this dataset id
+                // for (let i = 0; i < contents.length; i++) {
+                //   if (contents[i].id == DATASET_ID) {
+                //     dataset = contents[i];
+                //     break;
+                //   }
+                // }
+
+                console.log('dataset:', dataset);
+
+                let template = {
+                  templateId: AEGIS_DATASET_TEMPLATE_ID,
+                  inodePath: dataset.path
+                };
+                dataSetService.detachTemplate(DATASET_ID, AEGIS_DATASET_TEMPLATE_ID).finally(function () {
+                  dataSetService.attachTemplate(template).then(function (success) {
+                    growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
+                  }, function (error) {
+                    growl.info(
+                      'Could not attach template',
+                      {title: 'Info', ttl: 5000}
+                    );
+                  }).then(function () {
+                    ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                      console.log(jsonldData);
+                      const metaData = { 5: jsonldData };
+                      MetadataRestService.addMetadataWithSchema(
+                        parseInt(dataset.parentId), dataset.name, -1, metaData).then(function () {
+                          console.log('done?')
+                        }, function (error) {
+                          growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+                        });
                     });
                   });
                 });
+
               });
             };
 
@@ -378,10 +385,12 @@ angular.module('hopsWorksApp')
                 return;
               }
 
-              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context)
-                .then((result) => {
-                  console.log(JSON.stringify(JSON.parse(result), null, 2));
-                })
+              self.saveExtendedDatasetMetadata();
+
+              // ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context)
+              //   .then((result) => {
+              //     console.log(JSON.stringify(JSON.parse(result), null, 2));
+              //   })
             };
           }
         ]);
