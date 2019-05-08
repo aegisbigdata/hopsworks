@@ -216,24 +216,24 @@
                                 <form>
                                     <div class="form-group">
                                         <label for="inputTypeOfData" class="control-label">Type of data</label>
-                                        <select required id="inputTypeOfData" class="form-control" ng-model="vm.metadataExtendedDistribution.typeOfData">
+                                        <select required id="inputTypeOfData" class="form-control" ng-model="data.fields.typeannotation.model.typeOfData">
                                             <option value="" disabled selected>Select type of data...</option>
                                             <option value="tabular">Tabular data</option>
                                             <option value="other">Other</option>
                                         </select>
                                     </div>
 
-                                    <div class="form-group" ng-if="vm.metadataExtendedDistribution.typeOfData == 'tabular'">
+                                    <div class="form-group" ng-if="data.fields.typeannotation.model.typeOfData == 'tabular'">
                                         <label for="checkboxHasHeader" class="col-sm-4 control-label">Has header</label>
                                         <div class="col-sm-6">
                                             <md-checkbox class="md-primary" aria-label="Has header" style="margin-top: 0px"></md-checkbox>
                                         </div>
                                     </div>
 
-                                    <div class="row" ng-if="vm.metadataExtendedDistribution.typeOfData == 'tabular'">
+                                    <div class="row" ng-if="data.fields.typeannotation.model.typeOfData == 'tabular'">
                                         <div class=col-sm-12>
                                             <h4 style="margin-bottom: 15px;">Fields
-                                                <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.push({})"
+                                                <button type="button" class="btn btn-default" ng-click="data.fields.typeannotation.model.fields.push({})"
                                                     style="float: right">
                                                     <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
                                             </h4>
@@ -252,8 +252,7 @@
                                                     </thead>
 
                                                     <tbody>
-                                                        <!--tr ng-repeat="field in vm.metadataExtendedDistribution.fields">-->
-                                                        <tr>
+                                                        <tr ng-repeat="field in data.fields.typeannotation.model.fields">
                                                             <td>
                                                                 <md-checkbox class="md-primary" ng-checked="field.primary"
                                                                     ng-click="field.primary = !field.primary"
@@ -293,7 +292,7 @@
                                                                 </select>
                                                             </td>
                                                             <td>
-                                                                <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.splice($index, 1)">
+                                                                <button type="button" class="btn btn-default" ng-click="data.fields.typeannotation.model.fields.splice($index, 1)">
                                                                     <i class="fa fa-trash"></i>
                                                                 </button>
                                                             </td>

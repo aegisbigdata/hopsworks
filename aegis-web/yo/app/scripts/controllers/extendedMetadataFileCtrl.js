@@ -60,7 +60,8 @@ angular.module('hopsWorksApp')
                 "http://purl.org/dc/terms/format": {'@id': ''},
                 "http://xmlns.com/foaf/0.1/Agent": {'@id': ''},
                 'http://purl.org/dc/terms/language': {'@id': ''},
-                'http://purl.org/dc/terms/license': {'@id': ''}
+                'http://purl.org/dc/terms/license': {'@id': ''},
+                'http://purl.org/dc/terms/typeannotation': {'@id': ''}
               },
               context: {
                 "dcat": "http://www.w3.org/ns/dcat#",
@@ -115,6 +116,15 @@ angular.module('hopsWorksApp')
                   optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
+                },
+                typeannotation: {
+                  label: 'Type of Data',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: {
+                    fields: []
+                  },
+                  mapping: 'http://purl.org/dc/terms/typeannotation',
+                  recommended: true
                 }
               },
               bounds: null
@@ -128,18 +138,32 @@ angular.module('hopsWorksApp')
             self.loadExtendedDistroMetadata = function () {
               MetadataRestService.getMetadata(DISTRIBUTION_ID).then(function (distributionMetadata) {
                 if (!distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME] ||
-                    !distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload) {
+                    !distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload.length) {
                   return;
                 }
 
                 let data = distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload[0];
-                data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
+                // what we get back isn't proper stringified JSON, so we need to unmangle it before parsing
+                data = JSON.parse(data
+                  .replace(/\\@/g, '"@')
+                  .replace(/\\:\\/g, '":"')
+                  .replace(/\\:/g, '":')
+                  .replace(/\{\\/g, '\{"')
+                  .replace(/\\\{/g, '\"}')
+                  .replace(/\\\}/g, '"\}')
+                  .replace(/,\\/g, ',"')
+                  .replace(/\\,/g, '",')
+                  .replace(/"\\\\/g, '\\"')
+                  .replace(/\\\\"/g, '\\"'))['@graph'][0];
 
                 for (var key in data) {
                   if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
                     if (data[key] === './') continue;
                     $scope.data.fields[key].model = data[key].substr(1);
                   }
+                }
+                if (data['dcterms:typeannotation']) {
+                  $scope.data.fields.typeannotation.model = JSON.parse(data['dcterms:typeannotation']['@id']);
                 }
 
               });
@@ -150,6 +174,9 @@ angular.module('hopsWorksApp')
              * Saves form data in JSON-LD format as metadata with hopsworks
              */
             self.saveExtendedDistroMetadata = function () {
+              let data = $scope.data;
+              data.fields.typeannotation.model = JSON.stringify(data.fields.typeannotation.model);
+
               dataSetService.getAllDatasets().then(function (allDatasets) {
                 const tasks = allDatasets.data.map(function (dataset) {
                   return dataSetService.getContents(dataset.name);
@@ -207,7 +234,7 @@ angular.module('hopsWorksApp')
             /**
              * Helper function to filter fields by type
              */
-            
+
             $scope.fieldFilter = function (filter) {
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
             }
