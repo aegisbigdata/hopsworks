@@ -127,3 +127,13 @@ div.job-content--page {
 .job-content--text-muted {
   text-align: center;
 }
+
+.page-python .nav-tabs {
+  background: inherit;
+  height: inherit;
+  box-shadow: inherit;
+}
+
+.page-python a.nav-link {
+  height: inherit;
+}
