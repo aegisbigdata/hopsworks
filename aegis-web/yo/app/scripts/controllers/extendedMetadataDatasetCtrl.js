@@ -94,6 +94,7 @@ angular.module('hopsWorksApp')
               }
             };
 
+            $scope.tags = [{text: 'tag'}, {text: 'B'}, {text: 'C'}];
             $scope.form = {};
             $scope.data = {
               fields: {
@@ -136,6 +137,7 @@ angular.module('hopsWorksApp')
                   label: 'Keywords',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  tags: [],
                   mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
@@ -268,14 +270,23 @@ angular.module('hopsWorksApp')
 
             /**
              * Helper function to filter fields by type
-             * @param  {[type]} filter [description]
-             * @return {[type]}        [description]
              */
             
             $scope.fieldFilter = function (filter) {
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
-            }
+            };
 
+
+            /**
+             * Generate list of comma-separated tags from tag-input field and set keywords model
+             */
+
+            $scope.updateTags = function (tag) {
+              var tags = $scope.data.fields.keywords.tags;
+              $scope.data.fields.keywords.model = tags.map(function(tag){
+                return tag.text;
+              }).join(',');
+            };
 
             /**
              * Loads from data from JSON-LD format into page

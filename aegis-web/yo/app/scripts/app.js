@@ -78,7 +78,8 @@ angular.module('hopsWorksApp', [
   'ngFileSaver',
   'ngFileUpload',
   'googlechart',
-  'moment-picker'
+  'moment-picker',
+  'ngTagsInput'
 ])
         .config(['$routeProvider', '$httpProvider', '$compileProvider', 'flowFactoryProvider', 'accordionConfig',
           function ($routeProvider, $httpProvider, $compileProvider, flowFactoryProvider, accordionConfig) {

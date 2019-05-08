@@ -1,0 +1,16 @@
+/**
+ * Auto-included css of plugin seems broken. 
+ * This CSS file fixes tag-input field display and tag styles 
+ */
+
+tags-input .host {
+  height: auto;
+}
+
+tags-input .tags {
+  height: auto;
+}
+
+tags-input .tags .tag-item .remove-button {
+  display: inline;
+}
