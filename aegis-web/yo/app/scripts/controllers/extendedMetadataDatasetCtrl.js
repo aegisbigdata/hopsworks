@@ -40,7 +40,7 @@
 'use strict';
 
 const AEGIS_DATASET_TEMPLATE_ID = 14;
-const AEGIS_DATASET_TEMPLATE_NAME = 'aegis-dataset';
+const AEGIS_DATASET_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataDatasetCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
@@ -243,20 +243,6 @@ angular.module('hopsWorksApp')
             $scope.$on('$destroy', function () {
               listener();
             });
-
-
-            /**
-             *  Initially get existing extended metadata for project with PROJECT_ID from Service
-             *  WIP until Service is working / API endpoints are defined
-             */
-
-            // ExtendedMetadataService.getExtMetadataForProject(PROJECT_ID)
-            //   .then(function (response) {
-            //      self.setExtendedMetadata(response.data);
-            //   })
-            //   .catch(function (error) {
-            //     console.log(error);
-            //   });
             
             self.onFieldFocus = function (field) {
               self.selectedField = field;
@@ -303,47 +289,25 @@ angular.module('hopsWorksApp')
                 for (var key in data) {
                   if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
                     if (data[key] === './') continue;
-                    $scope.data.fields[key].model = data[key].substr(1);
+                    if (typeof(data[key]) === 'string') {
+                      $scope.data.fields[key].model = data[key].substr(1);
+                    } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
+                      $scope.data.fields[key].model = data[key]['@id'].substr(1);
+                    }
                   }
                 }
               });
             };
 
-            // self.loadExtendedDistroMetadata();
+            self.loadExtendedDistroMetadata();
 
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks
              */
             self.saveExtendedDatasetMetadata = function () {
               dataSetService.getAllDatasets().then(function (allDatasets) {
-                // const tasks = allDatasets.data.map(function (dataset) {
-                //   console.log('tasks:', dataset);
-                //   return dataSetService.getContents(dataset.name);
-                // });
-                // 
-                console.log('allDatasets', allDatasets);
                 let dataset = allDatasets.data.filter(ds => ds.id == DATASET_ID)[0];
-
                 if (!dataset) return;
-                // contents = contents.map(function (content) {
-                //   return content.data;
-                // }).reduce(function (acc, val) {
-                //   // flatten result array
-                //   return acc.concat(val);
-                // }, []);
-
-                // console.log(DATASET_ID);
-                // console.log('contents', contents);
-
-                // find metadata object for this dataset id
-                // for (let i = 0; i < contents.length; i++) {
-                //   if (contents[i].id == DATASET_ID) {
-                //     dataset = contents[i];
-                //     break;
-                //   }
-                // }
-
-                console.log('dataset:', dataset);
 
                 let template = {
                   templateId: AEGIS_DATASET_TEMPLATE_ID,
@@ -354,12 +318,11 @@ angular.module('hopsWorksApp')
                     growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
                   }, function (error) {
                     growl.info(
-                      'Could not attach template',
+                      'Could not attach template.',
                       {title: 'Info', ttl: 5000}
                     );
                   }).then(function () {
                     ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
-                      console.log(jsonldData);
                       const metaData = { 5: jsonldData };
                       MetadataRestService.addMetadataWithSchema(
                         parseInt(dataset.parentId), dataset.name, -1, metaData).then(function () {
@@ -370,7 +333,6 @@ angular.module('hopsWorksApp')
                     });
                   });
                 });
-
               });
             };
 
