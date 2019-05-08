@@ -289,9 +289,20 @@ angular.module('hopsWorksApp')
                 for (var key in data) {
                   if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
                     if (data[key] === './') continue;
-                    if (typeof(data[key]) === 'string') {
+                    
+                    if (key == 'keywords') {
+                      // Keywords field
+                      var cleaned_keywords = data[key].substr(1);
+                      var taglist = cleaned_keywords.split(',');
+                      $scope.data.fields[key].model = cleaned_keywords;                                         
+                      $scope.data.fields[key].tags = taglist.map(tag => {
+                        return {text: tag};
+                      });
+                    } else if (typeof(data[key]) === 'string') {
+                      // Standard string field
                       $scope.data.fields[key].model = data[key].substr(1);
                     } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
+                      // Nested object with @id property
                       $scope.data.fields[key].model = data[key]['@id'].substr(1);
                     }
                   }
