@@ -39,7 +39,8 @@
 
 'use strict';
 
-
+const AEGIS_PROJECT_TEMPLATE_ID = 14;
+const AEGIS_PROJECT_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
@@ -54,7 +55,6 @@ angular.module('hopsWorksApp')
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
-            // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
 
             self.rdf = {
               doc: {
@@ -171,19 +171,6 @@ angular.module('hopsWorksApp')
               listener();
             });
 
-
-            /**
-             *  Initially get existing extended metadata for project with PROJECT_ID from Service
-             *  WIP until Service is working / API endpoints are defined
-             */
-
-            // ExtendedMetadataService.getExtMetadataForProject(PROJECT_ID)
-            //   .then(function (response) {
-            //      self.setExtendedMetadata(response.data);
-            //   })
-            //   .catch(function (error) {
-            //     console.log(error);
-            //   });
             
             self.onFieldFocus = function (field) {
               self.selectedField = field;
@@ -221,6 +208,82 @@ angular.module('hopsWorksApp')
 
 
             /**
+             * Loads from data from JSON-LD format into page
+             */
+            self.loadExtendedDistroMetadata = function () {
+              MetadataRestService.getMetadata(4500621).then(function (datasetMetadata) {
+
+                console.log(datasetMetadata);
+                if (!datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME] ||
+                    !datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME].metadata.payload.length) {
+                  console.log('No metadata available.');
+                  return;
+                }
+
+                let data = datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME].metadata.payload[0];
+                data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
+
+                for (var key in data) {
+                  if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
+                    if (data[key] === './') continue;
+                    
+                    if (typeof(data[key]) === 'string') {
+                      // Standard string field
+                      $scope.data.fields[key].model = data[key].substr(1);
+                    } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
+                      // Nested object with @id property
+                      $scope.data.fields[key].model = data[key]['@id'].substr(1);
+                    }
+                  }
+                }
+              });
+            };
+
+            // self.loadExtendedDistroMetadata();
+
+
+            /**
+             * Saves form data in JSON-LD format as metadata with hopsworks
+             */
+            
+            self.saveExtendedProjectMetadata = function () {
+              ProjectService.get({}, {'id': PROJECT_ID}).$promise.then(
+                function (project) {
+                  console.log(project);
+
+                  let template = {
+                    templateId: AEGIS_PROJECT_TEMPLATE_ID,
+                    inodePath: '/Projects/' + project.projectName
+                  };
+
+                  dataSetService.detachTemplate(project.inodeid, AEGIS_PROJECT_TEMPLATE_ID).finally(function () {
+                    dataSetService.attachTemplate(template).then(function (success) {
+                      growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
+                    }, function (error) {
+                      growl.info(
+                        'Could not attach template.',
+                        {title: 'Info', ttl: 5000}
+                      );
+                    }).then(function () {
+                      ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                        const metaData = { 5: jsonldData };
+                        MetadataRestService.addMetadataWithSchema(
+                          parseInt(project.inodeid), project.projectName, -1, metaData).then(function () {
+                            console.log('done?')
+                          }, function (error) {
+                            growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+                          });
+                      });
+                    });
+                  });
+                },
+                function(error) {
+                  console.log(error);
+                });
+            };
+
+
+            /**
              * Entry point for saving extended metadata from fields in project-view
              * Is triggered on clicking the "Save Metadata" button
              */
@@ -231,10 +294,7 @@ angular.module('hopsWorksApp')
                 return;
               }
 
-              ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context)
-                .then((result) => {
-                  console.log(JSON.stringify(JSON.parse(result), null, 2));
-                })
+              self.saveExtendedProjectMetadata();
             };
           }
         ]);
