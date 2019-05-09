@@ -59,8 +59,8 @@ angular.module('hopsWorksApp')
         }
 
         // Set modified, spatial properties
-        if (data.bounds) {
-          doc[data.fields.spatial.mapping]['@id'] = JSON.stringify(data.bounds);
+        if (data.areaSelect) {
+          doc[data.fields.spatial.mapping]['@id'] = data.areaSelect._width + ', ' + data.areaSelect._height + ', ' + data.areaSelect.center.lat + ', ' + data.areaSelect.center.lng + ', ' +data.areaSelect.zoom;
         }
 
         doc[modifiedKey] = (new Date()).toISOString();

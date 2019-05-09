@@ -51,13 +51,11 @@ angular.module('hopsWorksApp')
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
             const DATASET_ID = $routeParams.dataSetID;
-
             var self = this;
 
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
-            // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
 
             self.rdf = {
               doc: {
@@ -215,7 +213,8 @@ angular.module('hopsWorksApp')
                   optional: true
                 },
               },
-              bounds: null
+              bounds: null,
+              areaSelect: null
             };
 
             self.attachedDetailedTemplateList = [];
@@ -235,11 +234,13 @@ angular.module('hopsWorksApp')
               }
             });
 
+
             /*
              * Rootscope events are not deregistered when the controller dies.
              * So on the controller destroy event deregister the rootscope listener manually.
              * @returns {undefined}
              */
+            
             $scope.$on('$destroy', function () {
               listener();
             });
@@ -252,6 +253,7 @@ angular.module('hopsWorksApp')
                 $scope.selectedFieldDescription = $scope.data.fields[field].description;
               }
             };
+
 
             /**
              * Helper function to filter fields by type
@@ -273,6 +275,7 @@ angular.module('hopsWorksApp')
               }).join(',');
             };
 
+
             /**
              * Loads from data from JSON-LD format into page
              */
@@ -290,7 +293,13 @@ angular.module('hopsWorksApp')
                   if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
                     if (data[key] === './') continue;
                     
-                    if (key == 'keywords') {
+                    if (key == 'spatial') {
+                      var cleaned_spatial = data[key].substr(1);
+                      var args = cleaned_spatial.split(',');
+                      args = args.map(e => parseFloat(e));
+                      $scope.data.areaSelect = { _width: args[0], _height: args[1], center: { lat: args[2], lng: args[3] }, raw: cleaned_spatial };
+                      $scope.data.mapCenter = { lat: args[2], lng: args[3], zoom: args[4] };
+                    } else if (key == 'keywords') {
                       // Keywords field
                       var cleaned_keywords = data[key].substr(1);
                       var taglist = cleaned_keywords.split(',');
@@ -315,6 +324,7 @@ angular.module('hopsWorksApp')
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks
              */
+            
             self.saveExtendedDatasetMetadata = function () {
               dataSetService.getAllDatasets().then(function (allDatasets) {
                 let dataset = allDatasets.data.filter(ds => ds.id == DATASET_ID)[0];
@@ -359,11 +369,6 @@ angular.module('hopsWorksApp')
               }
 
               self.saveExtendedDatasetMetadata();
-
-              // ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context)
-              //   .then((result) => {
-              //     console.log(JSON.stringify(JSON.parse(result), null, 2));
-              //   })
             };
           }
         ]);
