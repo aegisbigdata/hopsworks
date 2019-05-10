@@ -137,3 +137,141 @@ div.job-content--page {
 .page-python a.nav-link {
   height: inherit;
 }
+.navbar-search {
+  padding: 12px 0px;
+}
+
+.navbar-form-search {
+  margin-bottom: 10px;
+}
+
+.navbar-search-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: 1px solid lightgrey;
+  font-size: 18px;
+}
+
+.navbar-ul-search {
+  list-style-type: none;
+  margin-left: -55px;
+}
+
+.navbar-container {
+  padding: 0px;
+}
+
+.navbar-ul-search li:first-child {
+  border-top: 1px solid lightgrey;
+}
+
+.navbar-ul-search li {
+  border-bottom: 1px solid lightgrey;
+  border-left: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  padding: 10px 15px;
+}
+
+.navbar-search-radio input[type="radio"]:checked + label{
+  background-color: rgb(4, 146, 179);
+  display: block;
+  color: #ffffff;
+}
+
+.navbar-search-radio-more{
+  background-color: lightgrey;
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.navbar-search-radio input[type="radio"]{
+  display: none;
+}
+
+.navbar-search-radio label {
+  display: block;
+  padding: 10px 20px;
+  border-left: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 0px;
+  color: rgb(4, 146, 179);
+}
+
+.navbar-search-slider {
+  border-left: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 10px;
+}
+
+.navbar-search-slider .slider-space {
+  padding: 15px 0px;
+  width: 285px;
+}
+
+.navbar-search-header-slider {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: 1px solid lightgrey;
+  border-bottom: none;
+  font-size: 18px;
+}
+
+.search-result-header {
+  padding-top: 20px;
+}
+
+.search-result-border {
+  border-left: 1px dashed lightgrey;
+}
+
+.search-result-sort {
+  display: flex;
+  justify-content: right;
+}
+
+.search-form-control {
+  border: none;
+  margin: 10px 0px 10px 10px; 
+}
+
+.no-mrg {
+  margin-top: 0px; 
+}
+
+.input-date {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.input-date-group {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-left: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+}
+
+.form-date-control {
+  border-bottom: 1px solid grey;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  margin: 0px 15px;
+  width: 70%;
+}
+
+.search-header {
+  align-items: center;
+  display: flex;
+}
