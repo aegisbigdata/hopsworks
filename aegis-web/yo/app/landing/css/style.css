@@ -553,6 +553,10 @@ footer {
           align-items: center;
 }
 
+hr { display: block; height: 1px;
+  border: 0; border-top: 1px solid #ccc;
+  margin: 1em 0; padding: 0; }
+
 .footer-box {
   height: 26rem;
   border-right: 1px solid #707070;
@@ -575,7 +579,7 @@ footer {
 }
 
 .footer_project_name {
-  font-size: 3rem;
+  font-size: 2.6rem;
 }
 
 .site-links {
@@ -625,6 +629,18 @@ footer {
   height: 5rem;
   margin-right: 2rem;
 
+}
+
+.footer-text {
+  font-size: 1.3rem;
+  padding: 1rem;
+  text-align: justify;
+  margin-bottom: 1rem;
+}
+
+.footer-mobile {
+  font-size: 1.3rem;
+  text-align: justify;
 }
 
 .footer--button {
