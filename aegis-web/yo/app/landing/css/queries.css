@@ -37,12 +37,13 @@
     .features__card {
         width: 34rem;
         height: 65rem;
-        margin: 1rem;
+        margin: .5rem;
     }
 
     .objectives__card {
         width: 35rem;
         height: 90rem;
+        margin: .5rem;
     }
 
     .project-card {
