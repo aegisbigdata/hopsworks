@@ -300,8 +300,9 @@ section {
 }
 
 .features,
-.objectives {
-  padding-top: 10rem;
+.objectives,
+.project {
+  padding-top: 14rem;
   min-height: 95vh;
 }
 
