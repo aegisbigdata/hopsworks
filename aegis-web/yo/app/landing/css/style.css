@@ -341,8 +341,7 @@ section {
 }
 
 .features__list,
-.objectives__list,
-.project-list {
+.objectives__list {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -363,7 +362,7 @@ section {
 }
 
 .features__card {
-  width: 50rem;
+  width: 45rem;
   height: 60rem;
   border: 3px solid #f4f4f4;
   display: -webkit-box;
@@ -373,7 +372,7 @@ section {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  margin: 2rem;
+  margin: 1rem;
 }
 
 .features__card__image, 
@@ -445,8 +444,8 @@ section {
 }
 
 .objectives__card {
-  width: 55rem;
-  height: 70rem;
+  width: 50rem;
+  height: 75rem;
   border: 3px solid #fff;
   background-color: #fff;
   display: -webkit-box;
@@ -456,7 +455,7 @@ section {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  margin: 2rem;
+  margin: 1rem;
   -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
 }
@@ -482,6 +481,7 @@ section {
 
 .project-list {
   margin-top: 4rem;
+  align-content: center;
 }
 
 .project-card {
@@ -619,8 +619,8 @@ footer {
 }
 
 .footer__socialmedia {
-  width: 6rem;
-  height: 6rem;
+  width: 5rem;
+  height: 5rem;
   margin-right: 2rem;
 
 }
