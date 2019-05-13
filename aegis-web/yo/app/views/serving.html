@@ -108,12 +108,12 @@
                     <i class="fa fa-info-circle" tooltip-placement="auto left"
                       uib-tooltip='Select a model directory. The correct directory structure can be found in the documentation' style="margin-left: 10px"></i>
                   </div>
-                  <div style="margin-top: 7px; heigth: 2em;"><label>Model Name</label></div>
-                  <div style="margin-top: 9px; heigth: 2em;"><label>Model Version</label></div>
-                  <div style="margin-top: 15px; heigth: 2em;" ng-if="servingCtrl.sliderOptions.options.ceil > 1">
+                  <div class="model-serving--name"><label>Model Name</label></div>
+                  <div class="model-serving--version"><label>Model Version</label></div>
+                  <div class="model-serving--instances"  ng-if="servingCtrl.sliderOptions.options.ceil > 1">
                     <label># Instances</label>
                   </div>
-                  <div style="margin-top: 11px; heigth: 2em;"><label ng-click="servingCtrl.showAdvanced()">
+                  <div class="model-serving--advanced"><label ng-click="servingCtrl.showAdvanced()">
                     <span class="glyphicon glyphicon-chevron-right" ng-if="!servingCtrl.showAdvancedForm"></span>
                     <span class="glyphicon glyphicon-chevron-down" ng-if="servingCtrl.showAdvancedForm"></span>
                     Advanced</label>
@@ -137,26 +137,26 @@
               </div>
               <div class="row" ng-if="servingCtrl.showAdvancedForm">
                 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="text-align: right;">
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Request Batching</label></div>
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Kafka Topic</label></div>
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Kafka Num Partitions</label></div>
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Kafka Replication Factor</label></div>
+                  <div class="model-serving--advanced-form"><label>Request Batching</label></div>
+                  <div class="model-serving--advanced-form"><label>Kafka Topic</label></div>
+                  <div class="model-serving--advanced-form"><label>Kafka Num Partitions</label></div>
+                  <div class="model-serving--advanced-form"><label>Kafka Replication Factor</label></div>
                 </div>
 
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-top: 10px">
                   <input type="checkbox" name="requestBatching"
                           ng-model="servingCtrl.editServing.batchingEnabled">
 
-                  <select class="form-control" style="margin-top: 5px; width: 40%" name="kafkaTopicName"
+                  <select class="form-control model-serving--form-kafka" name="kafkaTopicName"
                           ng-model="servingCtrl.editServing.kafkaTopicDTO"
                           ng-options="x.name for x in servingCtrl.projectKafkaTopics"
                           ng-change="servingCtrl.updateKafkaDetails()"></select>
 
-                  <input style="margin-top: 5px; width: 40%" name="kafkaNumPartitions" class="form-control"
+                  <input name="kafkaNumPartitions" class="form-control model-serving--form-kafka"
                          type="number" min="1" ng-model="servingCtrl.editServing.kafkaTopicDTO.numOfPartitions"
                          ng-disabled="servingCtrl.editServing.kafkaTopicDTO.name !== 'CREATE'">
 
-                  <input style="margin-top: 5px; width: 40%" name="kafkaReplicationFactor" class="form-control" type="number"
+                  <input name="kafkaReplicationFactor" class="form-control model-serving--form-kafka" type="number"
                          max="{{servingCtrl.kafkaMaxNumReplicas}}" min="1"
                          ng-model="servingCtrl.editServing.kafkaTopicDTO.numOfReplicas"
                          ng-disabled="servingCtrl.editServing.kafkaTopicDTO.name !== 'CREATE'">
@@ -206,9 +206,9 @@
                   <td>
                     <!-- Start -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Stopped'">
-                      <button style="max-width: 80px;"
+                      <button 
                               ng-click="servingCtrl.startOrStopServing(serving, 'START'); $event.stopPropagation();"
-                              class="btn btn-default btn-sm btn-block">
+                              class="btn btn-default btn-sm btn-block  model-serving--maxwidth">
                         <span style="color: #20AD28" class="glyphicon glyphicon-play" aria-hidden="true"></span> Run
                       </button>
 
@@ -216,14 +216,14 @@
 
                     <!-- Stop with starting/update in progress -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Starting' || serving.status === 'Updating'">
-                      <button style="max-width: 80px;" class="btn btn-danger btn-sm btn-block" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
+                      <button class="btn btn-danger btn-sm btn-block model-serving--maxwidth" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
                         <span class="fa fa-spinner fa-spin" aria-hidden="true"></span> Stop
                       </button>
                     </div>
 
                     <!-- Stopping -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Stopping'" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
-                      <button style="max-width: 80px;" class="btn btn-danger btn-sm btn-block" >
+                      <button class="btn btn-danger btn-sm btn-block model-serving--maxwidth" >
                         <span class="fa fa-spinner fa-spin" aria-hidden="true"></span> Stopping
                       </button>
                     </div>
@@ -231,7 +231,7 @@
 
                     <!-- Stop -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Running'">
-                      <button style="max-width: 80px;" class="btn btn-danger btn-sm btn-block" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
+                      <button class="btn btn-danger btn-sm btn-block model-serving--maxwidth" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
                         <span class="glyphicon glyphicon-stop"></span> Stop
                       </button>
                     </div>
@@ -248,9 +248,9 @@
                   <td> {{serving.creator}} </td>
                   <td> {{serving.status}} </td>
                   <td>
-                    <button class="btn btn-info glyphicon glyphicon-edit" uib-tooltip="Edit" style="margin-right:-3px" ng-click="servingCtrl.updateServing(serving); $event.stopPropagation();"></button>
-                    <button class="btn btn-danger glyphicon glyphicon-trash" uib-tooltip="Delete" style="margin-right: -3px;" ng-click="servingCtrl.deleteServing(serving); $event.stopPropagation();"></button>
-                    <button class="btn btn-warning glyphicon glyphicon-list" uib-tooltip="Show logs" style="margin-right: -3px;" ng-click="servingCtrl.showServingLogs(serving); $event.stopPropagation();"></button>
+                    <button class="btn btn-info glyphicon glyphicon-edit model-serving--margin-right" uib-tooltip="Edit" ng-click="servingCtrl.updateServing(serving); $event.stopPropagation();"></button>
+                    <button class="btn btn-danger glyphicon glyphicon-trash model-serving--margin-right" uib-tooltip="Delete"  ng-click="servingCtrl.deleteServing(serving); $event.stopPropagation();"></button>
+                    <button class="btn btn-warning glyphicon glyphicon-list model-serving--margin-right" uib-tooltip="Show logs"  ng-click="servingCtrl.showServingLogs(serving); $event.stopPropagation();"></button>
                   </td>
                 </tr>
               </tbody>
@@ -266,7 +266,7 @@
         </div>
         <div class="" ng-if="servingCtrl.showLogs === true">
           <button ng-click="servingCtrl.showMainUI();$event.stopPropagation();"
-                  class="btn btn-primary btn-md fa fa-table" style="font-size:0.9em; padding:7px 10px; margin-bottom: 3px; background-color:#005571;"
+                  class="btn btn-primary btn-md fa fa-table model-serving--summary"
                   onmouseover="this.style.backgroundColor='#004159'"
                   onmouseout="this.style.backgroundColor='#005571'"> Model Serving Summary</button>
           <iframe style="overflow-y: auto;" id="ui_iframe"  ng-src="{{servingCtrl.kibanaUI}}" width="99%" height="86%"></iframe>

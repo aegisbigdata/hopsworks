@@ -261,3 +261,51 @@ div.job-content--page {
 .no-padding-kafka {
   padding: 0;
 }
+
+
+/* start model serving */
+
+.model-serving--name {
+  margin-top: 7px; 
+  height: 2em;
+}
+
+.model-serving--version {
+  margin-top: 9px; 
+  height: 2em;
+}
+
+.model-serving--instances {
+  margin-top: 15px; 
+  height: 2em;
+}
+
+.model-serving--advanced {
+  margin-top: 11px; 
+  height: 2em;
+}
+
+.model-serving--advanced-form {
+  margin-top: 10px; height: 2em;
+}
+
+.model-serving--form-kafka {
+  margin-top: 10px; width: 80%;
+}
+
+.model-serving--maxwidth {
+  max-width: 80px;
+}
+
+.model-serving--margin-right {
+  margin-right:-3px
+}
+
+.model-serving--summary {
+  font-size:0.9em; 
+  padding:7px 10px; 
+  margin-bottom: 3px; 
+  background-color:#005571;
+}
+
+/* end model serving */
