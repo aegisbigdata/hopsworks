@@ -39,7 +39,7 @@
 
 <div ng-controller="MainCtrl as mainCtrl">
     <div id="wrapper" class="toggled" data-spy="scroll" data-target="#toc">
-        <div ng-controller="MetadataCtrl as metadataCtrl">
+        <div ng-controller="ExtendedMetadataFileCtrl as extendedMetadataFileCtrl">
             <div class="overlay"></div>
             <div ng-include="'navProject.html'"></div>
             <section>
@@ -104,43 +104,29 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="row content-utility-bar content-utility-bar-actions">
-                            <div class="col-md-8">
-                                <h4 class="content-utility-bar-h4">Project > Extended Metadata for
-                                    Distribution</h4>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="pull-right">
-                                    <a href="http://www.w3.org/RDF/" title="RDF Resource Description Framework"><img
-                                            style="margin-right: 15px" src="http://www.w3.org/RDF/icons/rdf_metadata_button.48"
-                                            alt="RDF Resource Description Framework Metadata Icon" /></a>
-                                </div>
-                            </div>
-                        </div>
+                        <extmd-header type="Distribution"></extmd-header>
                         <div class="row" style="margin-top: 15px">
                             <!-- Left menu -->
                             <div class="col-md-4 col-sm-4 col-lg-3">
                                 <!--Nav Bar -->
                                 <nav class="bs-docs-sidebar">
                                     <ul id="sidebar" class="nav nav-stacked fixed">
-                                        <li class="active">
+                                        <li class="active" ng-if="fieldFilter('required').length > 0">
                                             <a>Mandatory</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a >Access URL</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
-                                        </li>
-                                        <li>
+                                          </li>
+                                          <li class="active" ng-if="fieldFilter('recommended').length > 0">
                                             <a>Recommended</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a >Sub-Group 1</a></li>
-                                                <li><a >Sub-Group 2</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
-                                        </li>
-                                        <li>
+                                          </li>
+                                          <li class="active" ng-if="fieldFilter('optional').length > 0">
                                             <a>Optional</a>
                                             <ul class="nav nav-stacked">
-                                                <li><a >Sub-Group 1</a></li>
-                                                <li><a >Sub-Group 2</a></li>
+                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a>{{ data.fields[fieldname].label }}</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -175,54 +161,24 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="inputTitle3">Title</label>
-                                            <input type="text" class="form-control" id="inputTitle3" placeholder="Title">
+                                            <input type="text" ng-model="data.fields.title.model" class="form-control" id="inputTitle3" ng-focus="extendedMetadataFileCtrl.onFieldFocus('title')" placeholder="Title">
                                         </div>
                                         <div class="form-group">
                                             <label for="inputDescription3">Description</label>
-                                            <textarea class="form-control" id="inputDescription3" placeholder="Description"></textarea>
+                                            <textarea ng-model="data.fields.description.model" class="form-control" id="inputDescription3" ng-focus="extendedMetadataFileCtrl.onFieldFocus('description')" placeholder="Description"></textarea>
                                         </div>
                                         <div class="form-group">
                                             <label for="inputFormat3">Format</label>
-                                            <input type="text" class="form-control" id="inputFormat3" placeholder="Format">
-                                        </div>
+                                            <input type="text" list="formats3" name="inputFormat3" id="inputFormat3" ng-model="data.fields.format.model" class="form-control">
+                                            <datalist id="formats3">
+                                                <option ng-repeat="option in data.fields.format.options" value="{{option.id}}">{{option.name}}</option>
+                                            </datalist>
+                                          </div>
                                         <div class="form-group">
-                                            <label for="inputLicense3">Licence</label>
-                                            <select id="inputLicense3" class="form-control">
-                                                <option value="" disabled>Select license...</option>
-                                                <option>CC BY 3.0 Austria</option>
-                                                <option>CC-BY 4.0</option>
-                                                <option>CC-BY 3.0 NL</option>
-                                                <option>CC-BY-NC 4.0</option>
-                                                <option>CC-BY-NC-ND 4.0</option>
-                                                <option>CC-BY-NC-SA 4.0</option>
-                                                <option>CC-BY-ND 4.0</option>
-                                                <option>CC-BY-SA 4.0</option>
-                                                <option>CC-BY-SA 3.0 NL</option>
-                                                <option>CC-PDM 1.0</option>
-                                                <option>CC0 1.0</option>
-                                                <option>DL-DE-BY 1.0</option>
-                                                <option>DL-DE-BY 2.0</option>
-                                                <option>DL-DE-BY-NC 1.0</option>
-                                                <option>DL-DE-ZERO 2.0</option>
-                                                <option>EUPL-1.1</option>
-                                                <option>EUPL-1.2</option>
-                                                <option>FR-LO</option>
-                                                <option>GFDL-1.1</option>
-                                                <option>GFDL-1.2</option>
-                                                <option>GFDL-1.3</option>
-                                                <option>HR-OD</option>
-                                                <option>IODL v1.0</option>
-                                                <option>IODL v2.0</option>
-                                                <option>NLOD</option>
-                                                <option>ODC-BY</option>
-                                                <option>ODC-ODbL</option>
-                                                <option>ODC-PDDL</option>
-                                                <option>OGL 1.0</option>
-                                                <option>OGL 2.0</option>
-                                                <option>OGL 3.0</option>
-                                                <option>OGL-NC</option>
-                                                <option>OGL-ROU-1.0</option>
-                                                <option>PSEUL</option>
+                                            <label for="inputLicence3">Licence</label>
+                                            <select name="inputLicence3" id="inputLicence3" ng-model="data.fields.license.model" class="form-control">
+                                              <!-- <option value="" disabled selected hidden>Select Licence</option> -->
+                                              <option ng-repeat="option in data.fields.license.options" value="{{option.id}}">{{option.name}}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -237,35 +193,35 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="inputLanguage3">Language</label>
-                                            <select id="inputLanguage3" class="form-control">
-                                                <option>English</option>
-                                                <option>German</option>
+                                            <select name="inputLanguage3" id="inputLanguage3" ng-model="data.fields.language.model" class="form-control">
+                                              <!-- <option value="" disabled selected hidden>Select Language</option> -->
+                                              <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
                                             </select>
+                                          </div>
                                         </div>
-                                    </div>
                                 </div>
                                 <hr>
                                 <form>
                                     <div class="form-group">
                                         <label for="inputTypeOfData" class="control-label">Type of data</label>
-                                        <select required id="inputTypeOfData" class="form-control" ng-model="vm.metadataExtendedDistribution.typeOfData">
+                                        <select required id="inputTypeOfData" class="form-control" ng-model="data.fields.typeannotation.model.typeOfData">
                                             <option value="" disabled selected>Select type of data...</option>
                                             <option value="tabular">Tabular data</option>
                                             <option value="other">Other</option>
                                         </select>
                                     </div>
 
-                                    <div class="form-group" ng-if="vm.metadataExtendedDistribution.typeOfData == 'tabular'">
+                                    <div class="form-group" ng-if="data.fields.typeannotation.model.typeOfData == 'tabular'">
                                         <label for="checkboxHasHeader" class="col-sm-4 control-label">Has header</label>
                                         <div class="col-sm-6">
                                             <md-checkbox class="md-primary" aria-label="Has header" style="margin-top: 0px"></md-checkbox>
                                         </div>
                                     </div>
 
-                                    <div class="row" ng-if="vm.metadataExtendedDistribution.typeOfData == 'tabular'">
+                                    <div class="row" ng-if="data.fields.typeannotation.model.typeOfData == 'tabular'">
                                         <div class=col-sm-12>
                                             <h4 style="margin-bottom: 15px;">Fields
-                                                <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.push({})"
+                                                <button type="button" class="btn btn-default" ng-click="data.fields.typeannotation.model.fields.push({})"
                                                     style="float: right">
                                                     <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
                                             </h4>
@@ -284,8 +240,7 @@
                                                     </thead>
 
                                                     <tbody>
-                                                        <!--tr ng-repeat="field in vm.metadataExtendedDistribution.fields">-->
-                                                        <tr>
+                                                        <tr ng-repeat="field in data.fields.typeannotation.model.fields">
                                                             <td>
                                                                 <md-checkbox class="md-primary" ng-checked="field.primary"
                                                                     ng-click="field.primary = !field.primary"
@@ -325,7 +280,7 @@
                                                                 </select>
                                                             </td>
                                                             <td>
-                                                                <button type="button" class="btn btn-default" ng-click="vm.metadataExtendedDistribution.fields.splice($index, 1)">
+                                                                <button type="button" class="btn btn-default" ng-click="data.fields.typeannotation.model.fields.splice($index, 1)">
                                                                     <i class="fa fa-trash"></i>
                                                                 </button>
                                                             </td>
@@ -341,12 +296,12 @@
                             <div class="col-md-2">
 
                                 <div id="sidebar-button-container" class="fixed" style="top: 185px;">
-                                    <div class="col-md-12" ng-controller="ExtendedMetadataFileCtrl as extendedMetadataFileCtrl">
+                                    <div class="col-md-12">
                                         <button type="submit" class="btn btn-default" ng-click="extendedMetadataFileCtrl.saveExtendedDistroMetadata()">Save Metadata</button>
                                     </div>
                                 </div>
 
-                                <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
+                                <div ng-if="extendedMetadataFileCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
                                     <h5>Usage note</h5>
                                     <p><small>{{ selectedFieldDescription }}</small></p>
                                 </div>

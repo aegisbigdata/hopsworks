@@ -39,6 +39,9 @@
 
 'use strict';
 
+const AEGIS_DISTRIBUTION_TEMPLATE_ID = 14;
+const AEGIS_DISTRIBUTION_TEMPLATE_NAME = 'aegis-distribution';
+
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataFileCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
@@ -50,35 +53,199 @@ angular.module('hopsWorksApp')
             const DISTRIBUTION_ID = $routeParams.distributionID;
             const self = this;
 
+            self.rdf = {
+              doc: {
+                "http://purl.org/dc/terms/title": {'@id': ''},
+                "http://purl.org/dc/terms/description": {'@id': ''},
+                "http://purl.org/dc/terms/format": {'@id': ''},
+                "http://xmlns.com/foaf/0.1/Agent": {'@id': ''},
+                'http://purl.org/dc/terms/language': {'@id': ''},
+                'http://purl.org/dc/terms/license': {'@id': ''},
+                'http://purl.org/dc/terms/typeannotation': {'@id': ''}
+              },
+              context: {
+                "dcat": "http://www.w3.org/ns/dcat#",
+                "dcterms": "http://purl.org/dc/terms/",
+                "foaf": "http://xmlns.com/foaf/0.1/",
+                "title": {"@id" : "http://purl.org/dc/terms/title", "@type": "@id"},
+                "description": {"@id" : "http://purl.org/dc/terms/description", "@type": "@id"},
+                "format": {"@id" : "http://purl.org/dc/terms/format", "@type": "@id"},
+                "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
+                "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"}
+              }
+            };
+
+            $scope.form = {};
+            $scope.data = {
+              fields: {
+                title: {
+                  label: 'Title',
+                  description: 'Description for title field',
+                  mapping: 'http://purl.org/dc/terms/title',
+                  model: '',
+                  required: true
+                },
+                description: {
+                  label: 'Description',
+                  description: 'Description for description field',
+                  mapping: 'http://purl.org/dc/terms/description',
+                  model: '',
+                  required: true
+                },
+                format: {
+                  label: 'Format',
+                  description: 'File format',
+                  mapping: 'http://purl.org/dc/terms/format',
+                  model: '',
+                  recommended: true,
+                  options: ExtendedMetadataService.FILE_FORMATS
+                },
+                license: {
+                  label: 'Licence',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  mapping: 'http://purl.org/dc/terms/license',
+                  recommended: true,
+                  options: ExtendedMetadataService.LICENCES
+                },
+                language: {
+                  label: 'Language',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: '',
+                  mapping: 'http://purl.org/dc/terms/language',
+                  optional: true,
+                  type: 'select',
+                  options: ExtendedMetadataService.LANGUAGES
+                },
+                typeannotation: {
+                  label: 'Type of Data',
+                  description: 'Lorem ipsum dolor sit amet.',
+                  model: {
+                    fields: []
+                  },
+                  mapping: 'http://purl.org/dc/terms/typeannotation',
+                  recommended: true
+                }
+              },
+              bounds: null
+            };
+
             var dataSetService = DataSetService(PROJECT_ID);
+
+            /**
+             * Loads from data from JSON-LD format into page
+             */
+            self.loadExtendedDistroMetadata = function () {
+              MetadataRestService.getMetadata(DISTRIBUTION_ID).then(function (distributionMetadata) {
+                if (!distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME] ||
+                    !distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload.length) {
+                  return;
+                }
+
+                let data = distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload[0];
+                // what we get back isn't proper stringified JSON, so we need to unmangle it before parsing
+                data = JSON.parse(data
+                  .replace(/\\@/g, '"@')
+                  .replace(/\\:\\/g, '":"')
+                  .replace(/\\:/g, '":')
+                  .replace(/\{\\/g, '\{"')
+                  .replace(/\\\{/g, '\"}')
+                  .replace(/\\\}/g, '"\}')
+                  .replace(/,\\/g, ',"')
+                  .replace(/\\,/g, '",')
+                  .replace(/"\\\\/g, '\\"')
+                  .replace(/\\\\"/g, '\\"'))['@graph'][0];
+
+                for (var key in data) {
+                  if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
+                    if (data[key] === './') continue;
+                    $scope.data.fields[key].model = data[key].substr(1);
+                  }
+                }
+                if (data['dcterms:typeannotation']) {
+                  $scope.data.fields.typeannotation.model = JSON.parse(data['dcterms:typeannotation']['@id']);
+                }
+
+              });
+            };
+            self.loadExtendedDistroMetadata();
 
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks
              */
             self.saveExtendedDistroMetadata = function () {
-              let data = {
-                templateId: 14, // hardcoded, needs to exist
-                inodePath: '' // TODO: needs file path, use DISTRIBUTION_ID to get file metadata
-              };
-              dataSetService.attachTemplate(data).then(function (success) {
-                growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
-              }, function (error) {
-                growl.info(
-                  'Could not attach template to file ' + file.name + '.',
-                  {title: 'Info', ttl: 5000}
-                );
-              }).then(function () {
-                const parentId = '9696'; // TODO: needs file parent id, use DISTRIBUTION_ID to get file metadata
-                const fname = 'fname'; // TODO: needs file name, use DISTRIBUTION_ID to get file metadata
-                const metaData = { 5: null }; // TODO: save json-ld data from form data
-                MetadataRestService.addMetadataWithSchema(
-                  parseInt(parentId), fname, -1, metaData)
-                  .then(function (success) {
-                    console.log('done?')
-                  }, function (error) {
-                    growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+              let data = $scope.data;
+              data.fields.typeannotation.model = JSON.stringify(data.fields.typeannotation.model);
+
+              dataSetService.getAllDatasets().then(function (allDatasets) {
+                const tasks = allDatasets.data.map(function (dataset) {
+                  return dataSetService.getContents(dataset.name);
+                });
+                Promise.all(tasks).then(function (contents) {
+                  let distribution;
+
+                  contents = contents.map(function (content) {
+                    return content.data;
+                  }).reduce(function (acc, val) {
+                    // flatten result array
+                    return acc.concat(val);
+                  }, []);
+
+                  // find metadata object for this distribution id
+                  for (let i = 0; i < contents.length; i++) {
+                    if (contents[i].id == DISTRIBUTION_ID) {
+                      distribution = contents[i];
+                      break;
+                    }
+                  }
+
+                  let template = {
+                    templateId: AEGIS_DISTRIBUTION_TEMPLATE_ID,
+                    inodePath: distribution.path
+                  };
+                  dataSetService.detachTemplate(DISTRIBUTION_ID, AEGIS_DISTRIBUTION_TEMPLATE_ID).finally(function () {
+                    dataSetService.attachTemplate(template).then(function () {
+                      ExtendedMetadataService.saveExtendedMetadata(data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                        const metaData = { 5: jsonldData };
+                        MetadataRestService.addMetadataWithSchema(
+                          parseInt(distribution.parentId), distribution.name, -1, metaData).then(function () {
+                            growl.success(
+                              'Done saving.',
+                              {title: 'Success', ttl: 1000}
+                            );
+                          }, function (error) {
+                            growl.error('Metadata could not be saved', {title: 'Error', ttl: 1000});
+                          });
+                      });
+                    }).catch(function (error) {
+                      growl.error(
+                        'Could not save. Attach template failed.',
+                        {title: 'Error', ttl: 5000}
+                      );
+                    });
                   });
+
+
+                });
               });
+
+            };
+
+            /**
+             * Helper function to filter fields by type
+             */
+
+            $scope.fieldFilter = function (filter) {
+              return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
+            }
+
+            self.onFieldFocus = function (field) {
+              self.selectedField = field;
+              $scope.selectedFieldDescription = null;
+
+              if ($scope.data.fields.hasOwnProperty(field)) {
+                $scope.selectedFieldDescription = $scope.data.fields[field].description;
+              }
             };
 
           }

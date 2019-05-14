@@ -78,7 +78,8 @@ angular.module('hopsWorksApp', [
   'ngFileSaver',
   'ngFileUpload',
   'googlechart',
-  'moment-picker'
+  'moment-picker',
+  'ngTagsInput'
 ])
         .config(['$routeProvider', '$httpProvider', '$compileProvider', 'flowFactoryProvider', 'accordionConfig',
           function ($routeProvider, $httpProvider, $compileProvider, flowFactoryProvider, accordionConfig) {
@@ -455,8 +456,7 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
-                    // TODO: use dataset id
-                    .when('/project/:projectID/extended-metadata-dataset', {
+                    .when('/project/:projectID/dataset/:dataSetID/extended-metadata-dataset', {
                       templateUrl: 'views/extended-metadata/dataset.html',
                       controller: 'ProjectCtrl as projectCtrl',
                       resolve: {
@@ -466,7 +466,7 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
-                    .when('/project/:projectID/:distributionID/extended-metadata-distribution', {
+                    .when('/project/:projectID/dist/:distributionID/extended-metadata-distribution', {
                       templateUrl: 'views/extended-metadata/distribution.html',
                       controller: 'ProjectCtrl as projectCtrl',
                       resolve: {

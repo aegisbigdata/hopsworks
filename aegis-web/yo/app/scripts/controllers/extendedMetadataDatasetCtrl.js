@@ -22,7 +22,7 @@
  * Copyright (C) 2013 - 2018, Logical Clocks AB and RISE SICS AB. All rights reserved
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
+ * software and associated documentation files (the 'Software'), to deal in the Software
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit
  * persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -30,7 +30,7 @@
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS  OR IMPLIED, INCLUDING
  * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
@@ -39,7 +39,8 @@
 
 'use strict';
 
-
+const AEGIS_DATASET_TEMPLATE_ID = 14;
+const AEGIS_DATASET_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataDatasetCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
@@ -49,104 +50,45 @@ angular.module('hopsWorksApp')
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
+            const DATASET_ID = $routeParams.dataSetID;
             var self = this;
 
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
-            // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
 
             self.rdf = {
               doc: {
-                "http://purl.org/dc/terms/title": {'@id': ''},
-                "http://purl.org/dc/terms/description": {'@id': ''},
-                "http://xmlns.com/foaf/0.1/Agent": {'@id': ''},
+                'http://purl.org/dc/terms/title': {'@id': ''},
+                'http://purl.org/dc/terms/description': {'@id': ''},
+                'http://xmlns.com/foaf/0.1/Agent': {'@id': ''},
                 'http://xmlns.com/foaf/0.1/homepage': {'@id': ''},
-                "http://purl.org/dc/terms/spatial": {'@id': ''},
+                'http://purl.org/dc/terms/spatial': {'@id': ''},
                 'http://purl.org/dc/terms/language': {'@id': ''},
                 'http://purl.org/dc/terms/license': {'@id': ''},
+                'http://xmlns.com/foaf/0.1/currency:': {'@id': ''},
+                'http://xmlns.com/foaf/0.1/keywords': {'@id': ''},
+                'http://purl.org/dc/terms/email': {'@id': ''},
+                'http://purl.org/dc/terms/theme': {'@id': ''},
                 'http://purl.org/dc/terms/modified': '',
               },
               context: {
-                "dcat": "http://www.w3.org/ns/dcat#",
-                "dcterms": "http://purl.org/dc/terms/",
-                "foaf": "http://xmlns.com/foaf/0.1/",
-                "title": {"@id" : "http://purl.org/dc/terms/title"},
-                "homepage": {"@id": "http://xmlns.com/foaf/0.1/homepage", "@type": "@id"},
-                "description": {"@id" : "http://purl.org/dc/terms/description", "@type": "@id"},
-                "publisher" : { "@id": "http://xmlns.com/foaf/0.1/Agent", "@type": "@id"},
-                "spatial": {"@id" : "http://purl.org/dc/terms/spatial", "@type": "@id"},
-                "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
-                "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"},
-                "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
-              },
-              data: {
-                description: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:description',
-                  mapping: "http://purl.org/dc/terms/description",
-                  value: null
-                },
-                title: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:title',
-                  mapping: "http://purl.org/dc/terms/title",
-                  value: null
-                },
-                contactpointtype: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                contactpointname: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                contactpointmail: {
-                  type: 'foaf:Document',
-                  uri: 'foaf:homepage',
-                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
-                  value: null
-                },
-                publishertype: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                publishername: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                homepage: {
-                  type: 'foaf:Document',
-                  uri: 'foaf:homepage',
-                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
-                  value: null
-                },
-                license: {
-                  type: 'dct:LicenseDocument',
-                  uri: 'dct:license',
-                  mapping: 'http://purl.org/dc/terms/license',
-                  value: null
-                },
-                spatial: {
-                  type: 'dct:Location',
-                  uri: 'dct:spatial',
-                  mapping: "http://purl.org/dc/terms/spatial",
-                  value: null
-                },
-                language: {
-                  type: 'dct:LinguisticSystem',
-                  uri: 'dct:language',
-                  mapping: 'http://purl.org/dc/terms/language',
-                  value: null
-                }
+                'dcat': 'http://www.w3.org/ns/dcat#',
+                'dcterms': 'http://purl.org/dc/terms/',
+                'foaf': 'http://xmlns.com/foaf/0.1/',
+                'title': {'@id' : 'http://purl.org/dc/terms/title'},
+                'homepage': {'@id': 'http://xmlns.com/foaf/0.1/homepage', '@type': '@id'},
+                'description': {'@id' : 'http://purl.org/dc/terms/description', '@type': '@id'},
+                'publisher' : { '@id': 'http://xmlns.com/foaf/0.1/Agent', '@type': '@id'},
+                'spatial': {'@id' : 'http://purl.org/dc/terms/spatial', '@type': '@id'},
+                'language': {'@id': 'http://purl.org/dc/terms/language', '@type': '@id'},
+                'license': {'@id': 'http://purl.org/dc/terms/license', '@type': '@id'},
+                'keywords': {'@id': 'http://xmlns.com/foaf/0.1/keywords', '@type': '@id'},
+                'contactpointmail': {'@id': 'http://purl.org/dc/terms/email', '@type': '@id'},
+                'price': {'@id': 'http://xmlns.com/foaf/0.1/currency', '@type': '@id'},
+                'theme': {'@id': 'http://purl.org/dc/terms/theme', '@type': '@id'},
+                'sellable': {'@id': 'http://purl.org/dc/terms/sellable', '@type': '@id'},
+                'modified' : {'@id' : 'http://purl.org/dc/terms/modified', '@type' : 'http://www.w3.org/2001/XMLSchema#dateTime'}
               }
             };
 
@@ -157,29 +99,34 @@ angular.module('hopsWorksApp')
                   label: 'Title',
                   description: 'Description for title field',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/title',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/description',
                   required: true
                 },
                 contactpointtype: {
                   label: 'Contact Point Type',
                   description: 'Description for Contact Point field',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointname: {
                   label: 'Contact Point Name',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointmail: {
                   label: 'Contact Point Mail',
                   description: 'Lorem ipsum dolor sit amet.',
+                  mapping: 'http://purl.org/dc/terms/email',
                   model: '',
                   recommended: true
                 },
@@ -187,41 +134,49 @@ angular.module('hopsWorksApp')
                   label: 'Keywords',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  tags: [],
+                  mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
                 publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 homepage: {
                   label: 'Publisher Homepage',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
                   recommended: true
                 },
                 theme: {
                   label: 'Theme',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/theme',
                   recommended: true
                 },
                 price: {
                   label: 'Price',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/currency',
                   recommended: true
                 },
                 sellable: {
                   label: 'Sellable',
                   description: 'Lorem ipsum dolor sit amet.',
+                  mapping: 'http://xmlns.com/foaf/0.1/sellable',
                   model: '',
                   recommended: true
                 },
@@ -241,6 +196,7 @@ angular.module('hopsWorksApp')
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/language',
                   optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
@@ -248,6 +204,7 @@ angular.module('hopsWorksApp')
                 spatial: {
                   label: 'Spatial',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/spatial',
                   optional: true
                 },
                 temporal: {
@@ -256,7 +213,8 @@ angular.module('hopsWorksApp')
                   optional: true
                 },
               },
-              bounds: null
+              bounds: null,
+              areaSelect: null
             };
 
             self.attachedDetailedTemplateList = [];
@@ -264,7 +222,7 @@ angular.module('hopsWorksApp')
             var dataSetService = DataSetService($routeParams.projectID);
 
             //update the current template whenever other users make changes
-            var listener = $rootScope.$on("template.change", function (event, response) {
+            var listener = $rootScope.$on('template.change', function (event, response) {
               try {
                 var incomingTemplateId = JSON.parse(response.board).templateId;
 
@@ -276,28 +234,16 @@ angular.module('hopsWorksApp')
               }
             });
 
+
             /*
              * Rootscope events are not deregistered when the controller dies.
              * So on the controller destroy event deregister the rootscope listener manually.
              * @returns {undefined}
              */
-            $scope.$on("$destroy", function () {
+            
+            $scope.$on('$destroy', function () {
               listener();
             });
-
-
-            /**
-             *  Initially get existing extended metadata for project with PROJECT_ID from Service
-             *  WIP until Service is working / API endpoints are defined
-             */
-
-            // ExtendedMetadataService.getExtMetadataForProject(PROJECT_ID)
-            //   .then(function (response) {
-            //      self.setExtendedMetadata(response.data);
-            //   })
-            //   .catch(function (error) {
-            //     console.log(error);
-            //   });
             
             self.onFieldFocus = function (field) {
               self.selectedField = field;
@@ -308,68 +254,121 @@ angular.module('hopsWorksApp')
               }
             };
 
+
             /**
              * Helper function to filter fields by type
-             * @param  {[type]} filter [description]
-             * @return {[type]}        [description]
              */
             
             $scope.fieldFilter = function (filter) {
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
-            }
-
-            /**
-             *   Receives data from ExtendedMetadataService and sets models of each available field
-             *   WIP until Service is working / API endpoints are defined
-             */
-
-            self.setExtendedMetadata = function (data) {
-              for (var key in data) {
-                if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
-                  $scope.data.fields[key].model = data[key]; 
-                }
-              }
             };
 
+
+            /**
+             * Generate list of comma-separated tags from tag-input field and set keywords model
+             */
+
+            $scope.updateTags = function (tag) {
+              var tags = $scope.data.fields.keywords.tags;
+              $scope.data.fields.keywords.model = tags.map(function(tag){
+                return tag.text;
+              }).join(',');
+            };
+
+
+            /**
+             * Loads from data from JSON-LD format into page
+             */
+            self.loadExtendedDistroMetadata = function () {
+              MetadataRestService.getMetadata(DATASET_ID).then(function (datasetMetadata) {
+                if (!datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME] ||
+                    !datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME].metadata.payload) {
+                  return;
+                }
+
+                let data = datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME].metadata.payload[0];
+                data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
+
+                for (var key in data) {
+                  if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
+                    if (data[key] === './') continue;
+                    
+                    if (key == 'spatial') {
+                      var cleaned_spatial = data[key].substr(1);
+                      var args = cleaned_spatial.split(',');
+                      args = args.map(e => parseFloat(e));
+                      $scope.data.areaSelect = { _width: args[0], _height: args[1], center: { lat: args[2], lng: args[3] }, raw: cleaned_spatial };
+                      $scope.data.mapCenter = { lat: args[2], lng: args[3], zoom: args[4] };
+                    } else if (key == 'keywords') {
+                      // Keywords field
+                      var cleaned_keywords = data[key].substr(1);
+                      var taglist = cleaned_keywords.split(',');
+                      $scope.data.fields[key].model = cleaned_keywords;                                         
+                      $scope.data.fields[key].tags = taglist.map(tag => {
+                        return {text: tag};
+                      });
+                    } else if (typeof(data[key]) === 'string') {
+                      // Standard string field
+                      $scope.data.fields[key].model = data[key].substr(1);
+                    } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
+                      // Nested object with @id property
+                      $scope.data.fields[key].model = data[key]['@id'].substr(1);
+                    }
+                  }
+                }
+              });
+            };
+
+            self.loadExtendedDistroMetadata();
+
+            /**
+             * Saves form data in JSON-LD format as metadata with hopsworks
+             */
+            
+            self.saveExtendedDatasetMetadata = function () {
+              dataSetService.getAllDatasets().then(function (allDatasets) {
+                let dataset = allDatasets.data.filter(ds => ds.id == DATASET_ID)[0];
+                if (!dataset) return;
+
+                let template = {
+                  templateId: AEGIS_DATASET_TEMPLATE_ID,
+                  inodePath: dataset.path
+                };
+                dataSetService.detachTemplate(DATASET_ID, AEGIS_DATASET_TEMPLATE_ID).finally(function () {
+                  dataSetService.attachTemplate(template).then(function (success) {
+                    growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
+                  }, function (error) {
+                    growl.info(
+                      'Could not attach template.',
+                      {title: 'Info', ttl: 5000}
+                    );
+                  }).then(function () {
+                    ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                      const metaData = { 5: jsonldData };
+                      MetadataRestService.addMetadataWithSchema(
+                        parseInt(dataset.parentId), dataset.name, -1, metaData).then(function () {
+                          console.log('done?')
+                        }, function (error) {
+                          growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+                        });
+                    });
+                  });
+                });
+              });
+            };
 
             /**
              * Entry point for saving extended metadata from fields in project-view
-             * Is triggered on clicking the "Save Metadata" button
+             * Is triggered on clicking the 'Save Metadata' button
              */
 
             self.saveExtendedMetadata = function () {
-              if (!$scope.form.extendedMetadataDataset.$valid) {
-                console.warn("Can't submit form - missing or invalid fields!");
+              if (!$scope.form.extendedMetadata.$valid) {
+                console.warn('Can"t submit form - missing or invalid fields!');
                 return;
               }
 
-              var modifiedKey = 'http://purl.org/dc/terms/modified';
-              var data = self.rdf.data; 
-              var doc = self.rdf.doc;
-
-              for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                  var mapping = data[key].mapping;
-
-                  if ($scope.data.fields.hasOwnProperty(key)) doc[mapping]['@id'] = $scope.data.fields[key].model;
-                }
-              }
-
-              doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.data.bounds);
-              doc[modifiedKey] = (new Date()).toISOString();
-              self.generateRDFString();
+              self.saveExtendedDatasetMetadata();
             };
-
-
-            /**
-             * Generates RDF compliant representation in json-ld format
-             * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
-             */
-
-            self.generateRDFString = function () {
-              jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
-                console.log(JSON.stringify(compacted, null, 2));
-              });
-            }
           }
         ]);

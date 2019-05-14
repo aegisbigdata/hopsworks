@@ -43,7 +43,17 @@ angular.module('hopsWorksApp')
 
         .factory('MetadataRestService', ['$http', function ($http) {
             var service = {
-              
+              getMetadata: function (inodePid) {
+                var req = {
+                  method: 'GET',
+                  url: '/api/metadata/' + inodePid,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                };
+                return $http(req);
+              },
+
               /**
                * Add a JSON metadata object to an Inode (file/dir)
                * @param {type} user

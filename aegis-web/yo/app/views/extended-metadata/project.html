@@ -104,25 +104,13 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="row content-utility-bar content-utility-bar-actions">
-                            <div class="col-md-8">
-                                <h4 class="content-utility-bar-h4">Project > Extended Metadata for this
-                                    Project</h4>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="pull-right">
-                                    <a href="http://www.w3.org/RDF/" title="RDF Resource Description Framework"><img
-                                            style="margin-right: 15px" src="http://www.w3.org/RDF/icons/rdf_metadata_button.48"
-                                            alt="RDF Resource Description Framework Metadata Icon" /></a>
-                                </div>
-                            </div>
-                        </div>
+                        <extmd-header type="this Project"></extmd-header>
                         <div class="row" style="margin-top: 15px">
                             <!-- Left menu -->
                             <div class="col-md-4 col-sm-4 col-lg-3">
                                 <!--Nav Bar -->
                                 <nav class="bs-docs-sidebar">
-                                    
+
                                     <ul id="sidebar" class="nav nav-stacked fixed">
                                         <li class="active">
                                             <a>Mandatory</a>
@@ -149,8 +137,8 @@
 
                             <!-- Rightside tables -->
                             <div class="col-md-8 col-sm-8 col-lg-6" style="border-right: 1px dashed lightgrey; border-left: 1px dashed lightgrey;">
-                                <form id="extendedMetadataProject" name="form.extendedMetadataProject">
-                                
+                                <form id="extendedMetadata" name="form.extendedMetadata">
+
                                 <div class="row" style="margin-bottom: 15px">
                                     <div class="col-md-12">
                                         <h3>Mandatory</h3>
@@ -158,9 +146,9 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-12"> 
+                                    <div class="col-md-12">
                                       <!-- Mandatory -->
-                                      
+
                                       <div class="form-group">
                                         <label for="input-title">Title *</label>
                                         <input type="text" ng-model="data.fields.title.model" class="form-control" id="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" ng-required="true" placeholder="Title">
@@ -173,7 +161,7 @@
 
                                       <div class="form-group bs-callout">
                                         <label for="input-publisher">Publisher *</label>
-                                        
+
                                         <div style="margin-bottom: 10px;margin-top: 10px">
                                           <label for="publisher-type" style="font-size: 14px">Publisher Type</label>
                                           <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" ng-required="true" required class="form-control">
@@ -182,7 +170,7 @@
                                             <option value="INDIVIDUAL">Individual</option>
                                           </select>
                                         </div>
-                                        
+
                                         <div style="margin-bottom: 10px;">
                                           <label for="publisher-name" style="font-size: 14px">Publisher Name</label>
                                           <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" ng-required="true" placeholder="Publisher Name">
@@ -192,7 +180,7 @@
                                           <label for="publisher-web" style="font-size: 14px">Publisher Homepage</label>
                                           <input type="text" ng-model="data.fields.homepage.model" class="form-control" id="publisher-web" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" ng-required="true" placeholder="Publisher Homepage">
                                         </div>
-                                      </div>                                        
+                                      </div>
                                     </div>
                                 </div>
 
@@ -206,7 +194,7 @@
 
                                 <div class="row">
                                   <div class="col-md-12">
-                                    
+
                                     <div class="form-group">
                                       <label for="input-language">Language</label>
                                       <select name="input-language" id="input-language" ng-model="data.fields.language.model" class="form-control">
@@ -237,9 +225,9 @@
                                 <div class="row">
                                   <div class="col-md-12">
                                     <div class="form-group" style="margin-bottom: 350px;position: relative;">
-                                      
+
                                       <label for="inputMap1">Spatial</label>
-                                      
+
                                       <div style="portion:relative;height: 310px;">
                                         <leaflet id="inputMap1" style="width: 500px; height: 300px; position: absolute;"></leaflet>
                                       </div>
@@ -260,7 +248,7 @@
                             <div class="col-md-2">
 
                                 <div id="sidebar-button-container" class="fixed" style="top: 185px;">
-                                    <button type="submit" form="extendedMetadataProject" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
+                                    <button type="submit" form="extendedMetadata" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
                                 </div>
 
                                 <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">

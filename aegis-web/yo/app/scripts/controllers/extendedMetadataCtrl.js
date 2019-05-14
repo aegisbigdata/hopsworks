@@ -39,7 +39,8 @@
 
 'use strict';
 
-
+const AEGIS_PROJECT_TEMPLATE_ID = 14;
+const AEGIS_PROJECT_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
@@ -54,7 +55,6 @@ angular.module('hopsWorksApp')
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
-            // self.ext = ExtendedMetadataService.getExtMetadataForProject(1234);
 
             self.rdf = {
               doc: {
@@ -79,56 +79,6 @@ angular.module('hopsWorksApp')
                 "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
                 "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"},
                 "modified" : {"@id" : "http://purl.org/dc/terms/modified", "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"}
-              },
-              data: {
-                description: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:description',
-                  mapping: "http://purl.org/dc/terms/description",
-                  value: null
-                },
-                title: {
-                  type: 'rdfs:Literal',
-                  uri: 'dct:title',
-                  mapping: "http://purl.org/dc/terms/title",
-                  value: null
-                },
-                publishertype: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                publishername: {
-                  type: 'foaf:Agent',
-                  uri: 'dct:publisher',
-                  mapping: "http://xmlns.com/foaf/0.1/Agent",
-                  value: null
-                },
-                homepage: {
-                  type: 'foaf:Document',
-                  uri: 'foaf:homepage',
-                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
-                  value: null
-                },
-                license: {
-                  type: 'dct:LicenseDocument',
-                  uri: 'dct:license',
-                  mapping: 'http://purl.org/dc/terms/license',
-                  value: null
-                },
-                spatial: {
-                  type: 'dct:Location',
-                  uri: 'dct:spatial',
-                  mapping: "http://purl.org/dc/terms/spatial",
-                  value: null
-                },
-                language: {
-                  type: 'dct:LinguisticSystem',
-                  uri: 'dct:language',
-                  mapping: 'http://purl.org/dc/terms/language',
-                  value: null
-                }
               }
             };
 
@@ -138,24 +88,28 @@ angular.module('hopsWorksApp')
                 title: {
                   label: 'Title',
                   description: 'Description for title field',
+                  mapping: 'http://purl.org/dc/terms/title',
                   model: '',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
+                  mapping: 'http://purl.org/dc/terms/description',
                   model: '',
                   required: true
                 },
                 publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   model: '',
                   required: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
+                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   model: '',
                   required: true,
                 },
@@ -163,12 +117,14 @@ angular.module('hopsWorksApp')
                   label: 'Publisher Homepage',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://xmlns.com/foaf/0.1/homepage',
                   required: true
                 },
                 license: {
                   label: 'Licence',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/license',
                   recommended: true,
                   options: ExtendedMetadataService.LICENCES
                 },
@@ -176,6 +132,7 @@ angular.module('hopsWorksApp')
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/language',
                   recommended: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
@@ -183,13 +140,12 @@ angular.module('hopsWorksApp')
                 spatial: {
                   label: 'Spatial',
                   model: '',
+                  mapping: 'http://purl.org/dc/terms/spatial',
                   optional: true
                 }
               },
               bounds: null
             };
-
-            self.attachedDetailedTemplateList = [];
 
             var dataSetService = DataSetService($routeParams.projectID);
 
@@ -215,19 +171,6 @@ angular.module('hopsWorksApp')
               listener();
             });
 
-
-            /**
-             *  Initially get existing extended metadata for project with PROJECT_ID from Service
-             *  WIP until Service is working / API endpoints are defined
-             */
-
-            // ExtendedMetadataService.getExtMetadataForProject(PROJECT_ID)
-            //   .then(function (response) {
-            //      self.setExtendedMetadata(response.data);
-            //   })
-            //   .catch(function (error) {
-            //     console.log(error);
-            //   });
             
             self.onFieldFocus = function (field) {
               self.selectedField = field;
@@ -238,6 +181,7 @@ angular.module('hopsWorksApp')
               }
             };
 
+
             /**
              * Helper function to filter fields by type
              * @param  {[type]} filter [description]
@@ -247,6 +191,7 @@ angular.module('hopsWorksApp')
             $scope.fieldFilter = function (filter) {
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
             }
+
 
             /**
              *   Receives data from ExtendedMetadataService and sets models of each available field
@@ -263,43 +208,93 @@ angular.module('hopsWorksApp')
 
 
             /**
+             * Loads from data from JSON-LD format into page
+             */
+            self.loadExtendedDistroMetadata = function () {
+              MetadataRestService.getMetadata(4500621).then(function (datasetMetadata) {
+
+                console.log(datasetMetadata);
+                if (!datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME] ||
+                    !datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME].metadata.payload.length) {
+                  console.log('No metadata available.');
+                  return;
+                }
+
+                let data = datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME].metadata.payload[0];
+                data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
+
+                for (var key in data) {
+                  if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
+                    if (data[key] === './') continue;
+                    
+                    if (typeof(data[key]) === 'string') {
+                      // Standard string field
+                      $scope.data.fields[key].model = data[key].substr(1);
+                    } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
+                      // Nested object with @id property
+                      $scope.data.fields[key].model = data[key]['@id'].substr(1);
+                    }
+                  }
+                }
+              });
+            };
+
+            // self.loadExtendedDistroMetadata();
+
+
+            /**
+             * Saves form data in JSON-LD format as metadata with hopsworks
+             */
+            
+            self.saveExtendedProjectMetadata = function () {
+              ProjectService.get({}, {'id': PROJECT_ID}).$promise.then(
+                function (project) {
+                  console.log(project);
+
+                  let template = {
+                    templateId: AEGIS_PROJECT_TEMPLATE_ID,
+                    inodePath: '/Projects/' + project.projectName
+                  };
+
+                  dataSetService.detachTemplate(project.inodeid, AEGIS_PROJECT_TEMPLATE_ID).finally(function () {
+                    dataSetService.attachTemplate(template).then(function (success) {
+                      growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
+                    }, function (error) {
+                      growl.info(
+                        'Could not attach template.',
+                        {title: 'Info', ttl: 5000}
+                      );
+                    }).then(function () {
+                      ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                        const metaData = { 5: jsonldData };
+                        MetadataRestService.addMetadataWithSchema(
+                          parseInt(project.inodeid), project.projectName, -1, metaData).then(function () {
+                            console.log('done?')
+                          }, function (error) {
+                            growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
+                          });
+                      });
+                    });
+                  });
+                },
+                function(error) {
+                  console.log(error);
+                });
+            };
+
+
+            /**
              * Entry point for saving extended metadata from fields in project-view
              * Is triggered on clicking the "Save Metadata" button
              */
 
             self.saveExtendedMetadata = function () {
-              if (!$scope.form.extendedMetadataProject.$valid) {
+              if (!$scope.form.extendedMetadata.$valid) {
                 console.warn("Can't submit form - missing or invalid fields!");
                 return;
               }
 
-              var modifiedKey = 'http://purl.org/dc/terms/modified';
-              var data = self.rdf.data; 
-              var doc = self.rdf.doc;
-
-              for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                  var mapping = data[key].mapping;
-
-                  if ($scope.data.fields.hasOwnProperty(key)) doc[mapping]['@id'] = $scope.data.fields[key].model;
-                }
-              }
-
-              doc[data.spatial.mapping]['@id'] = JSON.stringify($scope.data.bounds);
-              doc[modifiedKey] = (new Date()).toISOString();
-              self.generateRDFString();
+              self.saveExtendedProjectMetadata();
             };
-
-
-            /**
-             * Generates RDF compliant representation in json-ld format
-             * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
-             */
-
-            self.generateRDFString = function () {
-              jsonld.flatten(self.rdf.doc, self.rdf.context, function(err, compacted) {
-                console.log(JSON.stringify(compacted, null, 2));
-              });
-            }
           }
         ]);

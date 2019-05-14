@@ -785,7 +785,21 @@ angular.module('hopsWorksApp')
               self.noTemplates = false;
               dataSetService.fetchTemplatesForInode(self.currentFile.id)
                       .then(function (response) {
-                        self.currentFileTemplates = response.data;
+                        // fix for strange case where the same template is
+                        // included a thousand times in the response
+                        self.currentFileTemplates = response.data.reduce(function(acc, val) {
+                          if (!acc.length) {
+                            acc.push(val); // give initial element
+                            return acc;
+                          }
+
+                          for (let i = 0; i < acc.length; i++) {
+                            if (acc[i].id === val.id) continue;
+                            acc.push(val);
+                          }
+                          return acc;
+                        }, []);
+                        console.log('reduced the returned template list from', response.data.length, 'to', self.currentFileTemplates.length);
                         self.attachedDetailedTemplateList = [];
                         var index = 0;
                         angular.forEach(self.currentFileTemplates, function (template, key) {

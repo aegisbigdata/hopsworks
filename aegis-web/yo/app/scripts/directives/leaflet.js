@@ -65,21 +65,62 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
             }
           }
 
+          let mapcenter = [52.520008, 13.404954];
+          let areaSelectOptions = { width: 100, height: 100 };
+
+          if ($scope.$parent.data.areaSelect) {
+            let a = $scope.$parent.data.areaSelect;
+            mapcenter = [a.center.lat, a.center.lng];
+            areaSelectOptions = { width: a._width, height: a._height };
+          }
+
           // Create the Leaflet Map Object with the options
           const map = L.map($elm[0], {
-            center: [51.505, -0.09],
-            zoom: 13,
+            center: mapcenter,
+            zoom: 10,
           });
 
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
-
-          var areaSelect = L.areaSelect({ width: 100, height: 100 });
+          
+          var areaSelect = L.areaSelect(areaSelectOptions);
           areaSelect.addTo(map);
-          areaSelect.on("change", function() {
-            $scope.bounds = this.getBounds();
-            $scope.$parent.data.bounds = this.getBounds();
+
+          $attrs.$observe('area', function(area) {
+            let settings;
+
+            if (area != '') {
+              try {
+                settings = JSON.parse(area);
+              } catch (e) {
+                console.log(e);
+              }
+
+              if (settings && settings._width != 100 && settings._height != 100) {
+                console.log(settings);
+                areaSelect.setDimensions({ width: settings._width, height: settings._height })
+              }
+            }
+          })
+
+          $attrs.$observe('center', function(center) {
+            let settings;
+
+            if (center != '') {
+              try {
+                settings = JSON.parse(center);
+                console.log(settings);
+              } catch (e) {
+                console.log(e);
+              }
+
+              if (settings) map.setView(new L.LatLng(settings.lat, settings.lng), settings.zoom);
+            }
+          })
+          
+          areaSelect.on('change', function() {
+            $scope.$parent.data.areaSelect = { _width: areaSelect._width, _height: areaSelect._height, center: map.getCenter(), zoom: map.getZoom() };
           });
 
           // If the width attribute defined update css
