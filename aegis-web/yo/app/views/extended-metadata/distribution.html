@@ -108,29 +108,8 @@
                         <div class="row" style="margin-top: 15px">
                             <!-- Left menu -->
                             <div class="col-md-4 col-sm-4 col-lg-3">
-                                <!--Nav Bar -->
-                                <nav class="bs-docs-sidebar">
-                                    <ul id="sidebar" class="nav nav-stacked fixed">
-                                        <li class="active" ng-if="fieldFilter('required').length > 0">
-                                            <a>Mandatory</a>
-                                            <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a>{{ data.fields[fieldname].label }}</a></li>
-                                            </ul>
-                                          </li>
-                                          <li class="active" ng-if="fieldFilter('recommended').length > 0">
-                                            <a>Recommended</a>
-                                            <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a>{{ data.fields[fieldname].label }}</a></li>
-                                            </ul>
-                                          </li>
-                                          <li class="active" ng-if="fieldFilter('optional').length > 0">
-                                            <a>Optional</a>
-                                            <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a>{{ data.fields[fieldname].label }}</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </nav>
+                              <!--Nav Bar -->
+                              <extmd-sidebar-nav />
                             </div>
                             <!-- END Left menu -->
 
@@ -138,7 +117,7 @@
                             <div class="col-md-8 col-sm-8 col-lg-6" style="border-right: 1px dashed lightgrey; border-left: 1px dashed lightgrey;">
                                 <div class="row" style="margin-bottom: 15px">
                                     <div class="col-md-12">
-                                        <h3>Mandatory</h3>
+                                        <h3 id="fields-mandatory">Mandatory</h3>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -154,28 +133,28 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12" style="margin-bottom: 15px">
-                                        <h3>Recommended</h3>
+                                        <h3 id="fields-recommended">Recommended</h3>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="inputTitle3">Title</label>
-                                            <input type="text" ng-model="data.fields.title.model" class="form-control" id="inputTitle3" ng-focus="extendedMetadataFileCtrl.onFieldFocus('title')" placeholder="Title">
+                                            <label for="inputTitle3" id="input-title">Title</label>
+                                            <input type="text" ng-model="data.fields.title.model" class="form-control" ng-focus="extendedMetadataFileCtrl.onFieldFocus('title')" placeholder="Title">
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputDescription3">Description</label>
+                                            <label for="inputDescription3" id="input-description">Description</label>
                                             <textarea ng-model="data.fields.description.model" class="form-control" id="inputDescription3" ng-focus="extendedMetadataFileCtrl.onFieldFocus('description')" placeholder="Description"></textarea>
                                         </div>
                                         <div class="form-group">
-                                            <label for="inputFormat3">Format</label>
+                                            <label for="inputFormat3" id="input-format">Format</label>
                                             <input type="text" list="formats3" name="inputFormat3" id="inputFormat3" ng-model="data.fields.format.model" class="form-control">
                                             <datalist id="formats3">
                                                 <option ng-repeat="option in data.fields.format.options" value="{{option.id}}">{{option.name}}</option>
                                             </datalist>
                                           </div>
                                         <div class="form-group">
-                                            <label for="inputLicence3">Licence</label>
+                                            <label for="inputLicence3" id="input-license">Licence</label>
                                             <select name="inputLicence3" id="inputLicence3" ng-model="data.fields.license.model" class="form-control">
                                               <!-- <option value="" disabled selected hidden>Select Licence</option> -->
                                               <option ng-repeat="option in data.fields.license.options" value="{{option.id}}">{{option.name}}</option>
@@ -186,13 +165,13 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12" style="margin-bottom: 15px">
-                                        <h3>Optional</h3>
+                                        <h3 id="fields-optional">Optional</h3>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="inputLanguage3">Language</label>
+                                            <label for="inputLanguage3" id="input-language">Language</label>
                                             <select name="inputLanguage3" id="inputLanguage3" ng-model="data.fields.language.model" class="form-control">
                                               <!-- <option value="" disabled selected hidden>Select Language</option> -->
                                               <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
@@ -203,7 +182,7 @@
                                 <hr>
                                 <form>
                                     <div class="form-group">
-                                        <label for="inputTypeOfData" class="control-label">Type of data</label>
+                                        <label for="inputTypeOfData" class="control-label" id="input-typeannotation">Type of data</label>
                                         <select required id="inputTypeOfData" class="form-control" ng-model="data.fields.typeannotation.model.typeOfData">
                                             <option value="" disabled selected>Select type of data...</option>
                                             <option value="tabular">Tabular data</option>
