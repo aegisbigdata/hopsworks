@@ -53,6 +53,8 @@ angular.module('hopsWorksApp')
             const DISTRIBUTION_ID = $routeParams.distributionID;
             const self = this;
 
+            self.filePreviewLoaded = false;
+            self.filePreviewShowing = false;
             self.rdf = {
               doc: {
                 "http://purl.org/dc/terms/title": {'@id': ''},
@@ -253,23 +255,30 @@ angular.module('hopsWorksApp')
                 var datasetName = decodeURI(parameters.dataset);
                 var fileName = decodeURI(parameters.file);
                 var path = datasetName + '/' + fileName;
+                self.filePreviewShowing = true;
                 
-                dataSetService.filePreview(path, "head").then(
-                  function (success) {
-                    var fileDetails = JSON.parse(success.data.data);
-                    var content = fileDetails.filePreviewDTO[0].content;
-                    var conv = new showdown.Converter({parseImgDimensions: true});
-                    $scope.filePreviewContents = conv.makeHtml(content);
-                  }, function (error) {
-                    //To hide README from UI
-                    if (typeof error.data.usrMsg !== 'undefined') {
-                      growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
-                    } else {
-                      growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
-                    }
-                    $scope.filePreviewContents = null;
-                });
+                if (!self.filePreviewLoaded) {
+                  $scope.filePreviewContents = 'Loading file preview...';
+                
+                  dataSetService.filePreview(path, "head").then(
+                    function (success) {
+                      var fileDetails = JSON.parse(success.data.data);
+                      var content = fileDetails.filePreviewDTO[0].content;
+                      var conv = new showdown.Converter({parseImgDimensions: true});
+                      self.filePreviewLoaded = true;
+                      $scope.filePreviewContents = conv.makeHtml(content);
 
+                    }, function (error) {
+                      //To hide README from UI
+                      self.filePreviewLoaded = false;
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                        growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      } else {
+                        growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                      }
+                      $scope.filePreviewContents = 'Could not load file preview.';
+                  });
+                }
             }
           }
         ]);

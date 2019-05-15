@@ -276,9 +276,10 @@
                                     <div>
                                       <h4>File Preview</h4>
                                       <div class="form-group">
-                                        <a ng-click="extendedMetadataFileCtrl.filePreview()" class="btn btn-default">Show File Preview</a>
+                                        <a ng-if="!extendedMetadataFileCtrl.filePreviewShowing" ng-click="extendedMetadataFileCtrl.filePreview()" class="btn btn-default">Show File Preview</a>
+                                        <a ng-if="extendedMetadataFileCtrl.filePreviewShowing" ng-click="extendedMetadataFileCtrl.filePreviewShowing = false" class="btn btn-default">Hide File Preview</a>
                                       </div>
-                                      <div class="well">
+                                      <div class="well" ng-if="extendedMetadataFileCtrl.filePreviewShowing">
                                         <code style="word-break: break-word;">
                                           {{ filePreviewContents }}
                                         </code>
