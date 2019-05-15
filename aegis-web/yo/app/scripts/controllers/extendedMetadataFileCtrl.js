@@ -43,10 +43,10 @@ const AEGIS_DISTRIBUTION_TEMPLATE_ID = 14;
 const AEGIS_DISTRIBUTION_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
-        .controller('ExtendedMetadataFileCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
+        .controller('ExtendedMetadataFileCtrl', ['$location', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
           'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService',
-          function ($cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
+          function ($location, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService) {
             const PROJECT_ID = $routeParams.projectID;
@@ -248,5 +248,28 @@ angular.module('hopsWorksApp')
               }
             };
 
+            self.filePreview = function () {
+                var parameters = $location.search();
+                var datasetName = decodeURI(parameters.dataset);
+                var fileName = decodeURI(parameters.file);
+                var path = datasetName + '/' + fileName;
+                
+                dataSetService.filePreview(path, "head").then(
+                  function (success) {
+                    var fileDetails = JSON.parse(success.data.data);
+                    var content = fileDetails.filePreviewDTO[0].content;
+                    var conv = new showdown.Converter({parseImgDimensions: true});
+                    $scope.filePreviewContents = conv.makeHtml(content);
+                  }, function (error) {
+                    //To hide README from UI
+                    if (typeof error.data.usrMsg !== 'undefined') {
+                      growl.error(error.data.usrMsg, {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                    } else {
+                      growl.error("", {title: error.data.errorMsg, ttl: 5000, referenceId: 4});
+                    }
+                    $scope.filePreviewContents = null;
+                });
+
+            }
           }
         ]);

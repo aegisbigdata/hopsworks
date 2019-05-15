@@ -272,6 +272,18 @@
                                               <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
                                         </div>
                                     </div>
+
+                                    <div>
+                                      <h4>File Preview</h4>
+                                      <div class="form-group">
+                                        <a ng-click="extendedMetadataFileCtrl.filePreview()" class="btn btn-default">Show File Preview</a>
+                                      </div>
+                                      <div class="well">
+                                        <code style="word-break: break-word;">
+                                          {{ filePreviewContents }}
+                                        </code>
+                                      </div>
+                                    </div>
                                 </form>
 
                                 <hr>
