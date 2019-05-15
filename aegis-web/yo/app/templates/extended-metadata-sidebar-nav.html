@@ -1,0 +1,22 @@
+<nav class="bs-docs-sidebar">
+  <ul id="sidebar" class="nav nav-stacked fixed">
+    <li class="active" ng-if="fieldFilter('required').length > 0">
+      <a ng-click="anchorScroll('fields-mandatory')">Mandatory</a>
+      <ul class="nav nav-stacked">
+        <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a ng-click="anchorScroll('input-' + fieldname)">{{ data.fields[fieldname].label }}</a></li>
+      </ul>
+    </li>
+    <li class="active" ng-if="fieldFilter('recommended').length > 0">
+      <a ng-click="anchorScroll('fields-recommended')">Recommended</a>
+      <ul class="nav nav-stacked">
+        <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a ng-click="anchorScroll('input-' + fieldname)">{{ data.fields[fieldname].label }}</a></li>
+      </ul>
+    </li>
+    <li class="active" ng-if="fieldFilter('optional').length > 0">
+      <a ng-click="anchorScroll('fields-optional')">Optional</a>
+      <ul class="nav nav-stacked">
+        <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a ng-click="anchorScroll('input-' + fieldname)">{{ data.fields[fieldname].label }}</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>

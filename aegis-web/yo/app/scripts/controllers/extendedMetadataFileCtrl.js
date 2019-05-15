@@ -43,10 +43,10 @@ const AEGIS_DISTRIBUTION_TEMPLATE_ID = 14;
 const AEGIS_DISTRIBUTION_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
-        .controller('ExtendedMetadataFileCtrl', ['$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
+        .controller('ExtendedMetadataFileCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
           'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService',
-          function ($cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
+          function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService) {
             const PROJECT_ID = $routeParams.projectID;
@@ -238,6 +238,19 @@ angular.module('hopsWorksApp')
             $scope.fieldFilter = function (filter) {
               return Object.keys($scope.data.fields).filter(element => $scope.data.fields[element][filter] === true);
             }
+
+            
+            /**
+             * Scrolls page to anchor/hash
+             */
+
+            $scope.anchorScroll = function (hash) {
+              var id = $location.hash();  // neccessary to avoid page / controller reload on hash change / anchor scroll
+              $location.hash(hash);
+              $anchorScroll();
+              $location.hash(id);
+            };
+
 
             self.onFieldFocus = function (field) {
               self.selectedField = field;
