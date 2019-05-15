@@ -183,26 +183,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-md-12" style="margin-bottom: 15px">
-                                        <h3>Optional</h3>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="inputLanguage3">Language</label>
-                                            <select name="inputLanguage3" id="inputLanguage3" ng-model="data.fields.language.model" class="form-control">
-                                              <!-- <option value="" disabled selected hidden>Select Language</option> -->
-                                              <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
-                                            </select>
-                                          </div>
-                                        </div>
-                                </div>
-                                <hr>
+
                                 <form>
-                                    <div class="form-group">
+                                    <div class="form-group" style="margin-top: 25px;">
                                         <label for="inputTypeOfData" class="control-label">Type of data</label>
                                         <select required id="inputTypeOfData" class="form-control" ng-model="data.fields.typeannotation.model.typeOfData">
                                             <option value="" disabled selected>Select type of data...</option>
@@ -220,11 +203,7 @@
 
                                     <div class="row" ng-if="data.fields.typeannotation.model.typeOfData == 'tabular'">
                                         <div class=col-sm-12>
-                                            <h4 style="margin-bottom: 15px;">Fields
-                                                <button type="button" class="btn btn-default" ng-click="data.fields.typeannotation.model.fields.push({})"
-                                                    style="float: right">
-                                                    <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
-                                            </h4>
+                                            <h4 style="margin-top: 25px;margin-bottom: 15px;">Fields</h4>
 
                                             <div class="table-responsive">
                                                 <table class="table table-bordred table-hover">
@@ -288,9 +267,31 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            <button type="button" class="btn btn-default" ng-click="data.fields.typeannotation.model.fields.push({})" style="float: right">
+                                              <i class="fa fa-plus"></i>&nbsp;&nbsp;Add field</button>
                                         </div>
                                     </div>
                                 </form>
+
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-12" style="margin-bottom: 15px">
+                                        <h3>Optional</h3>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="inputLanguage3">Language</label>
+                                            <select name="inputLanguage3" id="inputLanguage3" ng-model="data.fields.language.model" class="form-control">
+                                              <!-- <option value="" disabled selected hidden>Select Language</option> -->
+                                              <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                </div>
+                                
                             </div>
                             <!-- END Rightside tables -->
                             <div class="col-md-2">
