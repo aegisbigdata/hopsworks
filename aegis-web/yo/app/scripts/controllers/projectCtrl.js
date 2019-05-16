@@ -285,12 +285,9 @@ angular.module('hopsWorksApp')
 
 
             self.goToUrl = function (serviceName, parameters) {
+              parameters = parameters || {};
               $scope.activeService = serviceName;
-              if (parameters && parameters != {}) {
-                $location.path('project/' + self.projectId + '/' + serviceName).search(parameters);
-              } else {
-                $location.path('project/' + self.projectId + '/' + serviceName);
-              }
+              $location.path('project/' + self.projectId + '/' + serviceName).search(parameters);
             };
 
             self.goToDatasets = function () {
