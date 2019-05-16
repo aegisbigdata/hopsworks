@@ -114,7 +114,7 @@
                             <!-- END Left menu -->
 
                             <!-- Rightside tables -->
-                            <div class="col-md-8 col-sm-8 col-lg-6" style="border-right: 1px dashed lightgrey; border-left: 1px dashed lightgrey;">
+                            <div class="col-md-8 col-sm-8 col-lg-6" style="margin-bottom: 100px;border-right: 1px dashed lightgrey; border-left: 1px dashed lightgrey;">
                               <form id="extendedMetadata" name="form.extendedMetadata">
                                 <div class="row" style="margin-bottom: 15px">
                                     <div class="col-md-12">
@@ -271,14 +271,37 @@
 
                                             <div class="form-group">
                                               <label for="input-temporal" id="input-temporal">Temporal</label>
-                                              <input class="form-control"
-                                                     placeholder="Select a date..."
-                                                     moment-picker="data.temporal"
-                                                     locale="en"
-                                                     min-view="year"
-                                                     max-view="hour"
-                                                     ng-model="data.temporal"
-                                                     ng-model-options="{ updateOn: 'blur' }">
+                                              <div class="row">
+                                                <div class="col-lg-6">
+                                                  
+                                                  <div class="input-group">
+                                                    <span class="input-group-addon" id="basic-addon1">From</span>
+                                                    <input class="form-control"
+                                                         placeholder="Select a date..."
+                                                         moment-picker="data.fields.temporalfrom"
+                                                         locale="en"
+                                                         min-view="year"
+                                                         max-view="day"
+                                                         ng-model="data.fields.temporalfrom"
+                                                         ng-model-options="{ updateOn: 'blur' }">
+                                                  </div>
+                                                </div>
+
+                                                <div class="col-lg-6">
+                                                  <div class="input-group">
+                                                    <span class="input-group-addon" id="basic-addon1">To</span>
+                                                    <input class="form-control"
+                                                           placeholder="Select a date..."
+                                                           moment-picker="data.fields.temporalto"
+                                                           locale="en"
+                                                           min-view="year"
+                                                           max-view="day"
+                                                           ng-model="data.fields.temporalto"
+                                                           ng-model-options="{ updateOn: 'blur' }">
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              
                                             </div>
 
                                     </div>
