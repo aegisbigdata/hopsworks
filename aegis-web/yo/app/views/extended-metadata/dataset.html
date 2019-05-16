@@ -108,30 +108,8 @@
                         <div class="row" style="margin-top: 15px">
                             <!-- Left menu -->
                             <div class="col-md-4 col-sm-4 col-lg-3">
-                                <!--Nav Bar -->
-                                <nav class="bs-docs-sidebar">
-
-                                    <ul id="sidebar" class="nav nav-stacked fixed">
-                                        <li class="active">
-                                            <a>Mandatory</a>
-                                            <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('required')"><a>{{ data.fields[fieldname].label }}</a></li>
-                                            </ul>
-                                          </li>
-                                          <li class="active">
-                                            <a>Recommended</a>
-                                            <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('recommended')"><a>{{ data.fields[fieldname].label }}</a></li>
-                                            </ul>
-                                          </li>
-                                          <li class="active">
-                                            <a>Optional</a>
-                                            <ul class="nav nav-stacked">
-                                                <li ng-repeat="(key, fieldname) in fieldFilter('optional')"><a>{{ data.fields[fieldname].label }}</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </nav>
+                              <!--Nav Bar -->
+                              <extmd-sidebar-nav />
                             </div>
                             <!-- END Left menu -->
 
@@ -140,20 +118,20 @@
                               <form id="extendedMetadata" name="form.extendedMetadata">
                                 <div class="row" style="margin-bottom: 15px">
                                     <div class="col-md-12">
-                                        <h3>Mandatory</h3>
+                                        <h3 id="fields-mandatory">Mandatory</h3>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
 
                                       <div class="form-group">
-                                        <label for="input-title">Title *</label>
-                                        <input type="text" ng-model="data.fields.title.model" class="form-control" id="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" ng-required="true" placeholder="Title">
+                                        <label for="input-title" id="input-title">Title *</label>
+                                        <input type="text" ng-model="data.fields.title.model" class="form-control" name="input-title" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" ng-required="true" placeholder="Title">
                                       </div>
 
                                       <div class="form-group">
-                                        <label for="input-description">Description *</label>
-                                        <textarea ng-model="data.fields.description.model" class="form-control" id="input-description" ng-focus="extendedMetadataCtrl.onFieldFocus('description')" ng-required="true" placeholder="Description"></textarea>
+                                        <label for="input-description" id="input-description">Description *</label>
+                                        <textarea ng-model="data.fields.description.model" class="form-control" name="input-description" ng-focus="extendedMetadataCtrl.onFieldFocus('description')" ng-required="true" placeholder="Description"></textarea>
                                       </div>
 
                                     </div>
@@ -161,7 +139,7 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <h3>Recommended</h3>
+                                        <h3 id="fields-recommended">Recommended</h3>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -170,20 +148,20 @@
                                             <h4 style="margin-top: 5px; margin-bottom: 25px">Contact point</h4>
 
                                             <div style="margin-bottom: 10px;margin-top: 10px">
-                                                <label for="publisher-type" style="font-size: 14px">Contact point Type</label>
-                                                <select name="publisher-type" id="publisher-type" ng-model="data.fields.contactpointtype.model" class="form-control">
+                                                <label for="contactpointtype" id="input-contactpointtype" style="font-size: 14px">Contact point Type</label>
+                                                <select name="contactpointtype" ng-model="data.fields.contactpointtype.model" class="form-control">
                                                   <option value="ORGANIZATION">Organization</option>
                                                   <option value="INDIVIDUAL">Individual</option>
                                                 </select>
                                               </div>
 
                                             <div class="form-group">
-                                                <label for="inputName3">Name</label>
-                                                <input type="text" class="form-control" id="inputName3" placeholder="Name" ng-model="data.fields.contactpointname.model" ng-focus="extendedMetadataCtrl.onFieldFocus('contactpointname')">
+                                                <label for="inputName3" id="input-contactpointname">Name</label>
+                                                <input type="text" class="form-control" placeholder="Name" ng-model="data.fields.contactpointname.model" ng-focus="extendedMetadataCtrl.onFieldFocus('contactpointname')">
                                             </div>
                                             <div class="form-group">
-                                                <label for="inputEmail3">Email</label>
-                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email" ng-model="data.fields.contactpointmail.model" ng-focus="extendedMetadataCtrl.onFieldFocus('contactpointmail')">
+                                                <label for="inputEmail3" id="input-contactpointmail">Email</label>
+                                                <input type="email" class="form-control" placeholder="Email" ng-model="data.fields.contactpointmail.model" ng-focus="extendedMetadataCtrl.onFieldFocus('contactpointmail')">
                                             </div>
                                         </div>
                                     </div>
@@ -193,7 +171,7 @@
                                     <div class="col-md-12">
 
                                             <div class="form-group">
-                                                <label for="inputKeywords3">Keywords</label>
+                                                <label for="inputKeywords3" id="input-keywords">Keywords</label>
                                                 <tags-input
                                                   ng-model="data.fields.keywords.tags"
                                                   placeholder="Add a keyword"
@@ -205,7 +183,7 @@
                                               <label for="input-publisher">Publisher *</label>
 
                                               <div style="margin-bottom: 10px;margin-top: 10px">
-                                                <label for="publisher-type" style="font-size: 14px">Publisher Type</label>
+                                                <label for="publisher-type" id="input-publishertype" style="font-size: 14px">Publisher Type</label>
                                                 <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" class="form-control">
                                                   <option value="" disabled selected hidden>Select Publisher Type</option>
                                                   <option value="ORGANIZATION">Organization</option>
@@ -214,18 +192,18 @@
                                               </div>
 
                                               <div style="margin-bottom: 10px;">
-                                                <label for="publisher-name" style="font-size: 14px">Publisher Name</label>
-                                                <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" placeholder="Publisher Name">
+                                                <label for="publisher-name" id="input-publishername" style="font-size: 14px">Publisher Name</label>
+                                                <input type="text" ng-model="data.fields.publishername.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" placeholder="Publisher Name">
                                               </div>
 
                                               <div style="margin-bottom: 10px;">
-                                                <label for="publisher-web" style="font-size: 14px">Publisher Homepage</label>
+                                                <label for="publisher-web" id="input-homepage" style="font-size: 14px">Publisher Homepage</label>
                                                 <input type="text" ng-model="data.fields.homepage.model" class="form-control" id="publisher-web" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" placeholder="Publisher Homepage">
                                               </div>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="inputTheme3">Theme/Category</label>
+                                                <label for="inputTheme3" id="input-theme">Theme/Category</label>
                                                 <select multiple id="inputTheme" class="form-control" size="13" ng-model="data.fields.theme.model">
                                                     <option value="AGRI">Agriculture, fisheries, forestry and food</option>
                                                     <option value="ECON">Economy and finance</option>
@@ -244,12 +222,12 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="input-price">Price</label>
+                                                <label for="input-price" id="input-price">Price</label>
                                                 <input type="text" class="form-control" id="input-price" placeholder="Price (Currency)" ng-model="data.fields.price.model" ng-focus="extendedMetadataCtrl.onFieldFocus('price')">
                                             </div>
 
                                             <div class="form-group">
-                                              <label>Sellable
+                                              <label id="input-sellable">Sellable
                                                 <input type="checkbox" ng-model="data.fields.sellable.model">
                                               </label>
                                             </div>
@@ -259,37 +237,32 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12" style="margin-bottom: 15px">
-                                        <h3>Optional</h3>
+                                        <h3 id="fields-optional">Optional</h3>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
 
                                             <div class="form-group">
-                                                <label for="input-accessRights">Access Rights</label>
-                                                <input type="text" class="form-control" id="input-accessRights" placeholder="Access Rights" ng-model="data.fields.accessRights.model" ng-focus="extendedMetadataCtrl.onFieldFocus('accessRights')">
+                                                <label for="input-accessRights" id="input-accessRights">Access Rights</label>
+                                                <input type="text" class="form-control" placeholder="Access Rights" ng-model="data.fields.accessRights.model" ng-focus="extendedMetadataCtrl.onFieldFocus('accessRights')">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="input-documentation">Documentation</label>
-                                                <input type="text" class="form-control" id="input-documentation" placeholder="Documentation" ng-model="data.fields.documentation.model" ng-focus="extendedMetadataCtrl.onFieldFocus('documentation')">
+                                                <label for="input-documentation" id="input-documentation">Documentation</label>
+                                                <input type="text" class="form-control" placeholder="Documentation" ng-model="data.fields.documentation.model" ng-focus="extendedMetadataCtrl.onFieldFocus('documentation')">
                                             </div>
 
                                             <div class="form-group">
-                                              <label for="input-language">Language</label>
-                                              <select name="input-language" id="input-language" ng-model="data.fields.language.model" class="form-control">
+                                              <label for="input-language" id="input-language">Language</label>
+                                              <select name="input-language" ng-model="data.fields.language.model" class="form-control">
                                                 <!-- <option value="" disabled selected hidden>Select Language</option> -->
                                                 <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
                                               </select>
                                             </div>
 
-<!--                                             <div class="form-group">
-                                                <label for="inputIdentifier3">Identifier</label>
-                                                <input type="text" class="form-control" id="inputIdentifier3" placeholder="Identifier">
-                                            </div> -->
-
                                             <div class="form-group" style="margin-bottom: 350px;position: relative;">
-                                              <label for="inputMap1">Spatial</label>
+                                              <label for="inputMap1" id="input-spatial">Spatial</label>
                                               <div>
                                                 <leaflet id="inputMap1" area="{{ data.areaSelect }}" center="{{ data.mapCenter }}" style="width: 500px; height: 300px; position: absolute;"></leaflet>
                                                 }
@@ -297,7 +270,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                              <label for="input-temporal">Temporal</label>
+                                              <label for="input-temporal" id="input-temporal">Temporal</label>
                                               <input class="form-control"
                                                      placeholder="Select a date..."
                                                      moment-picker="data.temporal"
