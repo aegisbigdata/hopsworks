@@ -15,12 +15,75 @@
   -->
 
 <div ng-controller="MainCtrl as mainCtrl">
-  <div ng-include="'nav.html'"></div>
+  <!-- <div ng-include="'nav.html'"></div> -->
   <div id="wrapper" class="toggled"  ng-controller="servingCtrl as servingCtrl">
     <div class="overlay"></div>
     <div ng-include="'navProject.html'"></div>
 
-    <div class="content-wrapper">
+    <div>
+        <div ng-if="mainCtrl.showSearchPage" class="container-fluid content-wrapper">
+          <div id="projectSearchResults">
+            <div ng-include="'views/search.html'"></div>
+          </div>
+        </div>
+        <div ng-if="!mainCtrl.showSearchPage" class="container-fluid content-wrapper" ng-controller="ProjectCtrl as projectCtrl">
+          <div growl reference="3" class="pull-right" ></div>
+          <div class="row content-utility-bar content-utility-bar-head">
+            <div class="col-md-5">
+              <div class="input-group">
+                <input type="text" class="form-control" ng-model="search" placeholder="Search for projects or datasets...">
+                <span class="input-group-btn">
+                  <button class="btn btn-default fa fa-search icon-resize-small" type="button" title="Filter"></button>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-7" style="padding-right: 30px;">
+              <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown" ng-click="mainCtrl.getMessages()">
+                  <a class="dropdown-toggle" data-toggle="dropdown" style="padding:5px 15px 0px 20px; margin-top: 7px;" aria-expanded="false">
+                    <i ng-if="mainCtrl.unreadMessages" class="fa fa-envelope fa-lg" title="Unread messages">
+                      <span class="badge" style="background-color: #f89406; font-family: sans-serif; z-index: 100; position: absolute; top: -10px; right: -18px">{{mainCtrl.unreadMessages}}</span>
+                    </i>
+                    <i ng-if="!mainCtrl.unreadMessages" class="fa fa-envelope fa-lg" title="No unread message"></i>
+                    &nbsp;Messages
+                  </a>
+                  <ul class="dropdown-menu dropdown-messages" >
+                    <li class="dropdown-header text-muted" ng-if="mainCtrl.messages.length"><h4>Latest messages</h4></li>
+                    <li class="dropdown-header text-muted" ng-if="!mainCtrl.messages.length"><h4>Inbox empty.</h4></li>
+                    <li ng-repeat="msg in mainCtrl.messages| limitTo:5">
+                      <div>
+                        <div ng-click="mainCtrl.openMessageModal(msg)">                    
+                          <div class="message-subject text-muted">
+                            <i ng-if="msg.unread" class="fa fa-circle pull-left" style="color:#f89406; margin-top: 4px;" title="Unread message"></i>
+                            <i ng-if="!msg.unread" class="fa fa-circle pull-left" style="color:grey; margin-top: 4px;" title="Read message"></i>
+                            {{msg.subject}}</div>
+                          <div class="text-muted">{{msg.dateSent| date:'medium'}}</div>
+                        </div>
+                        <div ng-click="mainCtrl.openMessageModal(msg)" class="message-preview">{{msg.preview| limitTo:80}} {{msg.preview.length > 80 ? ' ...' : ''}}</div>
+                        <a ng-if="msg.path" href="#!/{{msg.path}}"> go to requested path.</a>
+                      </div>
+                    </li>
+                    <a class="pull-right" ng-if="mainCtrl.messages.length" ng-click="mainCtrl.openMessageModal()" style="text-decoration:none;"> See all messages</a>
+                    <a class="pull-right" ng-if="!mainCtrl.messages.length" ng-click="mainCtrl.openMessageModal()" style="text-decoration:none;"> Goto messages</a>
+                  </ul>
+                </li>          
+              </ul>
+            </div>
+          </div>
+          <div class="row content-utility-bar content-utility-bar-actions">
+              <div class="col-md-3">
+                <h4 class="content-utility-bar-h4"> 
+                    <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                    title="{{projectCtrl.currentProject.projectName}}">
+                    {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+                  > Model Serving</h4>
+              </div>
+            </div>
+        </div><!--content wrapper -->
+  
+      </div>
+
+    <div class="container-fluid content-wrapper">
 
       <div ng-show="servingCtrl.activeTab === 'serving'" layout-align="center center">
 
@@ -45,12 +108,12 @@
                     <i class="fa fa-info-circle" tooltip-placement="auto left"
                       uib-tooltip='Select a model directory. The correct directory structure can be found in the documentation' style="margin-left: 10px"></i>
                   </div>
-                  <div style="margin-top: 7px; heigth: 2em;"><label>Model Name</label></div>
-                  <div style="margin-top: 9px; heigth: 2em;"><label>Model Version</label></div>
-                  <div style="margin-top: 15px; heigth: 2em;" ng-if="servingCtrl.sliderOptions.options.ceil > 1">
+                  <div class="model-serving--name"><label>Model Name</label></div>
+                  <div class="model-serving--version"><label>Model Version</label></div>
+                  <div class="model-serving--instances"  ng-if="servingCtrl.sliderOptions.options.ceil > 1">
                     <label># Instances</label>
                   </div>
-                  <div style="margin-top: 11px; heigth: 2em;"><label ng-click="servingCtrl.showAdvanced()">
+                  <div class="model-serving--advanced"><label ng-click="servingCtrl.showAdvanced()">
                     <span class="glyphicon glyphicon-chevron-right" ng-if="!servingCtrl.showAdvancedForm"></span>
                     <span class="glyphicon glyphicon-chevron-down" ng-if="servingCtrl.showAdvancedForm"></span>
                     Advanced</label>
@@ -74,26 +137,26 @@
               </div>
               <div class="row" ng-if="servingCtrl.showAdvancedForm">
                 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="text-align: right;">
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Request Batching</label></div>
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Kafka Topic</label></div>
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Kafka Num Partitions</label></div>
-                  <div style="margin-top: 10px; heigth: 2em;"><label>Kafka Replication Factor</label></div>
+                  <div class="model-serving--advanced-form"><label>Request Batching</label></div>
+                  <div class="model-serving--advanced-form"><label>Kafka Topic</label></div>
+                  <div class="model-serving--advanced-form"><label>Kafka Num Partitions</label></div>
+                  <div class="model-serving--advanced-form"><label>Kafka Replication Factor</label></div>
                 </div>
 
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-top: 10px">
                   <input type="checkbox" name="requestBatching"
                           ng-model="servingCtrl.editServing.batchingEnabled">
 
-                  <select class="form-control" style="margin-top: 5px; width: 40%" name="kafkaTopicName"
+                  <select class="form-control model-serving--form-kafka" name="kafkaTopicName"
                           ng-model="servingCtrl.editServing.kafkaTopicDTO"
                           ng-options="x.name for x in servingCtrl.projectKafkaTopics"
                           ng-change="servingCtrl.updateKafkaDetails()"></select>
 
-                  <input style="margin-top: 5px; width: 40%" name="kafkaNumPartitions" class="form-control"
+                  <input name="kafkaNumPartitions" class="form-control model-serving--form-kafka"
                          type="number" min="1" ng-model="servingCtrl.editServing.kafkaTopicDTO.numOfPartitions"
                          ng-disabled="servingCtrl.editServing.kafkaTopicDTO.name !== 'CREATE'">
 
-                  <input style="margin-top: 5px; width: 40%" name="kafkaReplicationFactor" class="form-control" type="number"
+                  <input name="kafkaReplicationFactor" class="form-control model-serving--form-kafka" type="number"
                          max="{{servingCtrl.kafkaMaxNumReplicas}}" min="1"
                          ng-model="servingCtrl.editServing.kafkaTopicDTO.numOfReplicas"
                          ng-disabled="servingCtrl.editServing.kafkaTopicDTO.name !== 'CREATE'">
@@ -143,9 +206,9 @@
                   <td>
                     <!-- Start -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Stopped'">
-                      <button style="max-width: 80px;"
+                      <button 
                               ng-click="servingCtrl.startOrStopServing(serving, 'START'); $event.stopPropagation();"
-                              class="btn btn-default btn-sm btn-block">
+                              class="btn btn-default btn-sm btn-block  model-serving--maxwidth">
                         <span style="color: #20AD28" class="glyphicon glyphicon-play" aria-hidden="true"></span> Run
                       </button>
 
@@ -153,14 +216,14 @@
 
                     <!-- Stop with starting/update in progress -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Starting' || serving.status === 'Updating'">
-                      <button style="max-width: 80px;" class="btn btn-danger btn-sm btn-block" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
+                      <button class="btn btn-danger btn-sm btn-block model-serving--maxwidth" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
                         <span class="fa fa-spinner fa-spin" aria-hidden="true"></span> Stop
                       </button>
                     </div>
 
                     <!-- Stopping -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Stopping'" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
-                      <button style="max-width: 80px;" class="btn btn-danger btn-sm btn-block" >
+                      <button class="btn btn-danger btn-sm btn-block model-serving--maxwidth" >
                         <span class="fa fa-spinner fa-spin" aria-hidden="true"></span> Stopping
                       </button>
                     </div>
@@ -168,7 +231,7 @@
 
                     <!-- Stop -->
                     <div class="btn-group" role="group" ng-if="serving.status === 'Running'">
-                      <button style="max-width: 80px;" class="btn btn-danger btn-sm btn-block" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
+                      <button class="btn btn-danger btn-sm btn-block model-serving--maxwidth" ng-click="servingCtrl.startOrStopServing(serving, 'STOP'); $event.stopPropagation();">
                         <span class="glyphicon glyphicon-stop"></span> Stop
                       </button>
                     </div>
@@ -185,9 +248,9 @@
                   <td> {{serving.creator}} </td>
                   <td> {{serving.status}} </td>
                   <td>
-                    <button class="btn btn-info glyphicon glyphicon-edit" uib-tooltip="Edit" style="margin-right:-3px" ng-click="servingCtrl.updateServing(serving); $event.stopPropagation();"></button>
-                    <button class="btn btn-danger glyphicon glyphicon-trash" uib-tooltip="Delete" style="margin-right: -3px;" ng-click="servingCtrl.deleteServing(serving); $event.stopPropagation();"></button>
-                    <button class="btn btn-warning glyphicon glyphicon-list" uib-tooltip="Show logs" style="margin-right: -3px;" ng-click="servingCtrl.showServingLogs(serving); $event.stopPropagation();"></button>
+                    <button class="btn btn-info glyphicon glyphicon-edit model-serving--margin-right" uib-tooltip="Edit" ng-click="servingCtrl.updateServing(serving); $event.stopPropagation();"></button>
+                    <button class="btn btn-danger glyphicon glyphicon-trash model-serving--margin-right" uib-tooltip="Delete"  ng-click="servingCtrl.deleteServing(serving); $event.stopPropagation();"></button>
+                    <button class="btn btn-warning glyphicon glyphicon-list model-serving--margin-right" uib-tooltip="Show logs"  ng-click="servingCtrl.showServingLogs(serving); $event.stopPropagation();"></button>
                   </td>
                 </tr>
               </tbody>
@@ -203,7 +266,7 @@
         </div>
         <div class="" ng-if="servingCtrl.showLogs === true">
           <button ng-click="servingCtrl.showMainUI();$event.stopPropagation();"
-                  class="btn btn-primary btn-md fa fa-table" style="font-size:0.9em; padding:7px 10px; margin-bottom: 3px; background-color:#005571;"
+                  class="btn btn-primary btn-md fa fa-table model-serving--summary"
                   onmouseover="this.style.backgroundColor='#004159'"
                   onmouseout="this.style.backgroundColor='#005571'"> Model Serving Summary</button>
           <iframe style="overflow-y: auto;" id="ui_iframe"  ng-src="{{servingCtrl.kibanaUI}}" width="99%" height="86%"></iframe>

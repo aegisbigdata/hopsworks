@@ -1,7 +1,7 @@
 @media only screen and (max-width: 1441px) { 
     .objectives__card {
-        width: 40rem;
-        height: 85rem;
+        width: 35rem;
+        height: 90rem;
     }
 
     .project-card {
@@ -10,21 +10,40 @@
     }
 
     .features__card {
-        width: 34rem;
+        width: 35rem;
         height: 65rem;
-        margin: 3rem;
+        margin: 1.5rem;
     }
 
     .features__card__text {
         padding: 0px 1rem;
     }
+
+    .footer__socialmedia {
+        width: 5rem;
+        height: 5rem;
+        margin-right: 1rem;
+      
+      }
 }
 
 
-@media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 1240px) {
 
     html {
         font-size: 55%;
+    }
+
+    .features__card {
+        width: 34rem;
+        height: 65rem;
+        margin: .5rem;
+    }
+
+    .objectives__card {
+        width: 35rem;
+        height: 90rem;
+        margin: .5rem;
     }
 
     .project-card {
@@ -58,7 +77,6 @@
     .footer-box {
         height: 25rem;
         border-right: none;
-        border-bottom: 1px solid #707070;
     }
 }
 
@@ -69,6 +87,12 @@
 
     .header__heading-box { 
         width: 100%;
+    }
+
+    .objectives__card {
+        width: 32rem;
+        height: 100rem;
+        margin: 0.5rem;
     }
 
     .project-card {
@@ -84,6 +108,7 @@
     .features__card {
         width: 30rem;
         height: 68rem;
+        margin: 0.5rem;
     }
 
     .features__card__text {
@@ -95,9 +120,9 @@
     }
  }
 
- @media only screen and (max-width: 767px) {
+ @media only screen and (max-width: 801px) {
     html {
-        font-size: 47%;
+        font-size: 45%;
     }
 
     li.tab {
@@ -108,18 +133,8 @@
         width: 22rem;
     }
 
-    .features__card {
-        width: 50rem;
-        height: 50rem;
-    }
-
     .features__card__text {
         font-size: 2.3rem;
-    }
-
-    .objectives__card {
-        width: 60rem;
-        height: 75rem;
     }
 
     .footer-mobile {
@@ -130,6 +145,10 @@
  }
 
  @media only screen and (max-width: 480px) {
+
+    html {
+        font-size: 40%;
+    }
 
     .features__list, .objectives__list, .project-list {
         margin-top: 3rem;
