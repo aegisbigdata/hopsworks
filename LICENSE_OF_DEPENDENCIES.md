@@ -91,7 +91,7 @@ Backend Dependecies
 * com.google.zxing:javase:jar:3.0.0 [ApacheV2](https://github.com/zxing/zxing/blob/master/LICENSE)
 * com.twitter.bijection-avro [ApacheV2](https://github.com/twitter/bijection/blob/develop/LICENSE)
 * commons-beanutils:commons-beanutils:jar:1.9.2 [ApacheV2](http://www.apache.org/licenses/LICENSE-2.0.txt)
-* commons-fileupload:commons-fileupload:jar:1.2.2 [ApacheV2](http://www.apache.org/licenses/LICENSE-2.0.txt)
+* commons-fileupload:commons-fileupload:jar:1.3.3 [ApacheV2](http://www.apache.org/licenses/LICENSE-2.0.txt)
 * commons-logging:commons-logging:jar:1.2 [ApacheV2](http://www.apache.org/licenses/LICENSE-2.0.txt)
 * io.hops:hadoop-client:jar:2.8.2.3 [ApacheV2](https://github.com/hopshadoop/hops/blob/master/LICENSE.txt)
 * io.hops.hive:hive-jdbc:jar:2.3.0 [ApacheV2](https://github.com/hopshadoop/hive/blob/master/LICENSE)
