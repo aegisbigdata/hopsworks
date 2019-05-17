@@ -42,41 +42,43 @@
 angular.module('hopsWorksApp')
 
         .factory('ExtendedMetadataAPIService', ['$http', function ($http) {
-            const EXTENDED_METADATA_GET_ENDPOINT = '';
-            const EXTENDED_METADATA_SAVE_ENDPOINT = '';
-            
+            const EXTENDED_METADATA_PROJECT_ENDPOINT = 'http://aegis-metadata.fokus.fraunhofer.de/catalogues/';
+            const API_KEY = '';
+
             var service = {
 
               /**
-               * GET existing extended metadata for project by ID (WIP)
+               * GET existing extended metadata for project by ID
                */
 
-              getExtMetadataForProject: function (projectId) {
-                return $http.get(EXTENDED_METADATA_GET_ENDPOINT + projectId);
+              getExtMetadataForProject: function (projectID) {
+                var req = {
+                  method: 'GET',
+                  url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+                  headers: {
+                    'Content-Type': 'application/ld+json',
+                    'Authorization': API_KEY
+                  },
+                  data: metadata
+                };
+                return $http(req);
               },
 
 
               /**
-               * POST/Save extended metadata to endpoint. 
+               * PUT/Save extended metadata to endpoint. 
                * Triggered when user clicks on "Save Metadata" button.
-               * WIP: Cloned from metadataRestService until API endpoints are specified
                */
 
-              saveExtMetadata: function (inodepid, inodename, metadataObj) {
-                var jsonObj = JSON.stringify({
-                  inodepid: inodepid,
-                  inodename: inodename,
-                  tableid: -1,
-                  metaid: metadataObj.id,
-                  metadata: metadataObj
-                });
+              storeExtendedMetadataForProject: function (projectID, metadata) {
                 var req = {
-                  method: 'POST',
-                  url: EXTENDED_METADATA_SAVE_ENDPOINT,
+                  method: 'PUT',
+                  url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
                   headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/ld+json',
+                    'Authorization': API_KEY
                   },
-                  data: jsonObj
+                  data: metadata
                 };
                 return $http(req);
               },

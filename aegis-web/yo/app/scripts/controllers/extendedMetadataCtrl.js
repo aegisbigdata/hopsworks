@@ -301,55 +301,22 @@ angular.module('hopsWorksApp')
             self.saveExtendedProjectMetadata = function () {
               var graph = self.template['@graph'][0];
               graph['@id'] = 'https://aegis.eu/id/project/' + PROJECT_ID;
+              graph.modified = (new Date()).toISOString();
 
+              // Populate template fields
               for (var key in $scope.data.fields) {
-                var field = $scope.data.fields[key];
-                
+                var field = $scope.data.fields[key];                
                 if (field.hasOwnProperty('mapping')) {
                   var mapping = field.mapping;
-                  
-
                   if (field.hasOwnProperty('model')) {
                     ExtendedMetadataService.setProperty(graph, mapping, field.model);
                   } 
                 }
               }
 
-              console.log(self.template);
+              console.log(self.template['@graph'][0]);
 
-              // ProjectService.get({}, {'id': PROJECT_ID}).$promise.then(
-              //   function (project) {
-              //     console.log(project);
-
-              //     let template = {
-              //       templateId: AEGIS_PROJECT_TEMPLATE_ID,
-              //       inodePath: '/Projects/' + project.projectName
-              //     };
-
-              //     dataSetService.detachTemplate(project.inodeid, AEGIS_PROJECT_TEMPLATE_ID).finally(function () {
-              //       dataSetService.attachTemplate(template).then(function (success) {
-              //         growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
-              //       }, function (error) {
-              //         growl.info(
-              //           'Could not attach template.',
-              //           {title: 'Info', ttl: 5000}
-              //         );
-              //       }).then(function () {
-              //         ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
-              //           const metaData = { 5: jsonldData };
-              //           MetadataRestService.addMetadataWithSchema(
-              //             parseInt(project.inodeid), project.projectName, -1, metaData).then(function () {
-              //               console.log('done?')
-              //             }, function (error) {
-              //               growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
-              //             });
-              //         });
-              //       });
-              //     });
-              //   },
-              //   function(error) {
-              //     console.log(error);
-              //   });
+              
             };
 
 
