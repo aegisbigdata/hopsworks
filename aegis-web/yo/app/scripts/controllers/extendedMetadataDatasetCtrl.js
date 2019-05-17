@@ -208,10 +208,14 @@ angular.module('hopsWorksApp')
                   mapping: 'http://purl.org/dc/terms/spatial',
                   optional: true
                 },
-                temporal: {
+                temporalfrom: {
                   label: 'Temporal',
                   model: '',
                   optional: true
+                },
+                temporalto: {
+                  label: 'Temporal',
+                  model: '',
                 },
               },
               bounds: null,
