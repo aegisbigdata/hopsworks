@@ -291,4 +291,8 @@ public class ClientWrapper<T extends Object> {
       }
     };
   }
+  
+  public void close() {
+    client.close();
+  }
 }
