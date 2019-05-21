@@ -59,7 +59,6 @@
     <module>hopsworks-dela</module>
     <module>hopsworks-jwt</module>
     <module>hopsworks-persistence</module>
-    <module>aegis-web</module>
   </modules>
 
   <profiles>
@@ -75,10 +74,19 @@
     <profile>
       <id>web</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>hopsworks-web</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>aegis</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>aegis-web</module>
       </modules>
     </profile>
   </profiles>
