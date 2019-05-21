@@ -88,8 +88,8 @@
 
 /* Layout for jobs.html */
 
-.job-layout {
-  margin-top: 80px;
+.rg-row-top.job-content--row{
+   background: transparent !important;
 }
 
 div.job-content--page {
