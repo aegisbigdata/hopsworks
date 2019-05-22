@@ -96,6 +96,7 @@ div.job-content--page {
   height:100%; 
   overflow: hidden; 
   padding: 0 !important;
+  background: initial;
 }
 
 .job-content--row {
