@@ -122,6 +122,76 @@ angular.module('hopsWorksApp')
               }
             };
 
+            self.mockResponse = {
+              "@graph": [
+                {
+                  "@id": "_:b0",
+                  "@type": "http://xmlns.com/foaf/0.1/Organization",
+                  "homepage": "http://www.fokus.fraunhofer.de",
+                  "name": "Fraunhofer FOKUS"
+                },
+                {
+                  "@id": "_:b1",
+                  "@type": "http://purl.org/dc/terms/Location",
+                  "geometry": "{\"type\": \"polygon\", \"coordinates\": [[[10.326304, 53.394985], [10.326304, 53.964153], [8.420551, 53.964153], [8.420551, 53.394985], [10.326304, 53.394985]]]}"
+                },
+                {
+                  "@id": "https://europeandataportal.eu/id/catalogue/1049",
+                  "@type": "http://www.w3.org/ns/dcat#Catalog",
+                  "description": "This is an example Project",
+                  "language": "http://publications.europa.eu/resource/authority/language/ENG",
+                  "license": "http://publications.europa.eu/resource/authority/licence/CC_BYNCND_4_0",
+                  "modified": "2019-05-16T14:02:00Z",
+                  "publisher": "_:b0",
+                  "spatial": "_:b1",
+                  "title": "Example Project",
+                  "type": "dcat-ap"
+                }
+              ],
+              "@context": {
+                "homepage": {
+                  "@id": "http://xmlns.com/foaf/0.1/homepage",
+                  "@type": "@id"
+                },
+                "name": {
+                  "@id": "http://xmlns.com/foaf/0.1/name"
+                },
+                "description": {
+                  "@id": "http://purl.org/dc/terms/description"
+                },
+                "license": {
+                  "@id": "http://purl.org/dc/terms/license",
+                  "@type": "@id"
+                },
+                "language": {
+                  "@id": "http://purl.org/dc/terms/language",
+                  "@type": "@id"
+                },
+                "publisher": {
+                  "@id": "http://purl.org/dc/terms/publisher",
+                  "@type": "@id"
+                },
+                "spatial": {
+                  "@id": "http://purl.org/dc/terms/spatial",
+                  "@type": "@id"
+                },
+                "type": {
+                  "@id": "http://purl.org/dc/terms/type"
+                },
+                "title": {
+                  "@id": "http://purl.org/dc/terms/title"
+                },
+                "modified": {
+                  "@id": "http://purl.org/dc/terms/modified",
+                  "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                },
+                "geometry": {
+                  "@id": "http://www.w3.org/ns/locn#geometry",
+                  "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
+                }
+              }
+            };
+
             $scope.form = {};
             $scope.data = {
               fields: {
@@ -259,39 +329,47 @@ angular.module('hopsWorksApp')
             };
 
 
+            self.updateModelsFromData = function (jsonld) {
+              if (!jsonld.hasOwnProperty('@graph')) return;
+              var graph = jsonld['@graph'];
+              var fields = $scope.data.fields;
+
+              // Set publisher Info
+              var type_splitted = graph[0]['@type'].split('/');
+              fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
+              fields.publishername.model = graph[0].name;
+              fields.homepage.model = graph[0].homepage;
+
+              // Set Language field
+              var language_splitted = graph[2].language.split('/');
+              fields.language.model = language_splitted[language_splitted.length - 1];
+
+              // Set License field
+              var license_splitted = graph[2].license.split('/');
+              fields.license.model = license_splitted[license_splitted.length - 1];
+
+              // Set other fields
+              fields.title.model = graph[2].title;
+              fields.description.model = graph[2].description;
+
+            };
+
             /**
              * Loads from data from JSON-LD format into page
              */
-            self.loadExtendedDistroMetadata = function () {
-              // MetadataRestService.getMetadata(4500621).then(function (datasetMetadata) {
-
-              //   console.log(datasetMetadata);
-              //   if (!datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME] ||
-              //       !datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME].metadata.payload.length) {
-              //     console.log('No metadata available.');
-              //     return;
-              //   }
-
-              //   let data = datasetMetadata.data[AEGIS_PROJECT_TEMPLATE_NAME].metadata.payload[0];
-              //   data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
-
-              //   for (var key in data) {
-              //     if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
-              //       if (data[key] === './') continue;
-                    
-              //       if (typeof(data[key]) === 'string') {
-              //         // Standard string field
-              //         $scope.data.fields[key].model = data[key].substr(1);
-              //       } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
-              //         // Nested object with @id property
-              //         $scope.data.fields[key].model = data[key]['@id'].substr(1);
-              //       }
-              //     }
-              //   }
-              // });
+            
+            self.loadExtendedProjectMetadata = function () {
+              ExtendedMetadataAPIService.getExtMetadataForProject(PROJECT_ID)
+                .then(function(data) {
+                  console.log(data);
+                })
+                .catch(function(error) {
+                  self.updateModelsFromData(self.mockResponse);
+                  console.error(error);
+                });
             };
 
-            // self.loadExtendedDistroMetadata();
+            self.loadExtendedProjectMetadata();
 
 
             /**
@@ -314,9 +392,7 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              console.log(self.template['@graph'][0]);
-
-              
+              console.log(self.template['@graph'][0]);             
             };
 
 

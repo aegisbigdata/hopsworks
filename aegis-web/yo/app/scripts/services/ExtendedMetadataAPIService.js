@@ -58,8 +58,7 @@ angular.module('hopsWorksApp')
                   headers: {
                     'Content-Type': 'application/ld+json',
                     'Authorization': API_KEY
-                  },
-                  data: metadata
+                  }
                 };
                 return $http(req);
               },
