@@ -392,7 +392,10 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              console.log(self.template['@graph'][0]);             
+              console.log(self.template['@graph'][0]);
+
+              // Send to API (WIP)
+              // ExtendedMetadataAPIService.storeExtendedMetadataForProject(PROJECT_ID, self.template); 
             };
 
 
