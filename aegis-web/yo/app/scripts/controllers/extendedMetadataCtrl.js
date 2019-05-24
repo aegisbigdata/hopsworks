@@ -362,9 +362,11 @@ angular.module('hopsWorksApp')
               ExtendedMetadataAPIService.getExtMetadataForProject(PROJECT_ID)
                 .then(function(data) {
                   console.log(data);
+
+                  // Until CORS is enabled, update models with mock data...
+                  self.updateModelsFromData(self.mockResponse);
                 })
                 .catch(function(error) {
-                  self.updateModelsFromData(self.mockResponse);
                   console.error(error);
                 });
             };
