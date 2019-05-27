@@ -48,28 +48,28 @@
 <div class="modal-body" id="profileModal" ng-controller="MainCtrl as mainCtrl">
 
   <div class="row">
-    <div class="col-md-5" style="max-width: 400px">
+    <div class="col-md-5">
+        <button type="button"
+                title="Add member(s)"
+                data-toggle="collapse"
+                data-target="#collapseAddMember"
+                aria-expanded="false"
+                aria-controls="collapseAddMember"
+                ng-disabled="memberCtrl.teamRole!=='Data owner'"
+                class="btn btn-sm btn-success">
+          <i class="fa fa-user-plus fa-2x"></i>
+          Add member(s)
+        </button>
 
-      <input type="text"
-             id="srch-term"
-             ng-model="searchInput"
-             name="srch-term"
-             placeholder="Find member..."
-             style="height: 28px;margin-top: 0px;height:38px;"
-             class="form-control" autofocus>
-    </div>
-    <div class="col-md-offset-5 col-md-2">
-      <button type="button"
-              title="Add member(s)"
-              data-toggle="collapse"
-              data-target="#collapseAddMember"
-              aria-expanded="false"
-              aria-controls="collapseAddMember"
-              ng-disabled="memberCtrl.teamRole!=='Data owner'"
-              class="btn btn-sm btn-success pull-right">
-        <i class="fa fa-user-plus fa-2x"></i>
-        Add member(s)
-      </button>
+      </div>
+      <div class="col-md-offset-2 col-md-5">
+          <input type="text"
+                 id="srch-term"
+                 ng-model="searchInput"
+                 name="srch-term"
+                 placeholder="Find member..."
+                 style="height: 28px;margin-top: 0px;height:38px;"
+                 class="form-control" autofocus>
     </div>
   </div>
 
