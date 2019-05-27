@@ -143,8 +143,8 @@
                   <button type="button"
                           style="width:32px; height: 32px; border-radius: 16px;"
                           ng-click="memberCtrl.removeMember(newMember.projectTeamPK.teamMember)"
-                          class="btn btn-danger pull-right">
-                    <em class="fa fa-trash"></em>
+                          class="btn btn-danger pull-right centered-icon">
+                    <i class="fa fa-trash"></i>
                   </button>
                 </td>
 
@@ -227,8 +227,8 @@
                     ng-disabled="member.user.email === memberCtrl.projectOwner.email ||
                       (memberCtrl.teamRole !== 'Data owner' && member.user.email !== mainCtrl.email)"
                     ng-click="memberCtrl.deleteMemberFromBackend(member.user.email)"
-                    class="btn btn-danger pull-right">
-              <em class="fa fa-trash"></em>
+                    class="btn btn-danger pull-right centered-icon">
+              <i class="fa fa-trash"></i>
             </button>
           </td>
         </tr>
