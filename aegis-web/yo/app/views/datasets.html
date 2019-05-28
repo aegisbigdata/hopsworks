@@ -167,7 +167,7 @@
                               <i ng-show="dataset.downloading"  class="glyphicon glyphicon-cloud-download"></i>
                             </div>
                             <div class="file-name" data-toggle="tooltip" title="Click on the bottom section to view metadata for this dataset."
-                                 ng-click="datasetsCtrl.select(dataset.name, dataset, $event); metadataCtrl.setMetadataTemplate(dataset); datasetsCtrl.filePreview(dataset, false, true);">
+                                 ng-click="datasetsCtrl.select(dataset.name, dataset, $event); metadataCtrl.setMetadataTemplate(dataset); datasetsCtrl.filePreview(dataset, false, true);" ng-dblclick="projectCtrl.browseDataset(dataset)">
                               <div class="content-text">
                                     <span class="content-text-icon" data-toggle="tooltip"
                                     title="{{dataset.name.length > 17 ? dataset.name:''}}">
