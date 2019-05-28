@@ -48,28 +48,28 @@
 <div class="modal-body" id="profileModal" ng-controller="MainCtrl as mainCtrl">
 
   <div class="row">
-    <div class="col-md-5" style="max-width: 400px">
+    <div class="col-md-5">
+        <button type="button"
+                title="Add member(s)"
+                data-toggle="collapse"
+                data-target="#collapseAddMember"
+                aria-expanded="false"
+                aria-controls="collapseAddMember"
+                ng-disabled="memberCtrl.teamRole!=='Data owner'"
+                class="btn btn-sm btn-success">
+          <i class="fa fa-user-plus fa-2x"></i>
+          Add member(s)
+        </button>
 
-      <input type="text"
-             id="srch-term"
-             ng-model="searchInput"
-             name="srch-term"
-             placeholder="Find member..."
-             style="height: 28px;margin-top: 0px;height:38px;"
-             class="form-control" autofocus>
-    </div>
-    <div class="col-md-offset-5 col-md-2">
-      <button type="button"
-              title="Add member(s)"
-              data-toggle="collapse"
-              data-target="#collapseAddMember"
-              aria-expanded="false"
-              aria-controls="collapseAddMember"
-              ng-disabled="memberCtrl.teamRole!=='Data owner'"
-              class="btn btn-sm btn-success pull-right">
-        <i class="fa fa-user-plus fa-2x"></i>
-        Add member(s)
-      </button>
+      </div>
+      <div class="col-md-offset-2 col-md-5">
+          <input type="text"
+                 id="srch-term"
+                 ng-model="searchInput"
+                 name="srch-term"
+                 placeholder="Find member..."
+                 style="height: 28px;margin-top: 0px;height:38px;"
+                 class="form-control" autofocus>
     </div>
   </div>
 
@@ -82,7 +82,7 @@
       <div class="controls">
 
         <ui-select ng-model="memberCtrl.card.selected"
-                   theme="select2" class="form-control" 
+                   theme="select2" class="form-control select-center" 
                    style="min-width: 300px;">
 
           <ui-select-match placeholder="Select member..."  style="height:24px;">{{$select.selected.email}}</ui-select-match>
@@ -143,8 +143,8 @@
                   <button type="button"
                           style="width:32px; height: 32px; border-radius: 16px;"
                           ng-click="memberCtrl.removeMember(newMember.projectTeamPK.teamMember)"
-                          class="btn btn-danger pull-right">
-                    <em class="fa fa-trash"></em>
+                          class="btn btn-danger pull-right centered-icon">
+                    <i class="fa fa-trash"></i>
                   </button>
                 </td>
 
@@ -227,8 +227,8 @@
                     ng-disabled="member.user.email === memberCtrl.projectOwner.email ||
                       (memberCtrl.teamRole !== 'Data owner' && member.user.email !== mainCtrl.email)"
                     ng-click="memberCtrl.deleteMemberFromBackend(member.user.email)"
-                    class="btn btn-danger pull-right">
-              <em class="fa fa-trash"></em>
+                    class="btn btn-danger pull-right centered-icon">
+              <i class="fa fa-trash"></i>
             </button>
           </td>
         </tr>

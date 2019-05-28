@@ -310,3 +310,24 @@ div.job-content--page {
 }
 
 /* end model serving */
+
+button.centered-icon {
+  position: relative;
+}
+
+button.centered-icon > .fa.fa-trash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: 9px;
+  margin-left: 9px;
+}
+
+.select2-drop-active {
+  opacity: 1 !important;
+}
+
+.select-center {
+  padding: 0px 10px;
+  height: auto;
+}
