@@ -309,3 +309,11 @@ div.job-content--page {
 }
 
 /* end model serving */
+
+.ds-box-bottom > div {
+  background-color: white;
+}
+
+.rg-row-bottom-ds.scrollbar-box {
+  margin-top: -75px;
+}

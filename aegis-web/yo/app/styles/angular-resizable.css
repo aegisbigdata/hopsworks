@@ -144,7 +144,7 @@
     height: 70%; 
     max-height: 90%; 
     min-height: 30%;
-    overflow: hidden;
+    overflow-y: scroll;
     z-index: 2;
 }
 
