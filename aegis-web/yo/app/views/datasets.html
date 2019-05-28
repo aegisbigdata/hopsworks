@@ -97,11 +97,11 @@
               </div>
             </div>
             <div class="row content-utility-bar content-utility-bar-actions">
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <h4 class="content-utility-bar-h4">
                     <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
                         title="{{projectCtrl.currentProject.projectName}}">
-                        {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+                        {{ projectCtrl.currentProject.projectName | limitTo: 27 }}{{projectCtrl.currentProject.projectName.length > 27 ? '…' : ''}}</a>
                     > Datasets
                 </h4>
               </div>
@@ -116,7 +116,7 @@
                   <a ng-click="datasetsCtrl.shared = true; datasetsCtrl.status = false; datasetsCtrl.isPublic = 0;" class="file-control">My Requests</a>
                 </div>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <div class="input-group">
                   <input type="text" class="form-control"
                         ng-model="search" placeholder="Filter...">
@@ -170,8 +170,8 @@
                                  ng-click="datasetsCtrl.select(dataset.name, dataset, $event); metadataCtrl.setMetadataTemplate(dataset); datasetsCtrl.filePreview(dataset, false, true);" ng-dblclick="projectCtrl.browseDataset(dataset)">
                               <div class="content-text">
                                     <span class="content-text-icon" data-toggle="tooltip"
-                                    title="{{dataset.name.length > 17 ? dataset.name:''}}">
-                                        <b>{{dataset.name| cut:true:17:'...'}}</b>
+                                    title="{{dataset.name.length > 27 ? dataset.name:''}}">
+                                        <b>{{dataset.name| cut:true:27:'...'}}</b>
                                     </span>
                                     <span class="fa fa-user pull-right" ng-if="dataset.permission === 'rwxrwx--T'" data-toggle="tooltip"
                                           title="This dataset is group writable and sticky bit is set."></span>
