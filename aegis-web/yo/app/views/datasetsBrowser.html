@@ -96,16 +96,16 @@
               </div>
             </div>
           <div class="row content-utility-bar content-utility-bar-actions" ng-if="!mainCtrl.showSearchPage">
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <h4 class="content-utility-bar-h4"><a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
                 <span ng-show="datasetsCtrl.pathArray.length > 10">...</span>
                 <span data-ng-repeat="path in datasetsCtrl.pathArray.slice(datasetsCtrl.pathArray.length - 1 - datasetsCtrl.breadcrumbLen()) track by $index">
-                  <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 16 }}{{path.length > 16 ? '..' : ' '}}</a>
+                  <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 26 }}{{path.length > 26 ? '..' : ' '}}</a>
                 </span>
                 <span><a ng-click="datasetsCtrl.goToFolder(datasetsCtrl.pathArray.length)"><span class="fa fa-refresh fa-sm"></span></a></span>
                 </h4>
               </div>
-              <div class="col-md-5" ng-show="datasetsCtrl.isSelectedFiles() === 1">
+              <div class="col-md-4" ng-show="datasetsCtrl.isSelectedFiles() === 1">
                 <div class=" input-group">
                   <input id="fileRef" type="text" class="form-control" 
                          value="{{datasetsCtrl.getSelectedPath(datasetsCtrl.selectedFiles[datasetsCtrl.selected])}}">
