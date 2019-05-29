@@ -164,7 +164,7 @@ div.job-content--page {
 }
 
 .navbar-search-radio-more{
-  background-color: lightgrey;
+  background-color: darkgrey;
   display: flex;
   justify-content: space-between;
   color: #ffffff;
@@ -234,11 +234,10 @@ div.job-content--page {
   display: flex;
   align-items: center;
   position: relative;
+  padding-bottom: 20px;
 }
 
 .input-date-group {
-  display: flex;
-  justify-content: space-between;
   padding: 10px 20px;
   border-left: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
@@ -250,10 +249,14 @@ div.job-content--page {
   border-top: none;
   border-left: none;
   border-right: none;
-  margin: 0px 15px;
-  width: 70%;
+  margin: 0px 10px;
+  width: 90%;
 }
 
+.date-title {
+  text-transform: uppercase;
+  font-size: 14px;
+}
 .search-header {
   align-items: center;
   display: flex;
@@ -368,7 +371,7 @@ button.centered-icon > .fa.fa-trash {
 }
 
 .oval-license.grey {
-  background-color: lightgrey; 
+  background-color: darkgrey; 
 }
 
 .card-body .details h3 {
