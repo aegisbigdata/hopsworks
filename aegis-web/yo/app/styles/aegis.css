@@ -331,3 +331,51 @@ button.centered-icon > .fa.fa-trash {
   padding: 0px 10px;
   height: auto;
 }
+
+.card-item {
+  height: auto;
+  min-height: 175px;
+}
+
+.card-item-content {
+  max-height: initial;
+  min-height: 175px;
+  height: auto;
+}
+
+.card-item-content .header {
+  height: auto;
+  max-height: initial;
+}
+
+.card-content.title-blue {
+  color: #0492b3;
+  font-weight: bold;
+}
+
+.oval {
+  padding: 10px 0px;
+}
+
+.oval-license {
+  background-color: #0492b3;  
+  color: #ffffff;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+  margin: 0px 10px 10px 0px;
+}
+
+.oval-license.grey {
+  background-color: lightgrey; 
+}
+
+.card-body .details h3 {
+  margin-top: 0px;
+  font-size: 18px;
+}
+
+.search-result-sort {
+  justify-content: flex-end;
+}
