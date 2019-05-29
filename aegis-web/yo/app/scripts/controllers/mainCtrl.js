@@ -55,6 +55,7 @@ angular.module('hopsWorksApp')
                   AirflowService) {
             const MIN_SEARCH_TERM_LEN = 2;
             var self = this;
+            self.hola="hola";
 
 
             self.ui = "/hopsworks-api/airflow/login?q=username=";
@@ -209,6 +210,7 @@ angular.module('hopsWorksApp')
             self.resultItemsPublicSearch = 0;
             self.currentPage = 1;
             self.pageSize = 9;
+            self.itemSearched = "";
 
             self.hitEnter = function (event) {
               var code = event.which || event.keyCode || event.charCode;
