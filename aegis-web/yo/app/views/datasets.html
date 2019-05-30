@@ -48,13 +48,8 @@
       <section>
         <div>
           <div ng-include="'views/searchBar.html'"></div>
-          
-          <div ng-if="mainCtrl.showSearchPage" class="container-fluid content-wrapper">
-            <div id="projectSearchResults">
-              <div ng-include="'views/search.html'"></div>
-            </div>
-          </div>
-          <div ng-if="!mainCtrl.showSearchPage" class="container-fluid content-wrapper" ng-controller="ProjectCtrl as projectCtrl">
+
+          <div class="container-fluid content-wrapper" ng-controller="ProjectCtrl as projectCtrl">
             <div growl reference="3" class="pull-right" ></div>
             <div class="row content-utility-bar content-utility-bar-actions">
               <div class="col-md-3">
@@ -339,7 +334,7 @@
             </div>
           </div><!--content wrapper -->
 
-          <div ng-if="!mainCtrl.showSearchPage">
+          <div>
             <div class="ds-sidenav" ng-class="{open: datasetsCtrl.tgState}">
               <div class="ibox float-e-margins" style="margin-top: 0px; margin-bottom: 0px; height: 100%;">
                 <div style="height: 100%;">

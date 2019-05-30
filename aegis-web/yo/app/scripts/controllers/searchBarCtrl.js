@@ -43,8 +43,8 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-  .controller('SearchBarCtrl', ['$scope', '$rootScope', 'ElasticService', 'DelaService', 'growl', '$routeParams', 
-    function ($scope, $rootScope, ElasticService, DelaService, growl, $routeParams) {
+  .controller('SearchBarCtrl', ['$scope', '$rootScope', '$location', 'ElasticService', 'DelaService', 'growl', '$routeParams', 
+    function ($scope, $rootScope, $location, ElasticService, DelaService, growl, $routeParams) {
       const MIN_SEARCH_TERM_LEN = 2;
       var self = this;
       var mainParent = $scope.mainCtrl;
@@ -59,8 +59,8 @@ angular.module('hopsWorksApp')
       } else {
         self.searchType = "global";
       }
+      console.log('search Type: ', self.searchType);
 
-      self.searchTerm = "";
       self.searching = false;
       self.globalClusterBoundary = false;
       self.resultPages = 0;
@@ -69,8 +69,13 @@ angular.module('hopsWorksApp')
       self.resultItemsPublicSearch = 0;
       self.currentPage = 1;
       self.pageSize = 9;
-
-
+      
+      if($location.search().q !== '' || $location.search().q !== undefined) {
+        self.searchTerm = $location.search().q;
+        mainParent.itemSearched = self.searchTerm;
+      } else {
+        self.searchTerm = '';
+      }
 
       self.hitEnter = function (event) {
         var code = event.which || event.keyCode || event.charCode;
@@ -97,13 +102,14 @@ angular.module('hopsWorksApp')
       self.onClickSearch = function() {
         if (self.searchTerm.length >= MIN_SEARCH_TERM_LEN || (mainParent.searchResult.length > 0 && self.searchTerm.length > 0)) {
           mainParent.searchResult = [];
-          mainParent.itemSearched = self.searchTerm;
-          self.search();
+          $scope.projectCtrl.goToUrl('search',{q:self.searchTerm});
         } else {
           mainParent.showSearchPage = false;
           mainParent.searchResult = [];
         }
       }
+
+
 
       self.clearSearch = function () {
         mainParent.showSearchPage = false;
@@ -122,6 +128,7 @@ angular.module('hopsWorksApp')
           return;
         }
         self.searching = true;
+
         if (self.searchType === "global" && $rootScope.isDelaEnabled) {
           var global_data;
           var searchHits;
@@ -265,6 +272,9 @@ angular.module('hopsWorksApp')
         }
         self.pageSize = self.pageSize - 1;
       };
+
+
+      self.search();
 
 
     }
