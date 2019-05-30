@@ -12,6 +12,9 @@
 .icon-menu {
     padding-left: 15px;
 }
+.first-icon-menu {
+  padding-right: 15px;
+}
 .btn-group.list-action {
     display: block;
     width: 100%;
