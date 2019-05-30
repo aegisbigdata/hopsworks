@@ -101,12 +101,12 @@
                 <h4 class="content-utility-bar-h4">
                     <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
                     title="{{projectCtrl.currentProject.projectName}}">
-                    {{ projectCtrl.currentProject.projectName | limitTo: 27 }}{{projectCtrl.currentProject.projectName.length > 27 ? '…' : ''}}</a>
+                    {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
                     <span> > </span>
                     <a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
                 <span ng-show="datasetsCtrl.pathArray.length > 10">...</span>
                 <span data-ng-repeat="path in datasetsCtrl.pathArray.slice(datasetsCtrl.pathArray.length - 1 - datasetsCtrl.breadcrumbLen()) track by $index">
-                  <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 26 }}{{path.length > 26 ? '..' : ' '}}</a>
+                  <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 16 }}{{path.length > 16 ? '..' : ' '}}</a>
                 </span>
                 <span><a ng-click="datasetsCtrl.goToFolder(datasetsCtrl.pathArray.length)"><span class="fa fa-refresh fa-sm"></span></a></span>
                 </h4>
