@@ -45,7 +45,7 @@
                 <h3 class="ng-bindings no-mrg">Filters</h4>
             </div>  
             <div class="pull-right col-md-4">
-              <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block"
+              <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block btn-bold"
                     ng-click="searchTypePub=undefined; 
                               searchType=undefined; 
                               sortKey=undefined;
@@ -95,14 +95,18 @@
                       <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
                   <div class="date-title">To:</div>    
                       <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
+                      <button class="btn btn-link btn-bold align-right"
+                                  ng-click="">
+                          APPLY
+                      </button>
                 </div>
             </form> 
             <form action="" class="navbar-form-search">
                 <div  class="navbar-search-header">
                     <div class="search-header">File Types</div>
-                    <button class="btn btn-link"
+                    <button class="btn btn-link btn-bold"
                                ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        SELECT ALL
+                        RESET
                     </button>
                 </div>
                 <div class="navbar-search-radio">
@@ -122,9 +126,9 @@
             <form action="" class="navbar-form-search">
                 <div  class="navbar-search-header">
                     <div class="search-header">License</div>
-                    <button class="btn btn-link"
+                    <button class="btn btn-link btn-bold"
                                ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        SELECT ALL
+                        RESET
                     </button>
                 </div>
                 <div class="navbar-search-radio">

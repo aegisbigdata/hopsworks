@@ -346,18 +346,28 @@ button.centered-icon > .fa.fa-trash {
   height: auto;
 }
 
+.card-item-content label {
+  font-weight: normal;
+}
+
 .card-item-content .header {
   height: auto;
   max-height: initial;
 }
 
+.card-item-content .value {
+  font-size: 15px;
+  font-weight: normal;
+}
+
 .card-content.title-blue {
   color: #0492b3;
-  font-weight: bold;
+  font-size: 15px;
 }
 
 .oval {
   padding: 10px 0px;
+  font-size: 13px;
 }
 
 .oval-license {
@@ -367,18 +377,29 @@ button.centered-icon > .fa.fa-trash {
   padding: 5px 10px;
   border-radius: 15px;
   display: inline-block;
-  margin: 0px 10px 10px 0px;
+  margin: 10px 10px 10px 0px;
 }
 
 .oval-license.grey {
   background-color: darkgrey; 
+  margin: 0px 10px 10px 0px;
 }
 
 .card-body .details h3 {
   margin-top: 0px;
+  margin-bottom: 25px;
   font-size: 18px;
 }
 
 .search-result-sort {
   justify-content: flex-end;
+}
+
+.btn-bold {
+  font-weight: bold;
+}
+
+.btn.align-right {
+  width: 100%;
+  text-align: right;
 }
