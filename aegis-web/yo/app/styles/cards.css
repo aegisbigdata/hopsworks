@@ -176,7 +176,7 @@
 }
 
 .card-footer-icons > span > i{
-  color: #dddddd;
+  color: darkgrey;
 }
 
 .card-footer-icons > span > i:hover{
@@ -231,9 +231,4 @@
   position: relative;
   padding: 15px;
   background: white;
-}
-
-.modal-blue{
-  background-color: #245580;
-  border-radius: 5px;
 }

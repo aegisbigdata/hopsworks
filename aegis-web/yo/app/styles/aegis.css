@@ -164,7 +164,7 @@ div.job-content--page {
 }
 
 .navbar-search-radio-more{
-  background-color: lightgrey;
+  background-color: darkgrey;
   display: flex;
   justify-content: space-between;
   color: #ffffff;
@@ -234,11 +234,10 @@ div.job-content--page {
   display: flex;
   align-items: center;
   position: relative;
+  padding-bottom: 20px;
 }
 
 .input-date-group {
-  display: flex;
-  justify-content: space-between;
   padding: 10px 20px;
   border-left: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
@@ -250,10 +249,14 @@ div.job-content--page {
   border-top: none;
   border-left: none;
   border-right: none;
-  margin: 0px 15px;
-  width: 70%;
+  margin: 0px 10px;
+  width: 90%;
 }
 
+.date-title {
+  text-transform: uppercase;
+  font-size: 14px;
+}
 .search-header {
   align-items: center;
   display: flex;
@@ -330,4 +333,73 @@ button.centered-icon > .fa.fa-trash {
 .select-center {
   padding: 0px 10px;
   height: auto;
+}
+
+.card-item {
+  height: auto;
+  min-height: 175px;
+}
+
+.card-item-content {
+  max-height: initial;
+  min-height: 175px;
+  height: auto;
+}
+
+.card-item-content label {
+  font-weight: normal;
+}
+
+.card-item-content .header {
+  height: auto;
+  max-height: initial;
+}
+
+.card-item-content .value {
+  font-size: 15px;
+  font-weight: normal;
+}
+
+.card-content.title-blue {
+  color: #0492b3;
+  font-size: 15px;
+}
+
+.oval {
+  padding: 10px 0px;
+  font-size: 13px;
+}
+
+.oval-license {
+  background-color: #0492b3;  
+  color: #ffffff;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+  margin: 10px 10px 10px 0px;
+}
+
+.oval-license.grey {
+  background-color: darkgrey; 
+  margin: 0px 10px 10px 0px;
+}
+
+.card-body .details h3 {
+  margin-top: 0px;
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+.search-result-sort {
+  justify-content: flex-end;
+}
+
+.btn-bold {
+  font-weight: bold;
+}
+
+.btn.align-right {
+  width: 100%;
+  text-align: right;
 }
