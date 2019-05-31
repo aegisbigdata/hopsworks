@@ -125,7 +125,7 @@ angular.module('hopsWorksApp', [
                       }
                     })
                     .when('/search', {
-                      templateUrl: 'views/searchPage.html',
+                      templateUrl: 'views/searchHome.html',
                       controller: 'HomeCtrl as homeCtrl',
                       resolve: {
                         auth: ['$q','AuthGuardService',

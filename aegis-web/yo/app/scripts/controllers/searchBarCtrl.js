@@ -48,8 +48,6 @@ angular.module('hopsWorksApp')
       const MIN_SEARCH_TERM_LEN = 2;
       var self = this;
       var mainParent = $scope.mainCtrl;
-      console.log('Parent ', mainParent);
-
       var elasticService = ElasticService();
 
       if (!angular.isUndefined($routeParams.datasetName)) {
@@ -59,67 +57,61 @@ angular.module('hopsWorksApp')
       } else {
         self.searchType = "global";
       }
-      console.log('search Type: ', self.searchType);
 
-      self.searching = false;
-      self.globalClusterBoundary = false;
       self.resultPages = 0;
-      self.resultPagesPublicSearch = 0;
       self.resultItems = 0;
-      self.resultItemsPublicSearch = 0;
-      self.currentPage = 1;
-      self.pageSize = 9;
+      // self.searchDisabled =  true;
       
-      if($location.search().q !== '' || $location.search().q !== undefined) {
+      if($location.search().q !== '' && typeof $location.search().q !== 'undefined') {
         self.searchTerm = $location.search().q;
         mainParent.itemSearched = self.searchTerm;
+        // self.searchDisabled =  false;
       } else {
         self.searchTerm = '';
+        // self.searchDisabled =  true;
       }
-
       self.hitEnter = function (event) {
         var code = event.which || event.keyCode || event.charCode;
-        console.log("hitEnter------", code);
-        if (angular.equals(code, 13) && !self.searching) {
-          mainParent.searchResult = [];
-          mainParent.itemSearched = self.searchTerm;
-          self.search();
+        if (angular.equals(code, 13) && !mainParent.searching) {
+          if(self.searchType === "global") {
+            $scope.mainCtrl.goToSearchHome('search', {q:self.searchTerm});
+          } else {
+            $scope.projectCtrl.goToUrl('search',{q:self.searchTerm});
+          }
         } else if (angular.equals(code, 27)) {
-          mainParent.showSearchPage = false;
-          self.clearSearch();
+          if(self.searchType === "global") {
+            $scope.mainCtrl.goToSearchHome('search');
+          } else {
+            $scope.projectCtrl.goToUrl('search');
+          }
         }
       };
-
-      self.keyTyped = function (evt) {
-        if (self.searchTerm.length >= MIN_SEARCH_TERM_LEN || (mainParent.searchResult.length > 0 && self.searchTerm.length > 0)) {
-          mainParent.itemSearched = self.searchTerm;
-        } else {
-          mainParent.showSearchPage = false;
-          mainParent.searchResult = [];
-        }
-      };
-
       self.onClickSearch = function() {
-        if (self.searchTerm.length >= MIN_SEARCH_TERM_LEN || (mainParent.searchResult.length > 0 && self.searchTerm.length > 0)) {
-          mainParent.searchResult = [];
-          $scope.projectCtrl.goToUrl('search',{q:self.searchTerm});
+        if ( self.searchTerm.length >= MIN_SEARCH_TERM_LEN ) {
+          if(self.searchType === "global") {
+            $scope.mainCtrl.goToSearchHome('search', {q:self.searchTerm});
+          } else {
+            $scope.projectCtrl.goToUrl('search',{q:self.searchTerm});
+          }
         } else {
-          mainParent.showSearchPage = false;
           mainParent.searchResult = [];
+          if(self.searchTerm == '*') {
+            if(self.searchType === "global") {
+              $scope.mainCtrl.goToSearchHome('search', {q:self.searchTerm});
+            } else {
+              $scope.projectCtrl.goToUrl('search',{q:self.searchTerm});
+            }
+          } else {
+            if(self.searchType === "global") {
+              $scope.mainCtrl.goToSearchHome('search');
+            } else {
+              $scope.projectCtrl.goToUrl('search');
+            }
+          }
         }
       }
-
-
-
-      self.clearSearch = function () {
-        mainParent.showSearchPage = false;
-        mainParent.searchResult = [];
-        mainParent.itemSearched = "";
-        self.searchTerm = "";
-      };
-
       self.search = function () {
-        mainParent.showSearchPage = true;
+        // mainParent.showSearchPage = true;
         self.currentPage = 1;
         self.pageSize = 9;
         mainParent.searchResult = [];
@@ -127,7 +119,7 @@ angular.module('hopsWorksApp')
         if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
           return;
         }
-        self.searching = true;
+        mainParent.searching = true;
 
         if (self.searchType === "global" && $rootScope.isDelaEnabled) {
           var global_data;
@@ -148,15 +140,15 @@ angular.module('hopsWorksApp')
                 global_data = response2.data;
                 if (global_data.length > 0) {
                   mainParent.searchResult = concatUnique(searchHits, global_data);
-                  self.searching = false;
+                  mainParent.searching = false;
                 } else {
-                  self.searching = false;
+                  mainParent.searching = false;
                 }
                 self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
                 self.resultItems = mainParent.searchResult.length;
               });
             }, function (error) {
-              self.searching = false;
+              mainParent.searching = false;
               growl.error(error.data.errorMsg, {
                 title: 'Error',
                 ttl: 5000
@@ -174,11 +166,11 @@ angular.module('hopsWorksApp')
               } else {
                 mainParent.searchResult = [];
               }
-              self.searching = false;
+              mainParent.searching = false;
               self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
               self.resultItems = mainParent.searchResult.length;
             }, function (error) {
-              self.searching = false;
+              mainParent.searching = false;
               growl.error(error.data.errorMsg, {
                 title: 'Error',
                 ttl: 5000
@@ -187,7 +179,7 @@ angular.module('hopsWorksApp')
         } else if (self.searchType === "projectCentric") {
           elasticService.projectSearch($routeParams.projectID, self.searchTerm)
             .then(function (response) {
-              self.searching = false;
+              mainParent.searching = false;
               var searchHits = response.data;
               console.log('Response earch ', searchHits);
               if (searchHits.length > 0) {
@@ -198,7 +190,7 @@ angular.module('hopsWorksApp')
               self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
               self.resultItems = mainParent.searchResult.length;
             }, function (error) {
-              self.searching = false;
+              mainParent.searching = false;
               growl.error(error.data.errorMsg, {
                 title: 'Error',
                 ttl: 5000
@@ -207,7 +199,7 @@ angular.module('hopsWorksApp')
         } else if (self.searchType === "datasetCentric") {
           elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
             .then(function (response) {
-              self.searching = false;
+              mainParent.searching = false;
               var searchHits = response.data;
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
@@ -217,7 +209,7 @@ angular.module('hopsWorksApp')
               self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
               self.resultItems = mainParent.searchResult.length;
             }, function (error) {
-              self.searching = false;
+              mainParent.searching = false;
               growl.error(error.data.errorMsg, {
                 title: 'Error',
                 ttl: 5000
@@ -262,20 +254,7 @@ angular.module('hopsWorksApp')
       $scope.$on("$destroy", function () {
       });
 
-      self.incrementPage = function () {
-        self.pageSize = self.pageSize + 1;
-      };
-
-      self.decrementPage = function () {
-        if (self.pageSize < 2) {
-          return;
-        }
-        self.pageSize = self.pageSize - 1;
-      };
-
-
       self.search();
-
 
     }
   ]);
