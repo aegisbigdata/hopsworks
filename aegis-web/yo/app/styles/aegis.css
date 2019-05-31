@@ -330,11 +330,6 @@ button.centered-icon > .fa.fa-trash {
   opacity: 1 !important;
 }
 
-.select-center {
-  padding: 0px 10px;
-  height: auto;
-}
-
 .card-item {
   height: auto;
   min-height: 175px;
@@ -402,4 +397,16 @@ button.centered-icon > .fa.fa-trash {
 .btn.align-right {
   width: 100%;
   text-align: right;
+}
+
+.select2-container-multi .select2-choices {
+  border: none !important;
+}
+
+.select2-container-multi.select2-container-active .select2-choices {
+  box-shadow: none !important;
+}
+
+.filter-search {
+  width: 100%;
 }
