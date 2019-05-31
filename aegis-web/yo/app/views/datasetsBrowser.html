@@ -97,7 +97,13 @@
             </div>
           <div class="row content-utility-bar content-utility-bar-actions" ng-if="!mainCtrl.showSearchPage">
               <div class="col-md-3">
-                <h4 class="content-utility-bar-h4"><a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
+                  
+                <h4 class="content-utility-bar-h4">
+                    <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                    title="{{projectCtrl.currentProject.projectName}}">
+                    {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+                    <span> > </span>
+                    <a ng-click="datasetsCtrl.goToDataSetsDir()">DataSets</a>
                 <span ng-show="datasetsCtrl.pathArray.length > 10">...</span>
                 <span data-ng-repeat="path in datasetsCtrl.pathArray.slice(datasetsCtrl.pathArray.length - 1 - datasetsCtrl.breadcrumbLen()) track by $index">
                   <span> > </span><a ng-click="datasetsCtrl.goToFolder($index + 1)">{{path| limitTo: 16 }}{{path.length > 16 ? '..' : ' '}}</a>
@@ -141,13 +147,13 @@
                       <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group" role="group" aria-label="First group">
                           <div type="button" class="btn btn-default" title="Go to parent directory" 
-                                  ng-click="datasetsCtrl.back()">Go up<i class="fa fa-level-up icon-menu"></i></div>
+                                  ng-click="datasetsCtrl.back()"><i class="fa fa-level-up first-icon-menu"></i>Go up</div>
                           <div type="button" class="btn btn-default" title="New folder"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.newDataSetModal()">New Folder<i class="fa fa-plus icon-menu"></i></div>
+                                  ng-click="datasetsCtrl.newDataSetModal()"><i class="fa fa-plus first-icon-menu"></i>New Folder</div>
                           <div type="button" class="btn btn-default" title="Upload"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.uploadFile()">Upload<i class="fa fa-cloud-upload icon-menu"></i></div>
+                                  ng-click="datasetsCtrl.uploadFile()"><i class="fa fa-cloud-upload first-icon-menu"></i>Upload</div>
                         </div>
                         <button type="button" class="btn btn-default dropdown-toggle" 
                                 data-toggle="dropdown" 
@@ -155,7 +161,7 @@
                                 aria-expanded="false" 
                                 ng-show="datasetsCtrl.isSelectedFiles() > 0">		
 	                        File Actions<span class="caret"></span>		
-	                </button>
+	                      </button>
                         <div class="dropdown-menu list-menu-action"> 
                             <div class="btn-group list-action" role="group" aria-label="Second group" ng-show="datasetsCtrl.isSelectedFiles() > 0">
                           <div type="button" class="btn btn-link" title="Copy"
