@@ -145,12 +145,12 @@
     max-height: 90%; 
     min-height: 30%;
     overflow-y: scroll;
-    z-index: 2;
+    /* z-index: 2; */
 }
 
 .rg-row-top-ds > div.rg-bottom {
   margin-bottom: 0px !important;
-  width: 90%;
+  width: 91%;
   margin-left: 14px;
   border-radius: 10px;
 }
@@ -178,9 +178,9 @@
 }
 
 .ds-box {
-    /* width: 98%; */
+    width: 98%;
     overflow-y: auto; 
-    /* height: 95%; */
+    height: 95%;
 }
 
 .ds-box-bottom {
