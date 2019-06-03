@@ -134,7 +134,7 @@
             </div>
             <div class="row" ng-controller="SearchResultCtrl as searchResultCtrl">
               <div class="ds-content col-lg-12" ng-class="{'sidenav-open': datasetsCtrl.tgState == true}">
-                <div class="row" resizable r-directions="['bottom']" ng-class="{'rg-row-top-ds': readme !== null}">
+                <div class="row" resizable r-directions="['bottom']" ng-class="{'rg-row-top-ds': readme !== null, 'rg-row-noreadme': readme == null}">
                   <div class="col-lg-12 ds-box thin-scrollbar" style="margin-top: 20px; padding-left: 20px">                    
                     <div class="file-box file-box-height" ng-click="datasetsCtrl.newDataSetModal()">
                       <div class="file file-height">

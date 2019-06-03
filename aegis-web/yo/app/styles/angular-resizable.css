@@ -98,13 +98,13 @@
 }
 
 .rg-bottom {
-  cursor: row-resize;
+  /* cursor: row-resize;
   width: 100%;
   bottom: 0;
   left: 0;
   margin-bottom: -14px;
   z-index: 3;
-  background: #0492b3;
+  background: #0492b3; */
 }
 
 .rg-left {
@@ -153,6 +153,12 @@
   width: 91%;
   margin-left: 14px;
   border-radius: 10px;
+  cursor: row-resize;
+  bottom: 0;
+  left: 0;
+  margin-bottom: -14px;
+  z-index: 3;
+  background: #0492b3;
 }
 
 .rg-row-bottom {
