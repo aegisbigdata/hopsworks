@@ -1127,7 +1127,7 @@ angular.module('hopsWorksApp')
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;
-              console.log(self.selectedFiles);
+              console.log('', self.selectedFiles);
             };
 
             self.haveSelected = function (file) {

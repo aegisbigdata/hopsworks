@@ -156,6 +156,9 @@
                            class="file-box file-box-height" ng-class="{disabled: dataset.downloading}"
                            context-menu
                            data-target="menu-{{ dataset.name}}">
+                           <p>{{dataset.status}}</p><br>
+                           <p>{{datasetsCtrl.selected}}</p><br>
+                           <p>{{dataset.name}}</p>
                         <div class="file file-height" ng-class="{'greyed' : datasetsCtrl.selected === dataset.name,
                                   'notAccepted' : dataset.status === false}">
                           <a>
