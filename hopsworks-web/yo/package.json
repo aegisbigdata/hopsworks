@@ -1,7 +1,9 @@
 {
   "name": "hopsworks",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "apexcharts": "^3.6.6"
+  },
   "repository": {},
   "devDependencies": {
     "globule": "^1.0.0",

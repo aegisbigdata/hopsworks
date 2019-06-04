@@ -144,3 +144,14 @@ To skip tests that need to run inside a vm
 ```
 When the test is done if `LAUNCH_BROWSER` is set to true in `.env`, it will open the test report in a browser.
 
+## Osx Development
+It seems that brew and node don't get along that well. Any module that is installed by bower through the npm plugin will fail on osx with node installed by brew.
+
+To fix this we can manually install the required modules globally:
+```
+cd aegis-web/yo
+npm install -g apexcharts
+npm install -g leaflet
+npm install -g jsonld
+```
+We change the index file to point to the node_modules folder, remove the dependency from bower.json and add it to the package.json.

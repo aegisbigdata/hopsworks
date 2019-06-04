@@ -1,7 +1,11 @@
 {
   "name": "aegis",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "apexcharts": "^2.5.0",
+    "leaflet": "^1.4.0",
+    "jsonld": "^1.5.4"
+  },
   "repository": {},
   "devDependencies": {
     "bower-npm-resolver": "^0.9.1",
