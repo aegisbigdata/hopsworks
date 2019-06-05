@@ -194,6 +194,7 @@ angular.module('hopsWorksApp')
 
             $scope.form = {};
             $scope.deleteButtonIsDisabled = false;
+            $scope.saveButtonIsDisabled = false;
             $scope.data = {
               fields: {
                 title: {
@@ -273,11 +274,13 @@ angular.module('hopsWorksApp')
               }
             });
 
+            
             /*
              * Rootscope events are not deregistered when the controller dies.
              * So on the controller destroy event deregister the rootscope listener manually.
              * @returns {undefined}
              */
+            
             $scope.$on("$destroy", function () {
               listener();
             });
@@ -352,8 +355,8 @@ angular.module('hopsWorksApp')
               // Set other fields
               fields.title.model = graph[2].title;
               fields.description.model = graph[2].description;
-
             };
+
 
             /**
              * Loads from data from JSON-LD format into page
@@ -380,6 +383,7 @@ angular.module('hopsWorksApp')
              */
             
             self.saveExtendedProjectMetadata = function () {
+              console.log($scope.data);
               var graph = self.template['@graph'][0];
               graph['@id'] = 'https://aegis.eu/id/project/' + PROJECT_ID;
               graph.modified = (new Date()).toISOString();
@@ -396,9 +400,18 @@ angular.module('hopsWorksApp')
               }
 
               console.log(self.template['@graph'][0]);
-
-              // Send to API (WIP)
-              // ExtendedMetadataAPIService.storeExtendedMetadataForProject(PROJECT_ID, self.template); 
+              $scope.saveButtonIsDisabled = true;
+              // Send to API
+              ExtendedMetadataAPIService.storeExtendedMetadataForProject(PROJECT_ID, self.template)
+                .then(function(success) {
+                  growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 1000});
+                })
+                .catch(function(error) {
+                  growl.error('Server error: ' + error.status, {title: 'Error while saving project metadata', ttl: 5000, referenceId: 0});
+                })
+                .finally(function() {
+                  $scope.saveButtonIsDisabled = false;
+                });
             };
 
 
