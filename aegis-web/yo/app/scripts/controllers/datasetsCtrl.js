@@ -1183,6 +1183,7 @@ angular.module('hopsWorksApp')
                 for (var name in self.selectedFiles) {
                   if (file.name === name) {
                     delete self.selectedFiles[name];
+                    self.tgState = false;
                     //break;
                   }
                 }
@@ -1191,13 +1192,15 @@ angular.module('hopsWorksApp')
                   for (var name in self.selectedFiles) {
                     if (file.name === name) {
                       delete self.selectedFiles[name];
+                      self.tgState = true;
                       break;
                     }
                   }
                 } else {
                   for (var name in self.selectedFiles) {
-                    if (file.name !== name) {
+                    if (file.name === name) {
                       delete self.selectedFiles[name];
+                      self.tgState = true;
                       //break;
                     }
                   }
@@ -1211,7 +1214,7 @@ angular.module('hopsWorksApp')
                 self.selected = Object.keys(self.selectedFiles)[0];
               }
               self.all_selected = false;
-              self.tgState = false;
+              // self.tgState = false;
 
             };
 
