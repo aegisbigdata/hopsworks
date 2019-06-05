@@ -193,6 +193,7 @@ angular.module('hopsWorksApp')
             };
 
             $scope.form = {};
+            $scope.deleteButtonIsDisabled = false;
             $scope.data = {
               fields: {
                 title: {
@@ -398,6 +399,32 @@ angular.module('hopsWorksApp')
 
               // Send to API (WIP)
               // ExtendedMetadataAPIService.storeExtendedMetadataForProject(PROJECT_ID, self.template); 
+            };
+
+
+            /**
+             * [deleteExtendedMetadataForProject description]
+             * @return {[type]} [description]
+             */
+            
+            self.deleteExtendedMetadata = function () {
+              $scope.deleteButtonIsDisabled = true;
+
+              ExtendedMetadataAPIService.deleteExtendedMetadataForProject(PROJECT_ID)
+                .then(function(success) {
+                  // Clear form fields if delete is successful
+                  for (var key in $scope.data.fields) {
+                    var field = $scope.data.fields[key];                
+                    field.model = '';
+                  }
+                  growl.success('Project metadata successfully deleted.', {title: 'Success', ttl: 1000});
+                })
+                .catch(function(error) {
+                  growl.error('Server error: ' + error.status, {title: 'Error while deleting project metadata', ttl: 5000, referenceId: 0});
+                })
+                .finally(function() {
+                  $scope.deleteButtonIsDisabled = false;
+                });
             };
 
 
