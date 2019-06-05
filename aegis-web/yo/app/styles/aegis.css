@@ -18,12 +18,8 @@
 }
 .btn-group.list-action > .btn-link {
     width: 100%;
-    text-align: right;
+    text-align: left;
     color: #000000;
-}
-.dropdown-menu.list-menu-action {
-    width: 200px;
-    left: 230px;
 }
 .c-checkbox-mrg {
   margin-top: 6px;
