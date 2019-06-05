@@ -1118,16 +1118,15 @@ angular.module('hopsWorksApp')
               } else {
                 self.selectedFiles = {};
               } */
-              if (self.isSelectedFiles() > 0) {
-                self.selected = null;
-              } else {
-                self.tgState = true;
-                self.selected = file.name;
-              }
+              // if (self.isSelectedFiles() > 0) {
+              //   self.selected = null;
+              // } else {
+              // }
+              self.tgState = true;
+              self.selected = file.name;
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;
-              console.log('', self.selectedFiles);
             };
 
             self.haveSelected = function (file) {
@@ -1247,6 +1246,13 @@ angular.module('hopsWorksApp')
               }
               return "hdfs://" + selectedFile.path;
             };
+            
+            self.singleClick = function() {
+              alert('Single Click');
+            }
+            self.doubleClick = function() {
+              alert('Double Click');
+            }
 
           }]);
 
