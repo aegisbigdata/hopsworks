@@ -81,6 +81,18 @@ angular.module('hopsWorksApp')
                 };
                 return $http(req);
               },
+
+              deleteExtendedMetadataForProject: function (projectID) {
+                var req = {
+                  method: 'DELETE',
+                  url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+                  headers: {
+                    'Content-Type': 'application/ld+json',
+                    'Authorization': API_KEY
+                  }
+                };
+                return $http(req);
+              }
               
             };
             
