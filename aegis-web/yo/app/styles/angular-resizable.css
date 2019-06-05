@@ -144,8 +144,8 @@
     height: 70%; 
     max-height: 90%; 
     min-height: 30%;
-    overflow-y: scroll;
-    /* z-index: 2; */
+    overflow-y: hidden;
+    z-index: 2;
 }
 
 .rg-row-top-ds > div.rg-bottom {

@@ -1246,14 +1246,6 @@ angular.module('hopsWorksApp')
               }
               return "hdfs://" + selectedFile.path;
             };
-            
-            self.singleClick = function() {
-              alert('Single Click');
-            }
-            self.doubleClick = function() {
-              alert('Double Click');
-            }
-
           }]);
 
 /**
