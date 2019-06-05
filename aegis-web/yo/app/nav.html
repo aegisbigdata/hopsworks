@@ -102,14 +102,14 @@
         </ul>
         <!--ng-show="showDatasets"-->
         <form class="navbar-form">
-          <div class="col-xs-12 col-sm-4 col-md-4 input-group">
+          <div class="col-xs-12 col-sm-4 col-md-4 input-group" ng-controller="SearchBarCtrl as searchBarCtrl">
             <input type="text" class="form-control dark" style="height: 44px; background-color: #6baec6; border: none; color: #fff"
-                   name="srch-term" id="srch-term" placeholder="Search for projects or datasets..." ng-model="mainCtrl.searchTerm" ng-model-options="{debounce: 500}"
-                   ng-change="mainCtrl.keyTyped()" ng-keyup="mainCtrl.hitEnter($event)">
+                   name="srch-term" id="srch-term" placeholder="Search for projects or datasets..." ng-model="searchBarCtrl.searchTerm" ng-model-options="{debounce: 500}"
+                   ng-change="searchBarCtrl.keyTyped()" ng-keyup="searchBarCtrl.hitEnter($event)">
 
             <div class="input-group-btn" style="width: 54px;">
               <button class="btn btn-default" style="color: #028e9b;padding: 6px 12px; height: 44px"
-                      ng-click="mainCtrl.search()" type="button">
+                      ng-click="searchBarCtrl.onClickSearch()" type="button">
                 <i class="fa fa-search"></i>
               </button>
             </div>

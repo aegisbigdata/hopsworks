@@ -244,8 +244,8 @@
     
     <div class="row search-result-header">
       <div class="col-md-6 pull-left">
-        <h4>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
-            {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h4>
+        <h4>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.itemSearched | limitTo: 85 }}
+            {{ mainCtrl.itemSearched.length > 85 ? '...' : ''}}</h4>
       </div>
         <div class="col-md-6 search-result-sort pull-right">
             <h4 class="ng-binding">Sort by:</h4>
