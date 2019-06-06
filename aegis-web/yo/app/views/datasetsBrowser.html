@@ -215,7 +215,7 @@
                         </tr>
                         </thead>
                         <tbody ng-model="datasetsCtrl.files">                       
-                          <tr
+                          <tr  ng-dblclick="datasetsCtrl.openDir(file)"
                             dir-paginate="file in datasetsCtrl.files | orderBy:sortKey:reverse | filter:search | itemsPerPage:datasetsCtrl.itemsPerPage"
                             context-menu
                             data-target="menu-{{ $index}}"
