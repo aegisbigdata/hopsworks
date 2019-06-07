@@ -266,7 +266,7 @@
                         </td>
                         <td uib-dropdown class="position-fixed" id="menu-{{ $index}}" style="border-top: none">
                           <ul uib-dropdown-menu class="dropdown-amore" role="menu">
-                            <li ng-show="datasetsCtrl.pathArray[0] === 'Jupyter' && datasetsCtrl.isSelectedFiles() === 0 &&  file.name.substr(-6) === '.ipynb'"  ng-controller="JupyterCtrl as jupyterCtrl">
+                            <li ng-show="datasetsCtrl.pathArray[0] === 'Jupyter' && datasetsCtrl.isSelectedFiles() <= 1 &&  file.name.substr(-6) === '.ipynb'"  ng-controller="JupyterCtrl as jupyterCtrl">
                               <a class="pointer"
                                  role="menuitem"
                                  tabindex="10"
