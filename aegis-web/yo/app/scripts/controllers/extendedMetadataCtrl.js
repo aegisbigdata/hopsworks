@@ -337,24 +337,42 @@ angular.module('hopsWorksApp')
               if (!jsonld.hasOwnProperty('@graph')) return;
               var graph = jsonld['@graph'];
               var fields = $scope.data.fields;
+              var index_location, index_organization, index_catalog;
+
+              // Determine indexes
+              graph.forEach(function(entry, index) {
+                if (!entry.hasOwnProperty('@type')) return;
+                let type = entry['@type'].split('/');
+                type = type[type.length - 1].toUpperCase();
+                console.log({type});
+                if (type == 'LOCATION') index_location = index;
+                if (type == 'ORGANIZATION' || type == 'INDIVIDUAL') index_organization = index;
+                if (type == 'DCAT#CATALOG') index_catalog = index;
+              })
+
+              console.log({index_location, index_organization, index_catalog});
 
               // Set publisher Info
-              var type_splitted = graph[0]['@type'].split('/');
+              var type_splitted = graph[index_organization]['@type'].split('/');
               fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
-              fields.publishername.model = graph[0].name;
-              fields.homepage.model = graph[0].homepage;
+              fields.publishername.model = graph[index_organization].name;
+              fields.homepage.model = graph[index_organization].homepage;
 
               // Set Language field
-              var language_splitted = graph[2].language.split('/');
-              fields.language.model = language_splitted[language_splitted.length - 1];
+              if (graph[index_catalog].hasOwnProperty('language')) {
+                var language_splitted = graph[index_catalog].language.split('/');
+                fields.language.model = language_splitted[language_splitted.length - 1];
+              }
 
               // Set License field
-              var license_splitted = graph[2].license.split('/');
-              fields.license.model = license_splitted[license_splitted.length - 1];
+              if (graph[index_catalog].hasOwnProperty('license')) {
+                var license_splitted = graph[index_catalog].license.split('/');
+                fields.license.model = license_splitted[license_splitted.length - 1];
+              }
 
               // Set other fields
-              fields.title.model = graph[2].title;
-              fields.description.model = graph[2].description;
+              fields.title.model = graph[index_catalog].title;
+              fields.description.model = graph[index_catalog].description;
             };
 
 
@@ -365,14 +383,19 @@ angular.module('hopsWorksApp')
             self.loadExtendedProjectMetadata = function () {
               ExtendedMetadataAPIService.getExtMetadataForProject(PROJECT_ID)
                 .then(function(data) {
-                  console.log(data);
+                  console.log(data.data);
+                  self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
                   console.error(error);
+                  if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for project', PROJECT_ID);
+
+                  // Until CORS is enabled, update models with mock data...
+                  self.updateModelsFromData(self.mockResponse);
                 });
 
-              // Until CORS is enabled, update models with mock data...
-              self.updateModelsFromData(self.mockResponse);
+              
+              
             };
 
             self.loadExtendedProjectMetadata();
@@ -404,7 +427,7 @@ angular.module('hopsWorksApp')
               // Send to API
               ExtendedMetadataAPIService.storeExtendedMetadataForProject(PROJECT_ID, self.template)
                 .then(function(success) {
-                  growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 1000});
+                  growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
                 .catch(function(error) {
                   growl.error('Server error: ' + error.status, {title: 'Error while saving project metadata', ttl: 5000, referenceId: 0});
