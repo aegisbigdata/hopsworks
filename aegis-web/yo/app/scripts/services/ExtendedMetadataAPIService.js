@@ -40,61 +40,160 @@
 'use strict';
 
 angular.module('hopsWorksApp')
+  .factory('ExtendedMetadataAPIService', ['$http', function ($http) {
+    const EXTENDED_METADATA_PROJECT_ENDPOINT = 'http://aegis-metadata.fokus.fraunhofer.de/catalogues/';
+    const EXTENDED_METADATA_DATASET_ENDPOINT = 'http://aegis-metadata.fokus.fraunhofer.de/datasets/';
+    const EXTENDED_METADATA_DISTRIBUTION_ENDPOINT = 'http://aegis-metadata.fokus.fraunhofer.de/distributions';
+    const API_KEY = '';
 
-        .factory('ExtendedMetadataAPIService', ['$http', function ($http) {
-            const EXTENDED_METADATA_PROJECT_ENDPOINT = 'http://aegis-metadata.fokus.fraunhofer.de/catalogues/';
-            const API_KEY = '';
+    var service = {
 
-            var service = {
+      /**
+       * GET existing extended metadata for project by ID
+       */
 
-              /**
-               * GET existing extended metadata for project by ID
-               */
-
-              getExtMetadataForProject: function (projectID) {
-                var req = {
-                  method: 'GET',
-                  url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
-                  headers: {
-                    'Content-Type': 'application/ld+json',
-                    'Authorization': API_KEY
-                  }
-                };
-                return $http(req);
-              },
+      getProjectMetadata: function (projectID) {
+        var req = {
+          method: 'GET',
+          url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          }
+        };
+        return $http(req);
+      },
 
 
-              /**
-               * PUT/Save extended metadata to endpoint. 
-               * Triggered when user clicks on "Save Metadata" button.
-               */
+      /**
+       * PUT/Save extended metadata to endpoint. 
+       * Triggered when user clicks on "Save Metadata" button.
+       */
 
-              storeExtendedMetadataForProject: function (projectID, metadata) {
-                var req = {
-                  method: 'PUT',
-                  url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
-                  headers: {
-                    'Content-Type': 'application/ld+json',
-                    'Authorization': API_KEY
-                  },
-                  data: metadata
-                };
-                return $http(req);
-              },
+      createOrUpdateProjectMetadata: function (projectID, metadata) {
+        var req = {
+          method: 'PUT',
+          url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
 
-              deleteExtendedMetadataForProject: function (projectID) {
-                var req = {
-                  method: 'DELETE',
-                  url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
-                  headers: {
-                    'Content-Type': 'application/ld+json',
-                    'Authorization': API_KEY
-                  }
-                };
-                return $http(req);
-              }
-              
-            };
-            
-            return service;
-          }]);
+      deleteProjectMetadata: function (projectID) {
+        var req = {
+          method: 'DELETE',
+          url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          }
+        };
+        return $http(req);
+      },
+
+
+      // DATASET METADATA
+
+      createOrUpdateDatasetMetadata: function(datasetID, projectID, metadata) {
+        var req = {
+          method: 'PUT',
+          url: EXTENDED_METADATA_DATASET_ENDPOINT + datasetID,
+          params: {
+            catalogue: projectID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
+
+      getDatasetMetadata: function (datasetID, projectID) {
+        var req = {
+          method: 'GET',
+          url: EXTENDED_METADATA_DATASET_ENDPOINT + datasetID,
+          params: {
+            catalogue: projectID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json'
+          }
+        };
+        return $http(req);
+      },
+
+      deleteDatasetMetadata: function (datasetID, projectID) {
+        var req = {
+          method: 'DELETE',
+          url: EXTENDED_METADATA_DATASET_ENDPOINT + datasetID,
+          params: {
+            catalogue: projectID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          }
+        };
+        return $http(req);
+      },
+
+
+      // DISTRIBUTION METADATA
+
+      createOrUpdateDistributionMetadata: function(datasetID, projectID, metadata) {
+        var req = {
+          method: 'PUT',
+          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
+          params: {
+            catalogue: projectID,
+            dataset: datasetID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
+
+      getDistributionMetadata: function (datasetID, projectID) {
+        var req = {
+          method: 'GET',
+          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
+          params: {
+            catalogue: projectID,
+            dataset: datasetID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json'
+          }
+        };
+        return $http(req);
+      },
+
+      deleteDistributionMetadata: function (datasetID, projectID) {
+        var req = {
+          method: 'DELETE',
+          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
+          params: {
+            catalogue: projectID,
+            dataset: datasetID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': API_KEY
+          }
+        };
+        return $http(req);
+      },
+    };
+    
+    return service;
+  }]);

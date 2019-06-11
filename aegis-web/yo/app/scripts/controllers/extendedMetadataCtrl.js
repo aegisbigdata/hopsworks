@@ -350,8 +350,6 @@ angular.module('hopsWorksApp')
                 if (type == 'DCAT#CATALOG') index_catalog = index;
               })
 
-              console.log({index_location, index_organization, index_catalog});
-
               // Set publisher Info
               var type_splitted = graph[index_organization]['@type'].split('/');
               fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
@@ -381,7 +379,7 @@ angular.module('hopsWorksApp')
              */
             
             self.loadExtendedProjectMetadata = function () {
-              ExtendedMetadataAPIService.getExtMetadataForProject(PROJECT_ID)
+              ExtendedMetadataAPIService.getProjectMetadata(PROJECT_ID)
                 .then(function(data) {
                   console.log(data.data);
                   self.updateModelsFromData(data.data);
@@ -425,7 +423,7 @@ angular.module('hopsWorksApp')
               console.log(self.template['@graph'][0]);
               $scope.saveButtonIsDisabled = true;
               // Send to API
-              ExtendedMetadataAPIService.storeExtendedMetadataForProject(PROJECT_ID, self.template)
+              ExtendedMetadataAPIService.createOrUpdateProjectMetadata(PROJECT_ID, self.template)
                 .then(function(success) {
                   growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
@@ -446,7 +444,7 @@ angular.module('hopsWorksApp')
             self.deleteExtendedMetadata = function () {
               $scope.deleteButtonIsDisabled = true;
 
-              ExtendedMetadataAPIService.deleteExtendedMetadataForProject(PROJECT_ID)
+              ExtendedMetadataAPIService.deleteProjectMetadata(PROJECT_ID)
                 .then(function(success) {
                   // Clear form fields if delete is successful
                   for (var key in $scope.data.fields) {
