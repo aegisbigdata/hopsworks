@@ -98,13 +98,13 @@
 }
 
 .rg-bottom {
-  cursor: row-resize;
+  /* cursor: row-resize;
   width: 100%;
   bottom: 0;
   left: 0;
   margin-bottom: -14px;
   z-index: 3;
-  background: #0492b3;
+  background: #0492b3; */
 }
 
 .rg-left {
@@ -144,15 +144,21 @@
     height: 70%; 
     max-height: 90%; 
     min-height: 30%;
-    overflow: hidden;
+    overflow-y: hidden;
     z-index: 2;
 }
 
 .rg-row-top-ds > div.rg-bottom {
   margin-bottom: 0px !important;
-  width: 90%;
+  width: 91%;
   margin-left: 14px;
   border-radius: 10px;
+  cursor: row-resize;
+  bottom: 0;
+  left: 0;
+  margin-bottom: -14px;
+  z-index: 3;
+  background: #0492b3;
 }
 
 .rg-row-bottom {
@@ -178,9 +184,9 @@
 }
 
 .ds-box {
-    /* width: 98%; */
+    width: 98%;
     overflow-y: auto; 
-    /* height: 95%; */
+    height: 95%;
 }
 
 .ds-box-bottom {

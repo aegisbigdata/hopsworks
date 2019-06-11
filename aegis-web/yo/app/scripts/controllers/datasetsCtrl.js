@@ -1114,20 +1114,18 @@ angular.module('hopsWorksApp')
               // Add existing selected file (idempotent, if already added)
               // If file already selected, deselect it.
               /** if (event && event.ctrlKey) {
-
               } else {
                 self.selectedFiles = {};
               } */
-              if (self.isSelectedFiles() > 0) {
-                self.selected = null;
-              } else {
-                self.tgState = true;
-                self.selected = file.name;
-              }
+              // if (self.isSelectedFiles() > 0) {
+              //   self.selected = null;
+              // } else {
+              // }
+              self.tgState = true;
+              self.selected = file.name;
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;
-              console.log(self.selectedFiles);
             };
 
             self.haveSelected = function (file) {
@@ -1185,6 +1183,7 @@ angular.module('hopsWorksApp')
                 for (var name in self.selectedFiles) {
                   if (file.name === name) {
                     delete self.selectedFiles[name];
+                    self.tgState = false;
                     //break;
                   }
                 }
@@ -1193,13 +1192,15 @@ angular.module('hopsWorksApp')
                   for (var name in self.selectedFiles) {
                     if (file.name === name) {
                       delete self.selectedFiles[name];
+                      self.tgState = true;
                       break;
                     }
                   }
                 } else {
                   for (var name in self.selectedFiles) {
-                    if (file.name !== name) {
+                    if (file.name === name) {
                       delete self.selectedFiles[name];
+                      self.tgState = true;
                       //break;
                     }
                   }
@@ -1213,7 +1214,7 @@ angular.module('hopsWorksApp')
                 self.selected = Object.keys(self.selectedFiles)[0];
               }
               self.all_selected = false;
-              self.tgState = false;
+              // self.tgState = false;
 
             };
 
@@ -1247,7 +1248,6 @@ angular.module('hopsWorksApp')
               }
               return "hdfs://" + selectedFile.path;
             };
-
           }]);
 
 /**

@@ -39,13 +39,31 @@
 
 <div ng-controller="MainCtrl as mainCtrl">
   <div ng-controller="ProjectCtrl as projectCtrl">
-    <div ng-include="'nav.html'"></div>
+    <!-- <div ng-include="'nav.html'"></div> -->
 
 
     <div id="wrapper" class="toggled">
       <div class="overlay"></div>
 
-      <div ng-include="'navProject.html'"></div>
+    <div ng-include="'navProject.html'"></div>
+
+    <div>
+      <!-- Search bar -->
+      <div ng-include="'views/searchBar.html'"></div>
+
+      <div class="container-fluid content-wrapper" ng-controller="ProjectCtrl as projectCtrl">
+        <div growl reference="3" class="pull-right" ></div>
+        <div class="row content-utility-bar content-utility-bar-actions">
+          <div class="col-md-3">
+            <h4 class="content-utility-bar-h4"> 
+                <a href="#!/project/{{projectCtrl.currentProject.projectId}}" class="text-center"
+                title="{{projectCtrl.currentProject.projectName}}">
+                {{ projectCtrl.currentProject.projectName | limitTo: 17 }}{{projectCtrl.currentProject.projectName.length > 17 ? '…' : ''}}</a>
+              > Jobs</h4>
+          </div>
+        </div>
+      </div><!--content wrapper -->
+    </div>
       <div class="job-content-wrapper">
         <h3 id="projectBread" style="display: none;"> {{ projectCtrl.currentProject.projectName}} / Jobs</h3>
       </div>

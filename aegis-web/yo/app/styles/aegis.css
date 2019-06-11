@@ -10,7 +10,7 @@
   width: 40%;
 }
 .icon-menu {
-    padding-left: 15px;
+    padding-right: 15px;
 }
 .btn-group.list-action {
     display: block;
@@ -18,44 +18,23 @@
 }
 .btn-group.list-action > .btn-link {
     width: 100%;
-    text-align: right;
-}
-.dropdown-menu.list-menu-action {
-    width: 200px;
-    left: 230px;
+    text-align: left;
+    color: #000000;
 }
 .c-checkbox-mrg {
   margin-top: 6px;
   margin-bottom: 21px;
 }
-
-/* For tabs not to be gradient -- projectSettings.html*/
-.ng-isolate-scope > .nav-tabs, .kafka-tabs {
-    background: #fff;
-    height: 80px;
-    box-shadow: 0 2em 3em #ddd;
-  }
-  
-  a.nav-link.ng-binding, .kafka-tabs li a {
-    height: 80px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  li.uib-tab.nav-item.ng-scope.ng-isolate-scope.active , .kafka-tabs li.active{
-    font-weight: bold;
-  }
   
   .panel {
     box-shadow: none;
   }
   .file-box-height{
-    height: 215px;
+    height: 165px;
     margin-bottom: 25px;
   }
   .file-height{
-    height: 215px;
+    height: 165px;
     background-color: #f8f8f8;
     margin-bottom: 0px;
   }
@@ -106,14 +85,15 @@
 
 /* Layout for jobs.html */
 
-.job-layout {
-  margin-top: 80px;
+.rg-row-top.job-content--row{
+   background: transparent !important;
 }
 
 div.job-content--page {
   height:100%; 
   overflow: hidden; 
   padding: 0 !important;
+  background: initial;
 }
 
 .job-content--row {
@@ -181,7 +161,7 @@ div.job-content--page {
 }
 
 .navbar-search-radio-more{
-  background-color: lightgrey;
+  background-color: darkgrey;
   display: flex;
   justify-content: space-between;
   color: #ffffff;
@@ -251,11 +231,10 @@ div.job-content--page {
   display: flex;
   align-items: center;
   position: relative;
+  padding-bottom: 20px;
 }
 
 .input-date-group {
-  display: flex;
-  justify-content: space-between;
   padding: 10px 20px;
   border-left: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
@@ -267,11 +246,176 @@ div.job-content--page {
   border-top: none;
   border-left: none;
   border-right: none;
-  margin: 0px 15px;
-  width: 70%;
+  margin: 0px 10px;
+  width: 90%;
 }
 
+.date-title {
+  text-transform: uppercase;
+  font-size: 14px;
+}
 .search-header {
   align-items: center;
   display: flex;
+}
+
+.no-padding-kafka {
+  padding: 0;
+}
+
+
+/* start model serving */
+
+.model-serving--name {
+  margin-top: 7px; 
+  height: 2em;
+}
+
+.model-serving--version {
+  margin-top: 9px; 
+  height: 2em;
+}
+
+.model-serving--instances {
+  margin-top: 15px; 
+  height: 2em;
+}
+
+.model-serving--advanced {
+  margin-top: 11px; 
+  height: 2em;
+}
+
+.model-serving--advanced-form {
+  margin-top: 10px; height: 2em;
+}
+
+.model-serving--form-kafka {
+  margin-top: 10px; width: 80%;
+}
+
+.model-serving--maxwidth {
+  max-width: 80px;
+}
+
+.model-serving--margin-right {
+  margin-right:-3px
+}
+
+.model-serving--summary {
+  font-size:0.9em; 
+  padding:7px 10px; 
+  margin-bottom: 3px; 
+  background-color:#005571;
+}
+
+/* end model serving */
+
+.ds-box-bottom > div {
+  background-color: white;
+}
+
+.thin-scrollbar {
+  padding-bottom: 70px;
+}
+
+.rg-row-noreadme {
+  height: auto !important;
+}
+
+button.centered-icon {
+  position: relative;
+}
+
+button.centered-icon > .fa.fa-trash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: 9px;
+  margin-left: 9px;
+}
+
+.select2-drop-active {
+  opacity: 1 !important;
+}
+
+.card-item {
+  height: auto;
+  min-height: 175px;
+}
+
+.card-item-content {
+  max-height: initial;
+  min-height: 175px;
+  height: auto;
+}
+
+.card-item-content label {
+  font-weight: normal;
+}
+
+.card-item-content .header {
+  height: auto;
+  max-height: initial;
+}
+
+.card-item-content .value {
+  font-size: 15px;
+  font-weight: normal;
+}
+
+.card-content.title-blue {
+  color: #0492b3;
+  font-size: 15px;
+}
+
+.oval {
+  padding: 10px 0px;
+  font-size: 13px;
+}
+
+.oval-license {
+  background-color: #0492b3;  
+  color: #ffffff;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+  margin: 10px 10px 10px 0px;
+}
+
+.oval-license.grey {
+  background-color: darkgrey; 
+  margin: 0px 10px 10px 0px;
+}
+
+.card-body .details h3 {
+  margin-top: 0px;
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+.search-result-sort {
+  justify-content: flex-end;
+}
+
+.btn-bold {
+  font-weight: bold;
+}
+
+.btn.align-right {
+  width: 100%;
+  text-align: right;
+}
+
+.select2-container-multi .select2-choices {
+  border: none !important;
+}
+
+.select2-container-multi.select2-container-active .select2-choices {
+  box-shadow: none !important;
+}
+
+.filter-search {
+  width: 100%;
 }
