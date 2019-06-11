@@ -274,7 +274,6 @@ angular.module('hopsWorksApp')
                 if (!entry.hasOwnProperty('@type')) return;
                 let type = entry['@type'].split('/');
                 type = type[type.length - 1].toUpperCase();
-                console.log({type});
                 if (type == 'LOCATION') index_location = index;
                 if (type == 'ORGANIZATION' || type == 'INDIVIDUAL') index_organization = index;
                 if (type == 'DCAT#CATALOG') index_catalog = index;
@@ -328,7 +327,6 @@ angular.module('hopsWorksApp')
              */
             
             self.saveExtendedProjectMetadata = function () {
-              console.log($scope.data);
               var graph = self.template['@graph'][0];
               graph['@id'] = 'https://aegis.eu/id/project/' + PROJECT_ID;
               graph.modified = (new Date()).toISOString();
