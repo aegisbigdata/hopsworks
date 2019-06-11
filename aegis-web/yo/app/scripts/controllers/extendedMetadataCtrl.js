@@ -122,76 +122,6 @@ angular.module('hopsWorksApp')
               }
             };
 
-            self.mockResponse = {
-              "@graph": [
-                {
-                  "@id": "_:b0",
-                  "@type": "http://xmlns.com/foaf/0.1/Organization",
-                  "homepage": "http://www.fokus.fraunhofer.de",
-                  "name": "Fraunhofer FOKUS"
-                },
-                {
-                  "@id": "_:b1",
-                  "@type": "http://purl.org/dc/terms/Location",
-                  "geometry": "{\"type\": \"polygon\", \"coordinates\": [[[10.326304, 53.394985], [10.326304, 53.964153], [8.420551, 53.964153], [8.420551, 53.394985], [10.326304, 53.394985]]]}"
-                },
-                {
-                  "@id": "https://europeandataportal.eu/id/catalogue/1049",
-                  "@type": "http://www.w3.org/ns/dcat#Catalog",
-                  "description": "This is an example Project",
-                  "language": "http://publications.europa.eu/resource/authority/language/ENG",
-                  "license": "http://publications.europa.eu/resource/authority/licence/CC_BYNCND_4_0",
-                  "modified": "2019-05-16T14:02:00Z",
-                  "publisher": "_:b0",
-                  "spatial": "_:b1",
-                  "title": "Example Project",
-                  "type": "dcat-ap"
-                }
-              ],
-              "@context": {
-                "homepage": {
-                  "@id": "http://xmlns.com/foaf/0.1/homepage",
-                  "@type": "@id"
-                },
-                "name": {
-                  "@id": "http://xmlns.com/foaf/0.1/name"
-                },
-                "description": {
-                  "@id": "http://purl.org/dc/terms/description"
-                },
-                "license": {
-                  "@id": "http://purl.org/dc/terms/license",
-                  "@type": "@id"
-                },
-                "language": {
-                  "@id": "http://purl.org/dc/terms/language",
-                  "@type": "@id"
-                },
-                "publisher": {
-                  "@id": "http://purl.org/dc/terms/publisher",
-                  "@type": "@id"
-                },
-                "spatial": {
-                  "@id": "http://purl.org/dc/terms/spatial",
-                  "@type": "@id"
-                },
-                "type": {
-                  "@id": "http://purl.org/dc/terms/type"
-                },
-                "title": {
-                  "@id": "http://purl.org/dc/terms/title"
-                },
-                "modified": {
-                  "@id": "http://purl.org/dc/terms/modified",
-                  "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
-                },
-                "geometry": {
-                  "@id": "http://www.w3.org/ns/locn#geometry",
-                  "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
-                }
-              }
-            };
-
             $scope.form = {};
             $scope.deleteButtonIsDisabled = false;
             $scope.saveButtonIsDisabled = false;
@@ -387,13 +317,7 @@ angular.module('hopsWorksApp')
                 .catch(function(error) {
                   console.error(error);
                   if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for project', PROJECT_ID);
-
-                  // Until CORS is enabled, update models with mock data...
-                  self.updateModelsFromData(self.mockResponse);
-                });
-
-              
-              
+                });              
             };
 
             self.loadExtendedProjectMetadata();
