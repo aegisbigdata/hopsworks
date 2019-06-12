@@ -148,7 +148,7 @@ angular.module('hopsWorksApp')
 
       createOrUpdateDistributionMetadata: function(datasetID, projectID, metadata) {
         var req = {
-          method: 'PUT',
+          method: 'POST',
           url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
           params: {
             catalogue: projectID,
@@ -163,14 +163,10 @@ angular.module('hopsWorksApp')
         return $http(req);
       },
 
-      getDistributionMetadata: function (datasetID, projectID) {
+      getDistributionMetadata: function (distributionID) {
         var req = {
           method: 'GET',
-          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
-          params: {
-            catalogue: projectID,
-            dataset: datasetID
-          },
+          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT + '/' + distributionID,
           headers: {
             'Content-Type': 'application/ld+json'
           }
@@ -178,14 +174,10 @@ angular.module('hopsWorksApp')
         return $http(req);
       },
 
-      deleteDistributionMetadata: function (datasetID, projectID) {
+      deleteDistributionMetadata: function (distributionID) {
         var req = {
           method: 'DELETE',
-          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
-          params: {
-            catalogue: projectID,
-            dataset: datasetID
-          },
+          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT + '/' + distributionID,
           headers: {
             'Content-Type': 'application/ld+json',
             'Authorization': API_KEY
