@@ -121,6 +121,8 @@ angular.module('hopsWorksApp')
 
             $scope.form = {};
             $scope.path = $location.path();
+            $scope.deleteButtonIsDisabled = false;
+            $scope.saveButtonIsDisabled = false;
             $scope.data = {
               fields: {
                 title: {
@@ -530,7 +532,9 @@ angular.module('hopsWorksApp')
                   growl.success('Dataset metadata successfully deleted.', {title: 'Success', ttl: 1000});
                 })
                 .catch(function(error) {
-                  growl.error('Server error: ' + error.status, {title: 'Error while deleting dataset metadata', ttl: 5000, referenceId: 0});
+                  let message = 'Server error: ' + error.status;
+                  if (error.data && error.data.cause) message = 'Cause: ' + error.data.cause;
+                  growl.error(message, {title: 'Error while deleting dataset metadata', ttl: 5000, referenceId: 0});
                 })
                 .finally(function() {
                   $scope.deleteButtonIsDisabled = false;

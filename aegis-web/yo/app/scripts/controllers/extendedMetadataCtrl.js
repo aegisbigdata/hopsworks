@@ -376,7 +376,9 @@ angular.module('hopsWorksApp')
                   growl.success('Project metadata successfully deleted.', {title: 'Success', ttl: 1000});
                 })
                 .catch(function(error) {
-                  growl.error('Server error: ' + error.status, {title: 'Error while deleting project metadata', ttl: 5000, referenceId: 0});
+                  let message = 'Server error: ' + error.status;
+                  if (error.data && error.data.cause) message = 'Cause: ' + error.data.cause;
+                  growl.error(message, {title: 'Error while deleting project metadata', ttl: 5000, referenceId: 0});
                 })
                 .finally(function() {
                   $scope.deleteButtonIsDisabled = false;
