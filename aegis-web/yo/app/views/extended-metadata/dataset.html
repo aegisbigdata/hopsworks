@@ -223,7 +223,7 @@
 
                                             <div class="form-group">
                                                 <label for="input-price" id="input-price">Price</label>
-                                                <input type="text" class="form-control" id="input-price" placeholder="Price (Currency)" ng-model="data.fields.price.model" ng-focus="extendedMetadataCtrl.onFieldFocus('price')">
+                                                <input type="text" class="form-control" id="input-price" placeholder="Price" ng-model="data.fields.price.model" ng-focus="extendedMetadataCtrl.onFieldFocus('price')">
                                             </div>
 
                                             <div class="form-group">
@@ -307,6 +307,12 @@
                                     </div>
                                 </div>
                               </form>
+
+                              <div style="margin-top: 40px;margin-bottom: 150px;position: relative;">
+                                <button class="btn btn-warning" ng-class="deleteButtonIsDisabled ? 'disabled' : ''" ng-click="extendedMetadataDatasetCtrl.deleteExtendedMetadata()">Delete Metadata for Dataset</button>
+                                
+                              </div>
+
                             </div>
                             <!-- END Rightside tables -->
                             <div class="col-md-2">
