@@ -511,7 +511,32 @@ angular.module('hopsWorksApp')
                   $scope.saveButtonIsDisabled = false;
                 });
             };
+
+            /**
+             * [deleteExtendedMetadataForProject description]
+             * @return {[type]} [description]
+             */
             
+            self.deleteExtendedMetadata = function () {
+              $scope.deleteButtonIsDisabled = true;
+
+              ExtendedMetadataAPIService.deleteDatasetMetadata(DATASET_ID, PROJECT_ID)
+                .then(function(success) {
+                  // Clear form fields if delete is successful
+                  for (var key in $scope.data.fields) {
+                    var field = $scope.data.fields[key];                
+                    field.model = '';
+                  }
+                  growl.success('Dataset metadata successfully deleted.', {title: 'Success', ttl: 1000});
+                })
+                .catch(function(error) {
+                  growl.error('Server error: ' + error.status, {title: 'Error while deleting dataset metadata', ttl: 5000, referenceId: 0});
+                })
+                .finally(function() {
+                  $scope.deleteButtonIsDisabled = false;
+                });
+            };
+
             /**
              * Entry point for saving extended metadata from fields in project-view
              * Is triggered on clicking the 'Save Metadata' button
