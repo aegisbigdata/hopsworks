@@ -320,6 +320,87 @@ angular.module('hopsWorksApp')
             };
 
 
+            self.updateModelsFromData = function (jsonld) {
+              if (!jsonld.hasOwnProperty('@graph')) return;
+              var graph = jsonld['@graph'];
+              var fields = $scope.data.fields;
+              var index_location, index_contactpoint, index_dataset, index_temporal;
+
+              // Determine indexes
+              graph.forEach(function(entry, index) {
+                if (!entry.hasOwnProperty('@type')) return;
+                let type = entry['@type'].split('/');
+                type = type[type.length - 1].toUpperCase();
+
+                if (type == 'LOCATION') index_location = index;
+                if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
+                if (type == 'DCAT#DATASET') index_dataset = index;
+                if (type == 'PERIODOFTIME') index_temporal = index;
+              })
+
+              // Set publisher Info
+              // var type_splitted = graph[index_organization]['@type'].split('/');
+              // fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
+              // fields.publishername.model = graph[index_organization].name;
+              // fields.homepage.model = graph[index_organization].homepage;
+
+              // Set Language field
+              if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
+                var language_splitted = graph[index_dataset]['http://purl.org/dc/terms/language']['@id'].split('/');
+                fields.language.model = language_splitted[language_splitted.length - 1];
+              }
+
+              // Set License field
+              if (graph[index_dataset].hasOwnProperty('license')) {
+                var license_splitted = graph[index_dataset].license.split('/');
+                fields.license.model = license_splitted[license_splitted.length - 1];
+              }
+
+              // Set other fields
+              fields.title.model = graph[index_dataset]['http://purl.org/dc/terms/title'] || '';
+              fields.description.model = graph[index_dataset]['http://purl.org/dc/terms/description'] || '';
+              fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
+              fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
+              fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || '';
+              
+              if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#keyword')) {
+                let tags = graph[index_dataset]['http://www.w3.org/ns/dcat#keyword'];
+                fields.keywords.model = tags.join();
+                fields.keywords.tags = tags.map(tag => {
+                  return {text: tag};
+                });
+              }
+
+              if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#theme')) {
+                var theme_splitted = graph[index_dataset]['http://www.w3.org/ns/dcat#theme']['@id'].split('/');
+                fields.theme.model = theme_splitted[theme_splitted.length - 1];
+              }
+
+              if (graph[index_dataset].hasOwnProperty('http://xmlns.com/foaf/0.1/page')) {
+                fields.documentation.model = graph[index_dataset]['http://xmlns.com/foaf/0.1/page']['@id'] || '';
+              }
+
+              // Set temporal data fields
+              if (index_temporal) {
+                let temporalData = graph[index_temporal];
+                if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']);
+                if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']);
+              }
+
+              if (index_contactpoint) {
+                var type_splitted = graph[index_contactpoint]['@type'].split('#');
+                fields.contactpointtype.model = type_splitted[type_splitted.length - 1].toUpperCase() || '';
+                fields.contactpointname.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#fn'] || '';
+
+                if (graph[index_contactpoint].hasOwnProperty('http://www.w3.org/2006/vcard/ns#hasEmail')) {
+                  fields.contactpointmail.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#hasEmail']['@id'];
+                  fields.contactpointmail.model = fields.contactpointmail.model.split(':');
+                  fields.contactpointmail.model = fields.contactpointmail.model[fields.contactpointmail.model.length - 1];
+                }
+              }
+            };
+
+
             /**
              * Loads from data from JSON-LD format into page
              */
@@ -328,7 +409,7 @@ angular.module('hopsWorksApp')
               ExtendedMetadataAPIService.getDatasetMetadata(DATASET_ID, PROJECT_ID)
                 .then(function(data) {
                   console.log(data.data);
-                  //self.updateModelsFromData(data.data);
+                  self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
                   console.error(error);
@@ -337,48 +418,6 @@ angular.module('hopsWorksApp')
             };
 
             self.loadDatasetMetadata();            
-
-            // self.loadExtendedDistroMetadata = function () {
-            //   MetadataRestService.getMetadata(DATASET_ID).then(function (datasetMetadata) {
-            //     if (!datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME] ||
-            //         !datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME].metadata.payload) {
-            //       return;
-            //     }
-
-            //     let data = datasetMetadata.data[AEGIS_DATASET_TEMPLATE_NAME].metadata.payload[0];
-            //     data = JSON.parse(data.replace(/\\/g, '"'))['@graph'][0];
-
-            //     for (var key in data) {
-            //       if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
-            //         if (data[key] === './') continue;
-                    
-            //         if (key == 'spatial') {
-            //           var cleaned_spatial = data[key].substr(1);
-            //           var args = cleaned_spatial.split(',');
-            //           args = args.map(e => parseFloat(e));
-            //           $scope.data.areaSelect = { _width: args[0], _height: args[1], center: { lat: args[2], lng: args[3] }, raw: cleaned_spatial };
-            //           $scope.data.mapCenter = { lat: args[2], lng: args[3], zoom: args[4] };
-            //         } else if (key == 'keywords') {
-            //           // Keywords field
-            //           var cleaned_keywords = data[key].substr(1);
-            //           var taglist = cleaned_keywords.split(',');
-            //           $scope.data.fields[key].model = cleaned_keywords;                                         
-            //           $scope.data.fields[key].tags = taglist.map(tag => {
-            //             return {text: tag};
-            //           });
-            //         } else if (typeof(data[key]) === 'string') {
-            //           // Standard string field
-            //           $scope.data.fields[key].model = data[key].substr(1);
-            //         } else if (typeof(data[key]) === 'object' && data[key].hasOwnProperty('@id')) {
-            //           // Nested object with @id property
-            //           $scope.data.fields[key].model = data[key]['@id'].substr(1);
-            //         }
-            //       }
-            //     }
-            //   });
-            // };
-
-            // self.loadExtendedDistroMetadata();
 
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks
@@ -420,10 +459,7 @@ angular.module('hopsWorksApp')
                 i++;
               }
 
-              // Add temporal object (from / to date)
-              
-              console.log(fields); 
-              
+              // Add temporal object (from / to date)            
               if (fields.temporalfrom.model || fields.temporalto.model) {
                 var temporalData = {
                   '@id': '_:b' + i,
@@ -444,12 +480,15 @@ angular.module('hopsWorksApp')
               }
 
               if (fields.contactpointtype.model || fields.contactpointname.model || fields.contactpointmail.model) {
+                let mail = fields.contactpointmail.model;
+                if (mail != '' && !mail.startsWith('mailto:')) mail = 'mailto:' + mail;
+
                 var contactPoint = {
                   '@id': '_:b' + i,
                   '@type': 'http://www.w3.org/2006/vcard/ns#' + fields.contactpointtype.model || 'Organization',
                   'http://www.w3.org/2006/vcard/ns#fn': fields.contactpointname.model || '',
                   'http://www.w3.org/2006/vcard/ns#hasEmail': {
-                    '@id': fields.contactpointmail.model || ''
+                    '@id': mail
                   }
                 };
                 
@@ -458,7 +497,6 @@ angular.module('hopsWorksApp')
                 i++;
               }
 
-              console.log(graph);
               $scope.saveButtonIsDisabled = true;
               
               // Send to API
@@ -474,38 +512,6 @@ angular.module('hopsWorksApp')
                 });
             };
             
-            // self.saveExtendedDatasetMetadata = function () {
-            //   dataSetService.getAllDatasets().then(function (allDatasets) {
-            //     let dataset = allDatasets.data.filter(ds => ds.id == DATASET_ID)[0];
-            //     if (!dataset) return;
-
-            //     let template = {
-            //       templateId: AEGIS_DATASET_TEMPLATE_ID,
-            //       inodePath: dataset.path
-            //     };
-            //     dataSetService.detachTemplate(DATASET_ID, AEGIS_DATASET_TEMPLATE_ID).finally(function () {
-            //       dataSetService.attachTemplate(template).then(function (success) {
-            //         growl.success(success.data.successMessage, {title: 'Success', ttl: 1000});
-            //       }, function (error) {
-            //         growl.info(
-            //           'Could not attach template.',
-            //           {title: 'Info', ttl: 5000}
-            //         );
-            //       }).then(function () {
-            //         ExtendedMetadataService.saveExtendedMetadata($scope.data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
-            //           const metaData = { 5: jsonldData };
-            //           MetadataRestService.addMetadataWithSchema(
-            //             parseInt(dataset.parentId), dataset.name, -1, metaData).then(function () {
-            //               console.log('done?')
-            //             }, function (error) {
-            //               growl.error('Metadata could not be saved', {title: 'Info', ttl: 1000});
-            //             });
-            //         });
-            //       });
-            //     });
-            //   });
-            // };
-
             /**
              * Entry point for saving extended metadata from fields in project-view
              * Is triggered on clicking the 'Save Metadata' button
