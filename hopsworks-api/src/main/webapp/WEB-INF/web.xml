@@ -264,7 +264,29 @@
     <servlet-name>AirflowProxyServlet</servlet-name>
     <url-pattern>/airflow</url-pattern>
   </servlet-mapping>
-  
+
+
+  <!-- Airflow proxy servlet -->
+  <servlet>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.MetadataServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8101/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <url-pattern>/metadataservice/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <url-pattern>/metadataservice</url-pattern>
+  </servlet-mapping>
 
 
   <!-- Other servlets -->
