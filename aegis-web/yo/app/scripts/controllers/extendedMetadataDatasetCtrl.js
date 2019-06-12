@@ -391,7 +391,6 @@ angular.module('hopsWorksApp')
               var i = 0;
 
               graph[0]['@id'] = 'https://europeandataportal.eu/set/data/' + DATASET_ID;
-              graph[0]['modified'] = (new Date()).toISOString();
               graph[0]['title'] = $scope.data.fields.title.model;
               graph[0]['description'] = $scope.data.fields.description.model;
 
