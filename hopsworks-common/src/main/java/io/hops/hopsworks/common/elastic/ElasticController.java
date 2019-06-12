@@ -76,6 +76,8 @@ import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.JSONArray;
@@ -144,6 +146,61 @@ public class ElasticController {
   @PreDestroy
   private void closeClient(){
     shutdownClient();
+  }
+  
+  public List<ElasticHit> search(String searchTerm, String type) throws ServiceException {
+    //some necessary client settings
+    Client client = getClient();
+    
+    //check if the index are up and running
+    if (!this.indexExists(client, Settings.META_INDEX)) {
+      throw new ServiceException(RESTCodes.ServiceErrorCode.ELASTIC_INDEX_NOT_FOUND,
+        Level.SEVERE, "index: " + Settings.META_INDEX);
+    }
+    
+    LOG.log(Level.INFO, "Found elastic index, now executing the query.");
+    
+    //hit the indices - execute the queries
+    SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
+    srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type.toLowerCase()));
+    srb = srb.setSize(10000).addSort("_score", SortOrder.DESC);
+  
+    TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders
+      .terms("doc_type").size(50).field("doc_type");
+  
+    srb.addAggregation(termsAggregationBuilder);
+    
+    LOG.log(Level.INFO, "Search Elastic query is: {0}", srb.toString());
+    ActionFuture<SearchResponse> futureResponse = srb.execute();
+    SearchResponse response = futureResponse.actionGet();
+    
+    if (response.status().getStatus() == 200) {
+      //construct the response
+      List<ElasticHit> elasticHits = new LinkedList<>();
+      if (response.getHits().getHits().length > 0) {
+        SearchHit[] hits = response.getHits().getHits();
+        
+        for (SearchHit hit : hits) {
+          ElasticHit eHit = new ElasticHit(hit);
+          eHit.setLocalDataset(true);
+          int inode_id = Integer.parseInt(hit.getId());
+          List<Dataset> dsl = datasetFacade.findByInodeId(inode_id);
+          if (!dsl.isEmpty() && dsl.get(0).isPublicDs()) {
+            Dataset ds = dsl.get(0);
+            eHit.setPublicId(ds.getPublicDsId());
+          }
+          elasticHits.add(eHit);
+        }
+      }
+      
+      return elasticHits;
+    } else {
+      //something went wrong so throw an exception
+      shutdownClient();
+      throw new ServiceException(RESTCodes.ServiceErrorCode.ELASTIC_SERVER_NOT_FOUND, Level.WARNING, "Elasticsearch " +
+        "error code: " + response.status().getStatus());
+    }
   }
 
   public List<ElasticHit> globalSearch(String searchTerm) throws ServiceException {
@@ -281,7 +338,7 @@ public class ElasticController {
   }
 
   public List<ElasticHit> datasetSearch(Integer projectId, String datasetName, String searchTerm)
-    throws ServiceException {
+      throws ServiceException {
     Client client = getClient();
     //check if the indices are up and running
     if (!this.indexExists(client, Settings.META_INDEX)) {
@@ -521,6 +578,22 @@ public class ElasticController {
     return boolQuery()
         .must(dataset)
         .must(nameDescQuery);
+  }
+  
+  /**
+   * Global search on datasets and projects.
+   * <p/>
+   * @param searchTerm
+   * @return
+   */
+  private QueryBuilder searchQuery(String searchTerm, String type) {
+    QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
+    QueryBuilder onlyType = termsQuery(Settings.META_DOC_TYPE_FIELD, type);
+    QueryBuilder query = boolQuery()
+      .must(onlyType)
+      .must(nameDescQuery);
+    
+    return query;
   }
 
   /**

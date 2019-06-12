@@ -58,6 +58,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -80,7 +81,30 @@ public class ElasticService {
   private NoCacheResponse noCacheResponse;
   @EJB
   private ElasticController elasticController;
-
+  
+  /**
+   * Search end point aegis
+   * <p/>
+   * @param q
+   * @param type
+   * @param req
+   * @return
+   */
+  @GET
+  @Path("search")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response search(@QueryParam("q") String q,
+    @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
+    if (Strings.isNullOrEmpty(q)) {
+      throw new IllegalArgumentException("searchTerm was not provided or was empty");
+    }
+    
+    logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
+    GenericEntity<List<ElasticHit>> searchResults = new GenericEntity<List<ElasticHit>>(elasticController.
+      search(q, type)) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
+  }
+  
   /**
    * Searches for content composed of projects and datasets. Hits two elastic
    * indices: 'project' and 'dataset'
@@ -92,8 +116,8 @@ public class ElasticService {
   @GET
   @Path("globalsearch/{searchTerm}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response globalSearch(@PathParam("searchTerm") String searchTerm, @Context HttpServletRequest req) throws
-      ServiceException {
+  public Response globalSearch(@PathParam("searchTerm") String searchTerm,
+    @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
 
     if (Strings.isNullOrEmpty(searchTerm)) {
       throw new IllegalArgumentException("searchTerm was not provided or was empty");
