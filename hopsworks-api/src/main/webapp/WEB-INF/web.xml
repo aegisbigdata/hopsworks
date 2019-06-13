@@ -264,7 +264,73 @@
     <servlet-name>AirflowProxyServlet</servlet-name>
     <url-pattern>/airflow</url-pattern>
   </servlet-mapping>
-  
+
+
+  <!-- Metadata Service proxy servlet -->
+  <servlet>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.MetadataServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8101/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata</url-pattern>
+  </servlet-mapping>
+
+  <!-- Metadata Search proxy servlet -->
+  <servlet>
+    <servlet-name>MetadataSearchProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.MetadataSearchProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8103/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MetadataSearchProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata-search/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MetadataSearchProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata-search</url-pattern>
+  </servlet-mapping>
+
+  <!-- Virtuoso proxy servlet -->
+  <servlet>
+    <servlet-name>VirtuosoProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.VirtuosoProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8106/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>VirtuosoProxyServlet</servlet-name>
+    <url-pattern>/virtuoso/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>VirtuosoProxyServlet</servlet-name>
+    <url-pattern>/virtuoso</url-pattern>
+  </servlet-mapping>
 
 
   <!-- Other servlets -->
