@@ -68,7 +68,7 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
           let mapcenter = [52.520008, 13.404954];
           let areaSelectOptions = { width: 100, height: 100 };
 
-          if ($scope.$parent.data.areaSelect) {
+          if ($scope.data.areaSelect) {
             let a = $scope.$parent.data.areaSelect;
             mapcenter = [a.center.lat, a.center.lng];
             areaSelectOptions = { width: a._width, height: a._height };
@@ -120,7 +120,13 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
           })
           
           areaSelect.on('change', function() {
-            $scope.$parent.data.areaSelect = { _width: areaSelect._width, _height: areaSelect._height, center: map.getCenter(), zoom: map.getZoom() };
+            $scope.data.areaSelect = { 
+              _width: areaSelect._width,
+              _height: areaSelect._height,
+              center: map.getCenter(),
+              zoom: map.getZoom(),
+              bounds: this.getBounds()
+            };
           });
 
           // If the width attribute defined update css

@@ -70,10 +70,6 @@ angular.module('hopsWorksApp')
                     "homepage": "",
                     "name": ""
                   },
-                  "spatial": {
-                    "@type": "http://purl.org/dc/terms/Location",
-                    "geometry": ""
-                  },
                   "title": "",
                   "type": "dcat-ap"
                 }
@@ -126,6 +122,7 @@ angular.module('hopsWorksApp')
             $scope.deleteButtonIsDisabled = false;
             $scope.saveButtonIsDisabled = false;
             $scope.data = {
+              areaSelect: null,
               fields: {
                 title: {
                   label: 'Title',
@@ -327,7 +324,8 @@ angular.module('hopsWorksApp')
              */
             
             self.saveExtendedProjectMetadata = function () {
-              var graph = self.template['@graph'][0];
+              var metadataObject = JSON.parse(JSON.stringify(self.template))
+              var graph = metadataObject['@graph'][0];
               graph['@id'] = 'https://aegis.eu/id/project/' + PROJECT_ID;
               graph.modified = (new Date()).toISOString();
 
@@ -342,10 +340,34 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              console.log(self.template['@graph'][0]);
+              graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
+              graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
+
+              if ($scope.data.areaSelect) {
+                var as = $scope.data.areaSelect;
+                var spatialData = {
+                  "@type": "http://purl.org/dc/terms/Location",
+                  geometry: {
+                    type: "polygon",
+                    coordinates: [
+                      [
+                        [as.bounds._northEast.lat, as.bounds._northEast.lng],
+                        [as.bounds._northEast.lat, as.bounds._southWest.lng],
+                        [as.bounds._southWest.lat, as.bounds._southWest.lng]
+                        [as.bounds._southWest.lat, as.bounds._northEast.lng]
+                      ]
+                    ]
+                  }
+                }
+
+                graph['spatial'] = JSON.stringify(JSON.stringify(spatialData)).substr(1).slice(0, -1);
+              }
+
+              console.log(metadataObject['@graph'][0]);
               $scope.saveButtonIsDisabled = true;
+              
               // Send to API
-              ExtendedMetadataAPIService.createOrUpdateProjectMetadata(PROJECT_ID, self.template)
+              ExtendedMetadataAPIService.createOrUpdateProjectMetadata(PROJECT_ID, metadataObject)
                 .then(function(success) {
                   growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
