@@ -43,6 +43,7 @@ import com.google.common.base.Strings;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.Audience;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import io.hops.hopsworks.common.elastic.ElasticAggregation;
 import io.hops.hopsworks.common.elastic.ElasticController;
 import io.hops.hopsworks.common.elastic.ElasticHit;
 import io.hops.hopsworks.common.exception.ServiceException;
@@ -83,6 +84,29 @@ public class ElasticService {
   private ElasticController elasticController;
   
   /**
+   * Aggregation end point aegis
+   * <p/>
+   * @param q
+   * @param type
+   * @param req
+   * @return
+   */
+  @GET
+  @Path("aggregation")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response aggregation(@QueryParam("q") String q,
+    @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
+    if (Strings.isNullOrEmpty(q)) {
+      throw new IllegalArgumentException("q was not provided or was empty");
+    }
+    
+    logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
+    GenericEntity<List<ElasticAggregation>> searchResults =
+      new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type)) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
+  }
+  
+  /**
    * Search end point aegis
    * <p/>
    * @param q
@@ -96,7 +120,7 @@ public class ElasticService {
   public Response search(@QueryParam("q") String q,
     @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
-      throw new IllegalArgumentException("searchTerm was not provided or was empty");
+      throw new IllegalArgumentException("q was not provided or was empty");
     }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
