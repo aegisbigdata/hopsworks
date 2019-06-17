@@ -1,59 +1,36 @@
 package io.hops.hopsworks.common.elastic;
 
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 @XmlRootElement
-public class ElasticAggregation {
+public class ElasticAggregation implements Comparator<ElasticAggregation> {
   
   public String name;
-  public List<ElasticAggregationItem> items;
+  public Map<String, Long> map;
   
-  public class ElasticAggregationItem {
-    public String name;
-    public long count;
-  
-    public ElasticAggregationItem(String name, long count) {
-      this.name = name;
-      this.count = count;
-    }
-  
-    public String getName() {
-      return name;
-    }
-  
-    public void setName(String name) {
-      this.name = name;
-    }
-  
-    public long getCount() {
-      return count;
-    }
-  
-    public void setCount(long count) {
-      this.count = count;
-    }
+  public ElasticAggregation() {
   }
   
   public ElasticAggregation(String name) {
     this.name = name;
-    this.items = new LinkedList<>();
+    this.map = new HashMap<>();
   }
   
-  public ElasticAggregation(ParsedStringTerms aggregation) {
+  public ElasticAggregation(StringTerms aggregation) {
     this.name = aggregation.getName();
     
-    this.items = new LinkedList<>();
+    this.map = new HashMap<>();
   
     for (Terms.Bucket bucket : aggregation.getBuckets()) {
       String name = bucket.getKey().toString();
       long count = bucket.getDocCount();
-      
-      this.items.add(new ElasticAggregationItem(name, count));
+      this.map.put(name, count);
     }
   }
   
@@ -65,11 +42,16 @@ public class ElasticAggregation {
     this.name = name;
   }
   
-  public List<ElasticAggregationItem> getItems() {
-    return items;
+  public void setMap(Map<String, Long> map) {
+    this.map = new HashMap<>(map);
   }
   
-  public void setItems(List<ElasticAggregationItem> items) {
-    this.items = items;
+  public Map<String, Long> getMap() {
+    return map;
+  }
+  
+  @Override
+  public int compare(ElasticAggregation o1, ElasticAggregation o2) {
+    return o1.getName().compareTo(o2.getName());
   }
 }

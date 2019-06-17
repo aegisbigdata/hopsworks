@@ -99,11 +99,17 @@ public class ElasticService {
     if (Strings.isNullOrEmpty(q)) {
       throw new IllegalArgumentException("q was not provided or was empty");
     }
+  
+    if (type == null) {
+      throw new IllegalArgumentException("type was not provided or was empty");
+    }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticAggregation>> searchResults =
       new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type)) {};
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
+    Response.ResponseBuilder noCacheResponseBuilder = noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK);
+    noCacheResponseBuilder = noCacheResponseBuilder.entity(searchResults);
+    return noCacheResponseBuilder.build();
   }
   
   /**
@@ -121,6 +127,10 @@ public class ElasticService {
     @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       throw new IllegalArgumentException("q was not provided or was empty");
+    }
+  
+    if (type == null) {
+      throw new IllegalArgumentException("type was not provided or was empty");
     }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());

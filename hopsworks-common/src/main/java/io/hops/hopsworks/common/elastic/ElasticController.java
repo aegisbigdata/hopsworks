@@ -78,7 +78,9 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -167,24 +169,39 @@ public class ElasticController {
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
     srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type.toLowerCase()));
     srb = srb.setSize(0);
+    
+    TermsAggregationBuilder typeAggregation = AggregationBuilders
+      .terms("Type").field("doc_type").size(50);
   
-    TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders
-      .terms("doc_type").size(50).field("doc_type");
+    srb.addAggregation(typeAggregation);
   
-    srb.addAggregation(termsAggregationBuilder);
+    NestedAggregationBuilder formatAggregation =
+      AggregationBuilders
+        .nested("File Types Nested", "xattr")
+        .subAggregation(
+          AggregationBuilders
+            .terms("File Types").field("xattr.aegis.search.format.keyword").size(50)
+        );
   
-    LOG.log(Level.INFO, "Search Elastic query is: {0}", srb.toString());
+    srb.addAggregation(formatAggregation);
+  
+    LOG.log(Level.INFO, "Aggregation Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
     SearchResponse response = futureResponse.actionGet();
   
     if (response.status().getStatus() == 200) {
       List<ElasticAggregation> elasticAggregations = new LinkedList<>();
-      if (response.getAggregations().asList().size() > 0) {
-        List<Aggregation> aggregations = response.getAggregations().asList();
-        for (Aggregation aggregation : aggregations) {
-          if (aggregation.getClass().getName().equals(ParsedStringTerms.class.getName())) {
-            ElasticAggregation elasticAggregation = new ElasticAggregation((ParsedStringTerms) aggregation);
-            elasticAggregations.add(elasticAggregation);
+      for (Aggregation aggregation : response.getAggregations()) {
+        if (aggregation.getClass().getName().equals(StringTerms.class.getName())) {
+          ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation);
+          elasticAggregations.add(elasticAggregation);
+        } else if (aggregation.getClass().getName().equals(InternalNested.class.getName())) {
+          InternalNested internalNested = (InternalNested) aggregation;
+          for (Aggregation nestedAggregation : internalNested.getAggregations()) {
+            if (nestedAggregation.getClass().getName().equals(StringTerms.class.getName())) {
+              ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) nestedAggregation);
+              elasticAggregations.add(elasticAggregation);
+            }
           }
         }
       }
@@ -214,11 +231,6 @@ public class ElasticController {
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
     srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type.toLowerCase()));
     srb = srb.setSize(10000).addSort("_score", SortOrder.DESC);
-  
-    TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders
-      .terms("doc_type").size(50).field("doc_type");
-  
-    srb.addAggregation(termsAggregationBuilder);
     
     LOG.log(Level.INFO, "Search Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
@@ -637,7 +649,16 @@ public class ElasticController {
    */
   private QueryBuilder searchQuery(String searchTerm, String type) {
     QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
-    QueryBuilder onlyType = termsQuery(Settings.META_DOC_TYPE_FIELD, type);
+  
+    QueryBuilder onlyType;
+    if (type == null || !(type.equals(Settings.DOC_TYPE_PROJECT) || type.equals(Settings.DOC_TYPE_DATASET)
+      || type.equals(Settings.DOC_TYPE_INODE))) {
+      onlyType = termsQuery(Settings.META_DOC_TYPE_FIELD,
+        Settings.DOC_TYPE_PROJECT, Settings.DOC_TYPE_DATASET, Settings.DOC_TYPE_INODE);
+    } else {
+      onlyType = termsQuery(Settings.META_DOC_TYPE_FIELD, type);
+    }
+    
     QueryBuilder query = boolQuery()
       .must(onlyType)
       .must(nameDescQuery);
