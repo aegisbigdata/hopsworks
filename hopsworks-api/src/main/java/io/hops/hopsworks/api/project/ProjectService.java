@@ -366,8 +366,20 @@ public class ProjectService {
     Inode inode = inodes.findById(inodeId);
     Inode parent = inodes.findParent(inode);
     Project proj = projectFacade.findByName(parent.getInodePK().getName());
+    String datasetName = inode.getInodePK().getName();
+    //a hive database
+    if(proj == null && datasetName.endsWith(".db")){
+      String projectName;
+      if (datasetName.endsWith("_featurestore.db")){
+        projectName = datasetName.substring(0, datasetName.lastIndexOf("_"));
+      }else{
+        projectName = datasetName.substring(0, datasetName.lastIndexOf("."));
+      }
+      proj = projectFacade.findByNameCaseInsensitive(projectName);
+    }
+    
     Dataset ds = datasetFacade.findByProjectAndInode(proj, inode);
-
+    
     if (ds == null) {
       throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_NOT_FOUND, Level.FINE, "inodeId: " + inodeId);
     }
