@@ -75,6 +75,7 @@ import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -82,6 +83,10 @@ import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
+import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.min.InternalMin;
+import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.JSONArray;
@@ -109,6 +114,7 @@ import java.util.regex.Pattern;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.fuzzyQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchPhraseQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.nestedQuery;
@@ -152,7 +158,8 @@ public class ElasticController {
     shutdownClient();
   }
   
-  public List<ElasticAggregation> aggregation(String searchTerm, String type) throws ServiceException {
+  public List<ElasticAggregation> aggregation(String searchTerm, List<String> type, List<String> fileType,
+    List<String> license) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
   
@@ -167,24 +174,50 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type.toLowerCase()));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license));
     srb = srb.setSize(0);
     
     TermsAggregationBuilder typeAggregation = AggregationBuilders
-      .terms("Type").field("doc_type").size(50);
+      .terms("Type").field("doc_type").size(1000);
   
     srb.addAggregation(typeAggregation);
   
-    NestedAggregationBuilder formatAggregation =
+    NestedAggregationBuilder fileTypeAggregation =
       AggregationBuilders
         .nested("File Types Nested", "xattr")
         .subAggregation(
           AggregationBuilders
-            .terms("File Types").field("xattr.aegis.search.format.keyword").size(50)
+            .terms("File Types").field("xattr.aegis.search.filetype.keyword").size(1000)
         );
   
-    srb.addAggregation(formatAggregation);
+    srb.addAggregation(fileTypeAggregation);
   
+    NestedAggregationBuilder licenseAggregation =
+      AggregationBuilders
+        .nested("Licenses Nested", "xattr")
+        .subAggregation(
+          AggregationBuilders
+            .terms("Licenses").field("xattr.aegis.search.license.keyword").size(1000)
+        );
+  
+    srb.addAggregation(licenseAggregation);
+  
+    Script minPriceScript = new Script("params._source.xattr == null || params._source.xattr.aegis == null || " +
+        "params._source.xattr.aegis.search == null || params._source" +
+        ".xattr.aegis.search.price == null ? Float.MAX_VALUE : Float.parseFloat(params._source.xattr.aegis.search" +
+        ".price) < 0 ? Float.MAX_VALUE : Float.parseFloat(params._source.xattr.aegis.search.price)");
+  
+    MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
+    srb.addAggregation(minPriceAggregation);
+  
+    Script maxPriceScript = new Script("params._source.xattr == null || params._source.xattr.aegis == null || " +
+      "params._source.xattr.aegis.search == null || params._source" +
+      ".xattr.aegis.search.price == null ? 0.0f : Float.parseFloat(params._source.xattr.aegis.search" +
+      ".price) < 0 ? 0.0f : Float.parseFloat(params._source.xattr.aegis.search.price)");
+  
+    MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
+    srb.addAggregation(maxPriceAggregation);
+    
     LOG.log(Level.INFO, "Aggregation Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
     SearchResponse response = futureResponse.actionGet();
@@ -192,17 +225,25 @@ public class ElasticController {
     if (response.status().getStatus() == 200) {
       List<ElasticAggregation> elasticAggregations = new LinkedList<>();
       for (Aggregation aggregation : response.getAggregations()) {
-        if (aggregation.getClass().getName().equals(StringTerms.class.getName())) {
+        if (aggregation instanceof StringTerms) {
           ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation);
           elasticAggregations.add(elasticAggregation);
-        } else if (aggregation.getClass().getName().equals(InternalNested.class.getName())) {
+        } else if (aggregation instanceof InternalNested) {
           InternalNested internalNested = (InternalNested) aggregation;
           for (Aggregation nestedAggregation : internalNested.getAggregations()) {
-            if (nestedAggregation.getClass().getName().equals(StringTerms.class.getName())) {
+            if (nestedAggregation instanceof StringTerms) {
               ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) nestedAggregation);
               elasticAggregations.add(elasticAggregation);
             }
           }
+        } else if (aggregation instanceof InternalMax) {
+          ElasticAggregation elasticAggregation =
+            new ElasticAggregation((InternalMax) aggregation);
+          elasticAggregations.add(elasticAggregation);
+        } else if (aggregation instanceof InternalMin) {
+          ElasticAggregation elasticAggregation =
+            new ElasticAggregation((InternalMin) aggregation);
+          elasticAggregations.add(elasticAggregation);
         }
       }
       return elasticAggregations;
@@ -214,7 +255,8 @@ public class ElasticController {
     }
   }
   
-  public List<ElasticHit> search(String searchTerm, String type) throws ServiceException {
+  public List<ElasticHit> search(String searchTerm, String sort, String order, List<String> type, List<String> fileType,
+    List<String> license, Integer page, Integer limit) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
     
@@ -229,8 +271,19 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type.toLowerCase()));
-    srb = srb.setSize(10000).addSort("_score", SortOrder.DESC);
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license));
+    srb = srb.setFrom(page*limit);
+    srb = srb.setSize(limit);
+    
+    SortOrder sortOrder = order.toLowerCase().equals("asc") ? SortOrder.ASC : SortOrder.DESC;
+    
+    if (sort.equals("title")) {
+      srb = srb.addSort("title", sortOrder);
+    } else if (sort.equals("date")) {
+      srb = srb.addSort("timestamp", sortOrder);
+    } else {
+      srb = srb.addSort("_score", sortOrder);
+    }
     
     LOG.log(Level.INFO, "Search Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
@@ -647,21 +700,38 @@ public class ElasticController {
    * @param searchTerm
    * @return
    */
-  private QueryBuilder searchQuery(String searchTerm, String type) {
+  private QueryBuilder searchQuery(String searchTerm, List<String> type, List<String> fileType, List<String> license) {
     QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
   
-    QueryBuilder onlyType;
-    if (type == null || !(type.equals(Settings.DOC_TYPE_PROJECT) || type.equals(Settings.DOC_TYPE_DATASET)
-      || type.equals(Settings.DOC_TYPE_INODE))) {
-      onlyType = termsQuery(Settings.META_DOC_TYPE_FIELD,
+    QueryBuilder typeQuery;
+    if (type == null || type.isEmpty()) {
+      typeQuery = termsQuery(Settings.META_DOC_TYPE_FIELD,
         Settings.DOC_TYPE_PROJECT, Settings.DOC_TYPE_DATASET, Settings.DOC_TYPE_INODE);
     } else {
-      onlyType = termsQuery(Settings.META_DOC_TYPE_FIELD, type);
+      typeQuery = termsQuery(Settings.META_DOC_TYPE_FIELD, type);
+    }
+  
+    QueryBuilder fileTypeQuery;
+    if (fileType == null || fileType.isEmpty()) {
+      fileTypeQuery = matchAllQuery();
+    } else {
+      fileTypeQuery = nestedQuery("xattr",
+        termsQuery("xattr.aegis.search.filetype.keyword", fileType), ScoreMode.None);
+    }
+  
+    QueryBuilder licenseQuery;
+    if (license == null || license.isEmpty()) {
+      licenseQuery = matchAllQuery();
+    } else {
+      licenseQuery = nestedQuery("xattr",
+        termsQuery("xattr.aegis.search.license.keyword", license), ScoreMode.None);
     }
     
     QueryBuilder query = boolQuery()
-      .must(onlyType)
-      .must(nameDescQuery);
+      .must(typeQuery)
+      .must(nameDescQuery)
+      .must(fileTypeQuery)
+      .must(licenseQuery);
     
     return query;
   }

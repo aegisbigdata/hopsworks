@@ -2,6 +2,7 @@ package io.hops.hopsworks.common.elastic;
 
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.InternalNumericMetricsAggregation;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Comparator;
@@ -13,6 +14,7 @@ public class ElasticAggregation implements Comparator<ElasticAggregation> {
   
   public String name;
   public Map<String, Long> map;
+  public Double value;
   
   public ElasticAggregation() {
   }
@@ -20,6 +22,11 @@ public class ElasticAggregation implements Comparator<ElasticAggregation> {
   public ElasticAggregation(String name) {
     this.name = name;
     this.map = new HashMap<>();
+  }
+  
+  public ElasticAggregation(InternalNumericMetricsAggregation.SingleValue aggregation) {
+    this.name = aggregation.getName();
+    this.value = aggregation.value();
   }
   
   public ElasticAggregation(StringTerms aggregation) {
@@ -48,6 +55,14 @@ public class ElasticAggregation implements Comparator<ElasticAggregation> {
   
   public Map<String, Long> getMap() {
     return map;
+  }
+  
+  public Double getValue() {
+    return value;
+  }
+  
+  public void setValue(Double value) {
+    this.value = value;
   }
   
   @Override

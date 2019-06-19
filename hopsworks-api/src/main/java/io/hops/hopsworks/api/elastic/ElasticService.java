@@ -64,6 +64,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,6 +89,8 @@ public class ElasticService {
    * <p/>
    * @param q
    * @param type
+   * @param fileType
+   * @param license
    * @param req
    * @return
    */
@@ -95,47 +98,105 @@ public class ElasticService {
   @Path("aggregation")
   @Produces(MediaType.APPLICATION_JSON)
   public Response aggregation(@QueryParam("q") String q,
-    @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
+    @QueryParam("type") List<String> type,
+    @QueryParam("fileType") List<String> fileType,
+    //@QueryParam("owner") List<String> owner,
+    //@QueryParam("dateFrom") Long dateFrom,
+    //@QueryParam("dataTo") Long dataTo,
+    @QueryParam("license") List<String> license,
+    //@QueryParam("priceFrom") Float priceFrom,
+    //@QueryParam("priceTo") Float priceTo
+    @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
-      throw new IllegalArgumentException("q was not provided or was empty");
+      q = "";
     }
   
     if (type == null) {
-      throw new IllegalArgumentException("type was not provided or was empty");
+      type = new ArrayList<>();
+    }
+  
+    if (fileType == null) {
+      fileType = new ArrayList<>();;
+    }
+  
+    if (license == null) {
+      license =  new ArrayList<>();
     }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticAggregation>> searchResults =
-      new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type)) {};
-    Response.ResponseBuilder noCacheResponseBuilder = noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK);
-    noCacheResponseBuilder = noCacheResponseBuilder.entity(searchResults);
-    return noCacheResponseBuilder.build();
+      new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type, fileType, license)) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   
   /**
    * Search end point aegis
    * <p/>
    * @param q
+   * @param sort
+   * @param order
    * @param type
+   * @param fileType
+   * @param license
+   * @param page
+   * @param limit
    * @param req
    * @return
    */
   @GET
   @Path("search")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response search(@QueryParam("q") String q,
-    @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
+  public Response search(
+    @QueryParam("q") String q,
+    @QueryParam("sort") String sort,
+    @QueryParam("order") String order,
+    @QueryParam("type") List<String> type,
+    @QueryParam("fileType") List<String> fileType,
+    //@QueryParam("owner") List<String> owner,
+    //@QueryParam("dateFrom") Long dateFrom,
+    //@QueryParam("dataTo") Long dataTo,
+    @QueryParam("license") List<String> license,
+    //@QueryParam("priceFrom") Float priceFrom,
+    //@QueryParam("priceTo") Float priceTo,
+    @QueryParam("page") Integer page,
+    @QueryParam("limit") Integer limit,
+    @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
-      throw new IllegalArgumentException("q was not provided or was empty");
+      q = "";
+    }
+  
+    if (Strings.isNullOrEmpty(sort)) {
+      sort = "relevance";
+    }
+  
+    if (Strings.isNullOrEmpty(order)) {
+      order = "asc";
     }
   
     if (type == null) {
-      throw new IllegalArgumentException("type was not provided or was empty");
+      type = new ArrayList<>();
+    }
+  
+    if (fileType == null) {
+      fileType = new ArrayList<>();
+    }
+    
+    if (license == null) {
+      license =  new ArrayList<>();
+    }
+    
+    if (page == null || page < 0) {
+      page = 0;
+    }
+    
+    if (limit == null || limit < 0) {
+      limit = 15;
     }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
-    GenericEntity<List<ElasticHit>> searchResults = new GenericEntity<List<ElasticHit>>(elasticController.
-      search(q, type)) {};
+    GenericEntity<List<ElasticHit>> searchResults =
+      new GenericEntity<List<ElasticHit>>(elasticController.search(q, sort, order, type, fileType, license, page,
+        limit)) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   
