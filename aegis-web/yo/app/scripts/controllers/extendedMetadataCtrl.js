@@ -376,13 +376,9 @@ angular.module('hopsWorksApp')
               }
 
               if ($scope.data.areaSelect) {
-                console.log('Has New Map Data');
-                console.log($scope.data.areaSelect[0]);
                 var latlngs = $scope.data.areaSelect[0];
                 graph['spatial'] = generateSpatialData(latlngs, true);
               } else if ($scope.geoJSON) {
-                console.log('Has previous geoJSON');
-                console.log($scope.geoJSON.coordinates[0]);
                 var latlngs = $scope.geoJSON.coordinates[0];
                 graph['spatial'] = generateSpatialData(latlngs);
               } else {
