@@ -103,9 +103,9 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
             $scope.data.areaSelect = layer._latlngs;
           });
 
-          map.on(L.Draw.Event.EDITMOVE, function (e) {
-            console.log('EDITMOVE', e);
-            var layer = e.layer;            
+          map.on('draw:editvertex ', function (e) {
+            console.log('draw:editvertex ', e);
+            var layer = e.poly;            
             $scope.data.areaSelect = layer._latlngs;
           });
 
