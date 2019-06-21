@@ -70,10 +70,6 @@ angular.module('hopsWorksApp')
                     "homepage": "",
                     "name": ""
                   },
-                  "spatial": {
-                    "@type": "http://purl.org/dc/terms/Location",
-                    "geometry": ""
-                  },
                   "title": "",
                   "type": "dcat-ap"
                 }
@@ -126,6 +122,7 @@ angular.module('hopsWorksApp')
             $scope.deleteButtonIsDisabled = false;
             $scope.saveButtonIsDisabled = false;
             $scope.data = {
+              areaSelect: null,
               fields: {
                 title: {
                   label: 'Title',
@@ -297,6 +294,16 @@ angular.module('hopsWorksApp')
                 fields.license.model = license_splitted[license_splitted.length - 1];
               }
 
+              if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('geometry')) {
+                var geoJSON = graph[index_location].geometry;
+                try {
+                  geoJSON = JSON.parse(geoJSON);
+                  $scope.geoJSON = geoJSON;
+                } catch(e) {
+                  console.log(e);
+                }                
+              }
+
               // Set other fields
               fields.title.model = graph[index_catalog].title;
               fields.description.model = graph[index_catalog].description;
@@ -327,7 +334,8 @@ angular.module('hopsWorksApp')
              */
             
             self.saveExtendedProjectMetadata = function () {
-              var graph = self.template['@graph'][0];
+              var metadataObject = JSON.parse(JSON.stringify(self.template))
+              var graph = metadataObject['@graph'][0];
               graph['@id'] = 'https://aegis.eu/id/project/' + PROJECT_ID;
               graph.modified = (new Date()).toISOString();
 
@@ -342,10 +350,46 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              console.log(self.template['@graph'][0]);
+              if ($scope.data.fields.license.model) graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
+              if ($scope.data.fields.language.model) graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
+              graph.publisher['@type'] = 'http://xmlns.com/foaf/0.1/' + $scope.data.fields.publishertype.model;
+
+              function generateSpatialData (latlngs, coordsNeedMapping) {
+                var spatialData = null;
+                var coordinates = latlngs;
+
+                if (coordsNeedMapping) {
+                  coordinates = latlngs.map(function(coordpair) {
+                    return [coordpair.lat, coordpair.lng]
+                  });
+                }
+
+                return spatialData = {
+                  '@type': 'http://purl.org/dc/terms/Location',
+                  geometry: JSON.stringify({
+                    type: 'polygon',
+                    coordinates: [
+                      coordinates
+                    ]
+                  })
+                }
+              }
+
+              if ($scope.data.areaSelect) {
+                var latlngs = $scope.data.areaSelect[0];
+                graph['spatial'] = generateSpatialData(latlngs, true);
+              } else if ($scope.geoJSON) {
+                var latlngs = $scope.geoJSON.coordinates[0];
+                graph['spatial'] = generateSpatialData(latlngs);
+              } else {
+                graph['spatial'] = null;
+              }
+
+              console.log(metadataObject['@graph'][0]);
               $scope.saveButtonIsDisabled = true;
+              
               // Send to API
-              ExtendedMetadataAPIService.createOrUpdateProjectMetadata(PROJECT_ID, self.template)
+              ExtendedMetadataAPIService.createOrUpdateProjectMetadata(PROJECT_ID, metadataObject)
                 .then(function(success) {
                   growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
