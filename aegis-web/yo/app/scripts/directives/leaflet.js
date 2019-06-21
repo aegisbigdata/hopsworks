@@ -143,6 +143,7 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
             if (newValue && newValue.hasOwnProperty('coordinates')) {
               var coordinates = newValue.coordinates[0];
               var layer = L.polygon(coordinates).addTo(editableLayers);
+              map.fitBounds(editableLayers.getBounds());
             }
           });
 
