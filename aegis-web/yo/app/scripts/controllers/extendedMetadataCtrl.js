@@ -294,6 +294,16 @@ angular.module('hopsWorksApp')
                 fields.license.model = license_splitted[license_splitted.length - 1];
               }
 
+              if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('geometry')) {
+                var geoJSON = graph[index_location].geometry;
+                try {
+                  geoJSON = JSON.parse(geoJSON);
+                  $scope.geoJSON = geoJSON;
+                } catch(e) {
+                  console.log(e);
+                }                
+              }
+
               // Set other fields
               fields.title.model = graph[index_catalog].title;
               fields.description.model = graph[index_catalog].description;
@@ -340,27 +350,43 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
-              graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
+              if ($scope.data.fields.license.model) graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
+              if ($scope.data.fields.language.model) graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
+              graph.publisher['@type'] = 'http://xmlns.com/foaf/0.1/' + $scope.data.fields.publishertype.model;
 
-              if ($scope.data.areaSelect) {
-                var as = $scope.data.areaSelect;
-                var spatialData = {
-                  "@type": "http://purl.org/dc/terms/Location",
-                  geometry: {
-                    type: "polygon",
-                    coordinates: [
-                      [
-                        [as.bounds._northEast.lat, as.bounds._northEast.lng],
-                        [as.bounds._northEast.lat, as.bounds._southWest.lng],
-                        [as.bounds._southWest.lat, as.bounds._southWest.lng]
-                        [as.bounds._southWest.lat, as.bounds._northEast.lng]
-                      ]
-                    ]
-                  }
+              function generateSpatialData (latlngs, coordsNeedMapping) {
+                var spatialData = null;
+                var coordinates = latlngs;
+
+                if (coordsNeedMapping) {
+                  coordinates = latlngs.map(function(coordpair) {
+                    return [coordpair.lat, coordpair.lng]
+                  });
                 }
 
-                graph['spatial'] = JSON.stringify(JSON.stringify(spatialData)).substr(1).slice(0, -1);
+                return spatialData = {
+                  '@type': 'http://purl.org/dc/terms/Location',
+                  geometry: JSON.stringify({
+                    type: 'polygon',
+                    coordinates: [
+                      coordinates
+                    ]
+                  })
+                }
+              }
+
+              if ($scope.data.areaSelect) {
+                console.log('Has New Map Data');
+                console.log($scope.data.areaSelect[0]);
+                var latlngs = $scope.data.areaSelect[0];
+                graph['spatial'] = generateSpatialData(latlngs, true);
+              } else if ($scope.geoJSON) {
+                console.log('Has previous geoJSON');
+                console.log($scope.geoJSON.coordinates[0]);
+                var latlngs = $scope.geoJSON.coordinates[0];
+                graph['spatial'] = generateSpatialData(latlngs);
+              } else {
+                graph['spatial'] = null;
               }
 
               console.log(metadataObject['@graph'][0]);

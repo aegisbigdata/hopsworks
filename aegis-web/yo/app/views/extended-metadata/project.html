@@ -101,7 +101,7 @@
 
                                         <div style="margin-bottom: 10px;">
                                           <label for="publisher-web" id="input-homepage" style="font-size: 14px">Publisher Homepage</label>
-                                          <input type="text" ng-model="data.fields.homepage.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" ng-required="true" placeholder="Publisher Homepage">
+                                          <input type="url" ng-model="data.fields.homepage.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" ng-required="true" placeholder="Publisher Homepage">
                                         </div>
                                       </div>
                                     </div>
@@ -152,7 +152,7 @@
                                       <label for="inputMap1" id="input-spatial">Spatial</label>
 
                                       <div style="portion:relative;height: 310px;">
-                                        <leaflet id="inputMap1" style="width: 500px; height: 300px; position: absolute;"></leaflet>
+                                        <leaflet id="inputMap1" geoJSON="{{geoJSON}}" style="width: 500px; height: 300px; position: absolute;"></leaflet>
                                       </div>
 
                                       <div class="form-group" style="display: none;">
