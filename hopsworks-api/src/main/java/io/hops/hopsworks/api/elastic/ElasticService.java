@@ -49,6 +49,7 @@ import io.hops.hopsworks.common.elastic.ElasticHit;
 import io.hops.hopsworks.common.exception.ServiceException;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -91,21 +92,21 @@ public class ElasticService {
    * @param type
    * @param fileType
    * @param license
+   * @param minPrice
+   * @param maxPrice
    * @param req
    * @return
    */
   @GET
   @Path("aggregation")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response aggregation(@QueryParam("q") String q,
-    @QueryParam("type") List<String> type,
-    @QueryParam("fileType") List<String> fileType,
-    //@QueryParam("owner") List<String> owner,
-    //@QueryParam("dateFrom") Long dateFrom,
-    //@QueryParam("dataTo") Long dataTo,
-    @QueryParam("license") List<String> license,
-    //@QueryParam("priceFrom") Float priceFrom,
-    //@QueryParam("priceTo") Float priceTo
+  public Response aggregation(
+    @ApiParam(value = "The query") @QueryParam("q") String q,
+    @ApiParam(value = "Filter by type prof, ds or inode (default: all)") @QueryParam("type") List<String> type,
+    @ApiParam(value = "Filter by file type (default: all)") @QueryParam("fileType") List<String> fileType,
+    @ApiParam(value = "Filter by license (default: all)") @QueryParam("license") List<String> license,
+    @ApiParam(value = "Filter by price, gte (default: all)") @QueryParam("minPrice") Float minPrice,
+    @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
     @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       q = "";
@@ -125,7 +126,9 @@ public class ElasticService {
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticAggregation>> searchResults =
-      new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type, fileType, license)) {};
+      new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type, fileType, license, minPrice,
+        maxPrice
+        )) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   
@@ -140,6 +143,8 @@ public class ElasticService {
    * @param license
    * @param page
    * @param limit
+   * @param minPrice
+   * @param maxPrice
    * @param req
    * @return
    */
@@ -147,19 +152,19 @@ public class ElasticService {
   @Path("search")
   @Produces(MediaType.APPLICATION_JSON)
   public Response search(
-    @QueryParam("q") String q,
-    @QueryParam("sort") String sort,
-    @QueryParam("order") String order,
-    @QueryParam("type") List<String> type,
-    @QueryParam("fileType") List<String> fileType,
+    @ApiParam(value = "The query") @QueryParam("q") String q,
+    @ApiParam(value = "Sort by title, relevance or date (default: relevance)") @QueryParam("sort") String sort,
+    @ApiParam(value = "Sort order asc/desc (default: desc)") @QueryParam("order") String order,
+    @ApiParam(value = "Filter by type prof, ds or inode (default: all)") @QueryParam("type") List<String> type,
+    @ApiParam(value = "Filter by file type (default: all)") @QueryParam("fileType") List<String> fileType,
     //@QueryParam("owner") List<String> owner,
     //@QueryParam("dateFrom") Long dateFrom,
     //@QueryParam("dataTo") Long dataTo,
-    @QueryParam("license") List<String> license,
-    //@QueryParam("priceFrom") Float priceFrom,
-    //@QueryParam("priceTo") Float priceTo,
-    @QueryParam("page") Integer page,
-    @QueryParam("limit") Integer limit,
+    @ApiParam(value = "Filter by license (default: all)") @QueryParam("license") List<String> license,
+    @ApiParam(value = "Filter by price, gte (default: all)") @QueryParam("minPrice") Float minPrice,
+    @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
+    @ApiParam(value = "The page number of matching results") @QueryParam("page") Integer page,
+    @ApiParam(value = "The maximum number of matching results per page") @QueryParam("limit") Integer limit,
     @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       q = "";
@@ -170,7 +175,7 @@ public class ElasticService {
     }
   
     if (Strings.isNullOrEmpty(order)) {
-      order = "asc";
+      order = "desc";
     }
   
     if (type == null) {
@@ -196,7 +201,7 @@ public class ElasticService {
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticHit>> searchResults =
       new GenericEntity<List<ElasticHit>>(elasticController.search(q, sort, order, type, fileType, license, page,
-        limit)) {};
+        limit, minPrice, maxPrice)) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   

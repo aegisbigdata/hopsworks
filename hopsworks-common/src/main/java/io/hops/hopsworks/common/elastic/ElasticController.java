@@ -76,6 +76,7 @@ import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -120,6 +121,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.nestedQuery;
 import static org.elasticsearch.index.query.QueryBuilders.prefixQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.elasticsearch.index.query.QueryBuilders.scriptQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.wildcardQuery;
@@ -159,7 +161,7 @@ public class ElasticController {
   }
   
   public List<ElasticAggregation> aggregation(String searchTerm, List<String> type, List<String> fileType,
-    List<String> license) throws ServiceException {
+    List<String> license, Float minPrice, Float maxPrice) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
   
@@ -174,7 +176,7 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice));
     srb = srb.setSize(0);
     
     TermsAggregationBuilder typeAggregation = AggregationBuilders
@@ -184,37 +186,45 @@ public class ElasticController {
   
     NestedAggregationBuilder fileTypeAggregation =
       AggregationBuilders
-        .nested("File Types Nested", "xattr")
+        .nested("File Types Nested", Settings.AEGIS_ELASTIC)
         .subAggregation(
           AggregationBuilders
-            .terms("File Types").field("xattr.aegis.search.filetype.keyword").size(1000)
+            .terms("File Types").field(Settings.AEGIS_ELASTIC_PATH_SEARCH_FILETYPE + ".keyword").size(1000)
         );
   
     srb.addAggregation(fileTypeAggregation);
   
     NestedAggregationBuilder licenseAggregation =
       AggregationBuilders
-        .nested("Licenses Nested", "xattr")
+        .nested("Licenses Nested", Settings.AEGIS_ELASTIC)
         .subAggregation(
           AggregationBuilders
-            .terms("Licenses").field("xattr.aegis.search.license.keyword").size(1000)
+            .terms("Licenses").field(Settings.AEGIS_ELASTIC_PATH_SEARCH_LICENSE + ".keyword").size(1000)
         );
   
     srb.addAggregation(licenseAggregation);
   
-    Script minPriceScript = new Script("params._source.xattr == null || params._source.xattr.aegis == null || " +
-        "params._source.xattr.aegis.search == null || params._source" +
-        ".xattr.aegis.search.price == null ? Float.MAX_VALUE : Float.parseFloat(params._source.xattr.aegis.search" +
-        ".price) < 0 ? Float.MAX_VALUE : Float.parseFloat(params._source.xattr.aegis.search.price)");
+    Script minPriceScript = new Script(
+      "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null ? " +
+        "Float.MAX_VALUE : Float.parseFloat (" +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
+        "Float.MAX_VALUE : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");
   
     MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
     srb.addAggregation(minPriceAggregation);
   
-    Script maxPriceScript = new Script("params._source.xattr == null || params._source.xattr.aegis == null || " +
-      "params._source.xattr.aegis.search == null || params._source" +
-      ".xattr.aegis.search.price == null ? 0.0f : Float.parseFloat(params._source.xattr.aegis.search" +
-      ".price) < 0 ? 0.0f : Float.parseFloat(params._source.xattr.aegis.search.price)");
-  
+    Script maxPriceScript = new Script(
+      "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null ? " +
+        "0.0f : Float.parseFloat (" +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
+        "0.0f : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");
+    
     MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
     srb.addAggregation(maxPriceAggregation);
     
@@ -256,7 +266,7 @@ public class ElasticController {
   }
   
   public List<ElasticHit> search(String searchTerm, String sort, String order, List<String> type, List<String> fileType,
-    List<String> license, Integer page, Integer limit) throws ServiceException {
+    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
     
@@ -271,14 +281,14 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice));
     srb = srb.setFrom(page*limit);
     srb = srb.setSize(limit);
     
     SortOrder sortOrder = order.toLowerCase().equals("asc") ? SortOrder.ASC : SortOrder.DESC;
     
     if (sort.equals("title")) {
-      srb = srb.addSort("title", sortOrder);
+      srb = srb.addSort("name", sortOrder);
     } else if (sort.equals("date")) {
       srb = srb.addSort("timestamp", sortOrder);
     } else {
@@ -700,7 +710,8 @@ public class ElasticController {
    * @param searchTerm
    * @return
    */
-  private QueryBuilder searchQuery(String searchTerm, List<String> type, List<String> fileType, List<String> license) {
+  private QueryBuilder searchQuery(String searchTerm, List<String> type, List<String> fileType, List<String> license,
+    Float minPrice, Float maxPrice) {
     QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
   
     QueryBuilder typeQuery;
@@ -715,23 +726,53 @@ public class ElasticController {
     if (fileType == null || fileType.isEmpty()) {
       fileTypeQuery = matchAllQuery();
     } else {
-      fileTypeQuery = nestedQuery("xattr",
-        termsQuery("xattr.aegis.search.filetype.keyword", fileType), ScoreMode.None);
+      fileTypeQuery = nestedQuery(Settings.AEGIS_ELASTIC,
+        termsQuery(Settings.AEGIS_ELASTIC_PATH_SEARCH_FILETYPE + ".keyword", fileType),
+        ScoreMode.None);
     }
   
     QueryBuilder licenseQuery;
     if (license == null || license.isEmpty()) {
       licenseQuery = matchAllQuery();
     } else {
-      licenseQuery = nestedQuery("xattr",
-        termsQuery("xattr.aegis.search.license.keyword", license), ScoreMode.None);
+      licenseQuery = nestedQuery(Settings.AEGIS_ELASTIC,
+        termsQuery(Settings.AEGIS_ELASTIC_PATH_SEARCH_LICENSE + ".keyword", license), ScoreMode.None);
+    }
+  
+    Map<String, Object> params = new HashMap<>();
+    params.put("minPrice", minPrice);
+    params.put("maxPrice", maxPrice);
+  
+    Script minPriceScript =
+      new Script(ScriptType.INLINE,"painless",
+        "doc[\u0027" + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ".keyword\u0027].value != null && " +
+        "Float.parseFloat" +
+        "(doc[\u0027" + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ".keyword\u0027].value) >= params.minPrice", params);
+  
+    Script maxPriceScript =
+      new Script(ScriptType.INLINE,"painless",
+        "doc[\u0027" + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ".keyword\u0027].value != null && " +
+        "Float.parseFloat" +
+        "(doc[\u0027" + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ".keyword\u0027].value) <= params.maxPrice", params);
+    
+    QueryBuilder priceQuery;
+    if (minPrice == null && maxPrice == null) {
+      priceQuery = matchAllQuery();
+    } else if (maxPrice == null) {
+      priceQuery = nestedQuery(Settings.AEGIS_ELASTIC, boolQuery().filter(scriptQuery(minPriceScript)), ScoreMode.None);
+    } else if (minPrice == null) {
+      priceQuery = nestedQuery(Settings.AEGIS_ELASTIC, boolQuery().filter(scriptQuery(maxPriceScript)), ScoreMode.None);
+    } else {
+      priceQuery = nestedQuery(Settings.AEGIS_ELASTIC, boolQuery().filter(scriptQuery(minPriceScript))
+        .filter(scriptQuery(maxPriceScript)), ScoreMode.None);
     }
     
     QueryBuilder query = boolQuery()
       .must(typeQuery)
       .must(nameDescQuery)
       .must(fileTypeQuery)
-      .must(licenseQuery);
+      .must(licenseQuery)
+      .must(priceQuery);
     
     return query;
   }
