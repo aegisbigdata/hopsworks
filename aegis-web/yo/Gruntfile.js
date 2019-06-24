@@ -57,7 +57,7 @@ module.exports = function (grunt) {
   // Cookies with Secure attribute are not saved/used if the site is not in https. localhost development isn't.
   proxyUtils.registerProxy = function (proxy) {
     _registerProxy(proxy);
-    if (proxy.server.options.secure) {;
+    if (proxy.server.options.target.https) {;
       grunt.log.ok("All secure cookies send from server will be transformed to non-secure.");
       proxy.server.on('proxyRes', function (proxyRes) {
         if (proxyRes.headers["set-cookie"]) {
