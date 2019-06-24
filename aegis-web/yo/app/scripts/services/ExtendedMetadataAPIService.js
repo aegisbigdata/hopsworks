@@ -44,7 +44,7 @@ angular.module('hopsWorksApp')
     const EXTENDED_METADATA_PROJECT_ENDPOINT = 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/catalogues/';
     const EXTENDED_METADATA_DATASET_ENDPOINT = 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/datasets/';
     const EXTENDED_METADATA_DISTRIBUTION_ENDPOINT = 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/distributions';
-    const API_KEY = '895b69ae-7093-11e9-a923-1681be663d3e';
+    const API_KEY = '';
 
     var service = {
 

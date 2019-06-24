@@ -112,7 +112,7 @@ angular.module('hopsWorksApp')
                 {
                   "@id": "",
                   "@type": "http://www.w3.org/ns/dcat#Dataset",
-                  "dct:accessRights": ":public",
+                  "dct:accessRights": "",
                   "description": "",
                   "title": ""
                 }
@@ -363,7 +363,9 @@ angular.module('hopsWorksApp')
               fields.description.model = graph[index_dataset]['http://purl.org/dc/terms/description'] || '';
               fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
               fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
-              fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || '';
+              fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
+
+
               
               if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#keyword')) {
                 let tags = graph[index_dataset]['http://www.w3.org/ns/dcat#keyword'];
@@ -399,6 +401,16 @@ angular.module('hopsWorksApp')
                   fields.contactpointmail.model = fields.contactpointmail.model.split(':');
                   fields.contactpointmail.model = fields.contactpointmail.model[fields.contactpointmail.model.length - 1];
                 }
+              }
+
+              if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('http://www.w3.org/ns/locn#geometry')) {
+                var geoJSON = graph[index_location]['http://www.w3.org/ns/locn#geometry'];
+                try {
+                  geoJSON = JSON.parse(geoJSON);
+                  $scope.geoJSON = geoJSON;
+                } catch(e) {
+                  console.log(e);
+                }                
               }
             };
 
@@ -439,9 +451,11 @@ angular.module('hopsWorksApp')
               if (fields.keywords.tags.length) graph[0]['http://www.w3.org/ns/dcat#keyword'] = fields.keywords.model.split(',');
               if (fields.price.model) graph[0]['http://www.aegis-bigdata.eu/md/voc/core/price'] = fields.price.model;
               if (fields.sellable.model) graph[0]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] = fields.sellable.model;
-              if (fields.accessRights.model) graph[0]['dct:accessRights'] = ':' + fields.accessRights.model;
-              if (fields.documentation.model) graph[0]['http://xmlns.com/foaf/0.1/page'] = {
-                '@id': fields.documentation.model
+              if (fields.accessRights.model) graph[0]['dct:accessRights'] = fields.accessRights.model;
+              if (fields.documentation.model) {
+                graph[0]['http://xmlns.com/foaf/0.1/page'] = {
+                  '@id': fields.documentation.model
+                }
               }
 
               if (fields.theme.model) {
@@ -450,15 +464,43 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              // Add spatial object
-              if (!fields.spatial.model) {
+              function generateSpatialData (latlngs, coordsNeedMapping) {
+                var spatialData = null;
+                var coordinates = latlngs;
+
+                if (coordsNeedMapping) {
+                  coordinates = latlngs.map(function(coordpair) {
+                    return [coordpair.lat, coordpair.lng]
+                  });
+                }
+
+                return spatialData = {
+                  '@type': 'http://purl.org/dc/terms/Location',
+                  geometry: JSON.stringify({
+                    type: 'polygon',
+                    coordinates: [
+                      coordinates
+                    ]
+                  })
+                }
+              }
+
+              if ($scope.data.areaSelect) {
+                var latlngs = $scope.data.areaSelect[0];
+                var spatial =  generateSpatialData(latlngs, true);
+                spatial['@id'] = '_:b' + i;
                 graph[0]['spatial'] = '_:b' + i;
-                graph.push({
-                  '@id': '_:b' + i,
-                  '@type': 'dct:Location',
-                  'http://www.w3.org/ns/locn#geometry': "{\"type\": \"polygon\", \"coordinates\": [[[10.326304, 53.394985], [10.326304, 53.964153], [8.420551, 53.964153], [8.420551, 53.394985], [10.326304, 53.394985]]]}"
-                });
+                graph.push(spatial);
                 i++;
+              } else if ($scope.geoJSON) {
+                var latlngs = $scope.geoJSON.coordinates[0];
+                var spatial =  generateSpatialData(latlngs);
+                spatial['@id'] = '_:b' + i;
+                graph[0]['spatial'] = '_:b' + i;
+                graph.push(spatial);
+                i++;
+              } else {
+                graph[0]['spatial'] = null;
               }
 
               // Add temporal object (from / to date)            
