@@ -43,11 +43,13 @@ import com.google.common.base.Strings;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.Audience;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import io.hops.hopsworks.common.elastic.ElasticAggregation;
 import io.hops.hopsworks.common.elastic.ElasticController;
 import io.hops.hopsworks.common.elastic.ElasticHit;
 import io.hops.hopsworks.common.exception.ServiceException;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -58,10 +60,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,7 +84,127 @@ public class ElasticService {
   private NoCacheResponse noCacheResponse;
   @EJB
   private ElasticController elasticController;
-
+  
+  /**
+   * Aggregation end point aegis
+   * <p/>
+   * @param q
+   * @param type
+   * @param fileType
+   * @param license
+   * @param minPrice
+   * @param maxPrice
+   * @param req
+   * @return
+   */
+  @GET
+  @Path("aggregation")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response aggregation(
+    @ApiParam(value = "The query") @QueryParam("q") String q,
+    @ApiParam(value = "Filter by type prof, ds or inode (default: all)") @QueryParam("type") List<String> type,
+    @ApiParam(value = "Filter by file type (default: all)") @QueryParam("fileType") List<String> fileType,
+    @ApiParam(value = "Filter by license (default: all)") @QueryParam("license") List<String> license,
+    @ApiParam(value = "Filter by price, gte (default: all)") @QueryParam("minPrice") Float minPrice,
+    @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
+    @Context HttpServletRequest req) throws ServiceException {
+    if (Strings.isNullOrEmpty(q)) {
+      q = "";
+    }
+  
+    if (type == null) {
+      type = new ArrayList<>();
+    }
+  
+    if (fileType == null) {
+      fileType = new ArrayList<>();;
+    }
+  
+    if (license == null) {
+      license =  new ArrayList<>();
+    }
+    
+    logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
+    GenericEntity<List<ElasticAggregation>> searchResults =
+      new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type, fileType, license, minPrice,
+        maxPrice
+        )) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
+  }
+  
+  /**
+   * Search end point aegis
+   * <p/>
+   * @param q
+   * @param sort
+   * @param order
+   * @param type
+   * @param fileType
+   * @param license
+   * @param page
+   * @param limit
+   * @param minPrice
+   * @param maxPrice
+   * @param req
+   * @return
+   */
+  @GET
+  @Path("search")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response search(
+    @ApiParam(value = "The query") @QueryParam("q") String q,
+    @ApiParam(value = "Sort by title, relevance or date (default: relevance)") @QueryParam("sort") String sort,
+    @ApiParam(value = "Sort order asc/desc (default: desc)") @QueryParam("order") String order,
+    @ApiParam(value = "Filter by type prof, ds or inode (default: all)") @QueryParam("type") List<String> type,
+    @ApiParam(value = "Filter by file type (default: all)") @QueryParam("fileType") List<String> fileType,
+    //@QueryParam("owner") List<String> owner,
+    //@QueryParam("dateFrom") Long dateFrom,
+    //@QueryParam("dataTo") Long dataTo,
+    @ApiParam(value = "Filter by license (default: all)") @QueryParam("license") List<String> license,
+    @ApiParam(value = "Filter by price, gte (default: all)") @QueryParam("minPrice") Float minPrice,
+    @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
+    @ApiParam(value = "The page number of matching results") @QueryParam("page") Integer page,
+    @ApiParam(value = "The maximum number of matching results per page") @QueryParam("limit") Integer limit,
+    @Context HttpServletRequest req) throws ServiceException {
+    if (Strings.isNullOrEmpty(q)) {
+      q = "";
+    }
+  
+    if (Strings.isNullOrEmpty(sort)) {
+      sort = "relevance";
+    }
+  
+    if (Strings.isNullOrEmpty(order)) {
+      order = "desc";
+    }
+  
+    if (type == null) {
+      type = new ArrayList<>();
+    }
+  
+    if (fileType == null) {
+      fileType = new ArrayList<>();
+    }
+    
+    if (license == null) {
+      license =  new ArrayList<>();
+    }
+    
+    if (page == null || page < 0) {
+      page = 0;
+    }
+    
+    if (limit == null || limit < 0) {
+      limit = 15;
+    }
+    
+    logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
+    GenericEntity<List<ElasticHit>> searchResults =
+      new GenericEntity<List<ElasticHit>>(elasticController.search(q, sort, order, type, fileType, license, page,
+        limit, minPrice, maxPrice)) {};
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
+  }
+  
   /**
    * Searches for content composed of projects and datasets. Hits two elastic
    * indices: 'project' and 'dataset'
@@ -92,8 +216,8 @@ public class ElasticService {
   @GET
   @Path("globalsearch/{searchTerm}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response globalSearch(@PathParam("searchTerm") String searchTerm, @Context HttpServletRequest req) throws
-      ServiceException {
+  public Response globalSearch(@PathParam("searchTerm") String searchTerm,
+    @QueryParam("type") String type, @Context HttpServletRequest req) throws ServiceException {
 
     if (Strings.isNullOrEmpty(searchTerm)) {
       throw new IllegalArgumentException("searchTerm was not provided or was empty");

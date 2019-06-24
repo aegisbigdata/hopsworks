@@ -75,8 +75,10 @@ import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
 import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.dataset.FilePreviewDTO;
 import io.hops.hopsworks.common.exception.DatasetException;
+import io.hops.hopsworks.common.exception.GenericException;
 import io.hops.hopsworks.common.exception.HopsSecurityException;
 import io.hops.hopsworks.common.exception.JobException;
+import io.hops.hopsworks.common.exception.MetadataException;
 import io.hops.hopsworks.common.exception.ProjectException;
 import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.hdfs.DistributedFileSystemOps;
@@ -108,6 +110,8 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -125,6 +129,7 @@ import javax.ws.rs.core.Response;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -187,7 +192,9 @@ public class DataSetService {
   private FeaturestoreController featurestoreController;
   @EJB
   private DsUpdateOperations dsUpdateOperations;
-
+  @EJB
+  private MetadataService metadataService;
+  
   private Integer projectId;
   private Project project;
 
@@ -1199,6 +1206,49 @@ public class DataSetService {
   public UploadService upload(@PathParam("path") String path, @QueryParam("templateId") int templateId) {
     this.uploader.setParams(project, path, templateId, false);
     return this.uploader;
+  }
+
+  @POST
+  @Path("/attachTempleteAndAddMetaData")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
+  @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
+  public Response attachTempleteAndAddMetaDataWithSchema(@Context SecurityContext sc, String obj)
+      throws MetadataException, GenericException {
+  
+    JsonObject objJson = Json.createReader(new StringReader(obj)).readObject();
+  
+    JsonObject filetemplateData = objJson.getJsonObject("filetemplateData");
+  
+    if (filetemplateData == null || filetemplateData.getString("inodePath") == null
+      || filetemplateData.getString("inodePath").equals("")) {
+      throw new IllegalArgumentException("filetempleateData was not provided or its InodePath was not set");
+    }
+  
+    String inodePath = filetemplateData.getString("inodePath");
+    int templateid = filetemplateData.getInt("templateId");
+  
+    Inode inode = inodes.getInodeAtPath(inodePath);
+    Template temp = template.findByTemplateId(templateid);
+    temp.getInodes().add(inode);
+  
+    //persist the relationship
+    this.template.updateTemplatesInodesMxN(temp);
+  
+    RESTApiJsonResponse json = new RESTApiJsonResponse();
+    json.setSuccessMessage("The template was attached to " + inode.getId() + " file and metadata was added");
+  
+    JsonObject metaObj = objJson.getJsonObject("metaObj");
+  
+    Response metadataServiceResponse = metadataService.addMetadataWithSchema(sc, metaObj.toString());
+    
+    if (Response.Status.OK.getStatusCode() == metadataServiceResponse.getStatus()) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
+    } else {
+      return noCacheResponse.getNoCacheResponseBuilder(
+        Response.Status.fromStatusCode(metadataServiceResponse.getStatus())
+      ).entity(metadataServiceResponse.getEntity()).build();
+    }
   }
 
   @POST
