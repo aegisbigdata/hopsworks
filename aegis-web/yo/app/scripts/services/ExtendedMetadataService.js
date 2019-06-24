@@ -58,12 +58,6 @@ angular.module('hopsWorksApp')
           }
         }
 
-        // Set modified, spatial properties
-        if (data.areaSelect) {
-          doc[data.fields.spatial.mapping]['@id'] = data.areaSelect._width + ', ' + data.areaSelect._height + ', ' + data.areaSelect.center.lat + ', ' + data.areaSelect.center.lng + ', ' +data.areaSelect.zoom;
-        }
-
-        doc[modifiedKey] = (new Date()).toISOString();
         return this.generateRDFString(doc, context);
       },
       generateRDFString (doc, context) {
@@ -77,6 +71,19 @@ angular.module('hopsWorksApp')
             resolve(jsonldData);
           });
         });
+      },
+      
+      setProperty (obj, path, value) {
+          var schema = obj;  // a moving reference to internal objects within obj
+          var pList = path.split('.');
+          var len = pList.length;
+          for(var i = 0; i < len-1; i++) {
+              var elem = pList[i];
+              if( !schema[elem] ) schema[elem] = {}
+              schema = schema[elem];
+          }
+
+          schema[pList[len-1]] = value;
       },
 
       FILE_FORMATS: [
