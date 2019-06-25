@@ -1,3 +1,6 @@
+html, body {
+  background-color: #fff;
+}
 .menu_icon {
   width: 30px !important;
   display: inline-block !important; 
