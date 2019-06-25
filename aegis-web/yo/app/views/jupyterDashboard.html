@@ -683,17 +683,17 @@
                         </div>
     
                         <div class="row top-buffer">
-                            <div class="col-sm-12 col-xs-12 col-md-3 col-lg-3 col-xl-3" ng-repeat="aegisTool in aegisTools">
-                                <div class="tool-card file" ng-click="jupyterCtrl.openNotebook(aegisTool.notebook)">
+                            <div class="col-sm-12 col-xs-12 col-md-4 col-lg-4 col-xl-4" ng-repeat="aegisTool in aegisTools">
+                                <div class="tool-card file" ng-click="jupyterCtrl.openNotebook(aegisTool.notebook)" title="{{aegisTool.name}}">
                                         <div class="card-body">
                                             <img class="card-img-top card-tool-image" src="{{aegisTool.img}}">
                                             <h5 class="card-tool-title">{{aegisTool.name}}</h5>
-                                            <p class="card-tool-text" title="{{aegisTool.description}}">
-                                                {{ aegisTool.description | limitTo: 100 }}{{aegisTool.description.length > 100 ? '...' : ''}}
-                                            </p>
+                                            <div class="card-tool-text thin-scrollbar">
+                                                {{ aegisTool.description }}
+                                            </div>
                                         </div>
                                         <div class="file-name" ng-if="aegisTool.documentationUrl||aegisTool.sourceUrl">
-                                            <div class="btn-group btn-group-justified">
+                                            <div class="btn-group btn-group-justified hidden-md hidden-xs">
                                                 <a ng-if="aegisTool.documentationUrl" 
                                                     href="{{aegisTool.documentationUrl}}" 
                                                     ng-click="$event.stopPropagation();" 
@@ -702,7 +702,17 @@
                                                     href="{{aegisTool.sourceUrl}}" 
                                                     ng-click="$event.stopPropagation();" 
                                                     target="_blank" class="btn btn-default">Source</a>
-                                              </div>
+                                            </div>
+                                            <div class="btn-group btn-group-vertical visible-md visible-xs">
+                                                <a ng-if="aegisTool.documentationUrl" 
+                                                    href="{{aegisTool.documentationUrl}}" 
+                                                    ng-click="$event.stopPropagation();" 
+                                                    target="_blank" class="btn btn-default">Documentation</a>
+                                                <a ng-if="aegisTool.sourceUrl" 
+                                                    href="{{aegisTool.sourceUrl}}" 
+                                                    ng-click="$event.stopPropagation();" 
+                                                    target="_blank" class="btn btn-default">Source</a>
+                                            </div>
                                         </div>
                                 </div>
                             </div>
