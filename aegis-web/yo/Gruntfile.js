@@ -47,7 +47,7 @@
 // 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
-
+  var env = process.env.NODE_ENV || 'default';
   var serveStatic = require('serve-static');
   var proxyUtils = require('grunt-connect-proxy/lib/utils');
   var proxyRequestMiddleware = proxyUtils.proxyRequest;
@@ -84,6 +84,7 @@ module.exports = function (grunt) {
 
   // Define the configuration for all the tasks
   grunt.initConfig({
+    env: env,
     // Project settings
     yeoman: appConfig,
     // Watches files for changes and runs tasks based on the changed files

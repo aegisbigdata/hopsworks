@@ -43,10 +43,10 @@ const AEGIS_PROJECT_TEMPLATE_ID = 14;
 const AEGIS_PROJECT_TEMPLATE_NAME = 'aegis-distribution';
 
 angular.module('hopsWorksApp')
-        .controller('ExtendedMetadataCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
+        .controller('ExtendedMetadataCtrl', ['AEGIS_CONFIG', '$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
           'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService',
-          function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
+          function (AEGIS_CONFIG, $location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
@@ -55,6 +55,8 @@ angular.module('hopsWorksApp')
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
+
+            console.log(AEGIS_CONFIG);
 
             self.rdf = {
               doc: {
