@@ -32,9 +32,11 @@
 .card-tool-text{
     text-align: center;
     color: grey;
-    padding: 5% 5% 5% 5%;
+    padding: 10px;
     margin-bottom: 0px;
-
+    height: 86px;
+    overflow-x: auto;
+    background-color: #fff;
 }
 .card-body-bottom{
     width:100%;
@@ -67,6 +69,11 @@
 .card-tool-bottom-link-morethan{
     float:right;
 }
+
+.tool-card {
+    margin-right: 0;
+}
+
 /* .card-inner-custom{
     position: relative;
     width: 100%;
