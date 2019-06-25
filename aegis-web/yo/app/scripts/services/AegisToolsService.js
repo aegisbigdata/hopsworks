@@ -20,7 +20,8 @@ angular.module('hopsWorksApp')
                 img: "images/tools-visualizer.png",
                 description: "Easily transform heaps of data to a wide sset of visualisations.",
                 documentationUrl: "https://github.com/aegisbigdata/documentation/wiki/Visualizer",
-                sourceUrl: "https://github.com/aegisbigdata/visualizer"
+                sourceUrl: "https://github.com/aegisbigdata/visualizer",
+                supportDatasetParam: true
             },
             {
                 name: "Algorithm Execution Container",
