@@ -942,5 +942,23 @@ angular.module('hopsWorksApp')
                     }
                 })
             };
+
+            self.openTool = function(toolpath, dataset, datasetPathArray) {
+                var param = "";
+                if (typeof dataset === "string") {
+                    var path = (datasetPathArray instanceof Array) ? datasetPathArray.slice() : [];
+                    path.push(dataset);
+                    path = encodeURIComponent(path.join('/'));
+                    param = `&dataset=${path}`
+                }
+                self.executeIfStarted(function(started) {
+                    if (started) {
+                        $window.open(
+                            `/hopsworks-api/jupyter/${self.config.port}/notebooks/${toolpath}?token=${self.config.token}${param}`, 
+                            '_blank'
+                        );
+                    }
+                })
+            };
         }
     ]);
