@@ -285,7 +285,7 @@
                                    ng-click="jupyterCtrl.openTool(aegisTool.notebook, file.name, datasetsCtrl.pathArray)"
                                    data-toggle="uib-tooltip" title="Open this file with {{aegisTool.name}} in new window."
                                    >
-                                  <span><img src="{{aegisTool.img}}" style="height: 14px; margin-right: 8px;"/>
+                                  <span><img ng-src="{{aegisTool.img}}" style="height: 14px; margin-right: 8px;"/>
                                     Open with {{aegisTool.name}}</span>
                                 </a>
                               </li>
