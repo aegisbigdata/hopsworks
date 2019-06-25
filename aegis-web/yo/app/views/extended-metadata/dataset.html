@@ -223,7 +223,7 @@
 
                                             <div class="form-group">
                                                 <label for="input-price" id="input-price">Price</label>
-                                                <input type="text" class="form-control" id="input-price" placeholder="Price (Currency)" ng-model="data.fields.price.model" ng-focus="extendedMetadataCtrl.onFieldFocus('price')">
+                                                <input type="text" class="form-control" id="input-price" placeholder="Price" ng-model="data.fields.price.model" ng-focus="extendedMetadataCtrl.onFieldFocus('price')">
                                             </div>
 
                                             <div class="form-group">
@@ -278,11 +278,11 @@
                                                     <span class="input-group-addon" id="basic-addon1">From</span>
                                                     <input class="form-control"
                                                          placeholder="Select a date..."
-                                                         moment-picker="data.fields.temporalfrom"
+                                                         moment-picker="data.fields.temporalfrom.model"
                                                          locale="en"
                                                          min-view="year"
                                                          max-view="day"
-                                                         ng-model="data.fields.temporalfrom"
+                                                         ng-model="data.fields.temporalfrom.model"
                                                          ng-model-options="{ updateOn: 'blur' }">
                                                   </div>
                                                 </div>
@@ -292,11 +292,11 @@
                                                     <span class="input-group-addon" id="basic-addon1">To</span>
                                                     <input class="form-control"
                                                            placeholder="Select a date..."
-                                                           moment-picker="data.fields.temporalto"
+                                                           moment-picker="data.fields.temporalto.model"
                                                            locale="en"
                                                            min-view="year"
                                                            max-view="day"
-                                                           ng-model="data.fields.temporalto"
+                                                           ng-model="data.fields.temporalto.model"
                                                            ng-model-options="{ updateOn: 'blur' }">
                                                   </div>
                                                 </div>
@@ -307,12 +307,18 @@
                                     </div>
                                 </div>
                               </form>
+
+                              <div style="margin-top: 40px;margin-bottom: 150px;position: relative;">
+                                <button class="btn btn-warning" ng-class="deleteButtonIsDisabled ? 'disabled' : ''" ng-click="extendedMetadataCtrl.deleteExtendedMetadata()">Delete Metadata for Dataset</button>
+                                
+                              </div>
+
                             </div>
                             <!-- END Rightside tables -->
                             <div class="col-md-2">
 
                                 <div id="sidebar-button-container" class="fixed" style="top: 185px;">
-                                    <button type="submit" form="extendedMetadata" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
+                                    <button type="submit" form="extendedMetadata" class="btn btn-primary" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
                                 </div>
 
                                 <div id="sidebar-usage-note" class="fixed" style="top: 235px;">

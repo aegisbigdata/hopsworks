@@ -40,16 +40,17 @@
 
 .timeline {
   margin: 0;
-  padding: 0;
+  padding: 20 0;
   position: relative;
 }
-.timeline .mid-line {
-  background: none repeat scroll 0 0 #ededed;
-  height: 100%;
-  /*left: 50%;*/
-  margin-left: -1.5px;
-  position: absolute;
-  width: 3px;
+.timeline .timeline-item {
+  border-left: 2px solid #ededed;
+  padding-bottom: 15px;
+}
+.timeline .timeline-item:last-of-type {
+  border-image: -moz-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(0, 0, 0, 0) 90%) 1;
+  border-image: -webkit-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(0, 0, 0, 0) 90%) 1;
+  border-image: linear-gradient(to bottom, rgba(237,237,237,1) 0%, rgba(0, 0, 0, 0) 90%) 1;
 }
 .timeline .time-header {
   border: 1px solid #ededed;
@@ -95,9 +96,6 @@
   text-align: left;
   margin-bottom: -10px;
 }
-.timeline .pagination {
- display: unset;
-}
 .timeline .time-header.completed {
   background: none repeat scroll 0 0 #3eb157;
   border: 1px solid #35974a;
@@ -109,14 +107,6 @@
 .timeline .time-header.error {
   background: none repeat scroll 0 0 #d13736;
   border: 1px solid #b92b2a;
-}
-.timeline > div {
-  clear: left;
-  float: left;
-  margin-bottom: 15px;
-  position: relative;
-  width: 100%;
-  z-index: 2;
 }
 .timeline > .right {
   clear: right;

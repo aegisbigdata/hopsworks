@@ -201,31 +201,31 @@ angular.module('hopsWorksApp')
                     }
                   }
 
-                  let template = {
-                    templateId: AEGIS_DISTRIBUTION_TEMPLATE_ID,
-                    inodePath: distribution.path
-                  };
-                  dataSetService.detachTemplate(DISTRIBUTION_ID, AEGIS_DISTRIBUTION_TEMPLATE_ID).finally(function () {
-                    dataSetService.attachTemplate(template).then(function () {
-                      ExtendedMetadataService.saveExtendedMetadata(data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
-                        const metaData = { 5: jsonldData };
-                        MetadataRestService.addMetadataWithSchema(
-                          parseInt(distribution.parentId), distribution.name, -1, metaData).then(function () {
-                            growl.success(
-                              'Done saving.',
-                              {title: 'Success', ttl: 1000}
-                            );
-                          }, function (error) {
-                            growl.error('Metadata could not be saved', {title: 'Error', ttl: 1000});
-                          });
-                      });
-                    }).catch(function (error) {
-                      growl.error(
-                        'Could not save. Attach template failed.',
-                        {title: 'Error', ttl: 5000}
-                      );
-                    });
-                  });
+                  // let template = {
+                  //   templateId: AEGIS_DISTRIBUTION_TEMPLATE_ID,
+                  //   inodePath: distribution.path
+                  // };
+                  // dataSetService.detachTemplate(DISTRIBUTION_ID, AEGIS_DISTRIBUTION_TEMPLATE_ID).finally(function () {
+                  //   dataSetService.attachTemplate(template).then(function () {
+                  //     ExtendedMetadataService.saveExtendedMetadata(data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
+                  //       const metaData = { 5: jsonldData };
+                  //       MetadataRestService.addMetadataWithSchema(
+                  //         parseInt(distribution.parentId), distribution.name, -1, metaData).then(function () {
+                  //           growl.success(
+                  //             'Done saving.',
+                  //             {title: 'Success', ttl: 1000}
+                  //           );
+                  //         }, function (error) {
+                  //           growl.error('Metadata could not be saved', {title: 'Error', ttl: 1000});
+                  //         });
+                  //     });
+                  //   }).catch(function (error) {
+                  //     growl.error(
+                  //       'Could not save. Attach template failed.',
+                  //       {title: 'Error', ttl: 5000}
+                  //     );
+                  //   });
+                  // });
 
 
                 });

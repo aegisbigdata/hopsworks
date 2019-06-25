@@ -1,3 +1,16 @@
+html, body {
+  background-color: #fff;
+}
+.menu_icon {
+  width: 30px !important;
+  display: inline-block !important; 
+  margin-right: 10px;
+  text-align: center;
+}
+.menu_icon > img {
+  max-width: 30px;
+  max-height: 22px;
+}
 .panel-logo-img {
   height: 50px;
 }
