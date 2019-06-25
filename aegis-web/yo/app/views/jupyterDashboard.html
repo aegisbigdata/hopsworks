@@ -686,7 +686,7 @@
                             <div class="col-sm-12 col-xs-12 col-md-4 col-lg-4 col-xl-4" ng-repeat="aegisTool in aegisTools">
                                 <div class="tool-card file" ng-click="jupyterCtrl.openTool(aegisTool.notebook)" title="{{aegisTool.name}}">
                                         <div class="card-body">
-                                            <img class="card-img-top card-tool-image" src="{{aegisTool.img}}">
+                                            <img class="card-img-top card-tool-image" ng-src="{{aegisTool.img}}">
                                             <h5 class="card-tool-title">{{aegisTool.name}}</h5>
                                             <div class="card-tool-text thin-scrollbar">
                                                 {{ aegisTool.description }}
