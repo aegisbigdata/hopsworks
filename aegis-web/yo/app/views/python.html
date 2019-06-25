@@ -38,8 +38,9 @@
   -->
 
 <div ng-controller="MainCtrl as mainCtrl" class="page-python">
+  <div ng-controller="ProjectCtrl as projectCtrl">
   <div ng-include="'nav.html'" class="project-navbar"></div>
-  <div id="wrapper" class="toggled" ng-controller="ProjectCtrl as projectCtrl">
+  <div id="wrapper" class="toggled">
     <div class="overlay"></div>
 
     <div ng-include="'navProject.html'"></div>
@@ -641,5 +642,6 @@
       </section>
 
     </div>
+  </div>
   </div>
 </div>
