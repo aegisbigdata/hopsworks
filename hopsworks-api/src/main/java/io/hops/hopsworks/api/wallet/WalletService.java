@@ -26,9 +26,11 @@ import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.exception.WalletException;
 import io.hops.hopsworks.common.util.ClientWrapper;
+import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
 import java.util.logging.Level;
@@ -56,27 +58,14 @@ public class WalletService {
   @EJB
   private NoCacheResponse noCacheResponse;
   @EJB
-  private InodeFacade inodeFacade;
-  @EJB
-  private DatasetFacade datasetFacade;
-  @EJB
-  private ProjectFacade projectFacade;
-
-  public static final String HYPERLEDGER_URL = "https://localhost:3001";
+  private WalletController walletController;
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response share(DatasetJSON datasetJSON) throws WalletException {
-    Project project = getProjectByName(datasetJSON.projectName);
-    Inode datasetInode = getInode(datasetJSON.datasetInodeId);
-    Dataset dataset = getDatasetByInode(project, datasetInode);
-
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget("http://localhost:30000").setPath("wallet/mypath").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
+    walletController.shareDataset();
 
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Dataset shared on wallet");
@@ -104,91 +93,15 @@ public class WalletService {
     }
   }
 
-  public static class WalletServerJSONResult {
-  }
-
-  private Project getProjectByName(String name) throws WalletException {
-    Project project = projectFacade.findByName(name);
-    if (project == null) {
-      throw new WalletException(RESTCodes.WalletErrorCode.FILE_NOT_FOUND, Level.FINE, "project does not exist",
-        "project with this name does not exist");
-    }
-    return project;
-  }
-
-  private Inode getInode(Long inodeId) throws WalletException {
-    if (inodeId == null) {
-      throw new WalletException(RESTCodes.WalletErrorCode.FILE_NOT_FOUND, Level.FINE, "file does not exist",
-        "inodeId does not exist");
-    }
-    return inodeFacade.findById(inodeId);
-  }
-
-  private Dataset getDatasetByInode(Project project, Inode inode) throws WalletException {
-    Dataset dataset = datasetFacade.findByProjectAndInode(project, inode);
-    if (dataset == null) {
-      throw new WalletException(RESTCodes.WalletErrorCode.FILE_NOT_FOUND, Level.FINE, "dataset does not exist",
-        "dataset with this project and inode does not exist");
-    }
-    return dataset;
-  }
-
   private Response successResponse(Object content) {
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(content).build();
-  }
-
-  public static class UserJSON {
-    public String $class = "eu.aegis.User";
-    public String uid;
-    public float balance;
-  }
-
-  public static class AEGISAssetJSON {
-    public String $class = "eu.aegis.AEGISAsset";
-    public String aid;
-    public String assetType;
-    public float cost;
-    public String status;
-    public String owner;
-  }
-
-  public static class ContractJSON {
-    public String $class = "eu.aegis.Contract";
-    public String tid;
-    public String exclusivity;
-    public float amountPaid;
-    public String status;
-    public String text;
-    public String seller;
-    public String buyer;
-    public String relatedAsset;
-  }
-
-  public static class ValidationJSON {
-    public String contract;
-  }
-
-  @POST
-  @Produces(MediaType.APPLICATION_JSON)
-  @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN"})
-  public Response createUser(UserJSON user) throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/User").setMediaType(MediaType.APPLICATION_JSON).setPayload(user);
-    WalletServerJSONResult result = client.doPost();
-    client.close();
-
-    return successResponse(result);
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUsers() throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/User").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getUsers();
     return successResponse(result);
   }
 
@@ -197,23 +110,23 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUser(@PathParam("uid") String uid) throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/User/" + uid).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getUser(uid);
+    return successResponse(result);
+  }
+  
+  @POST
+  @Produces(MediaType.APPLICATION_JSON)
+  @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN"})
+  public Response createUser(WalletController.UserJSON user) throws WalletException {
+    WalletController.WalletServerJSONResult result = walletController.createUser(user);
     return successResponse(result);
   }
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response createAsset(AEGISAssetJSON asset) throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset").setMediaType(MediaType.APPLICATION_JSON).setPayload(asset);
-    WalletServerJSONResult result = client.doPost();
-    client.close();
-
+  public Response createAsset(WalletController.AEGISAssetJSON asset) throws WalletException {
+    WalletController.WalletServerJSONResult result = walletController.createAsset(asset);
     return successResponse(result);
   }
 
@@ -221,11 +134,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAssets() throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getAssets();
     return successResponse(result);
   }
 
@@ -234,23 +143,15 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAsset(@PathParam("aid") String aid) throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset/" + aid).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getAsset(aid);
     return successResponse(result);
   }
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response createContract(ContractJSON contract) throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON).setPayload(contract);
-    WalletServerJSONResult result = client.doPost();
-    client.close();
-
+  public Response createContract(WalletController.ContractJSON contract) throws WalletException {
+    WalletController.WalletServerJSONResult result = walletController.createContract(contract);
     return successResponse(result);
   }
 
@@ -258,11 +159,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getContracts() throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getContracts();
     return successResponse(result);
   }
 
@@ -271,12 +168,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getBuyContracts(@PathParam("uid") String uid) throws WalletException {
-    String filter = URLEncoder.encode("{\"where\": {\"buyer\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getBuyContracts(uid);
     return successResponse(result);
   }
 
@@ -285,24 +177,15 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getSellContracts(@PathParam("uid") String uid) throws WalletException {
-    String filter = URLEncoder.encode("{\"where\": {\"seller\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
-    client.close();
-
+    WalletController.WalletServerJSONResult result = walletController.getSellContracts(uid);
     return successResponse(result);
   }
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response validateContract(ValidationJSON validation) throws WalletException {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON).setPayload(validation);
-    WalletServerJSONResult result = client.doPost();
-    client.close();
-
+  public Response validateContract(WalletController.ValidationJSON validation) throws WalletException {
+    WalletController.WalletServerJSONResult result = walletController.validateContract(validation);
     return successResponse(result);
   }
 }

@@ -53,6 +53,7 @@ import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.dela.cluster.ClusterDatasetController;
 import io.hops.hopsworks.common.exception.DelaException;
+import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
 import javax.ejb.EJB;
@@ -89,6 +90,8 @@ public class DelaClusterProjectService {
   private DatasetFacade datasetFacade;
   @EJB
   private ClusterDatasetController clusterCtrl;
+  @EJB
+  private WalletController walletCtrl;
   
   private Project project;
   private Integer projectId;
@@ -101,6 +104,7 @@ public class DelaClusterProjectService {
     Inode inode = getInode(inodeId.getId());
     Dataset dataset = getDatasetByInode(inode);
     clusterCtrl.shareWithCluster(dataset);
+    walletCtrl.shareDataset(dataset);
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Dataset transfer is started - published");
     return successResponse(json);
