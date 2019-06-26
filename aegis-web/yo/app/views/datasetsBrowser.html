@@ -38,6 +38,7 @@
   -->
 
   <div ng-controller="MainCtrl as mainCtrl">
+    <div ng-include="'nav.html'" class="project-navbar"></div>
     <div id="wrapper" ngCloak
          class="toggled"
          ng-controller="DatasetsCtrl as datasetsCtrl">
@@ -47,9 +48,6 @@
         <div ng-include="'navProject.html'"></div>
         <section>
           <div>
-            <!-- Search bar -->
-            <div ng-include="'views/searchBar.html'"></div>
-
             <div class="container-fluid content-wrapper" ng-controller="ProjectCtrl as projectCtrl">
               <div growl reference="3" class="pull-right" ></div>
             <div class="row content-utility-bar content-utility-bar-actions">
@@ -285,7 +283,7 @@
                                    ng-click="jupyterCtrl.openTool(aegisTool.notebook, file.name, datasetsCtrl.pathArray)"
                                    data-toggle="uib-tooltip" title="Open this file with {{aegisTool.name}} in new window."
                                    >
-                                  <span><img src="{{aegisTool.img}}" style="height: 14px; margin-right: 8px;"/>
+                                  <span><img ng-src="{{aegisTool.img}}" style="height: 14px; margin-right: 8px;"/>
                                     Open with {{aegisTool.name}}</span>
                                 </a>
                               </li>

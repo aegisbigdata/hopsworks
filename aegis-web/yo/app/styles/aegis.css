@@ -11,6 +11,67 @@ html, body {
   max-width: 30px;
   max-height: 22px;
 }
+
+#header_nav {
+  min-height: 80px;
+}
+.project-navbar nav.navbar-sics {
+  background-color: #efefef;
+}
+.project-navbar nav.navbar-sics ul.navbar-nav a {
+  color: #337ab7;
+}
+.project-navbar nav.navbar-sics ul.navbar-nav a:hover,
+.project-navbar nav.navbar-sics ul.navbar-nav a:focus {
+  color: #23527c;
+}
+.project-navbar .searchBar input {
+  background-color: #fff !important;
+}
+.project-navbar .dark:-ms-input-placeholder {
+  color: #337ab7 !important;
+  opacity: 0.5;
+}
+.project-navbar .dark::placeholder {
+  color: #337ab7 !important;
+  opacity: 0.5;
+}
+.project-navbar .searchBar input,
+.project-navbar .searchBar button {
+  color: #337ab7 !important;
+}
+.navbar-nav {
+  margin: 0;
+}
+#navbar {
+  padding-right: 0;
+}
+.project-navbar #navbar {
+  padding-right: 15px;
+  margin-left: 300px;
+}
+#header_nav #navbar > .navbar-right {
+  margin-right: 15px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+#header_nav #navbar .navbar-link {
+  text-decoration:none;
+  padding:0px !important;
+  margin-top: 12px;
+}
+#header_nav #navbar > .navbar-right:first-of-type {
+  margin-right: 0;
+}
+.project-navbar .navbar-right {
+}
+.project-navbar .navbar-form {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .panel-logo-img {
   height: 50px;
 }

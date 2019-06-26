@@ -1,10 +1,11 @@
 <div ng-controller="MainCtrl as mainCtrl">
-  <div id="wrapper" class="toggled" ng-controller="ProjectCtrl as projectCtrl">
+  <div ng-controller="ProjectCtrl as projectCtrl">
+  <div ng-include="'nav.html'" class="project-navbar"></div>
+  <div id="wrapper" class="toggled">
     <div class="overlay"></div>
     <div ng-include="'navProject.html'"></div>
     <section>
       <div>
-        <div ng-include="'views/searchBar.html'"></div>
         <div class="container-fluid content-wrapper">
           <div class="row content-utility-bar content-utility-bar-actions">
             <div class="col-md-12">
@@ -24,5 +25,6 @@
           </div>
         </div>
     </section>
+  </div>
   </div>
 </div>
