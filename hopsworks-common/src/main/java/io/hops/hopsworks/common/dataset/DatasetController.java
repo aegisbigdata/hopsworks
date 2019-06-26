@@ -45,6 +45,7 @@ import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
+import io.hops.hopsworks.common.dao.hdfsUser.HdfsUsers;
 import io.hops.hopsworks.common.dao.log.operation.OperationType;
 import io.hops.hopsworks.common.dao.log.operation.OperationsLog;
 import io.hops.hopsworks.common.dao.log.operation.OperationsLogFacade;
@@ -55,6 +56,7 @@ import io.hops.hopsworks.common.dao.metadata.db.TemplateFacade;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.project.team.ProjectTeamFacade;
+import io.hops.hopsworks.common.dao.user.UserFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dao.user.activity.ActivityFacade;
 import io.hops.hopsworks.common.exception.DatasetException;
@@ -114,6 +116,8 @@ public class DatasetController {
   private DistributedFsService dfs;
   @EJB
   private Settings settings;
+  @EJB
+  private UserFacade users;
 
   /**
    * Create a new DataSet. This is, a folder right under the project home
@@ -582,4 +586,10 @@ public class DatasetController {
     }
   }
   
+  public Users getOwner(Dataset dataset) {
+    Inode ds = dataset.getInode();
+    HdfsUsers hdfsOwner = ds.getHdfsUser();
+    Users hopsworksOwner = users.findByUsername(hdfsOwner.getUsername());
+    return hopsworksOwner;
+  }
 }
