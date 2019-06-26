@@ -68,10 +68,10 @@
           <p:watermark for="pwd2" value="Repeat the password" />
         </h:panelGrid>
         <p:messages id="messages"  autoUpdate="true" showDetail="false" closable="true"/>
-        <div style="margin-left: 215px;">
+        <div style="display:flex; justify-content:space-around;">
           <h:panelGrid columns="2">
+              <p:commandButton type="submit" value="Cancel" action="#{resetPassword.logout()}" process="@this"/>
             <p:commandButton  type="submit" value="Save" action="#{resetPassword.changePassword()}"></p:commandButton>
-            <p:commandButton type="submit" value="Cancel" action="#{resetPassword.logout()}" process="@this"/>
           </h:panelGrid>
         </div>
       </p:panel>

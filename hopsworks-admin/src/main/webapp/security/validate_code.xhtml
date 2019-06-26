@@ -64,13 +64,13 @@
           <p:watermark for="tcode" value="e.g. 138cf9" />
         </h:panelGrid>
         <p:messages id="messages"  autoUpdate="true" closable="true"/>
-        <div style="margin-left: 255px;">
+        <div style="display:flex; justify-content:space-around;">
           <h:panelGrid columns="2">
+            <p:commandButton type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/aegis-web')}" process="@this"/>
             <p:commandButton type="submit"
                              value="Send"
                              ajax="false"
                              action="#{recoverySelector.validateTmpCode()}"/>
-            <p:commandButton type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/hopsworks')}" process="@this"/>
           </h:panelGrid>
         </div>
       </p:panel>

@@ -503,7 +503,7 @@ public class ResetPassword implements Serializable {
       req.logout();
       session.invalidate();
       usersController.setOnline(people.getUid(), -1);
-      context.getExternalContext().redirect("/hopsworks/#!/home");
+      context.getExternalContext().redirect("/aegis-web/#!/home");
     } catch (IOException | ServletException ex) {
       logger.log(Level.SEVERE, null, ex);
     }
@@ -516,6 +516,14 @@ public class ResetPassword implements Serializable {
     if (sess != null) {
       sess.invalidate();
     }
-    return ("welcome");
+    //return ("welcome");
+    return ("welcome-aegis");
+    
   }
+  
+  
+  
+  
+          
+          
 }
