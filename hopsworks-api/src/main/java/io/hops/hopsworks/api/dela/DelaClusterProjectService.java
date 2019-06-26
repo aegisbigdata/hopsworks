@@ -43,6 +43,7 @@ import io.hops.hopsworks.api.dela.dto.InodeIdDTO;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.Audience;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import io.hops.hopsworks.api.jwt.JWTHelper;
 import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
@@ -50,6 +51,7 @@ import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.project.Project;
 import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.dela.cluster.ClusterDatasetController;
 import io.hops.hopsworks.common.exception.DelaException;
@@ -70,6 +72,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
@@ -91,6 +95,8 @@ public class DelaClusterProjectService {
   @EJB
   private ClusterDatasetController clusterCtrl;
   @EJB
+  private JWTHelper jWTHelper;
+  @EJB
   private WalletController walletCtrl;
   
   private Project project;
@@ -100,11 +106,13 @@ public class DelaClusterProjectService {
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response share(InodeIdDTO inodeId) throws DelaException {
+  public Response share(InodeIdDTO inodeId, @Context SecurityContext sc) throws DelaException {
     Inode inode = getInode(inodeId.getId());
     Dataset dataset = getDatasetByInode(inode);
     clusterCtrl.shareWithCluster(dataset);
-    walletCtrl.shareDataset(dataset);
+    Users requestingUser = jWTHelper.getUserPrincipal(sc);
+    walletCtrl.shareDataset(dataset, requestingUser);
+    
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Dataset transfer is started - published");
     return successResponse(json);

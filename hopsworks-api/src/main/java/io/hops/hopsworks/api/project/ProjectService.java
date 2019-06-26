@@ -710,7 +710,9 @@ public class ProjectService {
     if (!ds.isPublicDs()) {
       throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_NOT_PUBLIC, Level.FINE, "datasetId: " + ds.getId());
     }
-    walletCtrl.joinDataset(ds);
+    Users user = jWTHelper.getUserPrincipal(sc);
+    walletCtrl.joinDataset(ds, user);
+    
     Dataset newDS = new Dataset(inode, destProj);
     newDS.setShared(true);
 
@@ -722,7 +724,6 @@ public class ProjectService {
     }
     newDS.setEditable(DatasetPermissions.OWNER_ONLY);
     datasetFacade.persistDataset(newDS);
-    Users user = jWTHelper.getUserPrincipal(sc);
     
     activityFacade.persistActivity(ActivityFacade.SHARED_DATA + newDS.toString() + " with project " + destProj.getName()
         , destProj, user, ActivityFacade.ActivityFlag.DATASET);

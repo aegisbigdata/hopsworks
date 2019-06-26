@@ -39,9 +39,8 @@
 package io.hops.hopsworks.common.wallet;
 
 import io.hops.hopsworks.common.dao.dataset.Dataset;
-import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
-import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
-import io.hops.hopsworks.common.dao.project.ProjectFacade;
+import io.hops.hopsworks.common.dao.user.Users;
+import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.util.ClientWrapper;
 import java.net.URLEncoder;
 import java.util.logging.Logger;
@@ -58,15 +57,22 @@ public class WalletController {
   private static final Logger LOGGER = Logger.getLogger(WalletController.class.getName());
   public static final String HYPERLEDGER_URL = "https://localhost:3001";
   
-  public void shareDataset(Dataset dataset) {
+  @EJB
+  private DatasetController datasetCtrl;
+  
+  public void shareDataset(Dataset dataset, Users requestingUser) {
+    //TODO - Users provide for email, name, username - any details needed
+    //question is which user will you use? the requester or the owner
+    Users ownerUser = datasetCtrl.getOwner(dataset);
     ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
       .setTarget("http://localhost:30000").setPath("wallet/mypath").setMediaType(MediaType.APPLICATION_JSON);
     WalletServerJSONResult result = client.doGet();
     client.close();
   }
   
-  public void joinDataset(Dataset dataset) {
-    
+  public void joinDataset(Dataset dataset, Users requestingUser) {
+    //TODO - use owner for email, name, username - any details needed
+    Users owner = datasetCtrl.getOwner(dataset);
   }
   
   public WalletServerJSONResult createUser(UserJSON user) {
