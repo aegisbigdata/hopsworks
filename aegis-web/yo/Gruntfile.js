@@ -47,7 +47,7 @@
 // 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
-  var env = process.env.NODE_ENV || 'default';
+  var env = process.env.NODE_ENV || 'development';
   var serveStatic = require('serve-static');
   var proxyUtils = require('grunt-connect-proxy/lib/utils');
   var proxyRequestMiddleware = proxyUtils.proxyRequest;
@@ -243,6 +243,22 @@ module.exports = function (grunt) {
             src: '{,*/}*.css',
             dest: '.tmp/styles/'
           }]
+      }
+    },
+    // Inject environment
+    replace: {
+      dist: {
+        options: {
+          patterns: [{
+            match: /scripts\/env\/development\.js/g,
+            replacement: function () {
+              return 'scripts/env/' + env + '.js';
+            }
+          }]
+        },
+        files: [
+          {expand: true, flatten: true, src: ['<%= yeoman.dist %>/index.html'], dest: '<%= yeoman.dist %>'}
+        ]
       }
     },
     // Automatically inject Bower components into the app
@@ -499,6 +515,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+
      // 'wiredep',
       'concurrent:server',
       'autoprefixer:server',
@@ -535,7 +552,8 @@ module.exports = function (grunt) {
     'cssmin',
     'uglify',
     'filerev',
-    'usemin'
+    'usemin',
+    'replace'
 //    'htmlmin'
   ]);
 
