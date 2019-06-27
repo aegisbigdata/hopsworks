@@ -144,9 +144,14 @@ ul.messages {
 }
 .message-preview-div > button.close {
     display:none;
+    position: absolute;
+    right: 10;
 }
 
 .message-preview-div:hover > button.close {
     display:block;
 }
 
+.message-subject .fa.pull-left {
+    margin-right: .3em;
+}

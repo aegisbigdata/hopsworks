@@ -650,10 +650,13 @@ nav header {
   padding: 20px;
 }
 
-nav .dropdown-header {
+nav .menu-header {
   color: #fff;
   opacity: 0.7;
   margin-top: 25px;
+}
+
+nav .dropdown-header {
   margin-bottom: 10px;
   font-size: inherit;
   font-weight: bold;

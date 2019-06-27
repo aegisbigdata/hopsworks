@@ -47,20 +47,8 @@
     </header>
 
     <ul class="nav sidebar-nav" ng-cloak ng-controller="ClusterUtilisationCtrl as clusterUtilCtrl">
-      <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown">
-          <img src="http://placehold.it/40x40" class="profile-image img-circle">
-          &nbsp;admin@kth.se
-          <b class="caret pull-right" style="margin-top: 20px"></b>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a href="#"><i class="fa fa-cog"></i> Admin</a></li>
-          <li><a href="#"><i class="fa fa-cog"></i> Account</a></li>
-          <li><a href="#"><i class="fa fa-sign-out"></i> Sign-out</a></li>
-        </ul>
-      </li>
 
-      <li class="dropdown-header">Project</li>
+      <li class="dropdown-header menu-header">Project</li>
       
       <li ng-click="projectCtrl.goToDatasets()" ng-show="projectCtrl.cloak" id="datasetsTab">
         <a>
@@ -108,7 +96,7 @@
         </a>
       </li -->
 
-      <li class="dropdown-header">Tools</li>
+      <li class="dropdown-header menu-header">Tools</li>
 
       <li ng-click="projectCtrl.goToProjectExtendedMetadata()">
         <a>
