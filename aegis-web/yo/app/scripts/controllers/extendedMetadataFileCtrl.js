@@ -211,6 +211,9 @@ angular.module('hopsWorksApp')
             $scope.form = {};
             $scope.data = {
               fields: {
+                accessUrl: {
+                  model: 'Access URL'
+                },
                 title: {
                   label: 'Title',
                   description: 'Description for title field',
@@ -269,6 +272,7 @@ angular.module('hopsWorksApp')
                   fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
                   fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
 
+                  if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
                   if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
                     var language_splitted = distro['http://purl.org/dc/terms/language']['@id'].split('/');
                     fields.language.model = language_splitted[language_splitted.length - 1];
