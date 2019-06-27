@@ -264,6 +264,7 @@ angular.module('hopsWorksApp')
             self.updateModelsFromData = function (jsonld) {
               var fields = $scope.data.fields;
               var graph = jsonld['@graph'];
+              fields.typeannotation.model.fields = [];
 
               graph.forEach((entry, index) => {
                 if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
@@ -313,7 +314,10 @@ angular.module('hopsWorksApp')
              */
             
             self.loadExtendedDistroMetadata = function () {
-              ExtendedMetadataAPIService.getDistributionMetadata(PROJECT_ID)
+              var parameters = $location.search();
+              var path = 'hdfs://' + decodeURI(parameters.path);
+
+              ExtendedMetadataAPIService.getDistributionMetadata(path)
                 .then(function(data) {
                   console.log(data.data);
                   self.updateModelsFromData(data.data);
@@ -324,7 +328,7 @@ angular.module('hopsWorksApp')
                 });    
             };
             
-            //self.loadExtendedDistroMetadata();
+            self.loadExtendedDistroMetadata();
 
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks

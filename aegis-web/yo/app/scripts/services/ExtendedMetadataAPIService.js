@@ -163,10 +163,11 @@ angular.module('hopsWorksApp')
         return $http(req);
       },
 
-      getDistributionMetadata: function (distributionID) {
+      getDistributionMetadata: function (path) {
+        path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
         var req = {
           method: 'GET',
-          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT + '/' + distributionID,
+          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT + '/' + path,
           headers: {
             'Content-Type': 'application/ld+json'
           }
