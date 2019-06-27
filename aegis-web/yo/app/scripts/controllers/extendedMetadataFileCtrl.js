@@ -56,6 +56,82 @@ angular.module('hopsWorksApp')
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
 
+            self.mock = {
+              "@graph": [
+                {
+                  "@id": "https://europeandataportal.eu/set/distribution/1234",
+                  "@type": [
+                    "http://www.aegis-bigdata.eu/md/voc/core/TabularDistribution",
+                    "http://www.w3.org/ns/dcat#Distribution"
+                  ],
+                  "http://purl.org/dc/terms/identifier": "1234",
+                  "http://purl.org/dc/terms/description": "This is an example distribution",
+                  "http://purl.org/dc/terms/language": {
+                    "@id": "http://publications.europa.eu/resource/authority/language/ENG"
+                  },
+                  "http://purl.org/dc/terms/title": "Example Distribution",
+                  "http://purl.org/dc/terms/license": {
+                    "@id": "https://creativecommons.org/licenses/by/4.0/"
+                  },
+                  "http://purl.org/dc/terms/format": "CSV",
+                  "http://www.w3.org/ns/dcat#accessURL": {
+                    "@id": "hdfs:///Projects/AutomotiveDemonstrator/Demo2_SafeDrivingIndicator/Events/Driver1_Vehicle6_20170224_Trip_011__withoutnan.csv"
+                  },
+                  "http://www.aegis-bigdata.eu/md/voc/hops/fileId": "3804679",
+                  "http://www.aegis-bigdata.eu/md/voc/core/hasField": [
+                    {
+                      "@id": "_:vb10164"
+                    },
+                    {
+                      "@id": "_:vb10165"
+                    },
+                    {
+                      "@id": "_:vb10166"
+                    },
+                    {
+                      "@id": "_:vb10162"
+                    }
+                  ]
+                },
+                {
+                  "@id": "_:vb10162",
+                  "http://www.aegis-bigdata.eu/md/voc/core/description": "A description of the entry",
+                  "http://www.aegis-bigdata.eu/md/voc/core/name": "text",
+                  "http://www.aegis-bigdata.eu/md/voc/core/number": "3",
+                  "http://www.aegis-bigdata.eu/md/voc/core/type": {
+                    "@id": "http://www.aegis-bigdata.eu/md/voc/core/String"
+                  }
+                },
+                {
+                  "@id": "_:vb10164",
+                  "http://www.aegis-bigdata.eu/md/voc/core/description": "The longitude of the entry",
+                  "http://www.aegis-bigdata.eu/md/voc/core/name": "longitude",
+                  "http://www.aegis-bigdata.eu/md/voc/core/number": "2",
+                  "http://www.aegis-bigdata.eu/md/voc/core/type": {
+                    "@id": "http://www.aegis-bigdata.eu/md/voc/core/Longitude"
+                  }
+                },
+                {
+                  "@id": "_:vb10165",
+                  "http://www.aegis-bigdata.eu/md/voc/core/description": "The color of the marker",
+                  "http://www.aegis-bigdata.eu/md/voc/core/name": "color",
+                  "http://www.aegis-bigdata.eu/md/voc/core/number": "4",
+                  "http://www.aegis-bigdata.eu/md/voc/core/type": {
+                    "@id": "http://www.aegis-bigdata.eu/md/voc/core/Color"
+                  }
+                },
+                {
+                  "@id": "_:vb10166",
+                  "http://www.aegis-bigdata.eu/md/voc/core/description": "The latitude of the entry",
+                  "http://www.aegis-bigdata.eu/md/voc/core/name": "latitude",
+                  "http://www.aegis-bigdata.eu/md/voc/core/number": "1",
+                  "http://www.aegis-bigdata.eu/md/voc/core/type": {
+                    "@id": "http://www.aegis-bigdata.eu/md/voc/core/Latitude"
+                  }
+                }
+              ]
+            };
+
             self.template = {
               "@context": {
                 "geometry": {
@@ -171,11 +247,10 @@ angular.module('hopsWorksApp')
                 },
                 typeannotation: {
                   label: 'Type of Data',
-                  description: 'Lorem ipsum dolor sit amet.',
                   model: {
-                    fields: []
+                    fields: [],
+                    typeOfData: 'tabular'
                   },
-                  type: '',
                   recommended: true
                 }
               }
@@ -183,13 +258,69 @@ angular.module('hopsWorksApp')
 
             var dataSetService = DataSetService(PROJECT_ID);
 
+            self.updateModelsFromData = function (jsonld) {
+              var fields = $scope.data.fields;
+              var graph = jsonld['@graph'];
+
+              graph.forEach((entry, index) => {
+                if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
+                  var distro = graph[index];
+                  fields.title.model = distro['http://purl.org/dc/terms/title'] || '';
+                  fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
+                  fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
+
+                  if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
+                    var language_splitted = distro['http://purl.org/dc/terms/language']['@id'].split('/');
+                    fields.language.model = language_splitted[language_splitted.length - 1];
+                  }
+
+                  if (distro.hasOwnProperty('http://purl.org/dc/terms/license')) {
+                    var license_splitted = distro['http://purl.org/dc/terms/license']['@id'].split('/');
+                    fields.license.model = license_splitted[license_splitted.length - 1];
+                  }
+
+                } else {
+                  var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
+                  var type = null;
+
+                  if (entry.hasOwnProperty(aegis_prexix + 'type')) {
+                    if (entry[aegis_prexix + 'type']['@id'] != '') {
+                      var type_splitted = entry[aegis_prexix + 'type']['@id'].split('/');
+                      type = type_splitted[type_splitted.length - 1].toLowerCase();
+                    }
+                  }
+
+                  var new_field = {
+                    description: entry[aegis_prexix + 'description'] || '',
+                    name: entry[aegis_prexix + 'name'] || '',
+                    number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
+                    type
+                  }
+                  
+                  fields.typeannotation.model.fields.push(new_field)
+                }
+              });
+            };
+
+            self.updateModelsFromData(self.mock);
+
             /**
              * Loads from data from JSON-LD format into page
              */
+            
             self.loadExtendedDistroMetadata = function () {
-
+              ExtendedMetadataAPIService.getDistributionMetadata(PROJECT_ID)
+                .then(function(data) {
+                  console.log(data.data);
+                  self.updateModelsFromData(data.data);
+                })
+                .catch(function(error) {
+                  console.error(error);
+                  if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for distribution');
+                });    
             };
-            self.loadExtendedDistroMetadata();
+            
+            //self.loadExtendedDistroMetadata();
 
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks
