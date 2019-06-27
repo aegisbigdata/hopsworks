@@ -55,27 +55,88 @@ angular.module('hopsWorksApp')
 
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
-            self.rdf = {
-              doc: {
-                "http://purl.org/dc/terms/title": {'@id': ''},
-                "http://purl.org/dc/terms/description": {'@id': ''},
-                "http://purl.org/dc/terms/format": {'@id': ''},
-                "http://xmlns.com/foaf/0.1/Agent": {'@id': ''},
-                'http://purl.org/dc/terms/language': {'@id': ''},
-                'http://purl.org/dc/terms/license': {'@id': ''},
-                'http://purl.org/dc/terms/typeannotation': {'@id': ''}
+
+            self.template = {
+              "@context": {
+                "geometry": {
+                  "@id": "http://www.w3.org/ns/locn#geometry",
+                  "@type": "https://www.iana.org/assignments/media-types/application/vnd.geo+json"
+                },
+                "homepage": {
+                  "@id": "http://xmlns.com/foaf/0.1/homepage",
+                  "@type": "@id"
+                },
+                "name": {
+                  "@id": "http://xmlns.com/foaf/0.1/name"
+                },
+                "modified": {
+                  "@id": "http://purl.org/dc/terms/modified",
+                  "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                },
+                "title": {
+                  "@id": "http://purl.org/dc/terms/title"
+                },
+                "publisher": {
+                  "@id": "http://purl.org/dc/terms/publisher",
+                  "@type": "@id"
+                },
+                "type": {
+                  "@id": "http://purl.org/dc/terms/type"
+                },
+                "license": {
+                  "@id": "http://purl.org/dc/terms/license",
+                  "@type": "@id"
+                },
+                "description": {
+                  "@id": "http://purl.org/dc/terms/description"
+                },
+                "language": {
+                  "@id": "http://purl.org/dc/terms/language",
+                  "@type": "@id"
+                },
+                "spatial": {
+                  "@id": "http://purl.org/dc/terms/spatial",
+                  "@type": "@id"
+                },
+                "dct": {
+                  "@id": "http://purl.org/dc/terms/",
+                  "@type": "@id"
+                },
+                "schema": {
+                  "@id": "http://schema.org/",
+                  "@type": "@id"
+                },
+                "aegis": {
+                  "@id": "http://www.aegis-bigdata.eu/md/voc/core/",
+                  "@type": "@id"
+                },
+                "hops": {
+                  "@id": "http://www.aegis-bigdata.eu/md/voc/hops/",
+                  "@type": "@id"
+                }
               },
-              context: {
-                "dcat": "http://www.w3.org/ns/dcat#",
-                "dcterms": "http://purl.org/dc/terms/",
-                "foaf": "http://xmlns.com/foaf/0.1/",
-                "title": {"@id" : "http://purl.org/dc/terms/title", "@type": "@id"},
-                "description": {"@id" : "http://purl.org/dc/terms/description", "@type": "@id"},
-                "format": {"@id" : "http://purl.org/dc/terms/format", "@type": "@id"},
-                "language": {"@id": 'http://purl.org/dc/terms/language', "@type": "@id"},
-                "license": {"@id": 'http://purl.org/dc/terms/license', "@type": "@id"}
-              }
-            };
+              "@graph": [
+                {
+                  "@id": "https://example.de/dataset/distribution3",
+                  "@type": [
+                    "http://www.w3.org/ns/dcat#Distribution",
+                    "aegis:TabularDistribution"
+                  ],
+                  "description": "",
+                  "dct:format": "",
+                  "dct:identifier": "",
+                  "language": "",
+                  "license": "",
+                  "title": "",
+                  "aegis:hasField": [],
+                  "hops:fileId": "",
+                  "http://www.w3.org/ns/dcat#accessURL": {
+                    "@id": ""
+                  }
+                }
+              ]
+            }
+
 
             $scope.form = {};
             $scope.data = {
@@ -176,61 +237,38 @@ angular.module('hopsWorksApp')
              * Saves form data in JSON-LD format as metadata with hopsworks
              */
             self.saveExtendedDistroMetadata = function () {
-              let data = $scope.data;
+              var metadataObject = JSON.parse(JSON.stringify(self.template));
+              var graph = metadataObject['@graph'];
+              var data = $scope.data;
+              var fields = $scope.data.fields;
+              var parameters = $location.search();
+              var datasetName = decodeURI(parameters.dataset);
+              var path = decodeURI(parameters.path);
+
               data.fields.typeannotation.model = JSON.stringify(data.fields.typeannotation.model);
 
-              dataSetService.getAllDatasets().then(function (allDatasets) {
-                const tasks = allDatasets.data.map(function (dataset) {
-                  return dataSetService.getContents(dataset.name);
-                });
-                Promise.all(tasks).then(function (contents) {
-                  let distribution;
+              graph[0].description = fields.description.model;
+              graph[0].title = fields.title.model;
+              graph[0]['hops:fileId'] = DISTRIBUTION_ID;
+              graph[0]['http://www.w3.org/ns/dcat#accessURL']['@id'] = 'hdfs://' + path;
+ 
+              if (fields.format.model != '') graph[0]['dct:format'] = fields.format.model;
+              if (fields.language.model) graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
+              if (fields.license.model) graph[0].license = 'https://creativecommons.org/licenses/by/4.0/' + fields.license.model;
 
-                  contents = contents.map(function (content) {
-                    return content.data;
-                  }).reduce(function (acc, val) {
-                    // flatten result array
-                    return acc.concat(val);
-                  }, []);
+              console.log(graph[0]);
 
-                  // find metadata object for this distribution id
-                  for (let i = 0; i < contents.length; i++) {
-                    if (contents[i].id == DISTRIBUTION_ID) {
-                      distribution = contents[i];
-                      break;
-                    }
-                  }
-
-                  // let template = {
-                  //   templateId: AEGIS_DISTRIBUTION_TEMPLATE_ID,
-                  //   inodePath: distribution.path
-                  // };
-                  // dataSetService.detachTemplate(DISTRIBUTION_ID, AEGIS_DISTRIBUTION_TEMPLATE_ID).finally(function () {
-                  //   dataSetService.attachTemplate(template).then(function () {
-                  //     ExtendedMetadataService.saveExtendedMetadata(data, self.rdf.doc, self.rdf.context).then(function (jsonldData) {
-                  //       const metaData = { 5: jsonldData };
-                  //       MetadataRestService.addMetadataWithSchema(
-                  //         parseInt(distribution.parentId), distribution.name, -1, metaData).then(function () {
-                  //           growl.success(
-                  //             'Done saving.',
-                  //             {title: 'Success', ttl: 1000}
-                  //           );
-                  //         }, function (error) {
-                  //           growl.error('Metadata could not be saved', {title: 'Error', ttl: 1000});
-                  //         });
-                  //     });
-                  //   }).catch(function (error) {
-                  //     growl.error(
-                  //       'Could not save. Attach template failed.',
-                  //       {title: 'Error', ttl: 5000}
-                  //     );
-                  //   });
-                  // });
-
-
-                });
-              });
-
+              // Send to API
+              // ExtendedMetadataAPIService.createOrUpdateDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
+              //   .then(function(success) {
+              //     growl.success('Distribution metadata successfully saved.', {title: 'Success', ttl: 5000});
+              //   })
+              //   .catch(function(error) {
+              //     growl.error('Server error: ' + error.status, {title: 'Error while saving distribution metadata', ttl: 5000, referenceId: 0});
+              //   })
+              //   .finally(function() {
+              //     $scope.saveButtonIsDisabled = false;
+              //   });
             };
 
             /**
