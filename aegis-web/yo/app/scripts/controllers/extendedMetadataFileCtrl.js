@@ -45,10 +45,10 @@ const AEGIS_DISTRIBUTION_TEMPLATE_NAME = 'aegis-distribution';
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataFileCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService',
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', 
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
             const DISTRIBUTION_ID = $routeParams.distributionID;
             const self = this;
@@ -122,12 +122,6 @@ angular.module('hopsWorksApp')
                     "http://www.w3.org/ns/dcat#Distribution",
                     "aegis:TabularDistribution"
                   ],
-                  "description": "",
-                  "dct:format": "",
-                  "dct:identifier": "",
-                  "language": "",
-                  "license": "",
-                  "title": "",
                   "aegis:hasField": [],
                   "hops:fileId": "",
                   "http://www.w3.org/ns/dcat#accessURL": {
@@ -144,21 +138,18 @@ angular.module('hopsWorksApp')
                 title: {
                   label: 'Title',
                   description: 'Description for title field',
-                  mapping: 'http://purl.org/dc/terms/title',
                   model: '',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
-                  mapping: 'http://purl.org/dc/terms/description',
                   model: '',
                   required: true
                 },
                 format: {
                   label: 'Format',
                   description: 'File format',
-                  mapping: 'http://purl.org/dc/terms/format',
                   model: '',
                   recommended: true,
                   options: ExtendedMetadataService.FILE_FORMATS
@@ -167,7 +158,6 @@ angular.module('hopsWorksApp')
                   label: 'Licence',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/license',
                   recommended: true,
                   options: ExtendedMetadataService.LICENCES
                 },
@@ -175,7 +165,6 @@ angular.module('hopsWorksApp')
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/language',
                   optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
@@ -186,11 +175,10 @@ angular.module('hopsWorksApp')
                   model: {
                     fields: []
                   },
-                  mapping: 'http://purl.org/dc/terms/typeannotation',
+                  type: '',
                   recommended: true
                 }
-              },
-              bounds: null
+              }
             };
 
             var dataSetService = DataSetService(PROJECT_ID);
@@ -199,37 +187,7 @@ angular.module('hopsWorksApp')
              * Loads from data from JSON-LD format into page
              */
             self.loadExtendedDistroMetadata = function () {
-              MetadataRestService.getMetadata(DISTRIBUTION_ID).then(function (distributionMetadata) {
-                if (!distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME] ||
-                    !distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload.length) {
-                  return;
-                }
 
-                let data = distributionMetadata.data[AEGIS_DISTRIBUTION_TEMPLATE_NAME].metadata.payload[0];
-                // what we get back isn't proper stringified JSON, so we need to unmangle it before parsing
-                data = JSON.parse(data
-                  .replace(/\\@/g, '"@')
-                  .replace(/\\:\\/g, '":"')
-                  .replace(/\\:/g, '":')
-                  .replace(/\{\\/g, '\{"')
-                  .replace(/\\\{/g, '\"}')
-                  .replace(/\\\}/g, '"\}')
-                  .replace(/,\\/g, ',"')
-                  .replace(/\\,/g, '",')
-                  .replace(/"\\\\/g, '\\"')
-                  .replace(/\\\\"/g, '\\"'))['@graph'][0];
-
-                for (var key in data) {
-                  if (data.hasOwnProperty(key) && $scope.data.fields.hasOwnProperty(key)) {
-                    if (data[key] === './') continue;
-                    $scope.data.fields[key].model = data[key].substr(1);
-                  }
-                }
-                if (data['dcterms:typeannotation']) {
-                  $scope.data.fields.typeannotation.model = JSON.parse(data['dcterms:typeannotation']['@id']);
-                }
-
-              });
             };
             self.loadExtendedDistroMetadata();
 
@@ -245,30 +203,45 @@ angular.module('hopsWorksApp')
               var datasetName = decodeURI(parameters.dataset);
               var path = decodeURI(parameters.path);
 
-              data.fields.typeannotation.model = JSON.stringify(data.fields.typeannotation.model);
-
+              graph[0]['aegis:hasField'] = [];
               graph[0].description = fields.description.model;
               graph[0].title = fields.title.model;
               graph[0]['hops:fileId'] = DISTRIBUTION_ID;
+              graph[0]['dct:identifier'] = 'hdfs://' + path;
               graph[0]['http://www.w3.org/ns/dcat#accessURL']['@id'] = 'hdfs://' + path;
- 
+
               if (fields.format.model != '') graph[0]['dct:format'] = fields.format.model;
               if (fields.language.model) graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
               if (fields.license.model) graph[0].license = 'https://creativecommons.org/licenses/by/4.0/' + fields.license.model;
 
+              if (fields.typeannotation.model.fields.length) {
+                var tabularFields = fields.typeannotation.model.fields;
+                tabularFields.forEach(function (field) {
+                  var type = field.type ? "aegis:" + field.type : '';
+                  graph[0]['aegis:hasField'].push({
+                    "aegis:description": field.description,
+                    "aegis:name": field.name,
+                    "aegis:number": field.number.toString(),
+                    "aegis:type": {
+                      "@id": type
+                    }
+                  });
+                });
+              }
+
               console.log(graph[0]);
 
               // Send to API
-              // ExtendedMetadataAPIService.createOrUpdateDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
-              //   .then(function(success) {
-              //     growl.success('Distribution metadata successfully saved.', {title: 'Success', ttl: 5000});
-              //   })
-              //   .catch(function(error) {
-              //     growl.error('Server error: ' + error.status, {title: 'Error while saving distribution metadata', ttl: 5000, referenceId: 0});
-              //   })
-              //   .finally(function() {
-              //     $scope.saveButtonIsDisabled = false;
-              //   });
+              ExtendedMetadataAPIService.createOrUpdateDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
+                .then(function(success) {
+                  growl.success('Distribution metadata successfully saved.', {title: 'Success', ttl: 5000});
+                })
+                .catch(function(error) {
+                  growl.error('Server error: ' + error.status, {title: 'Error while saving distribution metadata', ttl: 5000, referenceId: 0});
+                })
+                .finally(function() {
+                  $scope.saveButtonIsDisabled = false;
+                });
             };
 
             /**

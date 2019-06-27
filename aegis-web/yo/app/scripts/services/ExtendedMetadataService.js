@@ -41,38 +41,7 @@
 
 angular.module('hopsWorksApp')
   .factory('ExtendedMetadataService', ['$http', function($http) {
-    var service = {
-      /**
-       * Generates RDF compliant representation in json-ld format
-       * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
-       */
-      saveExtendedMetadata  (data, doc, context) {
-        var modifiedKey = 'http://purl.org/dc/terms/modified';
-
-        // Map model of each field to RDF doc structure
-        for (var key in data.fields) {
-          var field = data.fields[key];
-          if (field.hasOwnProperty('mapping')) {
-            var mapping = field.mapping;
-            if (field.hasOwnProperty('model') && doc.hasOwnProperty(mapping)) doc[mapping]['@id'] = field.model;
-          }
-        }
-
-        return this.generateRDFString(doc, context);
-      },
-      generateRDFString (doc, context) {
-        return new Promise(function (resolve, reject) {
-          jsonld.flatten(doc, context, function(err, result) {
-            if (err) {
-              return reject(err);
-            }
-
-            const jsonldData = JSON.stringify(result);
-            resolve(jsonldData);
-          });
-        });
-      },
-      
+    var service = {     
       setProperty (obj, path, value) {
           var schema = obj;  // a moving reference to internal objects within obj
           var pList = path.split('.');
@@ -82,7 +51,6 @@ angular.module('hopsWorksApp')
               if( !schema[elem] ) schema[elem] = {}
               schema = schema[elem];
           }
-
           schema[pList[len-1]] = value;
       },
 
