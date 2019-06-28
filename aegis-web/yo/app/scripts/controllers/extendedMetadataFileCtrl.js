@@ -368,8 +368,6 @@ angular.module('hopsWorksApp')
                 });
               }
 
-              console.log(graph[0]);
-
               // Send to API
               ExtendedMetadataAPIService.createOrUpdateDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
                 .then(function(success) {
