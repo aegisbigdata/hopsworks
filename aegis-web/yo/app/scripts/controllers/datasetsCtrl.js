@@ -1109,7 +1109,6 @@ angular.module('hopsWorksApp')
              * @returns {undefined}
              */
             self.select = function (selectedIndex, file, event) {
-
               // 1. Turn off the selected file at the top of the browser.
               // Add existing selected file (idempotent, if already added)
               // If file already selected, deselect it.
@@ -1123,6 +1122,7 @@ angular.module('hopsWorksApp')
               // }
               self.tgState = true;
               self.selected = file.name;
+              self.selectedDataset = file.parentId;
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;
