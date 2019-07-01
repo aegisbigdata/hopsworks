@@ -1211,7 +1211,7 @@ angular.module('hopsWorksApp')
               let PROJECT_ID = $routeParams.projectID;
               let DATASET_ID = null;
               let DISTRIBUTION_PATH = null;
-
+              self.extendedMetadata = null;
               console.log(file);
 
 
