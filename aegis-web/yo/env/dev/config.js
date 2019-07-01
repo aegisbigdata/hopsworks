@@ -6,4 +6,4 @@ var AEGIS_CONFIG;
         DATASET_ENDPOINT: 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/datasets/',
         DISTRIBUTION_ENDPOINT: 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/distributions/'
     };
-})(AEGIS_CONFIG || (AEGIS_CONFIG = {}));git st
+})(AEGIS_CONFIG || (AEGIS_CONFIG = {}));
