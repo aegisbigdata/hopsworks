@@ -89,7 +89,7 @@
                                         <form>
                                             <div class="form-group">
                                                 <label for="inputUrl3">Access URL</label>
-                                                <input type="text" class="form-control" id="inputUrl3" placeholder="Access URL" disabled>
+                                                <input type="text" class="form-control" id="inputUrl3" placeholder="Access URL" ng-model="data.fields.accessUrl.model" disabled>
                                             </div>
                                         </form>
                                     </div>
@@ -131,8 +131,7 @@
                                     <div class="form-group" style="margin-top: 25px;">
                                         <label for="inputTypeOfData" class="control-label">Type of data</label>
                                         <select required id="inputTypeOfData" class="form-control" ng-model="data.fields.typeannotation.model.typeOfData">
-                                            <option value="" disabled selected>Select type of data...</option>
-                                            <option value="tabular">Tabular data</option>
+                                            <option value="tabular" selected>Tabular data</option>
                                             <option value="other">Other</option>
                                         </select>
                                     </div>

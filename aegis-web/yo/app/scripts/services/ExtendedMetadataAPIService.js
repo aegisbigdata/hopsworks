@@ -158,10 +158,12 @@ angular.module('hopsWorksApp')
         return $http(req);
       },
 
-      getDistributionMetadata: function (distributionID) {
+      getDistributionMetadata: function (path) {
+        path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
         var req = {
           method: 'GET',
-          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + distributionID,
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + path,
+
           headers: {
             'Content-Type': 'application/ld+json'
           }
