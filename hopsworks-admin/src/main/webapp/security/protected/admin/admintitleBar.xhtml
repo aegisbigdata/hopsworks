@@ -51,7 +51,6 @@
         <p:toolbar>
           <f:facet name="left" rendered="#{roleEnforcementPoint.loggedIn}">
             <p:commandButton value="Aegis" action="#{facesContext.externalContext.redirect('/aegis')}" ajax="false" process="@toolbarForm" icon="ui-icon-extlink"/>
-            <!--<p:commandButton value="Hopsworks" action="#{facesContext.externalContext.redirect('/aegis-web')}" ajax="false" process="@toolbarForm" icon="ui-icon-extlink"/>-->
             <p:commandButton value="Admin Home" action="adminIndex" ajax="false" process="@toolbarForm" icon="ui-icon-arrowrefresh-1-w"/>
           </f:facet>
           <f:facet name="right" rendered="#{roleEnforcementPoint.loggedIn}">

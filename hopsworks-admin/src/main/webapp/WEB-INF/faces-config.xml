@@ -252,7 +252,7 @@
     </navigation-case>
     <navigation-case>
       <from-outcome>welcome-aegis</from-outcome>
-      <to-view-id>/aegis-web/#!/login</to-view-id>
+      <to-view-id>/aegis/#!/login</to-view-id>
       <redirect/>
     </navigation-case>
     <navigation-case>

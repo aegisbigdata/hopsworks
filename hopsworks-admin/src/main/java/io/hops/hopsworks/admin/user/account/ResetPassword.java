@@ -503,7 +503,7 @@ public class ResetPassword implements Serializable {
       req.logout();
       session.invalidate();
       usersController.setOnline(people.getUid(), -1);
-      context.getExternalContext().redirect("/aegis-web/#!/home");
+      context.getExternalContext().redirect("/aegis/#!/home");
     } catch (IOException | ServletException ex) {
       logger.log(Level.SEVERE, null, ex);
     }
