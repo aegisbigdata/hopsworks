@@ -64,9 +64,9 @@
           <p:watermark for="tcode" value="e.g. 138cf9" />
         </h:panelGrid>
         <p:messages id="messages"  autoUpdate="true" closable="true"/>
-        <div style="display:flex; justify-content:space-around;">
+        <div style="display:flex; justify-content:space-around;margin:30px 0px 20px 0px;">
           <h:panelGrid columns="2">
-            <p:commandButton type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/aegis-web')}" process="@this"/>
+            <p:commandButton type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/hopsworks-admin/security/mobile_recovery.xhtml')}" process="@this"/>
             <p:commandButton type="submit"
                              value="Send"
                              ajax="false"

@@ -54,13 +54,13 @@
     <h:form>
       <p:panel id="loginPnl" header="Login" style="width: 400px; margin: 150px auto;">
         <h:panelGrid id="loginPanel" columns="3" cellpadding="5">
-          <h:outputText value="New password" />
+          
           <p:password id="pwd1" value="#{resetPassword.passwd1}"
                       match="pwd2" label="Password 1" 
                       required="true" 
                       requiredMessage="Enter new password"/>
           <p:watermark for="pwd1" value="Enter new password" />
-          <h:outputText value="Repeat password" />
+          
           <p:password id="pwd2" value="#{resetPassword.passwd2}"
                       label="Password 2" 
                       required="true"
@@ -68,9 +68,9 @@
           <p:watermark for="pwd2" value="Repeat the password" />
         </h:panelGrid>
         <p:messages id="messages"  autoUpdate="true" showDetail="false" closable="true"/>
-        <div style="display:flex; justify-content:space-around;">
+        <div style="display:flex; justify-content:space-around;margin:30px 0px 20px 0px;">
           <h:panelGrid columns="2">
-              <p:commandButton type="submit" value="Cancel" action="#{resetPassword.logout()}" process="@this"/>
+            <p:commandButton type="submit" value="Cancel" action="#{resetPassword.logout()}" process="@this"/>
             <p:commandButton  type="submit" value="Save" action="#{resetPassword.changePassword()}"></p:commandButton>
           </h:panelGrid>
         </div>
