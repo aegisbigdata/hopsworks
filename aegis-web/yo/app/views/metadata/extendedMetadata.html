@@ -39,14 +39,22 @@
 
 <div ng-show="metadataCtrl.noTemplates" style="padding-left: 10px" ng-show="!datasetsCtrl.selected">
 
-  <div ng-controller="ExtendedMetadataDatasetCtrl as extendedMetadataCtrl" dataset="{{datasetsCtrl.selectedDataset}}">
-    <div>{{ datasetsCtrl.selectedDataset }}</div>
-    <pre>
-      <code>
-        {{ extendedMetadataCtrl }}
-      </code>
-    </pre> 
-
+  <div>
+    <h5>Extended Metadata</h5>
+    <table class="table table-striped ng-scope" style="margin-top: 16px; font-size: 12px;box-shadow: none;">
+      <thead style="box-shadow: none;border-bottom: 1px solid #ddd;font-weight: bold;margin-bottom: 10px;">
+        <tr>
+          <td>Property</td>
+          <td>Value</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="entry in datasetsCtrl.extendedMetadata" style="border-bottom: 1px solid #ddd">
+          <td style="text-align: left;">{{ entry.label }}</td>
+          <td style="text-align: left;">{{ entry.model }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div style="display: inline-block">
