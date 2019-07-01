@@ -132,7 +132,6 @@ angular.module('hopsWorksApp')
           }                
         }
 
-        console.log(fields);
         return fields;
       },
       /**
