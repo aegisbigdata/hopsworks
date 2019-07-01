@@ -332,6 +332,28 @@
     <url-pattern>/virtuoso</url-pattern>
   </servlet-mapping>
 
+  <!-- Harvester UI proxy servlet -->
+  <servlet>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.HarvesterUIProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8108/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <url-pattern>/harvester/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <url-pattern>/harvester</url-pattern>
+  </servlet-mapping>
+
 
   <!-- Other servlets -->
 
