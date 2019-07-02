@@ -134,6 +134,52 @@ angular.module('hopsWorksApp')
 
         return fields;
       },
+      parseDistributionGraph (jsonld, fields) {
+        var graph = jsonld['@graph'];
+        fields.typeannotation.model.fields = [];
+
+        graph.forEach((entry, index) => {
+          if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
+            var distro = graph[index];
+            fields.title.model = distro['http://purl.org/dc/terms/title'] || '';
+            fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
+            fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
+
+            if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
+            if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
+              var language_splitted = distro['http://purl.org/dc/terms/language']['@id'].split('/');
+              fields.language.model = language_splitted[language_splitted.length - 1];
+            }
+
+            if (distro.hasOwnProperty('http://purl.org/dc/terms/license')) {
+              var license_splitted = distro['http://purl.org/dc/terms/license']['@id'].split('/');
+              fields.license.model = license_splitted[license_splitted.length - 1];
+            }
+
+          } else {
+            var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
+            var type = null;
+
+            if (entry.hasOwnProperty(aegis_prexix + 'type')) {
+              if (entry[aegis_prexix + 'type']['@id'] != '') {
+                var type_splitted = entry[aegis_prexix + 'type']['@id'].split('/');
+                type = type_splitted[type_splitted.length - 1].toLowerCase();
+              }
+            }
+
+            var new_field = {
+              description: entry[aegis_prexix + 'description'] || '',
+              name: entry[aegis_prexix + 'name'] || '',
+              number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
+              type
+            }
+            
+            fields.typeannotation.model.fields.push(new_field)
+          }
+        });
+
+        return fields;
+      },
       setProperty (obj, path, value) {
           var schema = obj;  // a moving reference to internal objects within obj
           var pList = path.split('.');
