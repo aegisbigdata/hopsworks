@@ -134,6 +134,17 @@ public class Settings implements Serializable {
 
   public static final String AGENT_EMAIL = "kagent@hops.io";
   public static final String SITE_EMAIL = "admin@kth.se";
+  
+  /**
+   * Aegis elastic search variables
+   */
+  public static final String AEGIS_ELASTIC = "xattr";
+  public static final String AEGIS_ELASTIC_PATH = "xattr.aegis";
+  public static final String AEGIS_ELASTIC_PATH_SEARCH = "xattr.aegis.search";
+  public static final String AEGIS_ELASTIC_PATH_SEARCH_FILETYPE = "xattr.aegis.search.filetype";
+  public static final String AEGIS_ELASTIC_PATH_SEARCH_LICENSE = "xattr.aegis.search.license";
+  public static final String AEGIS_ELASTIC_PATH_SEARCH_PRICE = "xattr.aegis.search.price";
+  
   /**
    * Global Variables taken from the DB
    */

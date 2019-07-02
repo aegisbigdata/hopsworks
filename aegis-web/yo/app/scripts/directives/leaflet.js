@@ -68,7 +68,7 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
           let mapcenter = [52.520008, 13.404954];
           let areaSelectOptions = { width: 100, height: 100 };
 
-          if ($scope.$parent.data.areaSelect) {
+          if ($scope.data.areaSelect) {
             let a = $scope.$parent.data.areaSelect;
             mapcenter = [a.center.lat, a.center.lng];
             areaSelectOptions = { width: a._width, height: a._height };
@@ -77,50 +77,74 @@ angular.module('hopsWorksApp').directive('leaflet', function() {
           // Create the Leaflet Map Object with the options
           const map = L.map($elm[0], {
             center: mapcenter,
-            zoom: 10,
+            zoom: 10
           });
 
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
+
+          var editableLayers = new L.FeatureGroup();
+          map.addLayer(editableLayers);
           
-          var areaSelect = L.areaSelect(areaSelectOptions);
-          areaSelect.addTo(map);
+          map.on(L.Draw.Event.CREATED, function (e) {
+            var type = e.layerType;
+            var layer = e.layer;
+            console.log('CREATED', e);
+            editableLayers.clearLayers();
+            editableLayers.addLayer(layer);
+            $scope.data.areaSelect = layer._latlngs;
+          });
 
-          $attrs.$observe('area', function(area) {
-            let settings;
 
-            if (area != '') {
-              try {
-                settings = JSON.parse(area);
-              } catch (e) {
-                console.log(e);
-              }
+          map.on(L.Draw.Event.EDITRESIZE, function (e) {
+            console.log('EDITRESIZE', e);
+            var layer = e.layer;            
+            $scope.data.areaSelect = layer._latlngs;
+          });
 
-              if (settings && settings._width != 100 && settings._height != 100) {
-                console.log(settings);
-                areaSelect.setDimensions({ width: settings._width, height: settings._height })
-              }
+          map.on('draw:editvertex ', function (e) {
+            console.log('draw:editvertex ', e);
+            var layer = e.poly;            
+            $scope.data.areaSelect = layer._latlngs;
+          });
+
+          map.on(L.Draw.Event.DELETED, function (e) {
+            console.log('Area deleted.');
+            $scope.data.areaSelect = null;
+            $scope.geoJSON = null;
+          });
+
+          var options = {
+            draw: {
+              marker: false,
+              polyline: false,
+              polygon: {
+                allowIntersection: false, // Restricts shapes to simple polygons
+                drawError: {
+                  color: '#e1e100', // Color the shape will turn when intersects
+                  message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+                }
+              },
+              circle: false, 
+              circlemarker: false,
+              rectangle: true
+            },
+            edit: {
+              featureGroup: editableLayers,
+              remove: true
             }
-          })
+          };
 
-          $attrs.$observe('center', function(center) {
-            let settings;
+          var drawControl = new L.Control.Draw(options);
+          map.addControl(drawControl);
 
-            if (center != '') {
-              try {
-                settings = JSON.parse(center);
-                console.log(settings);
-              } catch (e) {
-                console.log(e);
-              }
-
-              if (settings) map.setView(new L.LatLng(settings.lat, settings.lng), settings.zoom);
+          $scope.$watch("geoJSON", function(newValue, oldValue){
+            if (newValue && newValue.hasOwnProperty('coordinates')) {
+              var coordinates = newValue.coordinates[0];
+              var layer = L.polygon(coordinates).addTo(editableLayers);
+              map.fitBounds(editableLayers.getBounds());
             }
-          })
-          
-          areaSelect.on('change', function() {
-            $scope.$parent.data.areaSelect = { _width: areaSelect._width, _height: areaSelect._height, center: map.getCenter(), zoom: map.getZoom() };
           });
 
           // If the width attribute defined update css

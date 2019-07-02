@@ -57,7 +57,7 @@
   </h:head>
   <h:body >
     <h:form>
-      <p:panel id="loginPnl" header="Security Question" style="width: 350px; margin: 150px auto;">
+      <p:panel id="loginPnl" header="Insert your email address" style="width: 350px; margin: 150px auto;">
         <h:panelGrid id="loginPanel" columns="3" cellpadding="5">
           <p:inputText id="uname" 
                        required="true"  
@@ -69,10 +69,10 @@
           <p:watermark for="uname" value="Email Address" />
         </h:panelGrid>
         <p:messages id="messages" autoUpdate="true" closable="true"/>
-        <div style="margin-left: 165px;">
+        <div style="display:flex; justify-content:space-around;margin:30px 0px 20px 0px;">
           <h:panelGrid columns="2">
+            <p:commandButton styleClass="team_button button-save" type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/hopsworks-admin/security/login_issue.xhtml')}" process="@this" />
             <p:commandButton value="Continue" ajax="false" action="#{resetPassword.findQuestion}" > </p:commandButton>
-            <p:commandButton styleClass="team_button button-save" type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/hopsworks')}" process="@this" />
           </h:panelGrid>
         </div>
       </p:panel>

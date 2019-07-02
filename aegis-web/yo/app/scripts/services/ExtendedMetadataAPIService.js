@@ -40,48 +40,149 @@
 'use strict';
 
 angular.module('hopsWorksApp')
+  .factory('ExtendedMetadataAPIService', ['AEGIS_CONFIG', '$http', function (AEGIS_CONFIG, $http) {
+    var service = {
 
-        .factory('ExtendedMetadataAPIService', ['$http', function ($http) {
-            const EXTENDED_METADATA_GET_ENDPOINT = '';
-            const EXTENDED_METADATA_SAVE_ENDPOINT = '';
-            
-            var service = {
+      /**
+       * GET existing extended metadata for project by ID
+       */
 
-              /**
-               * GET existing extended metadata for project by ID (WIP)
-               */
+      getProjectMetadata: function (projectID) {
+        var req = {
+          method: 'GET',
+          url: AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + projectID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          }
+        };
+        return $http(req);
+      },
 
-              getExtMetadataForProject: function (projectId) {
-                return $http.get(EXTENDED_METADATA_GET_ENDPOINT + projectId);
-              },
+
+      /**
+       * PUT/Save extended metadata to endpoint. 
+       * Triggered when user clicks on "Save Metadata" button.
+       */
+
+      createOrUpdateProjectMetadata: function (projectID, metadata) {
+        var req = {
+          method: 'PUT',
+          url: AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + projectID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
+
+      deleteProjectMetadata: function (projectID) {
+        var req = {
+          method: 'DELETE',
+          url: AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + projectID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          }
+        };
+        return $http(req);
+      },
 
 
-              /**
-               * POST/Save extended metadata to endpoint. 
-               * Triggered when user clicks on "Save Metadata" button.
-               * WIP: Cloned from metadataRestService until API endpoints are specified
-               */
+      // DATASET METADATA
 
-              saveExtMetadata: function (inodepid, inodename, metadataObj) {
-                var jsonObj = JSON.stringify({
-                  inodepid: inodepid,
-                  inodename: inodename,
-                  tableid: -1,
-                  metaid: metadataObj.id,
-                  metadata: metadataObj
-                });
-                var req = {
-                  method: 'POST',
-                  url: EXTENDED_METADATA_SAVE_ENDPOINT,
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  data: jsonObj
-                };
-                return $http(req);
-              },
-              
-            };
-            
-            return service;
-          }]);
+      createOrUpdateDatasetMetadata: function(datasetID, projectID, metadata) {
+        var req = {
+          method: 'PUT',
+          url: AEGIS_CONFIG.metadata.DATASET_ENDPOINT + datasetID,
+          params: {
+            catalogue: projectID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
+
+      getDatasetMetadata: function (datasetID, projectID) {
+        var req = {
+          method: 'GET',
+          url: AEGIS_CONFIG.metadata.DATASET_ENDPOINT + datasetID,
+          params: {
+            catalogue: projectID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json'
+          }
+        };
+        return $http(req);
+      },
+
+      deleteDatasetMetadata: function (datasetID, projectID) {
+        var req = {
+          method: 'DELETE',
+          url: AEGIS_CONFIG.metadata.DATASET_ENDPOINT + datasetID,
+          params: {
+            catalogue: projectID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          }
+        };
+        return $http(req);
+      },
+
+
+      // DISTRIBUTION METADATA
+
+      createOrUpdateDistributionMetadata: function(datasetID, projectID, metadata) {
+        var req = {
+          method: 'POST',
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT,
+          params: {
+            catalogue: projectID,
+            dataset: datasetID
+          },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
+
+      getDistributionMetadata: function (path) {
+        path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
+        var req = {
+          method: 'GET',
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + path,
+
+          headers: {
+            'Content-Type': 'application/ld+json'
+          }
+        };
+        return $http(req);
+      },
+
+      deleteDistributionMetadata: function (distributionID) {
+        var req = {
+          method: 'DELETE',
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + distributionID,
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          }
+        };
+        return $http(req);
+      },
+    };
+    
+    return service;
+  }]);

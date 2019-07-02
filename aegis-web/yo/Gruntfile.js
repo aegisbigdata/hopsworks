@@ -57,7 +57,7 @@ module.exports = function (grunt) {
   // Cookies with Secure attribute are not saved/used if the site is not in https. localhost development isn't.
   proxyUtils.registerProxy = function (proxy) {
     _registerProxy(proxy);
-    if (proxy.server.options.secure) {;
+    if (proxy.server.options.target.https) {;
       grunt.log.ok("All secure cookies send from server will be transformed to non-secure.");
       proxy.server.on('proxyRes', function (proxyRes) {
         if (proxyRes.headers["set-cookie"]) {
@@ -489,7 +489,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
+      return grunt.task.run([
+        'build', 
+        'configureProxies', 
+        'connect:dist:keepalive'
+      ]);
     }
 
     grunt.task.run([
@@ -539,4 +543,19 @@ module.exports = function (grunt) {
     'test',
     'build'
   ]);
+
+  grunt.registerTask('config', function(env) {
+    var environment = env || "dev";
+    grunt.log.writeln(`Application environment is set to '${environment}'.`);
+    var path = require('path');
+    var source = path.join('env', environment, 'config.js');
+    var dest = path.join(grunt.config('yeoman.app'), 'scripts/config.js');
+    if (!grunt.file.exists(source))
+      grunt.warn(`Environment '${environment}' does not exist or does not contain config.js.`)
+    var files = {};
+    files[dest] = [source];
+    grunt.config.set('concat.config.options.banner', `// WARNING: DO NOT EDIT, AUTO-GENERATED CODE!\n// Generated using: grunt config:${environment}\n\n`);
+    grunt.config.set('concat.config.files', files);
+    grunt.task.run('concat:config');
+  })
 };

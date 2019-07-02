@@ -41,42 +41,17 @@
 
 angular.module('hopsWorksApp')
   .factory('ExtendedMetadataService', ['$http', function($http) {
-    var service = {
-      /**
-       * Generates RDF compliant representation in json-ld format
-       * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
-       */
-      saveExtendedMetadata  (data, doc, context) {
-        var modifiedKey = 'http://purl.org/dc/terms/modified';
-
-        // Map model of each field to RDF doc structure
-        for (var key in data.fields) {
-          var field = data.fields[key];
-          if (field.hasOwnProperty('mapping')) {
-            var mapping = field.mapping;
-            if (field.hasOwnProperty('model') && doc.hasOwnProperty(mapping)) doc[mapping]['@id'] = field.model;
+    var service = {     
+      setProperty (obj, path, value) {
+          var schema = obj;  // a moving reference to internal objects within obj
+          var pList = path.split('.');
+          var len = pList.length;
+          for(var i = 0; i < len-1; i++) {
+              var elem = pList[i];
+              if( !schema[elem] ) schema[elem] = {}
+              schema = schema[elem];
           }
-        }
-
-        // Set modified, spatial properties
-        if (data.areaSelect) {
-          doc[data.fields.spatial.mapping]['@id'] = data.areaSelect._width + ', ' + data.areaSelect._height + ', ' + data.areaSelect.center.lat + ', ' + data.areaSelect.center.lng + ', ' +data.areaSelect.zoom;
-        }
-
-        doc[modifiedKey] = (new Date()).toISOString();
-        return this.generateRDFString(doc, context);
-      },
-      generateRDFString (doc, context) {
-        return new Promise(function (resolve, reject) {
-          jsonld.flatten(doc, context, function(err, result) {
-            if (err) {
-              return reject(err);
-            }
-
-            const jsonldData = JSON.stringify(result);
-            resolve(jsonldData);
-          });
-        });
+          schema[pList[len-1]] = value;
       },
 
       FILE_FORMATS: [

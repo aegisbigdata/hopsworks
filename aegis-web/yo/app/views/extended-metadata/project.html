@@ -38,15 +38,13 @@
   -->
 
 <div ng-controller="MainCtrl as mainCtrl">
+    <div ng-include="'nav.html'" class="project-navbar"></div>
     <div id="wrapper" class="toggled" data-spy="scroll" data-target="#toc">
         <div ng-controller="ExtendedMetadataCtrl as extendedMetadataCtrl">
             <div class="overlay"></div>
             <div ng-include="'navProject.html'"></div>
             <section>
                 <div>
-                    <!-- Search bar -->
-                    <div ng-include="'views/searchBar.html'"></div>
-
                     <div class="container-fluid content-wrapper">
                         <div growl reference="3" class="pull-right"></div>
                         <extmd-header type="this Project"></extmd-header>
@@ -101,7 +99,7 @@
 
                                         <div style="margin-bottom: 10px;">
                                           <label for="publisher-web" id="input-homepage" style="font-size: 14px">Publisher Homepage</label>
-                                          <input type="text" ng-model="data.fields.homepage.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" ng-required="true" placeholder="Publisher Homepage">
+                                          <input type="url" ng-model="data.fields.homepage.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" ng-required="true" placeholder="Publisher Homepage">
                                         </div>
                                       </div>
                                     </div>
@@ -147,12 +145,12 @@
 
                                 <div class="row">
                                   <div class="col-md-12">
-                                    <div class="form-group" style="margin-bottom: 350px;position: relative;">
+                                    <div class="form-group">
 
                                       <label for="inputMap1" id="input-spatial">Spatial</label>
 
                                       <div style="portion:relative;height: 310px;">
-                                        <leaflet id="inputMap1" style="width: 500px; height: 300px; position: absolute;"></leaflet>
+                                        <leaflet id="inputMap1" geoJSON="{{geoJSON}}" style="width: 500px; height: 300px; position: absolute;"></leaflet>
                                       </div>
 
                                       <div class="form-group" style="display: none;">
@@ -166,12 +164,21 @@
                                 </div>
 
                               </form>
+
+                              <hr>
+
+                              <div style="margin-top: 40px;margin-bottom: 150px;position: relative;">
+                                <button class="btn btn-warning" ng-class="deleteButtonIsDisabled ? 'disabled' : ''" ng-click="extendedMetadataCtrl.deleteExtendedMetadata()">Delete Metadata for Project</button>
+                                
+                              </div>
+
                             </div>
+
                             <!-- END Rightside tables -->
                             <div class="col-md-2">
 
                                 <div id="sidebar-button-container" class="fixed" style="top: 185px;">
-                                    <button type="submit" form="extendedMetadata" class="btn btn-default" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
+                                    <button type="submit" form="extendedMetadata" class="btn btn-primary" ng-click="extendedMetadataCtrl.saveExtendedMetadata()">Save Metadata</button>
                                 </div>
 
                                 <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
