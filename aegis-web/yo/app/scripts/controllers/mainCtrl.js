@@ -61,6 +61,8 @@ angular.module('hopsWorksApp')
             self.email = $cookies.get('email');
             self.emailHash = md5.createHash(self.email || '');
             var elasticService = ElasticService();
+            self.searchResult = [];
+
 
             if (!angular.isUndefined($routeParams.datasetName)) {
               self.searchType = "datasetCentric";
@@ -68,6 +70,11 @@ angular.module('hopsWorksApp')
               self.searchType = "projectCentric";
             } else {
               self.searchType = "global";
+            }
+            if($location.search().type !== '' && typeof $location.search().type !== 'undefined') {
+              self.filterType = $location.search().type;
+            } else {
+              self.filterType = '';
             }
 
             var checkeIsAdmin = function () {
@@ -283,6 +290,34 @@ angular.module('hopsWorksApp')
               $scope.activeService = serviceName;
               $location.path('/' + serviceName).search(parameters).hash('');
             };
+            self.goToSearchProject = function (serviceName, parameters) {
+              parameters = parameters || {};
+              $scope.activeService = serviceName;
+              $location.path('project/' + $routeParams.projectID + '/' + serviceName).search(parameters).hash('');
+            }
+
+            self.activeFilter = function(filter, query) {
+              let params = $location.search();
+              switch(filter){
+                  case 'type':
+                    params.type = query;
+                    self.filterType = filter;
+                    if(self.searchType === "global") {
+                      self.goToSearchHome('search', params);
+                    } else {
+                      self.goToSearchProject('search', params);
+                    }
+                  break;
+              }
+            };
+            self.resetAllFilters = function () {
+              let params = {q:$location.search().q}
+              if(self.searchType === "global") { 
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
 
 
 

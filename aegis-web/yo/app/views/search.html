@@ -46,29 +46,32 @@
             </div>  
             <div class="pull-right col-md-4">
               <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block btn-bold"
-                    ng-click="searchTypePub=undefined; 
-                              searchType=undefined; 
-                              sortKey=undefined;
-                              searchName=undefined; 
-                              searchOwner=undefined;">RESET ALL</button>
+                    ng-click="mainCtrl.resetAllFilters()">RESET ALL</button>
             </div>
         </div>
         <div class="navbar-container col-md-11">
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Type</div>
                 <div class="navbar-search-radio">
-                    <div><input type="radio" id="Project" name="type" value="Project"
-                       class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='proj';"><label for="Project">Project</label></div>
-                    <div><input type="radio" id="Dataset" name="type" value="Dataset"
-                       class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='ds';"><label for="Dataset">Dataset</label></div>
-                    <div><input type="radio" id="Files" name="type" value="Files"
-                       class="filter-menu"
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click=""><label for="Files">Files</label></div>
+                    <div>
+                        <!-- ng-click="searchTypePub=undefined; searchType='proj';" -->
+                        <input type="radio" id="Project" name="type" value="proj" class="filter-menu" data-toggle="collapse" data-target="#filterdropdown"
+                            ng-click="mainCtrl.activeFilter('type','proj')" ng-model="mainCtrl.filterType"
+                        >
+                        <label for="Project">Project</label>
+                    </div>
+                    <div>
+                       <!-- ng-click="searchTypePub=undefined; searchType='ds';"> -->
+                        <input type="radio" id="Dataset" name="type" value="ds" class="filter-menu" data-toggle="collapse" data-target="#filterdropdown"
+                            ng-click="mainCtrl.activeFilter('type','ds');" ng-model="mainCtrl.filterType"
+                        >
+                       <label for="Dataset">Dataset</label></div>
+                    <div>
+                        <input type="radio" id="Files" name="type" value="inode" class="filter-menu" data-toggle="collapse" data-target="#filterdropdown"
+                            ng-click="mainCtrl.activeFilter('type','inode');" ng-model="mainCtrl.filterType"
+                        >
+                       <label for="Files">Files</label>
+                    </div>
                 </div>
             </form>
             <form action="" class="navbar-form-search">
@@ -273,7 +276,7 @@
     <div class="search-result-body row thin-scrollbar" ng-controller="SearchResultCtrl as searchResultCtrl">
       <div class="loader loader-md" ng-show="mainCtrl.searching"></div>
       <div ng-if="!mainCtrl.searching" ng-init="searchResultCtrl.init(mainCtrl.searchResult)"></div>
-      <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: searchType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize">
+      <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: filterType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize">
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
                    details-fn="mainCtrl.viewDetail(result)" 

@@ -19,7 +19,6 @@ angular.module('hopsWorksApp')
       self.resultPages = 0;
       self.resultItems = 0;
       // self.searchDisabled =  true;
-      
       if($location.search().q !== '' && typeof $location.search().q !== 'undefined') {
         self.searchTerm = $location.search().q;
         mainParent.itemSearched = self.searchTerm;
@@ -84,7 +83,7 @@ angular.module('hopsWorksApp')
           var searchHits;
           //triggering a global search
           mainParent.searchResult = [];
-          elasticService.globalSearch(self.searchTerm)
+          elasticService.globalSearch($location.search())
             .then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
@@ -116,7 +115,7 @@ angular.module('hopsWorksApp')
           var searchHits;
           //triggering a global search
           mainParent.searchResult = [];
-          elasticService.globalSearch(self.searchTerm)
+          elasticService.globalSearch($location.search())
             .then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
@@ -139,7 +138,6 @@ angular.module('hopsWorksApp')
             .then(function (response) {
               mainParent.searching = false;
               var searchHits = response.data;
-              console.log('Response earch ', searchHits);
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
               } else {
