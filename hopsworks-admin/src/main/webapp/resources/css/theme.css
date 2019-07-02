@@ -914,3 +914,46 @@
 .ui-menu.ui-menubar .ui-menu-parent .ui-menu-child {
       padding: 5px 0;
 }
+
+
+table {
+    width: 100%;
+}
+table td:first-child .ui-state-default .ui-button-text {
+    background-color: #ffffff;
+    color: #000000;
+}
+table td:last-child .ui-state-default .ui-button-text {
+    background-color: #5d9cec;
+    color: #fff;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    width: 100%;
+}
+.ui-button-text.ui-c {
+    border-color: transparent;
+    font-weight: normal;
+}
+.ui-widget-header {
+    background: #ffffff;
+    border-width: 0px;
+}
+.ui-panel .ui-panel-titlebar {
+    padding: .5em 1.5em .3em;
+} 
+.ui-button-text-only .ui-button-text {
+    padding: 6px 12px;
+}
+
+.ui-panel-content.ui-widget-content > table tr {
+    display: flex;
+    flex-flow: row wrap;
+}
+.ui-panel-content.ui-widget-content > table tr td {
+    width: 100%;
+}
+.ui-panel-content.ui-widget-content > table tr td .ui-inputfield, .ui-widget-content .ui-inputfield {
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid #cccccc;
+} 
