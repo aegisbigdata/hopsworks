@@ -51,8 +51,10 @@ angular.module('hopsWorksApp')
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
             const DATASET_ID = $routeParams.dataSetID;
+            const parameters = $location.search();
             var self = this;
 
+            self.datasetName = decodeURI(parameters.datasetName);
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
@@ -546,10 +548,10 @@ angular.module('hopsWorksApp')
               // Send to API
               ExtendedMetadataAPIService.createOrUpdateDatasetMetadata(DATASET_ID, PROJECT_ID, metadataObject)
                 .then(function(success) {
-                  growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 5000});
+                  growl.success('Dataset metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
                 .catch(function(error) {
-                  growl.error('Server error: ' + error.status, {title: 'Error while saving project metadata', ttl: 5000, referenceId: 0});
+                  growl.error('Server error: ' + error.status, {title: 'Error while saving dataset metadata', ttl: 5000, referenceId: 0});
                 })
                 .finally(function() {
                   $scope.saveButtonIsDisabled = false;
