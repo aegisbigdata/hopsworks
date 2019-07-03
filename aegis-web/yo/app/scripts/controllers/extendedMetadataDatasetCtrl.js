@@ -450,7 +450,7 @@ angular.module('hopsWorksApp')
               graph[0]['title'] = $scope.data.fields.title.model;
               graph[0]['description'] = $scope.data.fields.description.model;
 
-              if (fields.language.model) graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
+              if (fields.language.model != '') graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
               if (fields.keywords.tags.length) graph[0]['http://www.w3.org/ns/dcat#keyword'] = fields.keywords.model.split(',');
               if (fields.price.model) graph[0]['http://www.aegis-bigdata.eu/md/voc/core/price'] = fields.price.model;
               if (fields.sellable.model) graph[0]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] = fields.sellable.model;
