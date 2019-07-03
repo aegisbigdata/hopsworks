@@ -51,8 +51,10 @@ angular.module('hopsWorksApp')
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
             const DISTRIBUTION_ID = $routeParams.distributionID;
+            const parameters = $location.search();
             const self = this;
 
+            self.fileName = decodeURI(parameters.file);
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
             self.template = {
