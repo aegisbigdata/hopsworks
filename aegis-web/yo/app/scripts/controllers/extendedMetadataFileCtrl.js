@@ -239,6 +239,7 @@ angular.module('hopsWorksApp')
             self.loadExtendedDistroMetadata = function () {
               var parameters = $location.search();
               var path = 'hdfs://' + decodeURI(parameters.path);
+              $scope.data.fields.accessUrl.model = path;
 
               ExtendedMetadataAPIService.getDistributionMetadata(path)
                 .then(function(data) {
