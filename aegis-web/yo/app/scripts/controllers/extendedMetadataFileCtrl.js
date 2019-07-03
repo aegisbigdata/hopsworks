@@ -346,11 +346,18 @@ angular.module('hopsWorksApp')
                 
                   dataSetService.filePreview(path, "head").then(
                     function (success) {
+                      var truncation_length = 750;
                       var fileDetails = JSON.parse(success.data.data);
                       var content = fileDetails.filePreviewDTO[0].content;
                       var conv = new showdown.Converter({parseImgDimensions: true});
                       self.filePreviewLoaded = true;
                       $scope.filePreviewContents = conv.makeHtml(content);
+
+                      if ($scope.filePreviewContents.length > truncation_length) {
+                        $scope.filePreviewContents = $scope.filePreviewContents.substring(0, truncation_length) + '\n\n[...]';
+                      }
+
+                      console.log($scope.filePreviewContents.length);
 
                     }, function (error) {
                       //To hide README from UI
