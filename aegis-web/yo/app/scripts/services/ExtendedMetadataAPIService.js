@@ -40,12 +40,7 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-  .factory('ExtendedMetadataAPIService', ['$http', function ($http) {
-    const EXTENDED_METADATA_PROJECT_ENDPOINT = 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/catalogues/';
-    const EXTENDED_METADATA_DATASET_ENDPOINT = 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/datasets/';
-    const EXTENDED_METADATA_DISTRIBUTION_ENDPOINT = 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/distributions';
-    const API_KEY = '';
-
+  .factory('ExtendedMetadataAPIService', ['AEGIS_CONFIG', '$http', function (AEGIS_CONFIG, $http) {
     var service = {
 
       /**
@@ -55,10 +50,10 @@ angular.module('hopsWorksApp')
       getProjectMetadata: function (projectID) {
         var req = {
           method: 'GET',
-          url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+          url: AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + projectID,
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           }
         };
         return $http(req);
@@ -73,10 +68,10 @@ angular.module('hopsWorksApp')
       createOrUpdateProjectMetadata: function (projectID, metadata) {
         var req = {
           method: 'PUT',
-          url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+          url: AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + projectID,
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           },
           data: metadata
         };
@@ -86,10 +81,10 @@ angular.module('hopsWorksApp')
       deleteProjectMetadata: function (projectID) {
         var req = {
           method: 'DELETE',
-          url: EXTENDED_METADATA_PROJECT_ENDPOINT + projectID,
+          url: AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + projectID,
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           }
         };
         return $http(req);
@@ -101,13 +96,13 @@ angular.module('hopsWorksApp')
       createOrUpdateDatasetMetadata: function(datasetID, projectID, metadata) {
         var req = {
           method: 'PUT',
-          url: EXTENDED_METADATA_DATASET_ENDPOINT + datasetID,
+          url: AEGIS_CONFIG.metadata.DATASET_ENDPOINT + datasetID,
           params: {
             catalogue: projectID
           },
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           },
           data: metadata
         };
@@ -117,7 +112,7 @@ angular.module('hopsWorksApp')
       getDatasetMetadata: function (datasetID, projectID) {
         var req = {
           method: 'GET',
-          url: EXTENDED_METADATA_DATASET_ENDPOINT + datasetID,
+          url: AEGIS_CONFIG.metadata.DATASET_ENDPOINT + datasetID,
           params: {
             catalogue: projectID
           },
@@ -131,13 +126,13 @@ angular.module('hopsWorksApp')
       deleteDatasetMetadata: function (datasetID, projectID) {
         var req = {
           method: 'DELETE',
-          url: EXTENDED_METADATA_DATASET_ENDPOINT + datasetID,
+          url: AEGIS_CONFIG.metadata.DATASET_ENDPOINT + datasetID,
           params: {
             catalogue: projectID
           },
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           }
         };
         return $http(req);
@@ -149,24 +144,26 @@ angular.module('hopsWorksApp')
       createOrUpdateDistributionMetadata: function(datasetID, projectID, metadata) {
         var req = {
           method: 'POST',
-          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT,
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT,
           params: {
             catalogue: projectID,
             dataset: datasetID
           },
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           },
           data: metadata
         };
         return $http(req);
       },
 
-      getDistributionMetadata: function (distributionID) {
+      getDistributionMetadata: function (path) {
+        path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
         var req = {
           method: 'GET',
-          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT + '/' + distributionID,
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + path,
+
           headers: {
             'Content-Type': 'application/ld+json'
           }
@@ -177,10 +174,10 @@ angular.module('hopsWorksApp')
       deleteDistributionMetadata: function (distributionID) {
         var req = {
           method: 'DELETE',
-          url: EXTENDED_METADATA_DISTRIBUTION_ENDPOINT + '/' + distributionID,
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + distributionID,
           headers: {
             'Content-Type': 'application/ld+json',
-            'Authorization': API_KEY
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
           }
         };
         return $http(req);

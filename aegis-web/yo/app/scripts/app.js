@@ -634,4 +634,5 @@ angular.module('hopsWorksApp', [
                     });
 
 
-          }]);
+          }])
+        .constant('AEGIS_CONFIG', AEGIS_CONFIG);

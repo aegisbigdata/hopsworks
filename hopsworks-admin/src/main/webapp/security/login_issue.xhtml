@@ -55,7 +55,7 @@
 
   <h:body >
     <h:form>
-      <p:panel id="loginPnl" header="Security Question" style="width: 400px; margin: 150px auto;">
+      <p:panel id="loginPnl" header="Select your problem" style="width: 400px; margin: 150px auto;">
         <h:panelGrid id="loginPanel" columns="2" cellpadding="5">
           <p:selectOneRadio id="loginIssueRadio"  
                             value="#{recoverySelector.console}" 
@@ -66,11 +66,10 @@
           </p:selectOneRadio>
           <p:spacer height="10"></p:spacer>
         </h:panelGrid>
-        <div style="margin-left: 215px;">
+        <div style="display:flex; justify-content:space-around;margin:30px 0px 20px 0px;">
           <h:panelGrid columns="2">
-            <p:commandButton id="submitButton" value="Continue" action="#{recoverySelector.redirect()}" update="@form">
-            </p:commandButton>
-            <p:commandButton type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/hopsworks')}" process="@this" />
+            <p:commandButton type="submit" value="Cancel" action="#{facesContext.externalContext.redirect('/aegis')}" process="@this" />
+            <p:commandButton id="submitButton" value="Continue" action="#{recoverySelector.redirect()}" update="@form" />
           </h:panelGrid>
         </div>
       </p:panel>

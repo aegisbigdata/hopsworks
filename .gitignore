@@ -129,3 +129,5 @@ src/main/setup/glassfish-resources.xml
 /aegis-web/yo/nbproject/
 /hopsworks-cluster/src/main/webapp/node_modules/
 /hopsworks-cluster/src/main/webapp/vendor/
+
+.directory
