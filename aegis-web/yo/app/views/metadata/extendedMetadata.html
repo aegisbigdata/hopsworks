@@ -49,10 +49,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="entry in datasetsCtrl.extendedMetadata" style="border-bottom: 1px solid #ddd">
-          <td style="text-align: left;">{{ entry.label }}</td>
-          <td ng-show="!entry.model.hasOwnProperty('fields')" style="text-align: left;">{{ entry.model }}</td>
-          <td ng-show="entry.model.hasOwnProperty('fields')" style="text-align: left;">{{ entry.model.typeOfData }}, has {{ entry.model.fields.length + ' field' }}{{ entry.model.fields.length != 1 ? 's' : '' }}</td>
+        <tr ng-repeat="entry in datasetsCtrl.extendedMetadata" style="border-bottom: 1px solid #ddd;">
+          <td style="text-align: left;background-color: transparent;">{{ entry.label }}</td>
+          <td ng-show="!entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">{{ entry.model }}</td>
+          <td ng-show="entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">{{ entry.model.typeOfData }}, has {{ entry.model.fields.length + ' field' }}{{ entry.model.fields.length != 1 ? 's' : '' }}</td>
         </tr>
       </tbody>
     </table>
