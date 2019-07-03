@@ -390,8 +390,8 @@ angular.module('hopsWorksApp')
               // Set temporal data fields
               if (index_temporal) {
                 let temporalData = graph[index_temporal];
-                if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']);
-                if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']);
+                if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']['@value']);
+                if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']['@value']);
               }
 
               if (index_contactpoint) {
