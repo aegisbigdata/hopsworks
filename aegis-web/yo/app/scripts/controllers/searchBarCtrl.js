@@ -73,9 +73,9 @@ angular.module('hopsWorksApp')
         self.pageSize = 9;
         mainParent.searchResult = [];
 
-        if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
-          return;
-        }
+        // if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+        //   return;
+        // }
         mainParent.searching = true;
 
         if (self.searchType === "global" && $rootScope.isDelaEnabled) {
@@ -83,7 +83,13 @@ angular.module('hopsWorksApp')
           var searchHits;
           //triggering a global search
           mainParent.searchResult = [];
-          elasticService.globalSearch($location.search())
+          let queryParams = ''
+          if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+            queryParams = {q:'*'};
+          } else {
+            queryParams = $location.search();
+          }
+          elasticService.globalSearch(queryParams)
             .then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
@@ -110,12 +116,18 @@ angular.module('hopsWorksApp')
                 title: 'Error',
                 ttl: 5000
               });
-            });
+          });
         } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {
           var searchHits;
           //triggering a global search
           mainParent.searchResult = [];
-          elasticService.globalSearch($location.search())
+          let queryParams = ''
+          if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+            queryParams = {q:'*'};
+          } else {
+            queryParams = $location.search();
+          }
+          elasticService.globalSearch(queryParams)
             .then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
@@ -134,6 +146,11 @@ angular.module('hopsWorksApp')
               });
             });
         } else if (self.searchType === "projectCentric") {
+          // TODO: manage with new API
+          if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+            mainParent.searching = false;
+            return;
+          }
           elasticService.projectSearch($routeParams.projectID, self.searchTerm)
             .then(function (response) {
               mainParent.searching = false;
@@ -153,6 +170,10 @@ angular.module('hopsWorksApp')
               });
             });
         } else if (self.searchType === "datasetCentric") {
+          if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+            mainParent.searching = false;
+            return;
+          }
           elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
             .then(function (response) {
               mainParent.searching = false;
