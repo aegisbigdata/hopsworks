@@ -270,8 +270,8 @@ angular.module('hopsWorksApp')
               graph[0].description = fields.description.model;
               graph[0].title = fields.title.model;
               graph[0]['hops:fileId'] = DISTRIBUTION_ID;
-              graph[0]['dct:identifier'] = path;
-              graph[0]['http://www.w3.org/ns/dcat#accessURL']['@id'] = path;
+              graph[0]['dct:identifier'] = 'hdfs://' + path;
+              graph[0]['http://www.w3.org/ns/dcat#accessURL']['@id'] = 'hdfs://' + path;
 
               if (fields.format.model != '') graph[0]['dct:format'] = fields.format.model;
               if (fields.language.model != '') graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
