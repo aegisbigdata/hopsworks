@@ -94,6 +94,7 @@ angular.module('hopsWorksApp')
                   temporalto: { label: 'To (date)', model: '' }
                 },
                 distribution: {
+                  accessUrl: { label: 'Access URL', model: '' },
                   title: { label: 'Title', model: '' },
                   description: { label: 'Description', model: '' },
                   format: { label: 'Format', model: '' },

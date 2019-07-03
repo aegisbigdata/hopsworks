@@ -167,7 +167,7 @@ angular.module('hopsWorksApp')
                   mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
-                contactpointtype: {
+                publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',

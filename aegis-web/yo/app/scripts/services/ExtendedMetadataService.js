@@ -50,6 +50,7 @@ angular.module('hopsWorksApp')
         // Determine indexes
         graph.forEach(function(entry, index) {
           if (!entry.hasOwnProperty('@type')) return;
+          if (typeof(entry['@type']) != 'string') return;
           let type = entry['@type'].split('/');
           type = type[type.length - 1].toUpperCase();
 
@@ -126,7 +127,8 @@ angular.module('hopsWorksApp')
           var geoJSON = graph[index_location]['http://www.w3.org/ns/locn#geometry'];
           try {
             geoJSON = JSON.parse(geoJSON);
-            $scope.geoJSON = geoJSON;
+            fields.spatial.model = geoJSON.coordinates;
+            //$scope.geoJSON = geoJSON;
           } catch(e) {
             console.log(e);
           }                

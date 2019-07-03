@@ -39,7 +39,7 @@
 
 <div ng-show="metadataCtrl.noTemplates" ng-show="!datasetsCtrl.selected">
 
-  <div ng-show="datasetsCtrl.extendedMetadata">
+  <div ng-show="datasetsCtrl.extendedMetadata" style="font-family: sans-serif;">
     <h5>Extended Metadata</h5>
     <table class="table table-striped ng-scope" style="margin-top: 16px; font-size: 12px;box-shadow: none;">
       <thead style="box-shadow: none;border-bottom: 1px solid #ddd;font-weight: bold;margin-bottom: 10px;">
@@ -51,7 +51,8 @@
       <tbody>
         <tr ng-repeat="entry in datasetsCtrl.extendedMetadata" style="border-bottom: 1px solid #ddd">
           <td style="text-align: left;">{{ entry.label }}</td>
-          <td style="text-align: left;">{{ entry.model }}</td>
+          <td ng-show="!entry.model.hasOwnProperty('fields')" style="text-align: left;">{{ entry.model }}</td>
+          <td ng-show="entry.model.hasOwnProperty('fields')" style="text-align: left;">{{ entry.model.typeOfData }}, has {{ entry.model.fields.length + ' field' }}{{ entry.model.fields.length != 1 ? 's' : '' }}</td>
         </tr>
       </tbody>
     </table>
