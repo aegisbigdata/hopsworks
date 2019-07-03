@@ -43,10 +43,10 @@ angular.module('hopsWorksApp')
         .controller('DatasetsCtrl', ['$scope', '$mdSidenav', '$mdUtil',
           'DataSetService', 'JupyterService', '$routeParams', 'ModalService', 'growl', '$location',
           'MetadataHelperService', '$rootScope', 'DelaProjectService', 'DelaClusterProjectService', 'UtilsService', 'UserService', '$mdToast',
-          'TourService',
+          'TourService', 'ExtendedMetadataAPIService', 'ExtendedMetadataService',
           function ($scope, $mdSidenav, $mdUtil, DataSetService, JupyterService, $routeParams,
                   ModalService, growl, $location, MetadataHelperService,
-                  $rootScope, DelaProjectService, DelaClusterProjectService, UtilsService, UserService, $mdToast, TourService) {
+                  $rootScope, DelaProjectService, DelaClusterProjectService, UtilsService, UserService, $mdToast, TourService, ExtendedMetadataAPIService, ExtendedMetadataService) {
 
             var self = this;
             self.itemsPerPage = 14;
@@ -71,6 +71,45 @@ angular.module('hopsWorksApp')
             var delaClusterService = DelaClusterProjectService(self.projectId);
             
             $scope.all_selected = false;
+            $scope.data = {
+              fields: {
+                dataset: {
+                  title: { label: 'Title', model: '' },
+                  description: { label: 'Description', model: '' },
+                  contactpointtype: { label: 'Contact Point Type', model: '' },
+                  contactpointname: { label: 'Contact Point Name', model: '' },
+                  contactpointmail: { label: 'Contact Point Mail', model: '' },
+                  keywords: { label: 'Keywords', model: '', tags: [] },
+                  publishertype: { label: 'Publisher Type', model: '' },
+                  publishername: { label: 'Publisher Name', model: '' },
+                  homepage: { label: 'Publisher Homepage', model: '' },
+                  theme: { label: 'Theme', model: '' },
+                  price: { label: 'Price', model: '' },
+                  sellable: { label: 'Sellable', model: '' },
+                  accessRights: { label: 'Access Rights', model: '' },
+                  documentation: { label: 'Documentation', model: '' },
+                  language: { label: 'Language', model: '' },
+                  spatial: { label: 'Coordinates', model: '' },
+                  temporalfrom: { label: 'From (date)', model: '' },
+                  temporalto: { label: 'To (date)', model: '' }
+                },
+                distribution: {
+                  accessUrl: { label: 'Access URL', model: '' },
+                  title: { label: 'Title', model: '' },
+                  description: { label: 'Description', model: '' },
+                  format: { label: 'Format', model: '' },
+                  license: { label: 'Licence', model: '' },
+                  language: { label: 'Language', model: '' },
+                  typeannotation: {
+                    label: 'Type of Data',
+                    model: {
+                      fields: [],
+                      typeOfData: 'tabular'
+                    }
+                  }
+                }
+              }
+            };
             self.selectedFiles = {}; //Selected files
 
 
@@ -1109,7 +1148,6 @@ angular.module('hopsWorksApp')
              * @returns {undefined}
              */
             self.select = function (selectedIndex, file, event) {
-
               // 1. Turn off the selected file at the top of the browser.
               // Add existing selected file (idempotent, if already added)
               // If file already selected, deselect it.
@@ -1123,10 +1161,39 @@ angular.module('hopsWorksApp')
               // }
               self.tgState = true;
               self.selected = file.name;
+              self.selectedDataset = file.parentId;
               self.selectedFiles[file.name] = file;
               self.selectedFiles[file.name].selectedIndex = selectedIndex;
               self.menustyle.opacity = 1.0;
+
+              self.getExtendedMetadata(file);
             };
+
+            self.getExtendedMetadata = function (file) {
+              let PROJECT_ID = $routeParams.projectID;
+              let DATASET_ID = null;
+              let DISTRIBUTION_PATH = self.getSelectedPath(self.selectedFiles[self.selected]);
+              self.extendedMetadata = null;
+
+              if (file.dir) {
+                // Is dataset
+                DATASET_ID = file.id;
+                ExtendedMetadataAPIService.getDatasetMetadata(DATASET_ID, PROJECT_ID).
+                  then(function (response) {
+                    self.extendedMetadata = ExtendedMetadataService.parseDatasetGraph(response.data, $scope.data.fields.dataset);
+                  }).catch(function (error) {
+                    console.log(error);
+                  });
+              } else {
+                // Is distribution
+                ExtendedMetadataAPIService.getDistributionMetadata(DISTRIBUTION_PATH).
+                  then(function (response) {
+                    self.extendedMetadata = ExtendedMetadataService.parseDistributionGraph(response.data, $scope.data.fields.distribution);
+                  }).catch(function (error) {
+                    console.log(error);
+                  });
+              }
+            }
 
             self.haveSelected = function (file) {
               if (file === undefined || file === null || file.name === undefined || file.name === null) {

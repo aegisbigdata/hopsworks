@@ -162,7 +162,7 @@ angular.module('hopsWorksApp')
         path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
         var req = {
           method: 'GET',
-          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + '/' + path,
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + path,
 
           headers: {
             'Content-Type': 'application/ld+json'

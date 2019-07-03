@@ -332,6 +332,75 @@
     <url-pattern>/virtuoso</url-pattern>
   </servlet-mapping>
 
+  <!-- Harvester UI proxy servlet -->
+  <servlet>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.HarvesterUIProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8108/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <url-pattern>/harvester/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <url-pattern>/harvester</url-pattern>
+  </servlet-mapping>
+
+
+  <!-- Harvester Service proxy servlet -->
+  <servlet>
+    <servlet-name>HarvesterServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.HarvesterServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8109/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HarvesterServiceProxyServlet</servlet-name>
+    <url-pattern>/harvester-service/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HarvesterServiceProxyServlet</servlet-name>
+    <url-pattern>/harvester-service</url-pattern>
+  </servlet-mapping>
+
+  <!-- Translation Service proxy servlet -->
+  <servlet>
+    <servlet-name>TranslationServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.TranslationServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8110/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TranslationServiceProxyServlet</servlet-name>
+    <url-pattern>/translation-service/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TranslationServiceProxyServlet</servlet-name>
+    <url-pattern>/translation-service</url-pattern>
+  </servlet-mapping>
+
+
+
 
   <!-- Other servlets -->
 

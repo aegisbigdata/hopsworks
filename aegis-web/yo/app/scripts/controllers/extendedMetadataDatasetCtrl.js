@@ -49,12 +49,13 @@ angular.module('hopsWorksApp')
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
-            const PROJECT_ID = $routeParams.projectID;
-            const DATASET_ID = $routeParams.dataSetID;
             const parameters = $location.search();
             var self = this;
 
             self.datasetName = decodeURI(parameters.datasetName);
+            self.PROJECT_ID = $routeParams.projectID;
+            self.DATASET_ID = $routeParams.dataSetID;
+
             self.selectedField = null;
             self.metaData = {};
             self.metaDataDetail = {};
@@ -170,7 +171,7 @@ angular.module('hopsWorksApp')
                   mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
-                contactpointtype: {
+                publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',
@@ -422,14 +423,14 @@ angular.module('hopsWorksApp')
              */
 
             self.loadDatasetMetadata = function () {
-              ExtendedMetadataAPIService.getDatasetMetadata(DATASET_ID, PROJECT_ID)
+              ExtendedMetadataAPIService.getDatasetMetadata(self.DATASET_ID, self.PROJECT_ID)
                 .then(function(data) {
                   console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
                   console.error(error);
-                  if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for dataset', DATASET_ID);
+                  if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for dataset', self.DATASET_ID);
                 });              
             };
 
@@ -445,7 +446,7 @@ angular.module('hopsWorksApp')
               var fields = $scope.data.fields;
               var i = 0;
 
-              graph[0]['@id'] = 'https://europeandataportal.eu/set/data/' + DATASET_ID;
+              graph[0]['@id'] = 'https://europeandataportal.eu/set/data/' + self.DATASET_ID;
               graph[0]['title'] = $scope.data.fields.title.model;
               graph[0]['description'] = $scope.data.fields.description.model;
 
@@ -546,7 +547,7 @@ angular.module('hopsWorksApp')
               $scope.saveButtonIsDisabled = true;
               
               // Send to API
-              ExtendedMetadataAPIService.createOrUpdateDatasetMetadata(DATASET_ID, PROJECT_ID, metadataObject)
+              ExtendedMetadataAPIService.createOrUpdateDatasetMetadata(self.DATASET_ID, self.PROJECT_ID, metadataObject)
                 .then(function(success) {
                   growl.success('Dataset metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
@@ -566,7 +567,7 @@ angular.module('hopsWorksApp')
             self.deleteExtendedMetadata = function () {
               $scope.deleteButtonIsDisabled = true;
 
-              ExtendedMetadataAPIService.deleteDatasetMetadata(DATASET_ID, PROJECT_ID)
+              ExtendedMetadataAPIService.deleteDatasetMetadata(self.DATASET_ID, self.PROJECT_ID)
                 .then(function(success) {
                   // Clear form fields if delete is successful
                   for (var key in $scope.data.fields) {
