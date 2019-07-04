@@ -41,13 +41,14 @@
 
 angular.module('hopsWorksApp')
     .controller('WalletTransactionsCtrl', ['$location', '$anchorScroll', '$scope', '$rootScope',
-        'md5', 'ModalService', 'HopssiteService', 'DelaService', 'ProjectService', 'growl',
+        'md5', 'ModalService', 'HopssiteService', 'DelaService', 'ProjectService', 'growl', '$http', 'UserService', 'WalletService',
         function ($location, $anchorScroll, $scope, $rootScope, md5, ModalService,
-                  HopssiteService, DelaService, ProjectService, growl) {
+                  HopssiteService, DelaService, ProjectService, growl, $http, UserService, WalletService) {
 
-            this.currentTabIndex = 0;
+            var self = this;
+            self.currentTabIndex = 0;
 
-            this.transactionCategories = [
+            self.transactionCategories = [
                 {
                     key: 'all',
                     name: 'All Transactions',
@@ -57,9 +58,58 @@ angular.module('hopsWorksApp')
                     name: 'Recent Transactions',
                 },
             ];
-            this.selectedTransaction = this.transactionCategories[0];
+            self.selectedTransaction = self.transactionCategories[0];
+            self.assetsSold = [];
+            self.assetsBought = [];
 
-            this.assetsSold = [
+            UserService.profile().then(
+              function (success) {
+                // Get bought contracts
+                WalletService.getBuyContracts(success.data.email).then(
+                  function (res) {
+                    res.data.forEach(function (contract) {
+                      getAssetName(contract, self.assetsBought);
+                    });
+                  },
+                  function (err) {
+                    // TODO: Handle error
+                  }
+                );
+                WalletService.getSoldContracts(success.data.email).then(
+                  function (res) {
+                    res.data.forEach(function (contract) {
+                      getAssetName(contract, self.assetsSold);
+                    });
+                  },
+                  function (err) {
+                    // TODO: Handle error
+                  },
+                )
+              },
+              function (error) {
+                // TODO: Handle error
+              }
+            );
+
+            function getAssetName(contract, assets) {
+              var asset_id = contract.relatedAsset.split("#")[1];
+              var res = asset_id.split("-");
+              var projectID = res[0];
+              var inodeID = res[1];
+
+              ProjectService.getInodeInfo({id: projectID, inodeId: inodeID}).$promise.then(
+                function (response) {
+                  assets.push({
+                    id: contract.tid,
+                    name: response.name,
+                    coins: contract.amountPaid,
+                    date: contract.text,
+                    buyer: contract.buyer.split('#')[1],
+                    seller: contract.seller.split('#')[1],
+                });
+              }
+
+/*            this.assetsSold = [
                 {
                     id: 0,
                     dataset: 'dataset 0',
@@ -102,21 +152,21 @@ angular.module('hopsWorksApp')
                     coins: '564',
                     date: '20/1/2019',
                 },
-            ];
+            ];  */
 
-            this.selectTransaction = function (transaction) {
+            self.selectTransaction = function (transaction) {
               console.log('selectDisplayTransaction', transaction);
 
-              this.selectedTransaction = transaction;
+              self.selectedTransaction = transaction;
             };
 
-            this.displayTransaction = function (asset) {
+            self.displayTransaction = function (asset) {
                 ModalService.transaction('md', asset);
             };
 
             var init = function () {
               $('.keep-open').on('shown.bs.dropdown', '.dropdown', function () {
-                $(this).attr('closable', false);
+                $(self).attr('closable', false);
               });
 
               $('.keep-open').on('click', '.dropdown', function () {
@@ -124,16 +174,16 @@ angular.module('hopsWorksApp')
               });
 
               $('.keep-open').on('hide.bs.dropdown', '.dropdown', function () {
-                return $(this).attr('closable') === 'true';
+                return $(self).attr('closable') === 'true';
               });
 
               $('.keep-open').on('click', '#dLabel', function() {
-                $(this).parent().attr('closable', true );
+                $(self).parent().attr('closable', true );
               });
 
               $(window).scroll(function () {
-                if ($(this).scrollLeft() > 0) {
-                  $('#publicdataset').css({'left': 45 - $(this).scrollLeft()});
+                if ($(self).scrollLeft() > 0) {
+                  $('#publicdataset').css({'left': 45 - $(self).scrollLeft()});
                 }
               });
               $(window).resize(function () {
@@ -148,13 +198,13 @@ angular.module('hopsWorksApp')
               $('#hwWrapper').css({'overflow-y': val});
             };
 
-            this.setupStyle = function () {
+            self.setupStyle = function () {
               init();
               overflowY('hidden');
               $('#publicdatasetWrapper').css({'width': '1200px'});
             };
 
-            this.overflowYAuto = function () {
+            self.overflowYAuto = function () {
               overflowY('auto');
               $('#publicdatasetWrapper').css({'width': '1500px'});
             };
