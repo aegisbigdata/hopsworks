@@ -71,11 +71,6 @@ angular.module('hopsWorksApp')
             } else {
               self.searchType = "global";
             }
-            if($location.search().type !== '' && typeof $location.search().type !== 'undefined') {
-              self.filterType = $location.search().type;
-            } else {
-              self.filterType = '';
-            }
 
             var checkeIsAdmin = function () {
               var isAdmin = sessionStorage.getItem("isAdmin");
@@ -296,20 +291,67 @@ angular.module('hopsWorksApp')
               $location.path('project/' + $routeParams.projectID + '/' + serviceName).search(parameters).hash('');
             }
 
-            self.activeFilter = function(filter, query) {
-              let params = $location.search();
-              switch(filter){
-                  case 'type':
-                    params.type = query;
-                    self.filterType = filter;
-                    if(self.searchType === "global") {
-                      self.goToSearchHome('search', params);
-                    } else {
-                      self.goToSearchProject('search', params);
-                    }
-                  break;
+            /*
+            * ***************** 
+            * MANAGE FILTERS
+            * *****************
+            */
+
+            self.types = [
+              {name: 'Project', value: 'proj', selected: false},
+              {name: 'Dataset', value: 'ds', selected: false},
+              {name: 'Files', value: 'inode', selected: false},
+            ];
+            
+            self.initFilterType = function () {
+              var paramsType = $location.search().type;
+              if(paramsType !== '' && typeof paramsType !== 'undefined') {
+                if(angular.isArray(paramsType)){
+                  angular.forEach(self.types, function(type,key){
+                    var _type = type;
+                    angular.forEach(paramsType, function(pType,key){
+                      if(_type.value == pType) _type.selected = true;
+                    })
+                  })
+                } else {
+                  angular.forEach(self.types, function(type,key){
+                    if(type.value == paramsType) type.selected = true;
+                  })
+                }
               }
-            };
+            }
+            self.initFilterPage = function () {
+              var paramsPage = $location.search().page;
+              if(paramsPage !== '' && typeof paramsPage !== 'undefined') {
+                self.filterPage = paramsPage;
+              } else {
+                self.filterPage = '1';
+              }
+            }
+            self.updateFilterType = function () {
+              var typeSelected = [];
+              let params = $location.search();
+              angular.forEach(self.types, function(type,key){
+                if(type.selected) typeSelected.push(type.value);
+              })
+              params.type = typeSelected;
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
+            self.updateFilterPage = function(newPageNumber){
+              let params = $location.search();
+              params.page = newPageNumber;
+              params.limit = '10';
+              self.filterPage = newPageNumber;
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
             self.resetAllFilters = function () {
               let params = {q:$location.search().q}
               if(self.searchType === "global") { 
@@ -318,6 +360,17 @@ angular.module('hopsWorksApp')
                 self.goToSearchProject('search', params);
               }
             }
+            
+            self.initFilterType();
+            self.initFilterPage();
+
+            self.activeFilter = function(filter) {
+              switch(filter){
+                  case 'type':
+                  self.updateFilterType()
+                  break;
+              }
+            };
 
 
 

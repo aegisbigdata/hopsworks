@@ -55,7 +55,16 @@ angular.module('hopsWorksApp')
                 globalSearch: function (searchTerm) {
                   // return $http.get('/api/elastic/globalsearch/' + searchTerm);
                   var baseUrl = '/api/elastic/search?q=' + searchTerm.q;
-                  if(searchTerm.type) baseUrl +=  '&type='+ searchTerm.type
+                  if(Array.isArray(searchTerm.type)) {
+                    var types = searchTerm.type;
+                    angular.forEach(types, function(type,key){
+                      baseUrl +=  '&type='+ type;
+                    })
+                  }
+                  if(searchTerm.limit) {
+                    baseUrl +=  '&limit='+ searchTerm.limit;
+                  }
+                  
                   return $http.get(baseUrl);
                 },
                 /**
