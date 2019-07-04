@@ -39,6 +39,11 @@
 package io.hops.hopsworks.common.wallet;
 
 import io.hops.hopsworks.common.dao.dataset.Dataset;
+import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
+import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
+import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
+import io.hops.hopsworks.common.dao.project.Project;
+import io.hops.hopsworks.common.dao.project.ProjectFacade;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.util.ClientWrapper;
@@ -59,8 +64,21 @@ public class WalletController {
   
   @EJB
   private DatasetController datasetCtrl;
+  @EJB
+  private ProjectFacade projectFacade;
+  @EJB
+  private DatasetFacade datasetFacade;
+  @EJB
+  private InodeFacade inodeFacade;
   
-  public void shareDataset(Dataset dataset, Users requestingUser) {
+  public void shareDataset(DatasetJSON datasetJSON, Users requester) {
+    Inode datasetInode = inodeFacade.findById(datasetJSON.getDatasetInodeId());
+    Project project = projectFacade.findByName(datasetJSON.projectName);
+    Dataset dataset = datasetFacade.findByProjectAndInode(project, datasetInode);
+    shareDataset(dataset, requester);
+  }
+  
+  public void shareDataset(Dataset dataset, Users requester) {
     //TODO - Users provide for email, name, username - any details needed
     //question is which user will you use? the requester or the owner
     Users ownerUser = datasetCtrl.getOwner(dataset);
@@ -201,5 +219,26 @@ public class WalletController {
   
   public static class ValidationJSON {
     public String contract;
+  }
+  
+  public static class DatasetJSON{
+    String projectName;
+    long datasetInodeId;
+
+    public String getProjectName() {
+      return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+      this.projectName = projectName;
+    }
+
+    public long getDatasetInodeId() {
+      return datasetInodeId;
+    }
+
+    public void setDatasetInodeId(long datasetInodeId) {
+      this.datasetInodeId = datasetInodeId;
+    }
   }
 }

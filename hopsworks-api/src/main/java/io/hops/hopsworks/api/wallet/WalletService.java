@@ -19,34 +19,27 @@ package io.hops.hopsworks.api.wallet;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.Audience;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import io.hops.hopsworks.api.jwt.JWTHelper;
 import io.hops.hopsworks.api.util.RESTApiJsonResponse;
-import io.hops.hopsworks.common.dao.dataset.Dataset;
-import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
-import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
-import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
-import io.hops.hopsworks.common.dao.project.Project;
-import io.hops.hopsworks.common.dao.project.ProjectFacade;
-import io.hops.hopsworks.common.dataset.DatasetController;
-import io.hops.hopsworks.common.exception.RESTCodes;
+import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.WalletException;
-import io.hops.hopsworks.common.util.ClientWrapper;
 import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
-import java.util.logging.Level;
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.RequestScoped;
-import java.net.URLEncoder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
@@ -59,38 +52,21 @@ public class WalletService {
   private NoCacheResponse noCacheResponse;
   @EJB
   private WalletController walletController;
+  @EJB
+  private JWTHelper jWTHelper;
 
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response share(DatasetJSON datasetJSON) throws WalletException {
-    walletController.shareDataset();
+  public Response share(WalletController.DatasetJSON datasetJSON, @Context SecurityContext sc) 
+    throws WalletException {
+    Users user = jWTHelper.getUserPrincipal(sc);
+    walletController.shareDataset(datasetJSON, user);
 
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("Dataset shared on wallet");
     return successResponse(json);
-  }
-
-  public static class DatasetJSON{
-    String projectName;
-    long datasetInodeId;
-
-    public String getProjectName() {
-      return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-      this.projectName = projectName;
-    }
-
-    public long getDatasetInodeId() {
-      return datasetInodeId;
-    }
-
-    public void setDatasetInodeId(long datasetInodeId) {
-      this.datasetInodeId = datasetInodeId;
-    }
   }
 
   private Response successResponse(Object content) {
