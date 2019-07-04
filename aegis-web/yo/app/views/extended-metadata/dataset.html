@@ -147,7 +147,8 @@
 
                                             <div class="form-group">
                                                 <label for="inputTheme3" id="input-theme">Theme/Category</label>
-                                                <select multiple id="inputTheme" class="form-control" size="13" ng-model="data.fields.theme.model">
+                                                <select id="inputTheme" class="form-control" ng-model="data.fields.theme.model">
+                                                    <option value="" selected>None</option>
                                                     <option value="AGRI">Agriculture, fisheries, forestry and food</option>
                                                     <option value="ECON">Economy and finance</option>
                                                     <option value="EDUC">Education, culture and sport</option>
