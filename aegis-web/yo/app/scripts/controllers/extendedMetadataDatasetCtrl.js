@@ -505,19 +505,22 @@ angular.module('hopsWorksApp')
               }
 
               // Add temporal object (from / to date)            
-              if (fields.temporalfrom.model || fields.temporalto.model) {
+              if (fields.temporalfrom.model) {
                 var temporalData = {
                   '@id': '_:b' + i,
                   '@type': 'dct:PeriodOfTime',
                   'schema:startDate': {
                     '@type': 'http://www.w3.org/2001/XMLSchema#dateTime',
-                    '@value': moment(fields.temporalfrom.model).format() || ''
-                  },
-                  'schema:endDate': {
-                    '@type': 'http://www.w3.org/2001/XMLSchema#dateTime',
-                    '@value': moment(fields.temporalto.model).format() || ''
+                    '@value': moment(fields.temporalfrom.model).format()
                   }
                 };
+
+                if (fields.temporalto.model) {
+                  temporalData['schema:endDate'] = {
+                    '@type': 'http://www.w3.org/2001/XMLSchema#dateTime',
+                    '@value': moment(fields.temporalto.model).format()
+                  }
+                }
 
                 graph[0]['dct:temporal'] = {'@id': '_:b' + i};
                 graph.push(temporalData);
