@@ -132,34 +132,29 @@ angular.module('hopsWorksApp')
                   label: 'Title',
                   description: 'Description for title field',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/title',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/description',
                   required: true
                 },
                 contactpointtype: {
                   label: 'Contact Point Type',
                   description: 'Description for Contact Point field',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointname: {
                   label: 'Contact Point Name',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointmail: {
                   label: 'Contact Point Mail',
                   description: 'Lorem ipsum dolor sit amet.',
-                  mapping: 'http://purl.org/dc/terms/email',
                   model: '',
                   recommended: true
                 },
@@ -168,21 +163,19 @@ angular.module('hopsWorksApp')
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   tags: [],
-                  mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
                 publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
+                  mapping: 'http://xmlns.com/foaf/0.1/name',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 homepage: {
@@ -196,20 +189,17 @@ angular.module('hopsWorksApp')
                   label: 'Theme',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/theme',
                   recommended: true
                 },
                 price: {
                   label: 'Price',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/currency',
                   recommended: true
                 },
                 sellable: {
                   label: 'Sellable',
                   description: 'Lorem ipsum dolor sit amet.',
-                  mapping: 'http://xmlns.com/foaf/0.1/sellable',
                   model: '',
                   recommended: true
                 },
@@ -229,7 +219,6 @@ angular.module('hopsWorksApp')
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/language',
                   optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
@@ -237,7 +226,6 @@ angular.module('hopsWorksApp')
                 spatial: {
                   label: 'Spatial',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/spatial',
                   optional: true
                 },
                 temporalfrom: {
@@ -329,25 +317,35 @@ angular.module('hopsWorksApp')
               if (!jsonld.hasOwnProperty('@graph')) return;
               var graph = jsonld['@graph'];
               var fields = $scope.data.fields;
-              var index_location, index_contactpoint, index_dataset, index_temporal;
+              var index_location, index_contactpoint, index_dataset, index_temporal, index_publisher;
 
               // Determine indexes
               graph.forEach(function(entry, index) {
-                if (!entry.hasOwnProperty('@type')) return;
-                let type = entry['@type'].split('/');
-                type = type[type.length - 1].toUpperCase();
+                if (!entry.hasOwnProperty('@type')) {
+                  if (entry.hasOwnProperty(fields.publishername.mapping)) index_publisher = index;
+                } else {
+                  let type = entry['@type'].split('/');
+                  type = type[type.length - 1].toUpperCase();
 
-                if (type == 'LOCATION') index_location = index;
-                if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
-                if (type == 'DCAT#DATASET') index_dataset = index;
-                if (type == 'PERIODOFTIME') index_temporal = index;
-              })
+                  if (type == 'LOCATION') index_location = index;
+                  if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
+                  if (type == 'DCAT#DATASET') index_dataset = index;
+                  if (type == 'PERIODOFTIME') index_temporal = index;
+                  if (type == 'ORGANIZATION' || type == 'INDIVIDUAL') index_publisher = index;
+                }
+              });
 
               // Set publisher Info
-              // var type_splitted = graph[index_organization]['@type'].split('/');
-              // fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
-              // fields.publishername.model = graph[index_organization].name;
-              // fields.homepage.model = graph[index_organization].homepage;
+              if (index_publisher) {
+                try {
+                  var type_splitted = graph[index_publisher]['@type'].split('/');
+                  fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
+                } catch (e) {}
+                fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
+                if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
+                  fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
+                }
+              }
 
               // Set Language field
               if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
@@ -543,6 +541,16 @@ angular.module('hopsWorksApp')
                 graph.push(contactPoint);
                 i++;
               }
+
+              if (fields.publishertype.model || fields.publishername.model || fields.homepage.model) {
+                let type = fields.publishertype.model != '' ? fields.publishertype.model : null;
+                graph[0].publisher = {
+                  "homepage": fields.homepage.model || '',
+                  "name": fields.publishername.model || ''
+                };
+                if (type) graph[0].publisher['@type'] = "http://xmlns.com/foaf/0.1/" + type;
+              }
+
 
               $scope.saveButtonIsDisabled = true;
               
