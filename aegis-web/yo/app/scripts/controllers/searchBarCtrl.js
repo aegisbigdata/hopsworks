@@ -121,9 +121,14 @@ angular.module('hopsWorksApp')
           var searchHits;
           //triggering a global search
           mainParent.searchResult = [];
-          let queryParams = ''
+          let queryParams = {};
           if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
-            queryParams = {q:'*'};
+            if(angular.equals($location.search(), {})) {
+              queryParams.q = '*';
+            } else {
+              queryParams.q = '*';
+              for(var k in $location.search()) queryParams[k]=$location.search()[k];
+            }
           } else {
             queryParams = $location.search();
           }

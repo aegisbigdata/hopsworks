@@ -52,25 +52,12 @@
         <div class="navbar-container col-md-11">
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Type</div>
-                <div class="navbar-search-radio">
-                    <div>
-                        <!-- ng-click="searchTypePub=undefined; searchType='proj';" -->
-                        <input type="radio" id="Project" name="type" value="proj" class="filter-menu" data-toggle="collapse" data-target="#filterdropdown"
-                            ng-click="mainCtrl.activeFilter('type','proj')" ng-model="mainCtrl.filterType"
+                <div class="navbar-search-check">
+                    <div ng-repeat="type in mainCtrl.types">
+                        <input type="checkbox" id="{{type.name}}" name="selectedType[]" value="{{type.value}}" class="filter-menu"
+                            ng-change="mainCtrl.activeFilter('type')" ng-model="type.selected"
                         >
-                        <label for="Project">Project</label>
-                    </div>
-                    <div>
-                       <!-- ng-click="searchTypePub=undefined; searchType='ds';"> -->
-                        <input type="radio" id="Dataset" name="type" value="ds" class="filter-menu" data-toggle="collapse" data-target="#filterdropdown"
-                            ng-click="mainCtrl.activeFilter('type','ds');" ng-model="mainCtrl.filterType"
-                        >
-                       <label for="Dataset">Dataset</label></div>
-                    <div>
-                        <input type="radio" id="Files" name="type" value="inode" class="filter-menu" data-toggle="collapse" data-target="#filterdropdown"
-                            ng-click="mainCtrl.activeFilter('type','inode');" ng-model="mainCtrl.filterType"
-                        >
-                       <label for="Files">Files</label>
+                        <label for="{{type.name}}">{{type.name}}</label>
                     </div>
                 </div>
             </form>
@@ -276,7 +263,9 @@
     <div class="search-result-body row thin-scrollbar" ng-controller="SearchResultCtrl as searchResultCtrl">
       <div class="loader loader-md" ng-show="mainCtrl.searching"></div>
       <div ng-if="!mainCtrl.searching" ng-init="searchResultCtrl.init(mainCtrl.searchResult)"></div>
-      <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: filterType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize">
+      <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: filterType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize" 
+      current-page="mainCtrl.filterPage"
+      >
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
                    details-fn="mainCtrl.viewDetail(result)" 
@@ -291,11 +280,14 @@
     <div class="row divider" style="margin-bottom: 0px;"></div>
     <div class="row" style="margin-top: -20px">
         <dir-pagination-controls ng-show="(mainCtrl.searchResult.length /mainCtrl.pageSize) > 1 "
-            max-size="15"
+            max-size="1000"
             direction-links="true"
             boundary-links="true"
+            on-page-change="mainCtrl.updateFilterPage(newPageNumber)"
             class="no-margin-pagination pull-right">
         </dir-pagination-controls>
+        <!-- <dir-pagination-controls template-url="/views/searchPagination.html"></dir-pagination-controls> -->
+        
     </div>
   </section>
 </div>

@@ -154,7 +154,8 @@ div.job-content--page {
   padding: 10px 15px;
 }
 
-.navbar-search-radio input[type="radio"]:checked + label{
+.navbar-search-radio input[type="radio"]:checked + label,
+.navbar-search-check input[type="checkbox"]:checked + label{
   background-color: rgb(4, 146, 179);
   display: block;
   color: #ffffff;
@@ -169,11 +170,13 @@ div.job-content--page {
   font-weight: bold;
 }
 
-.navbar-search-radio input[type="radio"]{
+.navbar-search-radio input[type="radio"],
+.navbar-search-check input[type="checkbox"]{
   display: none;
 }
 
-.navbar-search-radio label {
+.navbar-search-radio label,
+.navbar-search-check label {
   display: block;
   padding: 10px 20px;
   border-left: 1px solid lightgrey;
@@ -182,6 +185,8 @@ div.job-content--page {
   margin-bottom: 0px;
   color: rgb(4, 146, 179);
 }
+
+
 
 .navbar-search-slider {
   border-left: 1px solid lightgrey;
