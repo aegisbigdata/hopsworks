@@ -43,12 +43,12 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('MainCtrl', ['$interval', '$cookies', '$location', '$scope', '$rootScope',
+        .controller('MainCtrl', ['$interval', '$cookies', '$translate', '$location', '$scope', '$rootScope',
           '$http', 'AuthService', 'UtilsService', 'ElasticService', 'DelaProjectService',
           'DelaService', 'md5', 'ModalService', 'ProjectService', 'growl',
           'MessageService', '$routeParams', '$window', 'HopssiteService', 'BannerService',
           'AirflowService',
-          function ($interval, $cookies, $location, $scope, $rootScope, $http, AuthService, UtilsService,
+          function ($interval, $cookies, $translate, $location, $scope, $rootScope, $http, AuthService, UtilsService,
                   ElasticService, DelaProjectService, DelaService, md5, ModalService, 
                   ProjectService, growl,
                   MessageService, $routeParams, $window, HopssiteService, BannerService,
@@ -69,6 +69,10 @@ angular.module('hopsWorksApp')
             } else {
               self.searchType = "global";
             }
+
+            $scope.changeLanguage = function (langKey) {
+              $translate.use(langKey);
+            };
 
             var checkeIsAdmin = function () {
               var isAdmin = sessionStorage.getItem("isAdmin");
