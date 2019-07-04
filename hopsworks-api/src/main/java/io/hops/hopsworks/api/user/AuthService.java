@@ -53,6 +53,7 @@ import io.hops.hopsworks.common.dao.user.security.audit.UserAuditActions;
 import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.exception.ServiceException;
 import io.hops.hopsworks.common.exception.UserException;
+import io.hops.hopsworks.common.exception.WalletException;
 import io.hops.hopsworks.common.user.AuthController;
 import io.hops.hopsworks.common.user.UserStatusValidator;
 import io.hops.hopsworks.common.user.UsersController;
@@ -217,7 +218,7 @@ public class AuthService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public Response register(UserDTO newUser, @Context HttpServletRequest req) throws NoSuchAlgorithmException,
-      UserException {
+      UserException, WalletException {
     byte[] qrCode;
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     qrCode = userController.registerUser(newUser, req);
@@ -328,7 +329,7 @@ public class AuthService {
       throw new LoginException("Failed to get ldap user from table.");
     }
     Users user = ladpUser.getUid();
-    // Do pre cauth realm check 
+    // Do pre cauth realm check
     String passwordWithSalt = authController.preLdapLoginCheck(user, ladpUser.getAuthKey());
     return login(user, passwordWithSalt, req);
   }
