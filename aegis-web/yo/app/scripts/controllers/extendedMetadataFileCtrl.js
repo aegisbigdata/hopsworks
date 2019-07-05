@@ -244,7 +244,6 @@ angular.module('hopsWorksApp')
 
               ExtendedMetadataAPIService.getDistributionMetadata(path)
                 .then(function(data) {
-                  console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {

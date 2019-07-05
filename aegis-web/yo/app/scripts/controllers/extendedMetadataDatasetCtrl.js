@@ -423,7 +423,6 @@ angular.module('hopsWorksApp')
             self.loadDatasetMetadata = function () {
               ExtendedMetadataAPIService.getDatasetMetadata(self.DATASET_ID, self.PROJECT_ID)
                 .then(function(data) {
-                  console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {

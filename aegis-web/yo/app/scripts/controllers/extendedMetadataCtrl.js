@@ -317,7 +317,6 @@ angular.module('hopsWorksApp')
             self.loadExtendedProjectMetadata = function () {
               ExtendedMetadataAPIService.getProjectMetadata(PROJECT_ID)
                 .then(function(data) {
-                  console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
