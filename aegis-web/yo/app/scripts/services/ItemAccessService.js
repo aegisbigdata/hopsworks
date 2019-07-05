@@ -40,7 +40,7 @@
 
 angular.module('hopsWorksApp')
         .factory('ItemAccessService', ['$http', function ($http) {
-            return function (id) {
+            return function () {
               var services = {
                 itemAccess: function (inodeId) {
                   return $http.get('/api/project/' + inodeId '/access');
