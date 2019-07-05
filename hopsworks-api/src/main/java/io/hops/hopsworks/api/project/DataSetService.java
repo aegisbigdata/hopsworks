@@ -117,7 +117,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -1228,25 +1227,5 @@ public class DataSetService {
             + inode.getId());
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
             json).build();
-  }
-  
-  @GET
-  @Path("/{inodeId}/access")
-  @Produces(MediaType.APPLICATION_JSON)
-  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
-  public Response accessQuery(ContainerRequestContext requestContext, @PathParam("inodeId") Long datasetInodeId) {
-    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
-    Users user = userFacade.findByEmail(userEmail);
-    Inode datasetInode = inodes.findById(datasetInodeId);
-    List<Project> sharedWithProjects = datasetFacade.findProjectSharedWith(project, datasetInode);
-    List<Integer> accessableProjects = new ArrayList<>();
-    for(Project project : sharedWithProjects) {
-      String projectRole = projectTeamFacade.findCurrentRole(project, user);
-      if(projectRole != null) {
-        accessableProjects.add(project.getId());
-      }
-    }
-    GenericEntity<List<Integer>> result = new GenericEntity<List<Integer>>(accessableProjects) {};
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
   }
 }
