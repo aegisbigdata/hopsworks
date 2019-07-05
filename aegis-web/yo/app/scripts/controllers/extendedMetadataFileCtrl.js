@@ -193,9 +193,11 @@ angular.module('hopsWorksApp')
 
               graph.forEach((entry, index) => {
                 if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
-                  var distro = graph[index];
-                  fields.title.model = distro['http://purl.org/dc/terms/title'] || '';
-                  fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
+                  let distro = graph[index];
+                  let title = graph[index]['http://purl.org/dc/terms/title'];
+                  let description = graph[index]['http://purl.org/dc/terms/description'];
+                  fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
+                  fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
                   fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
 
                   if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
