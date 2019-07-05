@@ -221,6 +221,7 @@ angular.module('hopsWorksApp')
                   }
 
                   var new_field = {
+                    primary: entry[aegis_prexix + 'primary'] || false,
                     description: entry[aegis_prexix + 'description'] || '',
                     name: entry[aegis_prexix + 'name'] || '',
                     number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
@@ -282,6 +283,7 @@ angular.module('hopsWorksApp')
                 tabularFields.forEach(function (field) {
                   var type = field.type ? "aegis:" + field.type : '';
                   graph[0]['aegis:hasField'].push({
+                    "aegis:primary": field.primary || false,
                     "aegis:description": field.description,
                     "aegis:name": field.name,
                     "aegis:number": field.number.toString(),
