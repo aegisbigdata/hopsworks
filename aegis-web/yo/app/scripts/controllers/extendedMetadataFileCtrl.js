@@ -352,7 +352,6 @@ angular.module('hopsWorksApp')
                 
                 if (!self.filePreviewLoaded) {
                   $scope.filePreviewContents = 'Loading file preview...';
-                
                   dataSetService.filePreview(path, "head").then(
                     function (success) {
                       var truncation_length = 750;
@@ -365,9 +364,6 @@ angular.module('hopsWorksApp')
                       if ($scope.filePreviewContents.length > truncation_length) {
                         $scope.filePreviewContents = $scope.filePreviewContents.substring(0, truncation_length) + '\n\n[...]';
                       }
-
-                      console.log($scope.filePreviewContents.length);
-
                     }, function (error) {
                       //To hide README from UI
                       self.filePreviewLoaded = false;
