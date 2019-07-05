@@ -42,10 +42,25 @@
 angular.module('hopsWorksApp')
   .factory('ExtendedMetadataService', ['$http', function($http) {
     var service = {
+      setFieldFromStringOrArray (input) {
+        let string = '';
+
+        if (typeof(input) === 'string') {
+          string = input;
+        } else if (Array.isArray(input) && input.length > 0) {
+          try {
+            string = input.find(el => el['@language'] === 'en')['@value'];
+          } catch (e) {
+            console.log(e);
+            string = '';
+          }
+        }
+        return string;
+      },
       parseDatasetGraph (jsonld, fields) {
         if (!jsonld.hasOwnProperty('@graph')) return;
         var graph = jsonld['@graph'];
-        var index_location, index_contactpoint, index_dataset, index_temporal;
+        var index_location, index_contactpoint, index_dataset, index_temporal, index_publisher;
 
         // Determine indexes
         graph.forEach(function(entry, index) {
@@ -58,13 +73,20 @@ angular.module('hopsWorksApp')
           if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
           if (type == 'DCAT#DATASET') index_dataset = index;
           if (type == 'PERIODOFTIME') index_temporal = index;
+          if (type == 'ORGANIZATION' || type == 'INDIVIDUAL') index_publisher = index;
         })
 
         // Set publisher Info
-        // var type_splitted = graph[index_organization]['@type'].split('/');
-        // fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
-        // fields.publishername.model = graph[index_organization].name;
-        // fields.homepage.model = graph[index_organization].homepage;
+        if (index_publisher) {
+          try {
+            var type_splitted = graph[index_publisher]['@type'].split('/');
+            fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
+          } catch (e) {}
+            fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
+          if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
+            fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
+          }
+        }
 
         // Set Language field
         if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
@@ -78,14 +100,15 @@ angular.module('hopsWorksApp')
           fields.license.model = license_splitted[license_splitted.length - 1];
         }
 
+        let title = graph[index_dataset]['http://purl.org/dc/terms/title'];
+        let description = graph[index_dataset]['http://purl.org/dc/terms/description'];
+
         // Set other fields
-        fields.title.model = graph[index_dataset]['http://purl.org/dc/terms/title'] || '';
-        fields.description.model = graph[index_dataset]['http://purl.org/dc/terms/description'] || '';
         fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
         fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
         fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
-
-
+        fields.title.model = this.setFieldFromStringOrArray(title);
+        fields.description.model = this.setFieldFromStringOrArray(description);
         
         if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#keyword')) {
           let tags = graph[index_dataset]['http://www.w3.org/ns/dcat#keyword'];
@@ -142,9 +165,12 @@ angular.module('hopsWorksApp')
 
         graph.forEach((entry, index) => {
           if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
-            var distro = graph[index];
-            fields.title.model = distro['http://purl.org/dc/terms/title'] || '';
-            fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
+            let distro = graph[index];
+            let title = graph[index]['http://purl.org/dc/terms/title'];
+            let description = graph[index]['http://purl.org/dc/terms/description'];
+            
+            fields.title.model = this.setFieldFromStringOrArray(title);
+            fields.description.model = this.setFieldFromStringOrArray(description);
             fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
 
             if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';

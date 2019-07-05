@@ -341,7 +341,7 @@ angular.module('hopsWorksApp')
                   var type_splitted = graph[index_publisher]['@type'].split('/');
                   fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
                 } catch (e) {}
-                fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
+                  fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
                 if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
                   fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
                 }
