@@ -362,20 +362,27 @@ module.exports = function (grunt) {
             cwd: '<%= yeoman.app %>/images',
             src: '{,*/}*.{png,jpg,jpeg,gif}',
             dest: '<%= yeoman.dist %>/images'
-          }, {// <-- this will copy some unnecessary images to the styles folder 
-            // but is needed to copy images used by vendros .css. 
+          }, {// <-- this will copy some unnecessary images to the styles folder
+            // but is needed to copy images used by vendor.css
             expand: true,
             flatten: true,
             cwd: '<%= yeoman.bower %>',
             src: '*/*.{png,jpg,jpeg,gif}',
             dest: '<%= yeoman.dist %>/styles'
-          }, {// <-- this will copy some unnecessary images to the styles folder 
-            // but is needed to copy images used by vendros .css. 
+          }, {// <-- this will copy some unnecessary images to the styles folder
+            // but is needed to copy images used by vendor.css
             expand: true,
             flatten: true,
             cwd: '<%= yeoman.bower %>',
             src: '**/img/*.{png,jpg,jpeg,gif}',
             dest: '<%= yeoman.dist %>/img'
+          }, {// <-- this will copy leaflet images to the styles folder
+            // needed to find images used by vendor.css
+            expand: true,
+            flatten: true,
+            cwd: '<%= yeoman.bower %>',
+            src: '**/*.{png,jpg,jpeg,gif,svg}',
+            dest: '<%= yeoman.dist %>/styles/images'
           }
         ]
       }

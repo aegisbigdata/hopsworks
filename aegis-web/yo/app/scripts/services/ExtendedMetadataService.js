@@ -195,6 +195,7 @@ angular.module('hopsWorksApp')
       },
 
       FILE_FORMATS: [
+        { id: '', name: 'None' },
         { id: 'TAR', name: 'TAR' },
         { id: 'ZIP', name: 'ZIP' },
         { id: 'GIF', name: 'GIF' },
@@ -230,6 +231,7 @@ angular.module('hopsWorksApp')
       ],
 
       LANGUAGES: [
+        { id: '', name: 'None' },
         { id: 'BUL', name: 'Bulgarian' },
         { id: 'HRV', name: 'Croatian' },
         { id: 'CES', name: 'Czech' },
@@ -257,7 +259,8 @@ angular.module('hopsWorksApp')
       ],
 
       LICENCES: [
-        { id: 'CC0', name: 'CC0 - Creative Commons CC0 1.0 Universal', default: true },
+        { id: '', name: 'None', default: true  },
+        { id: 'CC0', name: 'CC0 - Creative Commons CC0 1.0 Universal' },
         { id: 'CC_BY', name: 'CC_BY - Creative Commons Attribution 4.0 International' },
         { id: 'CC_BYNC', name: 'CC_BYNC - Creative Commons Attribution–NonCommercial 4.0 International' },
         { id: 'CC_BYNCND', name: 'CC_BYNCND - Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International' },

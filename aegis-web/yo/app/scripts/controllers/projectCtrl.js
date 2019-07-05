@@ -426,7 +426,8 @@ angular.module('hopsWorksApp')
             };
 
             self.goToDatasetExtendedMetadata = function (dataset) {
-              self.goToUrl('dataset/' + dataset.id + '/extended-metadata-dataset');
+              var url = 'dataset/' + dataset.id + '/extended-metadata-dataset';
+              self.goToUrl(url, {datasetName: dataset.name});
             };
 
             self.goToDistributionExtendedMetadata = function (file) {

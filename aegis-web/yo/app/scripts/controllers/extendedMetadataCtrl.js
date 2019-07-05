@@ -317,7 +317,6 @@ angular.module('hopsWorksApp')
             self.loadExtendedProjectMetadata = function () {
               ExtendedMetadataAPIService.getProjectMetadata(PROJECT_ID)
                 .then(function(data) {
-                  console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
@@ -350,8 +349,8 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              if ($scope.data.fields.license.model) graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
-              if ($scope.data.fields.language.model) graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
+              if ($scope.data.fields.license.model  != '') graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
+              if ($scope.data.fields.language.model  != '') graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
               graph.publisher['@type'] = 'http://xmlns.com/foaf/0.1/' + $scope.data.fields.publishertype.model;
 
               function generateSpatialData (latlngs, coordsNeedMapping) {
