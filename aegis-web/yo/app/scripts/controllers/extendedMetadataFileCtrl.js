@@ -294,6 +294,12 @@ angular.module('hopsWorksApp')
                 });
               }
 
+              // Clear fields if type of data is not tabular
+              if (fields.typeannotation.model.typeOfData != 'tabular') {
+                fields.typeannotation.model.fields = [];
+                graph[0]['aegis:hasField'] = [];
+              }
+
               // Send to API
               ExtendedMetadataAPIService.createOrUpdateDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
                 .then(function(success) {
