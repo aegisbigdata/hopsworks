@@ -312,7 +312,6 @@ angular.module('hopsWorksApp')
               }).join(',');
             };
 
-
             self.updateModelsFromData = function (jsonld) {
               if (!jsonld.hasOwnProperty('@graph')) return;
               var graph = jsonld['@graph'];
@@ -323,7 +322,7 @@ angular.module('hopsWorksApp')
               graph.forEach(function(entry, index) {
                 if (!entry.hasOwnProperty('@type')) {
                   if (entry.hasOwnProperty(fields.publishername.mapping)) index_publisher = index;
-                } else {
+                } else if (typeof(entry['@type']) === 'string') {
                   let type = entry['@type'].split('/');
                   type = type[type.length - 1].toUpperCase();
 
@@ -341,7 +340,7 @@ angular.module('hopsWorksApp')
                   var type_splitted = graph[index_publisher]['@type'].split('/');
                   fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
                 } catch (e) {}
-                fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
+                  fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
                 if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
                   fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
                 }
@@ -359,9 +358,12 @@ angular.module('hopsWorksApp')
                 fields.license.model = license_splitted[license_splitted.length - 1];
               }
 
+              let title = graph[index_dataset]['http://purl.org/dc/terms/title'];
+              let description = graph[index_dataset]['http://purl.org/dc/terms/description'];
+              fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
+              fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
+
               // Set other fields
-              fields.title.model = graph[index_dataset]['http://purl.org/dc/terms/title'] || '';
-              fields.description.model = graph[index_dataset]['http://purl.org/dc/terms/description'] || '';
               fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
               fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
               fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
