@@ -571,9 +571,9 @@ angular.module('hopsWorksApp')
                 });
             };
 
+
             /**
-             * [deleteExtendedMetadataForProject description]
-             * @return {[type]} [description]
+             * Delete stored Metadata for Dataset
              */
             
             self.deleteExtendedMetadata = function () {
