@@ -45,7 +45,7 @@
                 <h3 class="ng-bindings no-mrg">Filters</h4>
             </div>  
             <div class="pull-right col-md-4">
-              <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block"
+              <button data-toggle="collapse" data-target="#filterdropdown" type="submit" class="btn btn-link btn-block btn-bold"
                     ng-click="searchTypePub=undefined; 
                               searchType=undefined; 
                               sortKey=undefined;
@@ -91,16 +91,22 @@
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Date added to AEGIS</div>
                 <div class="input-date-group">
-                      <div class="input-date"><i class="far fa-calendar" for="datepicker1"></i><input type="datepicker" class="form-date-control" id="datepicker1" placeholder="From date"><i class="fas fa-chevron-down" for="datepicker1" style="position: absolute; right: 10px"></i></div>
-                      <div class="input-date"><i class="far fa-calendar" for="datepicker1"></i><input type="datepicker" class="form-date-control" id="datepicker2" placeholder="To date"><i class="fas fa-chevron-down" for="datepicker1" style="position: absolute; right: 10px"></i></div>
+                  <div class="date-title">From:</div>
+                      <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
+                  <div class="date-title">To:</div>    
+                      <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
+                      <button class="btn btn-link btn-bold align-right"
+                                  ng-click="">
+                          APPLY
+                      </button>
                 </div>
             </form> 
             <form action="" class="navbar-form-search">
                 <div  class="navbar-search-header">
                     <div class="search-header">File Types</div>
-                    <button class="btn btn-link"
+                    <button class="btn btn-link btn-bold"
                                ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        SELECT ALL
+                        RESET
                     </button>
                 </div>
                 <div class="navbar-search-radio">
@@ -120,9 +126,9 @@
             <form action="" class="navbar-form-search">
                 <div  class="navbar-search-header">
                     <div class="search-header">License</div>
-                    <button class="btn btn-link"
+                    <button class="btn btn-link btn-bold"
                                ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        SELECT ALL
+                        RESET
                     </button>
                 </div>
                 <div class="navbar-search-radio">
@@ -238,8 +244,8 @@
     
     <div class="row search-result-header">
       <div class="col-md-6 pull-left">
-        <h4>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.searchTerm | limitTo: 85 }}
-            {{ mainCtrl.searchTerm.length > 85 ? '...' : ''}}</h4>
+        <h4>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.itemSearched | limitTo: 85 }}
+            {{ mainCtrl.itemSearched.length > 85 ? '...' : ''}}</h4>
       </div>
         <div class="col-md-6 search-result-sort pull-right">
             <h4 class="ng-binding">Sort by:</h4>

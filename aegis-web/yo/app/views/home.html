@@ -39,13 +39,8 @@
 
 <div ng-controller="MainCtrl as mainCtrl">
   <div ng-include="'nav.html'"></div>
-  <div ng-if="mainCtrl.showSearchPage" class="row">
-    <div id="projectSearchResults">
-      <div ng-include="'views/search.html'"></div>
-    </div>
-  </div>
-
-  <div class="container content-wrapper" ng-if="!mainCtrl.showSearchPage" ng-controller="HomeCtrl as homeCtrl">
+  
+  <div class="container content-wrapper" ng-controller="HomeCtrl as homeCtrl">
     <div class="row">
       <div class="col-md-12">
         <h1 style="margin-top: 40px; margin-bottom: 30px">My Projects ({{homeCtrl.projects.length}})</h1>
@@ -77,24 +72,24 @@
     </div>
     <ul uib-pager items-per-page="11" total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" class="aegis-home-page" ></ul>
     <hr style="margin-bottom: 40px">
-    <div class="row">
+    <div class="row" style="margin-bottom: 25px">
       <div class="col-md-4" style="text-align: center">
-        <img src="https://i.pinimg.com/originals/9f/90/ab/9f90aba21e11b7b63e575785a2d4563c.png" height="130px">
+        <img src="images/home_getting_started.png" height="130px">
         <h2 style=" margin-bottom: 20px">Getting Started</h2>
-        <p>If you are new to AEGIS click here! Master the AEGIS platform in a simple 5 step tutorial!</p>
+        <p>If you are new to AEGIS click here! Learn how to use the AEGIS tools through a quick tutorial</p>
         <a href="#!/getStarted">&raquo; Learn more</a>
       </div>
       <div class="col-md-4" style="text-align: center">
-        <img src="https://us.123rf.com/450wm/martialred/martialred1709/martialred170900039/85728240-online-shop-marktplatz-oder-e-commerce-shop-flache-vektor-symbol-für-apps-und-websites.jpg?ver=6" height="130px">
+        <img src="images/home_marketplace.png" height="130px">
         <h2 style="margin-bottom: 20px">AEGIS Marketplace</h2>
-        <p>See what's possible with AEGIS! Browse popular AEGIS datasets to use within your project</p>
-        <a href="#">&raquo; Go to Marketplace</a>
+        <p>See what's possible with AEGIS! Browse popular AEGIS datasets to use for your project</p>
+        <a href="#!/search">&raquo; Go to Marketplace</a>
       </div>
       <div class="col-md-4" style="text-align: center">
-        <img src="https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F52230452%2F233567016891%2F1%2Foriginal.jpg?h=512&w=512&auto=compress&rect=0%2C0%2C800%2C400&s=aa46ba847eca4cc1beb9e6b79ccf6571" height="130px" style="padding-bottom: 10px">
+        <img src="images/home_news.png" height="130px">
         <h2 style="margin-bottom: 20px">What's New</h2>
-        <p>October 2018 Report Published: An In-Depth Look at Big Data Trends and Challenges in Insurance</p>
-        <a href="https://www.aegis-bigdata.eu/blog/" target="_blank">&raquo; Read more</a>
+        <p>Find out the latest news related to the AEGIS platform</p>
+        <a href="https://www.aegis-bigdata.eu/news-events/" target="_blank">&raquo; Read more</a>
       </div>
     </div>
 

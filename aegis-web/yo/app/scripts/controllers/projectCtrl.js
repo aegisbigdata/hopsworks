@@ -426,14 +426,17 @@ angular.module('hopsWorksApp')
             };
 
             self.goToDatasetExtendedMetadata = function (dataset) {
-              self.goToUrl('dataset/' + dataset.id + '/extended-metadata-dataset');
+              var url = 'dataset/' + dataset.id + '/extended-metadata-dataset';
+              self.goToUrl(url, {datasetName: dataset.name});
             };
 
             self.goToDistributionExtendedMetadata = function (file) {
-              var path_splitted = file.path.split('/');
+              var path = file.path;
+              var path_splitted = path.split('/');
+              var project = path_splitted[2];
               var dataset = path_splitted[path_splitted.length - 2];
               var url = 'dist/' + file.id + '/extended-metadata-distribution';
-              self.goToUrl(url, {dataset: dataset, file: file.name});
+              self.goToUrl(url, {project, dataset, datasetID: file.parentId, file: file.name, path: encodeURI(path) });
             };
 
             /**

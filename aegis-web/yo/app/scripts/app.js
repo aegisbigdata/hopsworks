@@ -124,6 +124,16 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
+                    .when('/search', {
+                      templateUrl: 'views/searchHome.html',
+                      controller: 'HomeCtrl as homeCtrl',
+                      resolve: {
+                        auth: ['$q','AuthGuardService',
+                          function ($q, AuthGuardService) {
+                            return AuthGuardService.guardSession($q);
+                          }]
+                      }
+                    })
                     .when('/getStarted', {
                       templateUrl: 'views/getStarted.html',
                       controller: '',
@@ -204,6 +214,16 @@ angular.module('hopsWorksApp', [
                     .when('/project/:projectID', {
                       redirectTo: '/project/:projectID/datasets'
                     })
+                    .when('/project/:projectID/search', {
+                      templateUrl: 'views/searchProject.html',
+                      controller: 'SearchProjectCtrl as searchProjectCtrl',
+                      resolve: {
+                        auth: ['$q', '$route', 'AuthGuardService',
+                          function ($q, $route, AuthGuardService) {
+                            return AuthGuardService.guardProject($q, $route.current.params.projectID);
+                          }]
+                      }
+                    })
                     .when('/project/:projectID/activities', {
                       templateUrl: 'views/project.html',
                       controller: 'ProjectCtrl as projectCtrl',
@@ -214,7 +234,6 @@ angular.module('hopsWorksApp', [
                           }]
                       }
                     })
-
                     .when('/project/:projectID/datasets', {
                       templateUrl: 'views/datasets.html',
                       controller: 'ProjectCtrl as projectCtrl',
@@ -615,4 +634,5 @@ angular.module('hopsWorksApp', [
                     });
 
 
-          }]);
+          }])
+        .constant('AEGIS_CONFIG', AEGIS_CONFIG);

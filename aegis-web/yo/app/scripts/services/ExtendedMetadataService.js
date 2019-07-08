@@ -42,44 +42,160 @@
 angular.module('hopsWorksApp')
   .factory('ExtendedMetadataService', ['$http', function($http) {
     var service = {
-      /**
-       * Generates RDF compliant representation in json-ld format
-       * WIP: for now the function simply logs the json-ld to the console until Service is working / API endpoints are defined
-       */
-      saveExtendedMetadata  (data, doc, context) {
-        var modifiedKey = 'http://purl.org/dc/terms/modified';
+      parseDatasetGraph (jsonld, fields) {
+        if (!jsonld.hasOwnProperty('@graph')) return;
+        var graph = jsonld['@graph'];
+        var index_location, index_contactpoint, index_dataset, index_temporal;
 
-        // Map model of each field to RDF doc structure
-        for (var key in data.fields) {
-          var field = data.fields[key];
-          if (field.hasOwnProperty('mapping')) {
-            var mapping = field.mapping;
-            if (field.hasOwnProperty('model') && doc.hasOwnProperty(mapping)) doc[mapping]['@id'] = field.model;
+        // Determine indexes
+        graph.forEach(function(entry, index) {
+          if (!entry.hasOwnProperty('@type')) return;
+          if (typeof(entry['@type']) != 'string') return;
+          let type = entry['@type'].split('/');
+          type = type[type.length - 1].toUpperCase();
+
+          if (type == 'LOCATION') index_location = index;
+          if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
+          if (type == 'DCAT#DATASET') index_dataset = index;
+          if (type == 'PERIODOFTIME') index_temporal = index;
+        })
+
+        // Set publisher Info
+        // var type_splitted = graph[index_organization]['@type'].split('/');
+        // fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
+        // fields.publishername.model = graph[index_organization].name;
+        // fields.homepage.model = graph[index_organization].homepage;
+
+        // Set Language field
+        if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
+          var language_splitted = graph[index_dataset]['http://purl.org/dc/terms/language']['@id'].split('/');
+          fields.language.model = language_splitted[language_splitted.length - 1];
+        }
+
+        // Set License field
+        if (graph[index_dataset].hasOwnProperty('license')) {
+          var license_splitted = graph[index_dataset].license.split('/');
+          fields.license.model = license_splitted[license_splitted.length - 1];
+        }
+
+        // Set other fields
+        fields.title.model = graph[index_dataset]['http://purl.org/dc/terms/title'] || '';
+        fields.description.model = graph[index_dataset]['http://purl.org/dc/terms/description'] || '';
+        fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
+        fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
+        fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
+
+
+        
+        if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#keyword')) {
+          let tags = graph[index_dataset]['http://www.w3.org/ns/dcat#keyword'];
+          fields.keywords.model = tags.join();
+          fields.keywords.tags = tags.map(tag => {
+            return {text: tag};
+          });
+        }
+
+        if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#theme')) {
+          var theme_splitted = graph[index_dataset]['http://www.w3.org/ns/dcat#theme']['@id'].split('/');
+          fields.theme.model = theme_splitted[theme_splitted.length - 1];
+        }
+
+        if (graph[index_dataset].hasOwnProperty('http://xmlns.com/foaf/0.1/page')) {
+          fields.documentation.model = graph[index_dataset]['http://xmlns.com/foaf/0.1/page']['@id'] || '';
+        }
+
+        // Set temporal data fields
+        if (index_temporal) {
+          let temporalData = graph[index_temporal];
+          if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']);
+          if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']);
+        }
+
+        if (index_contactpoint) {
+          var type_splitted = graph[index_contactpoint]['@type'].split('#');
+          fields.contactpointtype.model = type_splitted[type_splitted.length - 1].toUpperCase() || '';
+          fields.contactpointname.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#fn'] || '';
+
+          if (graph[index_contactpoint].hasOwnProperty('http://www.w3.org/2006/vcard/ns#hasEmail')) {
+            fields.contactpointmail.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#hasEmail']['@id'];
+            fields.contactpointmail.model = fields.contactpointmail.model.split(':');
+            fields.contactpointmail.model = fields.contactpointmail.model[fields.contactpointmail.model.length - 1];
           }
         }
 
-        // Set modified, spatial properties
-        if (data.areaSelect) {
-          doc[data.fields.spatial.mapping]['@id'] = data.areaSelect._width + ', ' + data.areaSelect._height + ', ' + data.areaSelect.center.lat + ', ' + data.areaSelect.center.lng + ', ' +data.areaSelect.zoom;
+        if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('http://www.w3.org/ns/locn#geometry')) {
+          var geoJSON = graph[index_location]['http://www.w3.org/ns/locn#geometry'];
+          try {
+            geoJSON = JSON.parse(geoJSON);
+            fields.spatial.model = geoJSON.coordinates;
+            //$scope.geoJSON = geoJSON;
+          } catch(e) {
+            console.log(e);
+          }                
         }
 
-        doc[modifiedKey] = (new Date()).toISOString();
-        return this.generateRDFString(doc, context);
+        return fields;
       },
-      generateRDFString (doc, context) {
-        return new Promise(function (resolve, reject) {
-          jsonld.flatten(doc, context, function(err, result) {
-            if (err) {
-              return reject(err);
+      parseDistributionGraph (jsonld, fields) {
+        var graph = jsonld['@graph'];
+        fields.typeannotation.model.fields = [];
+
+        graph.forEach((entry, index) => {
+          if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
+            var distro = graph[index];
+            fields.title.model = distro['http://purl.org/dc/terms/title'] || '';
+            fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
+            fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
+
+            if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
+            if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
+              var language_splitted = distro['http://purl.org/dc/terms/language']['@id'].split('/');
+              fields.language.model = language_splitted[language_splitted.length - 1];
             }
 
-            const jsonldData = JSON.stringify(result);
-            resolve(jsonldData);
-          });
+            if (distro.hasOwnProperty('http://purl.org/dc/terms/license')) {
+              var license_splitted = distro['http://purl.org/dc/terms/license']['@id'].split('/');
+              fields.license.model = license_splitted[license_splitted.length - 1];
+            }
+
+          } else {
+            var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
+            var type = null;
+
+            if (entry.hasOwnProperty(aegis_prexix + 'type')) {
+              if (entry[aegis_prexix + 'type']['@id'] != '') {
+                var type_splitted = entry[aegis_prexix + 'type']['@id'].split('/');
+                type = type_splitted[type_splitted.length - 1].toLowerCase();
+              }
+            }
+
+            var new_field = {
+              description: entry[aegis_prexix + 'description'] || '',
+              name: entry[aegis_prexix + 'name'] || '',
+              number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
+              type
+            }
+            
+            fields.typeannotation.model.fields.push(new_field)
+          }
         });
+
+        return fields;
+      },
+      setProperty (obj, path, value) {
+          var schema = obj;  // a moving reference to internal objects within obj
+          var pList = path.split('.');
+          var len = pList.length;
+          for(var i = 0; i < len-1; i++) {
+              var elem = pList[i];
+              if( !schema[elem] ) schema[elem] = {}
+              schema = schema[elem];
+          }
+          schema[pList[len-1]] = value;
       },
 
       FILE_FORMATS: [
+        { id: '', name: 'None' },
         { id: 'TAR', name: 'TAR' },
         { id: 'ZIP', name: 'ZIP' },
         { id: 'GIF', name: 'GIF' },
@@ -115,6 +231,7 @@ angular.module('hopsWorksApp')
       ],
 
       LANGUAGES: [
+        { id: '', name: 'None' },
         { id: 'BUL', name: 'Bulgarian' },
         { id: 'HRV', name: 'Croatian' },
         { id: 'CES', name: 'Czech' },
@@ -142,7 +259,8 @@ angular.module('hopsWorksApp')
       ],
 
       LICENCES: [
-        { id: 'CC0', name: 'CC0 - Creative Commons CC0 1.0 Universal', default: true },
+        { id: '', name: 'None', default: true  },
+        { id: 'CC0', name: 'CC0 - Creative Commons CC0 1.0 Universal' },
         { id: 'CC_BY', name: 'CC_BY - Creative Commons Attribution 4.0 International' },
         { id: 'CC_BYNC', name: 'CC_BYNC - Creative Commons Attribution–NonCommercial 4.0 International' },
         { id: 'CC_BYNCND', name: 'CC_BYNCND - Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International' },

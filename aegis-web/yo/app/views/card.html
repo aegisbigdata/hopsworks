@@ -46,47 +46,55 @@
         {{content.type === 'ds' && content.public_ds && content.localDataset ? 'public dataset in cluster': ''}}
         {{content.type === 'ds' && content.public_ds && !content.localDataset ? 'public dataset': ''}}
       </label>
-      <h3>{{content.name}}
-        <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
-      </h3>
+      <div class="oval">
+          <span class="oval-license">cc-by 4.0</span>     
+      </div>
+      <div>
+        <label class="card-content title-blue">Owner</label>
+        <div class="value">{{content.user || '--'}}</div>            
+      </div>
+      <div ng-show="!content.localDataset">
+        <label class="card-content title-blue">Organization</label>
+        <div class="value">{{content.organization || '--'}}</div>            
+      </div>
+      <div>
+        <label class="card-content title-blue">Date published</label>
+        <div class="value">{{content.createDate| date:'short'}}</div>        
+      </div>
+      <div>
+        <label ng-show="content.type === 'ds'" class="card-content title-blue">Size</label>
+        <div class="value" ng-show="content.type === 'ds'">{{cardCtrl.sizeOnDisk(content.size)}}</div> 
+      </div>
+      <div class="row" ng-if="!content.localDataset">
+        <div>
+          <label ng-show="content.public_ds">Seeders</label>
+          <div class="value">{{content.datasetHealth.seeders}}</div> 
+        </div>
+        <div>
+          <label ng-show="content.public_ds">Leechers</label>
+          <div class="value">{{content.datasetHealth.leechers}}</div> 
+        </div>
+      </div>
     </div>
     <div class="card-body col-md-8">
       <div class="details">
+        <h3>{{content.name}}
+          <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
+        </h3>
+        <div class="card-content title-blue">Description</div>
         <div class="desc">{{content.description | limitTo: limit}}
-          {{content.description.length > limit ? '...':''}}</div>
-        
-        <div class="row">
-          <div class="col-sm-6 col-md-8">
-            <label>owner</label>
-            <div class="value">{{content.user || '--'}}</div>            
-          </div>
-          <div ng-show="!content.localDataset" class="col-sm-4 col-md-4">
-            <label>organization</label>
-            <div class="value">{{content.organization || '--'}}</div>            
-          </div>
+          {{content.description.length > limit ? '...':''}}
         </div>
-        <div class="row">
-          <div class="col-sm-6 col-md-6">
-            <label>Date published</label>
-            <div class="value">{{content.createDate| date:'short'}}</div>        
-          </div>
-          <div class="col-sm-4 col-md-4">
-            <label ng-show="content.type === 'ds'">Size</label>
-            <div class="value" ng-show="content.type === 'ds'">{{cardCtrl.sizeOnDisk(content.size)}}</div> 
-          </div>
-        </div> 
-        <div class="row" ng-if="!content.localDataset">
-          <div class="col-sm-4 col-md-4">
-            <label ng-show="content.public_ds">Seeders</label>
-            <div class="value">{{content.datasetHealth.seeders}}</div> 
-          </div>
-          <div class="col-sm-4 col-md-4">
-            <label ng-show="content.public_ds">Leechers</label>
-            <div class="value">{{content.datasetHealth.leechers}}</div> 
-          </div>
+        <div class="oval">
+            <span class="oval-license grey">csv</span>     
+            <span class="oval-license grey">wms</span>     
+            <span class="oval-license grey">csv</span>     
+            <span class="oval-license grey">txt</span>     
+            <span class="oval-license grey">txt</span>     
+            <span class="oval-license grey">txt</span>     
+            <span class="oval-license grey">html</span>     
         </div>
-        
-      </div>
+      </div> 
     </div>
     <div class="card-footer col-md-1">
       <div class="card-footer-icons">
@@ -111,7 +119,7 @@
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}" style="color: green;"></i> 
         </span> 
         <span data-placement="bottom" data-toggle="tooltip" title="Detail"
-              ng-click="detailsFn(content)" class="modal-blue">
+              ng-click="detailsFn(content)">
           <i class="card-footer-icon fa fa-bars" aria-hidden="true"
              data-toggle="collapse" data-target="#carddropdown-{{cardIndex}}"></i>
         </span>

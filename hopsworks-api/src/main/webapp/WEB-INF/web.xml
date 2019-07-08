@@ -264,9 +264,164 @@
     <servlet-name>AirflowProxyServlet</servlet-name>
     <url-pattern>/airflow</url-pattern>
   </servlet-mapping>
+
+
+  <!-- Metadata Service proxy servlet -->
+  <servlet>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.MetadataServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8101/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MetadataServiceProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata</url-pattern>
+  </servlet-mapping>
+
+  <!-- Metadata Search proxy servlet -->
+  <servlet>
+    <servlet-name>MetadataSearchProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.MetadataSearchProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8103/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MetadataSearchProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata-search/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MetadataSearchProxyServlet</servlet-name>
+    <url-pattern>/aegis-metadata-search</url-pattern>
+  </servlet-mapping>
+
+  <!-- Virtuoso proxy servlet -->
+  <servlet>
+    <servlet-name>VirtuosoProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.VirtuosoProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8106/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>VirtuosoProxyServlet</servlet-name>
+    <url-pattern>/virtuoso/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>VirtuosoProxyServlet</servlet-name>
+    <url-pattern>/virtuoso</url-pattern>
+  </servlet-mapping>
+
+  <!-- Harvester UI proxy servlet -->
+  <servlet>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.HarvesterUIProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8108/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <url-pattern>/harvester/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HarvesterUIProxyServlet</servlet-name>
+    <url-pattern>/harvester</url-pattern>
+  </servlet-mapping>
+
+
+  <!-- Harvester Service proxy servlet -->
+  <servlet>
+    <servlet-name>HarvesterServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.HarvesterServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8109/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HarvesterServiceProxyServlet</servlet-name>
+    <url-pattern>/harvester-service/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HarvesterServiceProxyServlet</servlet-name>
+    <url-pattern>/harvester-service</url-pattern>
+  </servlet-mapping>
+
+  <!-- Translation Service proxy servlet -->
+  <servlet>
+    <servlet-name>TranslationServiceProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.TranslationServiceProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8110/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TranslationServiceProxyServlet</servlet-name>
+    <url-pattern>/translation-service/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TranslationServiceProxyServlet</servlet-name>
+    <url-pattern>/translation-service</url-pattern>
+  </servlet-mapping>
+
+  <!-- Linda proxy servlet -->
+  <servlet>
+    <servlet-name>LindaProxyServlet</servlet-name>
+    <servlet-class>io.hops.hopsworks.api.aegis.proxy.LindaProxyServlet</servlet-class>
+    <init-param>
+      <param-name>targetUri</param-name>
+      <param-value>http://localhost:8111/</param-value>
+    </init-param>
+    <init-param>
+      <param-name>log</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LindaProxyServlet</servlet-name>
+    <url-pattern>/linda/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LindaProxyServlet</servlet-name>
+    <url-pattern>/linda</url-pattern>
+  </servlet-mapping>
+
   
-
-
   <!-- Other servlets -->
 
   <servlet>

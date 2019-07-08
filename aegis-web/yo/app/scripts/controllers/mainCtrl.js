@@ -56,7 +56,6 @@ angular.module('hopsWorksApp')
             const MIN_SEARCH_TERM_LEN = 2;
             var self = this;
 
-
             self.ui = "/hopsworks-api/airflow/login?q=username=";
 
             self.email = $cookies.get('email');
@@ -196,177 +195,9 @@ angular.module('hopsWorksApp')
                       });
             };
 
-            self.searchTerm = "";
             self.searching = false;
-            self.globalClusterBoundary = false;
-            self.searchReturned = "";
-            self.searchReturnedPublicSearch = "";
-            self.searchResult = [];
-            self.searchResultPublicSearch = [];
-            self.resultPages = 0;
-            self.resultPagesPublicSearch = 0;
-            self.resultItems = 0;
-            self.resultItemsPublicSearch = 0;
-            self.currentPage = 1;
             self.pageSize = 9;
-
-            self.hitEnter = function (event) {
-              var code = event.which || event.keyCode || event.charCode;
-              console.log("hitEnter", code);
-              if (angular.equals(code, 13) && !self.searching) {
-                self.searchResult = [];
-                self.search();
-              } else if (angular.equals(code, 27)) {
-                self.showSearchPage = false;
-                self.clearSearch();
-              }
-            };
-
-            self.keyTyped = function (evt) {
-              if (self.searchTerm.length >= MIN_SEARCH_TERM_LEN || (self.searchResult.length > 0 && self.searchTerm.length > 0)) {
-                self.searchReturned = "Searching for <b>" + self.searchTerm + "<b> ...";
-                self.searchResult = [];
-                self.search();
-              } else {
-                self.showSearchPage = false;
-                self.searchResult = [];
-                self.searchReturned = "";
-                self.searchResultPublicSearch = [];
-                self.searchReturnedPublicSearch = "";
-              }
-            };
-
-            self.clearSearch = function () {
-              self.showSearchPage = false;
-              self.searchResult = [];
-              self.searchReturned = "";
-              self.searchTerm = "";
-            };
-
-            self.search = function () {
-              self.showSearchPage = true;
-              self.currentPage = 1;
-              self.pageSize = 9;
-              self.searchResult = [];
-
-              if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
-                return;
-              }
-              self.searching = true;
-              if (self.searchType === "global" && $rootScope.isDelaEnabled) {
-                var global_data;
-                var searchHits;
-                //triggering a global search
-                self.searchResult = [];
-                elasticService.globalSearch(self.searchTerm)
-                        .then(function (response) {
-                          searchHits = response.data;
-                          if (searchHits.length > 0) {
-                            self.searchResult = searchHits;
-                          } else {
-                            self.searchResult = [];
-                          }
-                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
-                          self.resultItems = self.searchResult.length;
-                          DelaService.search(self.searchTerm).then(function (response2) {
-                            global_data = response2.data;
-                            if (global_data.length > 0) {
-                              self.searchResult = concatUnique(searchHits, global_data);
-                              self.searching = false;
-                            } else {
-                              self.searching = false;
-                            }
-                            self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
-                            self.resultItems = self.searchResult.length;
-                          });
-                        }, function (error) {
-                          self.searching = false;
-                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
-                        });
-              } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {
-                var searchHits;
-                //triggering a global search
-                self.searchResult = [];
-                elasticService.globalSearch(self.searchTerm)
-                        .then(function (response) {
-                          searchHits = response.data;
-                          if (searchHits.length > 0) {
-                            self.searchResult = searchHits;
-                          } else {
-                            self.searchResult = [];
-                          }
-                          self.searching = false;
-                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
-                          self.resultItems = self.searchResult.length;
-                        }, function (error) {
-                          self.searching = false;
-                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
-                        });
-              } else if (self.searchType === "projectCentric") {
-                elasticService.projectSearch($routeParams.projectID, self.searchTerm)
-                        .then(function (response) {
-                          self.searching = false;
-                          var searchHits = response.data;
-                          if (searchHits.length > 0) {
-                            self.searchResult = searchHits;
-                          } else {
-                            self.searchResult = [];
-                          }
-                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
-                          self.resultItems = self.searchResult.length;
-                        }, function (error) {
-                          self.searching = false;
-                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
-                        });
-              } else if (self.searchType === "datasetCentric") {
-                elasticService.datasetSearch($routeParams.projectID, $routeParams.datasetName, self.searchTerm)
-                        .then(function (response) {
-                          self.searching = false;
-                          var searchHits = response.data;
-                          if (searchHits.length > 0) {
-                            self.searchResult = searchHits;
-                          } else {
-                            self.searchResult = [];
-                          }
-                          self.resultPages = Math.ceil(self.searchResult.length / self.pageSize);
-                          self.resultItems = self.searchResult.length;
-                        }, function (error) {
-                          self.searching = false;
-                          growl.error(error.data.errorMsg, {title: 'Error', ttl: 5000});
-                        });
-              }
-              datePicker();// this will load the function so that the date picker can call it.
-            };
-
-            var concatUnique = function (a, array2) {
-              a = a.concat(array2);
-              for (var i = 0; i < a.length; ++i) {
-                for (var j = i + 1; j < a.length; ++j) {
-                  if (!(a[i].publicId === undefined || a[i].publicId === null) &&
-                          a[i].publicId === a[j].publicId)
-                    a.splice(j--, 1);
-                }
-              }
-              return a;
-            };
-
-            var datePicker = function () {
-              $(function () {
-                $('[type="datepicker"]').datetimepicker({format: 'DD/MM/YYYY'});
-                $("#datepicker1").on("dp.change", function (e) {
-                  $('#datepicker2').data("DateTimePicker").minDate(e.date);
-                });
-                $("#datepicker2").on("dp.change", function (e) {
-                  $('#datepicker1').data("DateTimePicker").maxDate(e.date);
-                });
-                $("#datepicker3").on("dp.change", function (e) {
-                  $('#datepicker4').data("DateTimePicker").minDate(e.date);
-                });
-                $("#datepicker4").on("dp.change", function (e) {
-                  $('#datepicker3').data("DateTimePicker").maxDate(e.date);
-                });
-              });
-            };
+            self.itemSearched = "";
 
             self.viewType = function (listView) {
               if (listView) {
@@ -408,17 +239,6 @@ angular.module('hopsWorksApp')
               }
             };
 
-            self.incrementPage = function () {
-              self.pageSize = self.pageSize + 1;
-            };
-
-            self.decrementPage = function () {
-              if (self.pageSize < 2) {
-                return;
-              }
-              self.pageSize = self.pageSize - 1;
-            };
-
             self.viewDetail = function (result) {
               if (result.localDataset) {
                 if (result.type === 'proj') {
@@ -456,6 +276,12 @@ angular.module('hopsWorksApp')
               } else {
                 ModalService.viewSearchResult('lg', result, result, null);
               }
+            };
+
+            self.goToSearchHome = function (serviceName, parameters) {
+              parameters = parameters || {};
+              $scope.activeService = serviceName;
+              $location.path('/' + serviceName).search(parameters).hash('');
             };
 
 

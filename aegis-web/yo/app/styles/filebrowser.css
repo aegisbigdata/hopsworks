@@ -380,7 +380,6 @@ md-backdrop.md-sidenav-backdrop {
 }
 .dropdown-amore {
   border-radius: 0px;
-  width: 250px;
   margin:0px;
   padding:0px;
 }
@@ -394,19 +393,6 @@ md-backdrop.md-sidenav-backdrop {
   padding-right: 10px;
 }
 
-
-.dropdown-amore li:first-child {
-  border-left: 3px solid #314190;
-}
-.dropdown-amore li:nth-child(2) {
-  border-left: 3px solid #79aefe;
-}
-.dropdown-amore li:nth-child(3) {
-  border-left: 3px solid #7d5d81;
-}
-.dropdown-amore li:nth-child(4) {
-  border-left: 3px solid #ec1b5a;
-}
 
 .table-hover > tbody > tr.highlight {
   background-color:#4285f4;

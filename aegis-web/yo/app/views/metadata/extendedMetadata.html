@@ -37,8 +37,28 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
 
-<div ng-show="metadataCtrl.noTemplates" style="padding-left: 10px" ng-show="!datasetsCtrl.selected">
-  <div style="display: inline-block">
+<div ng-show="metadataCtrl.noTemplates" ng-show="!datasetsCtrl.selected">
+
+  <div ng-show="datasetsCtrl.extendedMetadata" style="font-family: sans-serif;">
+    <h5>Extended Metadata</h5>
+    <table class="table table-striped ng-scope" style="margin-top: 16px; font-size: 12px;box-shadow: none;">
+      <thead style="box-shadow: none;border-bottom: 1px solid #ddd;font-weight: bold;margin-bottom: 10px;">
+        <tr>
+          <td>Property</td>
+          <td>Value</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="entry in datasetsCtrl.extendedMetadata" style="border-bottom: 1px solid #ddd;">
+          <td style="text-align: left;background-color: transparent;">{{ entry.label }}</td>
+          <td ng-show="!entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">{{ entry.model }}</td>
+          <td ng-show="entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">{{ entry.model.typeOfData }}, has {{ entry.model.fields.length + ' field' }}{{ entry.model.fields.length != 1 ? 's' : '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display: inline-block" ng-show="!datasetsCtrl.extendedMetadata">
     <div style="display: inline-block"><h5>No extended metadata.</h5></div>
     <span class="field-info" uib-tooltip="Right click on the file to add a metadata template." style="padding-top: 5px;padding-left:3px">
       <i class="fa fa-exclamation-circle"></i>
