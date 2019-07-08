@@ -864,6 +864,23 @@ public class ProjectService {
   }
   
   @GET
+  @Path("{projectId}/accessByProjectId")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  public Response hasProjectAccess(@PathParam("projectId") Integer projectId, 
+    ContainerRequestContext requestContext) {
+    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByEmail(userEmail);
+    Project project = projectFacade.find(projectId);
+    
+    if(hasProjectAccess(project, user)) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
+    } else {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
+    }
+  }
+  
+  @GET
   @Path("{inodeId}/access")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
