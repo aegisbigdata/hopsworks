@@ -57,6 +57,7 @@ angular.module('hopsWorksApp')
             self.fileName = decodeURI(parameters.file);
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
+            self.distributionUUID = null;
             self.template = {
               "@context": {
                 "geometry": {
@@ -186,6 +187,11 @@ angular.module('hopsWorksApp')
 
             var dataSetService = DataSetService(PROJECT_ID);
 
+
+            /**
+             * Populate / update models from JSON-LD data object 
+             */
+
             self.updateModelsFromData = function (jsonld) {
               var fields = $scope.data.fields;
               var graph = jsonld['@graph'];
@@ -193,12 +199,21 @@ angular.module('hopsWorksApp')
 
               graph.forEach((entry, index) => {
                 if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
+                  // Is distribution Metadata object
                   let distro = graph[index];
                   let title = graph[index]['http://purl.org/dc/terms/title'];
                   let description = graph[index]['http://purl.org/dc/terms/description'];
                   fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
                   fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
                   fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
+
+                  // Extract UUID from graph response
+                  try {
+                    let id_string = graph[index]['@id'].split('/');
+                    self.distributionUUID = id_string[id_string.length - 1];
+                  } catch (e) {
+                    console.error(e);
+                  }
 
                   if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
                   if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
@@ -212,6 +227,7 @@ angular.module('hopsWorksApp')
                   }
 
                 } else {
+                  // Populate tabular data fields
                   var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
                   var type = null;
 
@@ -235,6 +251,7 @@ angular.module('hopsWorksApp')
               });
             };
 
+
             /**
              * Loads from data from JSON-LD format into page
              */
@@ -256,16 +273,16 @@ angular.module('hopsWorksApp')
             
             self.loadExtendedDistroMetadata();
 
+
             /**
              * Saves form data in JSON-LD format as metadata with hopsworks
              */
+            
             self.saveExtendedDistroMetadata = function () {
               var metadataObject = JSON.parse(JSON.stringify(self.template));
               var graph = metadataObject['@graph'];
-              var data = $scope.data;
               var fields = $scope.data.fields;
               var parameters = $location.search();
-              var datasetName = decodeURI(parameters.dataset);
               var path = decodeURI(parameters.path);
 
               graph[0]['aegis:hasField'] = [];
@@ -314,6 +331,33 @@ angular.module('hopsWorksApp')
                 });
             };
 
+
+            self.deleteExtendedMetadata = function () {
+              if (!self.distributionUUID) {
+                console.error('No Distribution UUID available!');
+                return;
+              }
+
+              $scope.deleteButtonIsDisabled = true;
+              ExtendedMetadataAPIService.deleteDistributionMetadata(self.distributionUUID)
+                .then(function(success) {
+                  // Clear form fields if delete is successful
+                  for (var key in $scope.data.fields) {
+                    var field = $scope.data.fields[key];                
+                    field.model = '';
+                  }
+                  growl.success('Distribution metadata successfully deleted.', {title: 'Success', ttl: 1000});
+                })
+                .catch(function(error) {
+                  let message = 'Server error: ' + error.status;
+                  if (error.data && error.data.cause) message = 'Cause: ' + error.data.cause;
+                  growl.error(message, {title: 'Error while deleting distribution metadata', ttl: 5000, referenceId: 0});
+                })
+                .finally(function() {
+                  $scope.deleteButtonIsDisabled = false;
+                });
+            };
+
             /**
              * Helper function to filter fields by type
              */
@@ -335,6 +379,11 @@ angular.module('hopsWorksApp')
             };
 
 
+            /**
+             * Displays field description in sidebar
+             * @param field : identifier of field
+             */
+            
             self.onFieldFocus = function (field) {
               self.selectedField = field;
               $scope.selectedFieldDescription = null;
@@ -344,6 +393,11 @@ angular.module('hopsWorksApp')
               }
             };
 
+
+            /**
+             * Loads and displays truncated file preview in frontend
+             */
+            
             self.filePreview = function () {
                 var parameters = $location.search();
                 var datasetName = decodeURI(parameters.dataset);
