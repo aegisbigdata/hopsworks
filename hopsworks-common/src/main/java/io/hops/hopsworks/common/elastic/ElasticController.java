@@ -298,7 +298,7 @@ public class ElasticController {
     SortOrder sortOrder = order.toLowerCase().equals("asc") ? SortOrder.ASC : SortOrder.DESC;
     
     if (sort.equals("title")) {
-      srb = srb.addSort("name", sortOrder);
+      srb = srb.addSort("name.keyword", sortOrder);
     } else if (sort.equals("date")) {
       srb = srb.addSort("timestamp", sortOrder);
     } else {
