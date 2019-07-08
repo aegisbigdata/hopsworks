@@ -94,6 +94,7 @@ public class ElasticService {
    * @param license
    * @param minPrice
    * @param maxPrice
+   * @param projId
    * @param req
    * @return
    */
@@ -107,6 +108,7 @@ public class ElasticService {
     @ApiParam(value = "Filter by license (default: all)") @QueryParam("license") List<String> license,
     @ApiParam(value = "Filter by price, gte (default: all)") @QueryParam("minPrice") Float minPrice,
     @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
+    @ApiParam(value = "Filter by project id (default: all)") @QueryParam("projId") List<String> projId,
     @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       q = "";
@@ -117,17 +119,21 @@ public class ElasticService {
     }
   
     if (fileType == null) {
-      fileType = new ArrayList<>();;
+      fileType = new ArrayList<>();
     }
   
     if (license == null) {
-      license =  new ArrayList<>();
+      license = new ArrayList<>();
+    }
+    
+    if (projId == null) {
+      projId = new ArrayList<>();
     }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticAggregation>> searchResults =
       new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type, fileType, license, minPrice,
-        maxPrice
+        maxPrice, projId
         )) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
@@ -145,6 +151,7 @@ public class ElasticService {
    * @param limit
    * @param minPrice
    * @param maxPrice
+   * @param projId
    * @param req
    * @return
    */
@@ -165,6 +172,7 @@ public class ElasticService {
     @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
     @ApiParam(value = "The page number of matching results") @QueryParam("page") Integer page,
     @ApiParam(value = "The maximum number of matching results per page") @QueryParam("limit") Integer limit,
+    @ApiParam(value = "Filter by project id (default: all)") @QueryParam("projId") List<String> projId,
     @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       q = "";
@@ -197,11 +205,15 @@ public class ElasticService {
     if (limit == null || limit < 0) {
       limit = 15;
     }
+  
+    if (projId == null) {
+      projId = new ArrayList<>();
+    }
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticHit>> searchResults =
       new GenericEntity<List<ElasticHit>>(elasticController.search(q, sort, order, type, fileType, license, page,
-        limit, minPrice, maxPrice)) {};
+        limit, minPrice, maxPrice, projId)) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   
