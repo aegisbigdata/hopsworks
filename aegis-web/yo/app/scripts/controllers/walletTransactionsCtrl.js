@@ -107,7 +107,8 @@ angular.module('hopsWorksApp')
                     buyer: contract.buyer.split('#')[1],
                     seller: contract.seller.split('#')[1],
                 });
-              }
+              })
+            }
 
 /*            this.assetsSold = [
                 {
