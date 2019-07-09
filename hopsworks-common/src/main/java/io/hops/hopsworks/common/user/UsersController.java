@@ -66,10 +66,12 @@ import io.hops.hopsworks.common.dao.user.sshkey.SshkeysFacade;
 import io.hops.hopsworks.common.exception.RESTCodes;
 import io.hops.hopsworks.common.exception.ServiceException;
 import io.hops.hopsworks.common.exception.UserException;
+import io.hops.hopsworks.common.exception.WalletException;
 import io.hops.hopsworks.common.util.EmailBean;
 import io.hops.hopsworks.common.util.FormatUtils;
 import io.hops.hopsworks.common.util.QRCodeGenerator;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.hopsworks.common.wallet.WalletController;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ejb.EJB;
@@ -117,12 +119,14 @@ public class UsersController {
   private AuthController authController;
   @EJB
   private AccountAuditFacade auditManager;
+  @EJB
+  private WalletController walletController;
 
   // To send the user the QR code image
   private byte[] qrCode;
 
   public byte[] registerUser(UserDTO newUser, HttpServletRequest req) throws
-    NoSuchAlgorithmException, UserException {
+    NoSuchAlgorithmException, UserException, WalletException {
     userValidator.isValidNewUser(newUser);
     Users user = createNewUser(newUser, UserAccountStatus.NEW_MOBILE_ACCOUNT, UserAccountType.M_ACCOUNT_TYPE);
     addAddress(user);
@@ -143,7 +147,6 @@ public class UsersController {
       accountAuditFacade.registerAccountChange(user, AccountsAuditActions.QRCODE.name(),
           AccountsAuditActions.SUCCESS.name(), "", user, req);
     } catch (WriterException | MessagingException | IOException ex) {
-
       accountAuditFacade.registerAccountChange(user, AccountsAuditActions.REGISTRATION.name(),
           AccountsAuditActions.FAILED.name(), "", user, req);
       accountAuditFacade.registerAccountChange(user, AccountsAuditActions.QRCODE.name(),
@@ -152,9 +155,15 @@ public class UsersController {
       throw new UserException(RESTCodes.UserErrorCode.ACCOUNT_REGISTRATION_ERROR, Level.SEVERE,
         "user: " + newUser.getUsername(), ex.getMessage(), ex);
     }
+
+    WalletController.UserJSON jsonUser = new WalletController.UserJSON();
+    jsonUser.uid = newUser.getEmail();
+    jsonUser.balance = 10000;
+    walletController.createUser(jsonUser);
+
     return qrCode;
   }
-  
+
   @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
   public String activateUser(String role, Users user1, Users loggedInUser, HttpServletRequest httpServletRequest) {
     BbcGroup bbcGroup = bbcGroupFacade.findByGroupName(role);
@@ -171,7 +180,7 @@ public class UsersController {
           user1, httpServletRequest);
       return "Role could not be granted.";
     }
-    
+
     try {
       updateStatus(user1, UserAccountStatus.ACTIVATED_ACCOUNT);
       auditManager.registerAccountChange(loggedInUser,
@@ -184,10 +193,10 @@ public class UsersController {
           user1, httpServletRequest);
       return "User could not be activated.";
     }
-    
+
     return null;
   }
-  
+
   /**
    * Create a new user
    *

@@ -99,6 +99,7 @@ import io.hops.hopsworks.common.user.AuthController;
 import io.hops.hopsworks.common.user.UsersController;
 import io.hops.hopsworks.common.util.EmailBean;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -208,6 +209,8 @@ public class ProjectService {
   private JWTHelper jWTHelper;
   @Inject
   private FeaturestoreService featurestoreService;
+  @EJB 
+  private WalletController walletCtrl;
 
   private final static Logger LOGGER = Logger.getLogger(ProjectService.class.getName());
 
@@ -719,7 +722,9 @@ public class ProjectService {
     if (!ds.isPublicDs()) {
       throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_NOT_PUBLIC, Level.FINE, "datasetId: " + ds.getId());
     }
-
+    Users user = jWTHelper.getUserPrincipal(sc);
+    walletCtrl.joinDataset(ds, user);
+    
     Dataset newDS = new Dataset(inode, destProj);
     newDS.setShared(true);
 
@@ -731,8 +736,7 @@ public class ProjectService {
     }
     newDS.setEditable(DatasetPermissions.OWNER_ONLY);
     datasetFacade.persistDataset(newDS);
-    Users user = jWTHelper.getUserPrincipal(sc);
-
+    
     activityFacade.persistActivity(ActivityFacade.SHARED_DATA + newDS.toString() + " with project " + destProj.getName()
         , destProj, user, ActivityFacade.ActivityFlag.DATASET);
 

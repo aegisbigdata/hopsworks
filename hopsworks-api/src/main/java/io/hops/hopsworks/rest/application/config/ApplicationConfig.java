@@ -121,6 +121,9 @@ public class ApplicationConfig extends ResourceConfig {
     register(io.hops.hopsworks.api.hopssite.CommentService.class);
     register(io.hops.hopsworks.api.hopssite.RatingService.class);
 
+    //wallet
+    register(io.hops.hopsworks.api.wallet.WalletService.class);
+    
     //swagger
     register(io.swagger.jaxrs.listing.ApiListingResource.class);
     register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
