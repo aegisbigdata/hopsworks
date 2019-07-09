@@ -75,7 +75,7 @@ angular.module('hopsWorksApp')
                     // TODO: Handle error
                   }
                 );
-                WalletService.getSoldContracts(success.data.email).then(
+                WalletService.getSellContracts(success.data.email).then(
                   function (res) {
                     res.data.forEach(function (contract) {
                       getAssetName(contract, self.assetsSold);
