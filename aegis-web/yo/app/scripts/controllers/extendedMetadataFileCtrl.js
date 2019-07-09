@@ -51,8 +51,10 @@ angular.module('hopsWorksApp')
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
             const PROJECT_ID = $routeParams.projectID;
             const DISTRIBUTION_ID = $routeParams.distributionID;
+            const parameters = $location.search();
             const self = this;
 
+            self.fileName = decodeURI(parameters.file);
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
             self.template = {
@@ -191,9 +193,11 @@ angular.module('hopsWorksApp')
 
               graph.forEach((entry, index) => {
                 if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
-                  var distro = graph[index];
-                  fields.title.model = distro['http://purl.org/dc/terms/title'] || '';
-                  fields.description.model = distro['http://purl.org/dc/terms/description'] || '';
+                  let distro = graph[index];
+                  let title = graph[index]['http://purl.org/dc/terms/title'];
+                  let description = graph[index]['http://purl.org/dc/terms/description'];
+                  fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
+                  fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
                   fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
 
                   if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
@@ -219,6 +223,7 @@ angular.module('hopsWorksApp')
                   }
 
                   var new_field = {
+                    primary: entry[aegis_prexix + 'primary'] || false,
                     description: entry[aegis_prexix + 'description'] || '',
                     name: entry[aegis_prexix + 'name'] || '',
                     number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
@@ -237,10 +242,10 @@ angular.module('hopsWorksApp')
             self.loadExtendedDistroMetadata = function () {
               var parameters = $location.search();
               var path = 'hdfs://' + decodeURI(parameters.path);
+              $scope.data.fields.accessUrl.model = path;
 
               ExtendedMetadataAPIService.getDistributionMetadata(path)
                 .then(function(data) {
-                  console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
@@ -271,14 +276,15 @@ angular.module('hopsWorksApp')
               graph[0]['http://www.w3.org/ns/dcat#accessURL']['@id'] = 'hdfs://' + path;
 
               if (fields.format.model != '') graph[0]['dct:format'] = fields.format.model;
-              if (fields.language.model) graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
-              if (fields.license.model) graph[0].license = 'https://creativecommons.org/licenses/by/4.0/' + fields.license.model;
+              if (fields.language.model != '') graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
+              if (fields.license.model != '') graph[0].license = 'https://creativecommons.org/licenses/by/4.0/' + fields.license.model;
 
               if (fields.typeannotation.model.fields.length) {
                 var tabularFields = fields.typeannotation.model.fields;
                 tabularFields.forEach(function (field) {
                   var type = field.type ? "aegis:" + field.type : '';
                   graph[0]['aegis:hasField'].push({
+                    "aegis:primary": field.primary || false,
                     "aegis:description": field.description,
                     "aegis:name": field.name,
                     "aegis:number": field.number.toString(),
@@ -287,6 +293,12 @@ angular.module('hopsWorksApp')
                     }
                   });
                 });
+              }
+
+              // Clear fields if type of data is not tabular
+              if (fields.typeannotation.model.typeOfData != 'tabular') {
+                fields.typeannotation.model.fields = [];
+                graph[0]['aegis:hasField'] = [];
               }
 
               // Send to API
@@ -341,15 +353,18 @@ angular.module('hopsWorksApp')
                 
                 if (!self.filePreviewLoaded) {
                   $scope.filePreviewContents = 'Loading file preview...';
-                
                   dataSetService.filePreview(path, "head").then(
                     function (success) {
+                      var truncation_length = 750;
                       var fileDetails = JSON.parse(success.data.data);
                       var content = fileDetails.filePreviewDTO[0].content;
                       var conv = new showdown.Converter({parseImgDimensions: true});
                       self.filePreviewLoaded = true;
                       $scope.filePreviewContents = conv.makeHtml(content);
 
+                      if ($scope.filePreviewContents.length > truncation_length) {
+                        $scope.filePreviewContents = $scope.filePreviewContents.substring(0, truncation_length) + '\n\n[...]';
+                      }
                     }, function (error) {
                       //To hide README from UI
                       self.filePreviewLoaded = false;
