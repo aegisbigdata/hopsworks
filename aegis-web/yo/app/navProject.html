@@ -196,7 +196,7 @@
       <br>
       <div>
         <div class="sidebar-nav-static">
-          <small ng-show="clusterUtilCtrl.utilisation >= 0" style="color: #ddd; font-size: 80%;"><em>Cluster Utilization: {{clusterUtilCtrl.utilisation}}%</em></small>
+          <small ng-show="clusterUtilCtrl.utilisation >= 0" style="color: #ddd; font-size: 80%;"><em>{{ 'NAV.CLUSTER_USE' | translate }}: {{clusterUtilCtrl.utilisation}}%</em></small>
           <small ng-show="clusterUtilCtrl.utilisation < 0" style="color: #ddd;"><em>Cluster Utilization is unknown</em></small>
           <div class="progress" style="height: 10px;margin-bottom: 1px"
                uib-tooltip="Orange (> 50%): consider allocating less resources for your application.

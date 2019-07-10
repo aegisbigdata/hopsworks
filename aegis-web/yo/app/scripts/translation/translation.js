@@ -38,33 +38,219 @@
  */
 
 angular.module('hopsWorksApp')
-  .config(['$translateProvider', function($translateProvider) {
-    
-    $translateProvider
-      .translations('de_DE', {
-        NAV: {
-          PROJECT:           'Projekt',
-          SETTINGS:          'Einstellungen',
-          DATASETS:          'Datensätze',
-          MEMBERS:           'Mitglieder',
-          ACTIVITY_STREAM:   'Aktivitäten',
-          TOOLS:             'Werkzeuge',
-          EXTENDED_METADATA: 'Erweiterte Metadaten'
-        }})
-      .translations('en_EN', {
-        NAV: {
-          PROJECT:           'Project',
-          SETTINGS:          'Setings',
-          DATASETS:          'Datasets',
-          MEMBERS:           'Members',
-          ACTIVITY_STREAM:   'Activity-Stream',
-          TOOLS:             'Tools',
-          EXTENDED_METADATA: 'Extended Metadata'
-        }
-      })
-      .fallbackLanguage('en_EN');
+    .config(['$translateProvider', function ($translateProvider) {
 
-    $translateProvider.preferredLanguage('en_EN');
+        $translateProvider
+            .translations('de_DE', {
+                NAV: {
+                    PROJECT: 'Projekt',
+                    SETTINGS: 'Einstellungen',
+                    DATASETS: 'Datensätze',
+                    MEMBERS: 'Mitglieder',
+                    ACTIVITY_STREAM: 'Aktivitäten',
+                    TOOLS: 'Werkzeuge',
+                    EXTENDED_METADATA: 'Erweiterte Metadaten',
+                    MESSAGES: 'Nachrichten',
+                    SEARCH_PLACEHOLDER: 'Nach Projekten und Datensätzen suchen...',
+                    CLUSTER_USE: 'Cluster Auslastung'
+                },
+                FILTER: {
+                    LABEL: 'Filter',
+                    ALL: 'Alle',
+                    SHARED: 'Mit mir geteilt',
+                    PUBLIC: 'Öffentlich im Cluster',
+                    MY_DATASETS: 'Meine Datensätze',
+                    MY_REQUESTS: 'Meine Anfragen'
+                },
+                DATASET: {
+                    GO_UP: 'Zurück',
+                    NEW_FOLDER: 'Neuer Ordner',
+                    UPLOAD: 'Upload',
+                    FILE_ACTIONS: 'Datei-Aktionen',
+                    COPY: 'Kopieren',
+                    MOVE: 'Verschieben',
+                    RENAME: 'Umbenennen',
+                    DELETE: 'Löschen',
+                    DOWNLOAD: 'Download',
+                    PREVIEW: 'Vorschau',
+                    TYPE: 'Typ',
+                    NAME: 'Name',
+                    OWNER: 'Besitzer',
+                    LAST_MODIFIED: 'Letzte Änderung',
+                    SIZE: 'Dateigröße'
+                },
+                HOME: {
+                    STARTED: 'Hier geht\'s los',
+                    STARTED_INTRO: 'Sind Sie neu auf der AEGIS Plattform? Unser Tutorial gibt Ihnen einen Einblick in die Tools.',
+                    MARKETPLACE: 'AEGIS Marktplatz',
+                    MARKETPLACE_INTRO: 'Lernen Sie die Möglichkeiten von AEGIS kennen! Finden Sie populäre Datensätze für Ihr Projekt.',
+                    NEW: 'Neuigkeiten',
+                    NEW_INTRO: 'Erfahren Sie alle Neuigkeiten rund um die AEGIS Plattform.',
+                    LEARN: 'Mehr erfahren',
+                    GO_MARKET: 'Zum Marktplatz',
+                    READ_MORE: 'Weiter',
+                    MY_PROJECTS: 'Meine Projekte',
+                    NEW_PROJECT: 'Neues Projekt'
+                }
+            })
+            .translations('en_EN', {
+                NAV: {
+                    PROJECT: 'Project',
+                    SETTINGS: 'Setings',
+                    DATASETS: 'Datasets',
+                    MEMBERS: 'Members',
+                    ACTIVITY_STREAM: 'Activity-Stream',
+                    TOOLS: 'Tools',
+                    EXTENDED_METADATA: 'Extended Metadata',
+                    MESSAGES: 'Messages',
+                    SEARCH_PLACEHOLDER: 'Search for projects or datasets...',
+                    CLUSTER_USE: 'Cluster Utilization'
+                },
+                FILTER: {
+                    LABEL: 'Filter',
+                    ALL: 'All',
+                    SHARED: 'Shared with Me',
+                    PUBLIC: 'Public in Cluster',
+                    MY_DATASETS: 'My Datasets',
+                    MY_REQUESTS: 'My Requests'
+                },
+                DATASET: {
+                    GO_UP: 'Go up',
+                    NEW_FOLDER: 'New Folder',
+                    UPLOAD: 'Upload',
+                    FILE_ACTIONS: 'File Actions',
+                    COPY: 'Copy',
+                    MOVE: 'Move',
+                    RENAME: 'Rename',
+                    DELETE: 'Delete',
+                    DOWNLOAD: 'Download File',
+                    PREVIEW: 'Preview',
+                    TYPE: 'Type',
+                    NAME: 'Name',
+                    OWNER: 'Owner',
+                    LAST_MODIFIED: 'Last modified',
+                    SIZE: 'File size'
+                },
+                HOME: {
+                    STARTED: 'Getting Started',
+                    STARTED_INTRO: 'If you are new to AEGIS click here! Learn how to use the AEGIS tools through a quick tutorial',
+                    MARKETPLACE: 'AEGIS Marketplace',
+                    MARKETPLACE_INTRO: 'See what\'s possible with AEGIS! Browse popular AEGIS datasets to use for your project',
+                    NEW: 'What\'s New',
+                    NEW_INTRO: 'Find out the latest news related to the AEGIS platform',
+                    LEARN: 'Learn more',
+                    GO_MARKET: 'Go to Marketplace',
+                    READ_MORE: 'Read more',
+                    MY_PROJECTS: 'My Projects',
+                    NEW_PROJECT: 'New Project'
+                }
+            })
+            .translations('it_IT', {
+                NAV: {
+                    PROJECT: 'Project',
+                    SETTINGS: 'Setings',
+                    DATASETS: 'Datasets',
+                    MEMBERS: 'Members',
+                    ACTIVITY_STREAM: 'Activity-Stream',
+                    TOOLS: 'Tools',
+                    EXTENDED_METADATA: 'Extended Metadata',
+                    MESSAGES: 'Messages',
+                    SEARCH_PLACEHOLDER: 'Search for projects or datasets...',
+                    CLUSTER_USE: 'Cluster Utilization'
+                },
+                FILTER: {
+                    LABEL: 'Filter',
+                    ALL: 'All',
+                    SHARED: 'Shared with Me',
+                    PUBLIC: 'Public in Cluster',
+                    MY_DATASETS: 'My Datasets',
+                    MY_REQUESTS: 'My Requests'
+                },
+                DATASET: {
+                    GO_UP: 'Go up',
+                    NEW_FOLDER: 'New Folder',
+                    UPLOAD: 'Upload',
+                    FILE_ACTIONS: 'File Actions',
+                    COPY: 'Copy',
+                    MOVE: 'Move',
+                    RENAME: 'Rename',
+                    DELETE: 'Delete',
+                    DOWNLOAD: 'Download File',
+                    PREVIEW: 'Preview',
+                    TYPE: 'Type',
+                    NAME: 'Name',
+                    OWNER: 'Owner',
+                    LAST_MODIFIED: 'Last modified',
+                    SIZE: 'File size'
+                },
+                HOME: {
+                    STARTED: 'Getting Started',
+                    STARTED_INTRO: 'If you are new to AEGIS click here! Learn how to use the AEGIS tools through a quick tutorial',
+                    MARKETPLACE: 'AEGIS Marketplace',
+                    MARKETPLACE_INTRO: 'See what\'s possible with AEGIS! Browse popular AEGIS datasets to use for your project',
+                    NEW: 'What\'s New',
+                    NEW_INTRO: 'Find out the latest news related to the AEGIS platform',
+                    LEARN: 'Learn more',
+                    GO_MARKET: 'Go to Marketplace',
+                    READ_MORE: 'Read more',
+                    MY_PROJECTS: 'My Projects',
+                    NEW_PROJECT: 'New Project'
+                }
+            })
+            .translations('el_GR', {
+                NAV: {
+                    PROJECT: 'Project',
+                    SETTINGS: 'Setings',
+                    DATASETS: 'Datasets',
+                    MEMBERS: 'Members',
+                    ACTIVITY_STREAM: 'Activity-Stream',
+                    TOOLS: 'Tools',
+                    EXTENDED_METADATA: 'Extended Metadata',
+                    MESSAGES: 'Messages',
+                    SEARCH_PLACEHOLDER: 'Search for projects or datasets...',
+                    CLUSTER_USE: 'Cluster Utilization'
+                },
+                FILTER: {
+                    LABEL: 'Filter',
+                    ALL: 'All',
+                    SHARED: 'Shared with Me',
+                    PUBLIC: 'Public in Cluster',
+                    MY_DATASETS: 'My Datasets',
+                    MY_REQUESTS: 'My Requests'
+                },
+                DATASET: {
+                    GO_UP: 'Go up',
+                    NEW_FOLDER: 'New Folder',
+                    UPLOAD: 'Upload',
+                    FILE_ACTIONS: 'File Actions',
+                    COPY: 'Copy',
+                    MOVE: 'Move',
+                    RENAME: 'Rename',
+                    DELETE: 'Delete',
+                    DOWNLOAD: 'Download File',
+                    PREVIEW: 'Preview',
+                    TYPE: 'Type',
+                    NAME: 'Name',
+                    OWNER: 'Owner',
+                    LAST_MODIFIED: 'Last modified',
+                    SIZE: 'File size'
+                },
+                HOME: {
+                    STARTED: 'Getting Started',
+                    STARTED_INTRO: 'If you are new to AEGIS click here! Learn how to use the AEGIS tools through a quick tutorial',
+                    MARKETPLACE: 'AEGIS Marketplace',
+                    MARKETPLACE_INTRO: 'See what\'s possible with AEGIS! Browse popular AEGIS datasets to use for your project',
+                    NEW: 'What\'s New',
+                    NEW_INTRO: 'Find out the latest news related to the AEGIS platform',
+                    LEARN: 'Learn more',
+                    GO_MARKET: 'Go to Marketplace',
+                    READ_MORE: 'Read more',
+                    MY_PROJECTS: 'My Projects',
+                    NEW_PROJECT: 'New Project'
+                }
+            })
+            .fallbackLanguage('en_EN');
 
-  }]);
+        $translateProvider.preferredLanguage('en_EN');
 
+    }]);

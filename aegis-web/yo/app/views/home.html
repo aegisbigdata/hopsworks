@@ -43,7 +43,7 @@
   <div class="container content-wrapper" ng-controller="HomeCtrl as homeCtrl">
     <div class="row">
       <div class="col-md-12">
-        <h1 style="margin-top: 40px; margin-bottom: 30px">My Projects ({{homeCtrl.projects.length}})</h1>
+        <h1 style="margin-top: 40px; margin-bottom: 30px">{{ 'HOME.MY_PROJECTS' | translate }} ({{homeCtrl.projects.length}})</h1>
       </div>
     </div>
     <div class="row">
@@ -52,7 +52,7 @@
           ng-click="homeCtrl.newProject()"
           class="home-project-container-new"
         >
-          <h4 class="home-project-container-title"><span class="fa fa-plus"></span>New Project</h4>
+          <h4 class="home-project-container-title"><span class="fa fa-plus"></span> {{ 'HOME.NEW_PROJECT' | translate }}</h4>
         </a>
       </div>
       <div class="col-sm-3" ng-repeat="project in homeCtrl.projects| filter: searchProject:false | startFrom:(homeCtrl.currentPageProjects - 1) * homeCtrl.pageSizeProjects | limitTo:homeCtrl.pageSizeProjects | orderBy: homeCtrl.sortBy">
@@ -70,26 +70,29 @@
       </div>
 
     </div>
-    <ul uib-pager items-per-page="11" total-items="homeCtrl.totalItemsProjects" ng-model="homeCtrl.currentPageProjects" class="aegis-home-page" ></ul>
+    <ul uib-pager items-per-page="11"
+        total-items="homeCtrl.totalItemsProjects"
+        ng-model="homeCtrl.currentPageProjects"
+        class="aegis-home-page"></ul>
     <hr style="margin-bottom: 40px">
     <div class="row" style="margin-bottom: 25px">
       <div class="col-md-4" style="text-align: center">
         <img src="images/home_getting_started.png" height="130px">
-        <h2 style=" margin-bottom: 20px">Getting Started</h2>
-        <p>If you are new to AEGIS click here! Learn how to use the AEGIS tools through a quick tutorial</p>
-        <a href="#!/getStarted">&raquo; Learn more</a>
+        <h2 style=" margin-bottom: 20px">{{ 'HOME.STARTED' | translate }}</h2>
+        <p>{{ 'HOME.STARTED_INTRO' | translate }}</p>
+        <a href="#!/getStarted">&raquo; {{ 'HOME.LEARN' | translate }}</a>
       </div>
       <div class="col-md-4" style="text-align: center">
         <img src="images/home_marketplace.png" height="130px">
-        <h2 style="margin-bottom: 20px">AEGIS Marketplace</h2>
-        <p>See what's possible with AEGIS! Browse popular AEGIS datasets to use for your project</p>
-        <a href="#!/search">&raquo; Go to Marketplace</a>
+        <h2 style="margin-bottom: 20px">{{ 'HOME.MARKETPLACE' | translate }}</h2>
+        <p>{{ 'HOME.MARKETPLACE_INTRO' | translate }}</p>
+        <a href="#!/search">&raquo; {{ 'HOME.GO_MARKET' | translate }}</a>
       </div>
       <div class="col-md-4" style="text-align: center">
         <img src="images/home_news.png" height="130px">
-        <h2 style="margin-bottom: 20px">What's New</h2>
-        <p>Find out the latest news related to the AEGIS platform</p>
-        <a href="https://www.aegis-bigdata.eu/news-events/" target="_blank">&raquo; Read more</a>
+        <h2 style="margin-bottom: 20px">{{ 'HOME.NEW' | translate }}</h2>
+        <p>{{ 'HOME.NEW_INTRO' | translate }}</p>
+        <a href="https://www.aegis-bigdata.eu/news-events/" target="_blank">&raquo; {{ 'HOME.READ_MORE' | translate }}</a>
       </div>
     </div>
 
