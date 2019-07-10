@@ -55,17 +55,30 @@ angular.module('hopsWorksApp')
                 globalSearch: function (searchTerm) {
                   // return $http.get('/api/elastic/globalsearch/' + searchTerm);
                   var baseUrl = '/api/elastic/search?q=' + searchTerm.q;
+                  var aggUrl = '/api/elastic/aggregation?q=' + searchTerm.q;
                   if(Array.isArray(searchTerm.type)) {
                     var types = searchTerm.type;
                     angular.forEach(types, function(type,key){
                       baseUrl +=  '&type='+ type;
                     })
                   }
+                  if(searchTerm.page) {
+                    baseUrl +=  '&page='+ searchTerm.page;
+                  }
                   if(searchTerm.limit) {
                     baseUrl +=  '&limit='+ searchTerm.limit;
                   }
+                  if(searchTerm.sort) {
+                    baseUrl +=  '&sort='+ searchTerm.sort;
+                  }
+                  if(searchTerm.order) {
+                    baseUrl +=  '&order='+ searchTerm.order;
+                  }
                   
-                  return $http.get(baseUrl);
+                  return {
+                    'search': $http.get(baseUrl),
+                    'aggr': $http.get(aggUrl)
+                  }
                 },
                 /**
                  * Search under a project hitting hitting 'project' index

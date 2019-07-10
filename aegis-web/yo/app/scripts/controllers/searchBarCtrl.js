@@ -70,7 +70,7 @@ angular.module('hopsWorksApp')
       self.search = function () {
         // mainParent.showSearchPage = true;
         self.currentPage = 1;
-        self.pageSize = 9;
+        self.pageSize = 15;
         mainParent.searchResult = [];
 
         // if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
@@ -89,8 +89,9 @@ angular.module('hopsWorksApp')
           } else {
             queryParams = $location.search();
           }
+          //  Call API Search
           elasticService.globalSearch(queryParams)
-            .then(function (response) {
+            .search.then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
@@ -117,6 +118,16 @@ angular.module('hopsWorksApp')
                 ttl: 5000
               });
           });
+          //  Call API Aggregation
+          elasticService.globalSearch(queryParams)
+            .aggr.then(function (response) {
+              mainParent.totalResults = response.data[0].value;
+            }, function (error) {
+              growl.error(error.data.errorMsg, {
+                title: 'Error',
+                ttl: 5000
+              });
+          });
         } else if (self.searchType === "global" && !$rootScope.isDelaEnabled) {
           var searchHits;
           //triggering a global search
@@ -132,8 +143,9 @@ angular.module('hopsWorksApp')
           } else {
             queryParams = $location.search();
           }
+        //  Call API Search
           elasticService.globalSearch(queryParams)
-            .then(function (response) {
+            .search.then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
@@ -142,14 +154,25 @@ angular.module('hopsWorksApp')
               }
               mainParent.searching = false;
               self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
-              self.resultItems = mainParent.searchResult.length;
+              // self.resultItems = mainParent.searchResult.length;
             }, function (error) {
               mainParent.searching = false;
               growl.error(error.data.errorMsg, {
                 title: 'Error',
                 ttl: 5000
               });
-            });
+          });
+            
+          //  Call API Aggregation
+          elasticService.globalSearch(queryParams)
+            .aggr.then(function (response) {
+              mainParent.totalResults = response.data[0].value;
+            }, function (error) {
+              growl.error(error.data.errorMsg, {
+                title: 'Error',
+                ttl: 5000
+              });
+          });
         } else if (self.searchType === "projectCentric") {
           // TODO: manage with new API
           if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
