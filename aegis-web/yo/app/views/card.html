@@ -39,7 +39,7 @@
 
 <div id="card-{{pageNo}}-{{cardIndex}}" class="card-item">
   <div class="card-item-content">
-    <div class="header col-md-3">
+    <div class="header col-md-3" ng-click="cardCtrl.goToProject(content.id)">
       <label>
         {{content.type === 'proj'? 'project': ''}}
         {{content.type === 'ds' && !content.public_ds ? 'dataset': ''}} 

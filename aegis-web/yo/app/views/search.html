@@ -234,20 +234,17 @@
     
     <div class="row search-result-header">
       <div class="col-md-6 pull-left">
-        <h4>{{mainCtrl.searchResult.length}} Results found for: {{mainCtrl.itemSearched | limitTo: 85 }}
+        <h4>{{mainCtrl.totalResults}} Results found for: {{mainCtrl.itemSearched | limitTo: 85 }}
             {{ mainCtrl.itemSearched.length > 85 ? '...' : ''}}</h4>
       </div>
         <div class="col-md-6 search-result-sort pull-right">
             <h4 class="ng-binding">Sort by:</h4>
             <div>
-                <select class="search-form-control">
-                  <option value="RASC" selected>Relevance ascending</option>
-                  <option value="RDESC">Relevance decreasing</option>
-                  <option value="LASC" selected>Latest ascending</option>
-                  <option value="LDESC">Latest descending</option>
-                  <option value="TASC" selected>Title ascending</option>
-                  <option value="TDESC">Title descending</option>
-                </select>
+                <select 
+                    class="search-form-control" 
+                    ng-options="option.name for option in mainCtrl.options_sortby track by option.value"
+                    ng-model="mainCtrl.selectedSortby"
+                    ng-change="mainCtrl.activeFilter('sortby')"></select>
               </div>
         </div>
       <!-- <div class="col-xs-2 pull-right">
@@ -265,6 +262,7 @@
       <div ng-if="!mainCtrl.searching" ng-init="searchResultCtrl.init(mainCtrl.searchResult)"></div>
       <div dir-paginate="result in mainCtrl.searchResult | orderBy:sortKey | filter: {public_ds: searchTypePub} | filter: {type: filterType} | filter: {user: searchOwner} | filter: {name: searchName} | itemsPerPage:mainCtrl.pageSize" 
       current-page="mainCtrl.filterPage"
+      total-items="mainCtrl.totalResults"
       >
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
@@ -279,8 +277,8 @@
     </div>
     <div class="row divider" style="margin-bottom: 0px;"></div>
     <div class="row" style="margin-top: -20px">
-        <dir-pagination-controls ng-show="(mainCtrl.searchResult.length /mainCtrl.pageSize) > 1 "
-            max-size="1000"
+        <dir-pagination-controls ng-show="(mainCtrl.totalResults/mainCtrl.pageSize) > 1 "
+            max-size="10"
             direction-links="true"
             boundary-links="true"
             on-page-change="mainCtrl.updateFilterPage(newPageNumber)"

@@ -43,10 +43,10 @@ angular.module('hopsWorksApp')
             return function () {
               var services = {
                 itemAccess: function (inodeId) {
-                  return $http.get('/api/project/' + inodeId '/access');
+                  return $http.get('/api/project/' + inodeId + '/access');
                 },
                 projectAccess: function(projectId) {
-                  return $http.get('/api/project/' + projectId '/accessByProjectId');
+                  return $http.get('/api/project/' + projectId + '/accessByProjectId');
                 }
               };
               return services;
