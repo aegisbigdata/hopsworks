@@ -42,7 +42,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class ItemAccessDTO {
-  private String result;
   private String type;
   private Long inodeId;
   private Integer projectId;
@@ -52,23 +51,14 @@ public class ItemAccessDTO {
   
   public ItemAccessDTO() {}
   
-  public ItemAccessDTO(String result, String type, Long inodeId, Integer projectId, Integer datasetId,
+  public ItemAccessDTO(String type, Long inodeId, Integer projectId, Integer datasetId,
     String name, String description) {
-    this.result = result;
     this.type = type;
     this.inodeId = inodeId;
     this.projectId = projectId;
     this.datasetId = datasetId;
     this.name = name;
     this.description = description;
-  }
-  
-  public String getResult() {
-    return result;
-  }
-  
-  public void setResult(String result) {
-    this.result = result;
   }
   
   public String getType() {

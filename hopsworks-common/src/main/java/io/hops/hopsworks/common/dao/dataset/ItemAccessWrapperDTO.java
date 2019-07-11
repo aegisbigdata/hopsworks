@@ -39,15 +39,23 @@
 package io.hops.hopsworks.common.dao.dataset;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 @XmlRootElement
-public class SimpleItemAccessDTO {
-  public String result;
+public class ItemAccessWrapperDTO {
+  private String result;
+  private List<ItemAccessDTO> items;
   
-  public SimpleItemAccessDTO() {}
+  public ItemAccessWrapperDTO() {}
   
-  public SimpleItemAccessDTO(String result) {
+  public ItemAccessWrapperDTO(String result) {
     this.result = result;
+    this.items = null;
+  }
+  
+  public ItemAccessWrapperDTO(String result, List<ItemAccessDTO> items) {
+    this.result = result;
+    this.items = items;
   }
   
   public String getResult() {
@@ -56,5 +64,13 @@ public class SimpleItemAccessDTO {
   
   public void setResult(String result) {
     this.result = result;
+  }
+  
+  public List<ItemAccessDTO> getItems() {
+    return items;
+  }
+  
+  public void setItems(List<ItemAccessDTO> items) {
+    this.items = items;
   }
 }
