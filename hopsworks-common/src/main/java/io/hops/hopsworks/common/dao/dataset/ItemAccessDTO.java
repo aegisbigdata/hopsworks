@@ -38,6 +38,9 @@
  */
 package io.hops.hopsworks.common.dao.dataset;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class ItemAccessDTO {
   private String type;
   private Long inodeId;
@@ -55,6 +58,54 @@ public class ItemAccessDTO {
     this.projectId = projectId;
     this.datasetId = datasetId;
     this.name = name;
+    this.description = description;
+  }
+  
+  public String getType() {
+    return type;
+  }
+  
+  public void setType(String type) {
+    this.type = type;
+  }
+  
+  public Long getInodeId() {
+    return inodeId;
+  }
+  
+  public void setInodeId(Long inodeId) {
+    this.inodeId = inodeId;
+  }
+  
+  public Integer getProjectId() {
+    return projectId;
+  }
+  
+  public void setProjectId(Integer projectId) {
+    this.projectId = projectId;
+  }
+  
+  public Integer getDatasetId() {
+    return datasetId;
+  }
+  
+  public void setDatasetId(Integer datasetId) {
+    this.datasetId = datasetId;
+  }
+  
+  public String getName() {
+    return name;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
+  }
+  
+  public String getDescription() {
+    return description;
+  }
+  
+  public void setDescription(String description) {
     this.description = description;
   }
 }

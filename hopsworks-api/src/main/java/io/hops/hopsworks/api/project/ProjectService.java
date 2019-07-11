@@ -933,7 +933,7 @@ public class ProjectService {
     }
     for(Dataset dataset : datasets) {
       if(hasProjectAccess(dataset.getProject(), user)) {
-        ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId, dataset.getProject().getId(), dataset.getId(), 
+        ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId, dataset.getProject().getId(), dataset.getId(),
           dataset.getName(), dataset.getDescription());
         dtos.add(dto);
       }
@@ -941,7 +941,9 @@ public class ProjectService {
     if(dtos.isEmpty()) {
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
     }
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(dtos).build();
+    GenericEntity<List<ItemAccessDTO>> result = new GenericEntity<List<ItemAccessDTO>>(dtos) {
+    };
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
   }
     
   private boolean hasProjectAccess(Project project, Users user) {
