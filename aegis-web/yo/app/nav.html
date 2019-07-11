@@ -58,8 +58,11 @@
       <div class="collapse navbar-collapse" id="navbar">
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
-            <a class="navbar-link dropdown-toggle" data-toggle="dropdown" style="margin-top: 5px;" aria-expanded="false" id="navbarProfile">
-              <img alt="" src="images/flags/{{ getCurrentLanguage()}}.png" style="height: 35px;" class="profile-image img-circle">
+            <a class="navbar-link dropdown-toggle" data-toggle="dropdown" style="margin-top: 5px;" aria-expanded="false" id="navbarLanguage">
+              <img ng-if="getCurrentLanguage() == 'en_EN'" alt="" src="images/flags/en_EN.png" style="height: 35px;" class="profile-image img-circle">
+              <img ng-if="getCurrentLanguage() == 'de_DE'" alt="" src="images/flags/de_DE.png" style="height: 35px;" class="profile-image img-circle">
+              <img ng-if="getCurrentLanguage() == 'it_IT'" alt="" src="images/flags/it_IT.png" style="height: 35px;" class="profile-image img-circle">
+              <img ng-if="getCurrentLanguage() == 'el_GR'" alt="" src="images/flags/el_GR.png" style="height: 35px;" class="profile-image img-circle">
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
