@@ -45,17 +45,16 @@
         </div>
     </div>
     <div growl reference="13" class="pull-right"></div>
-    <div ng-if="!mainCtrl.showSearchPage" class="container content-wrapper"
-         ng-init="walletTransactionsCtrl.setupStyle()">
+    <div ng-if="!mainCtrl.showSearchPage" class="container content-wrapper" ng-init="walletTransactionsCtrl.setupStyle()">
         <div class="bs-docs-sidebar">
             <ul class="nav nav-stacked fixed">
                 <li class="sidebar-header-0">AEGIS Wallet</li>
                 <li class="sidebar-header-1" ng-repeat="transaction in walletTransactionsCtrl.transactionCategories">
-                    <a ng-click="walletTransactionsCtrl.selectTransaction(transaction)">{{ transaction.name }}</a></li>
+                    <a ng-click="walletTransactionsCtrl.selectTransaction(transaction)">{{ transaction.name }}</a>
+                </li>
             </ul>
         </div>
-        <article class="transactions-view" id="transactions-article"
-                 style="border-left: 1px dashed lightgrey; padding-left: 15px;">
+        <article class="transactions-view" id="transactions-article" style="border-left: 1px dashed lightgrey; padding-left: 15px;">
             <div class="row">
                 <div class="col-sm-12">
                     <h3 class="transactions-view-heading">{{ walletTransactionsCtrl.selectedTransaction.name }}</h3>
@@ -65,14 +64,12 @@
                 <div class="row">
                     <div class="col">
                         <ul class="nav nav-tabs nav-align-center">
-                            <li ng-class="{active: walletTransactionsCtrl.currentTabIndex === 0}"
-                                ng-click="walletTransactionsCtrl.currentTabIndex = 0;">
+                            <li ng-class="{active: walletTransactionsCtrl.currentTabIndex === 0}" ng-click="walletTransactionsCtrl.currentTabIndex = 0;">
                                 <a>
                                     Assets Sold
                                 </a>
                             </li>
-                            <li ng-class="{active: walletTransactionsCtrl.currentTabIndex === 1}"
-                                ng-click="walletTransactionsCtrl.currentTabIndex = 1;">
+                            <li ng-class="{active: walletTransactionsCtrl.currentTabIndex === 1}" ng-click="walletTransactionsCtrl.currentTabIndex = 1;">
                                 <a>
                                     Assets Bought
                                 </a>
@@ -85,25 +82,24 @@
                         <div class="col-sm-12" style="margin-top: 20px;">
                             <table st-table="rowCollection" class="table table-striped">
                                 <thead>
-                                <tr>
-                                    <th>Dataset</th>
-                                    <th>Coins Earned</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        <th>Dataset</th>
+                                        <th>Cost</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="asset in walletTransactionsCtrl.assetsSold">
-                                    <td>{{ asset.dataset }}</td>
-                                    <td>{{ asset.coins }}</td>
-                                    <td>{{ asset.date }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                                ng-click="walletTransactionsCtrl.displayTransaction(asset)">
-                                            <i class="glyphicon glyphicon-search glyphicon-override"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                    <tr ng-repeat="asset in walletTransactionsCtrl.assetsSold">
+                                        <td>{{ asset.dataset }}</td>
+                                        <td>{{ asset.coins }}</td>
+                                        <td>{{ asset.date }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary" ng-click="walletTransactionsCtrl.displayTransaction(asset)">
+                                                <i class="glyphicon glyphicon-search glyphicon-override"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -112,25 +108,24 @@
                         <div class="col-sm-12" style="margin-top: 20px;">
                             <table st-table="rowCollection" class="table table-striped">
                                 <thead>
-                                <tr>
-                                    <th>Dataset</th>
-                                    <th>Coins Earned</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        <th>Dataset</th>
+                                        <th>Cost</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="asset in walletTransactionsCtrl.assetsSold">
-                                    <td>{{ asset.dataset }}</td>
-                                    <td>{{ asset.coins }}</td>
-                                    <td>{{ asset.date }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                                ng-click="walletTransactionsCtrl.displayTransaction(asset)">
-                                            <i class="glyphicon glyphicon-search glyphicon-override"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                    <tr ng-repeat="asset in walletTransactionsCtrl.assetsBought">
+                                        <td>{{ asset.dataset }}</td>
+                                        <td>{{ asset.coins }}</td>
+                                        <td>{{ asset.date }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary" ng-click="walletTransactionsCtrl.displayTransaction(asset)">
+                                                <i class="glyphicon glyphicon-search glyphicon-override"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

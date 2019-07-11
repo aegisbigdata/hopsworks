@@ -40,8 +40,8 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('CardCtrl', ['$scope', 'ProjectService', 'DelaService', '$routeParams', '$rootScope', '$location',
-          function ($scope, ProjectService, DelaService, $routeParams, $rootScope, $location) {
+        .controller('CardCtrl', ['$scope', 'ProjectService', 'DelaService', '$routeParams', '$rootScope', '$location', 'ItemAccessService',
+          function ($scope, ProjectService, DelaService, $routeParams, $rootScope, $location, ItemAccessService) {
             var self = this;
             self.detail = [];
             var init = function (content) {
@@ -149,6 +149,16 @@ angular.module('hopsWorksApp')
                 $location.path('/delahopsDataset');
               }
             };
+
+            // self.goToProject = function (id) {
+            //   console.log(id);
+            //   var itemAccessService = ItemAccessService();
+            //   itemAccessService.projectAccess(id).then(function (response) {
+            //     console.log(response);
+            //   }, function (error) {
+            //     console.log("error ", error);
+            //   });
+            // }
             
           }]);
 

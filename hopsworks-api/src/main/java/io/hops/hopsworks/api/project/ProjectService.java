@@ -57,6 +57,7 @@ import io.hops.hopsworks.api.serving.TfServingService;
 import io.hops.hopsworks.api.util.RESTApiJsonResponse;
 import io.hops.hopsworks.api.util.LocalFsService;
 import io.hops.hopsworks.common.constants.message.ResponseMessages;
+import io.hops.hopsworks.common.dao.dataset.ItemAccessDTO;
 import io.hops.hopsworks.common.dao.dataset.DataSetDTO;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
@@ -99,6 +100,7 @@ import io.hops.hopsworks.common.user.AuthController;
 import io.hops.hopsworks.common.user.UsersController;
 import io.hops.hopsworks.common.util.EmailBean;
 import io.hops.hopsworks.common.util.Settings;
+import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -126,6 +128,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -208,6 +211,8 @@ public class ProjectService {
   private JWTHelper jWTHelper;
   @Inject
   private FeaturestoreService featurestoreService;
+  @EJB 
+  private WalletController walletCtrl;
 
   private final static Logger LOGGER = Logger.getLogger(ProjectService.class.getName());
 
@@ -719,7 +724,9 @@ public class ProjectService {
     if (!ds.isPublicDs()) {
       throw new DatasetException(RESTCodes.DatasetErrorCode.DATASET_NOT_PUBLIC, Level.FINE, "datasetId: " + ds.getId());
     }
-
+    Users user = jWTHelper.getUserPrincipal(sc);
+    walletCtrl.joinDataset(ds, user);
+    
     Dataset newDS = new Dataset(inode, destProj);
     newDS.setShared(true);
 
@@ -731,8 +738,7 @@ public class ProjectService {
     }
     newDS.setEditable(DatasetPermissions.OWNER_ONLY);
     datasetFacade.persistDataset(newDS);
-    Users user = jWTHelper.getUserPrincipal(sc);
-
+    
     activityFacade.persistActivity(ActivityFacade.SHARED_DATA + newDS.toString() + " with project " + destProj.getName()
         , destProj, user, ActivityFacade.ActivityFlag.DATASET);
 
@@ -874,20 +880,69 @@ public class ProjectService {
   }
   
   @GET
-  @Path("{id}/access")
+  @Path("{projectId}/accessByProjectId")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
-  public Response accessQuery(ContainerRequestContext requestContext, @PathParam("id") Integer projectId) {
+  public Response hasProjectAccess(@PathParam("projectId") Integer projectId, 
+    ContainerRequestContext requestContext) {
     String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
     Users user = userFacade.findByEmail(userEmail);
     Project project = projectFacade.find(projectId);
-    boolean accessToProject = false;
-    for(ProjectTeam member : project.getProjectTeamCollection()) {
-      if(member.getUser().equals(user)) {
-        accessToProject = true;
-        break;
+    
+    if(hasProjectAccess(project, user)) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
+    } else {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
+    }
+  }
+  
+  @GET
+  @Path("{inodeId}/access")
+  @Produces(MediaType.APPLICATION_JSON)
+  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
+  public Response accessQuery(ContainerRequestContext requestContext, @PathParam("inodeId") Long inodeId) {
+    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByEmail(userEmail);
+    Inode inode = inodes.findById(inodeId);
+    if(inode == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+    }
+    List<ItemAccessDTO> dtos = new LinkedList<>();
+    Project project = projectFacade.findByInodeId(inode.getInodePK().getParentId(), inode.getInodePK().getName());
+    if(project != null) {
+      if (hasProjectAccess(project, user)) {
+        ItemAccessDTO dto = new ItemAccessDTO("project", inodeId, project.getId(), null,
+          project.getName(), project.getDescription());
+        dtos.add(dto);
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(dtos).build();
+      } else {
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
       }
     }
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(accessToProject).build();
+    
+    List<Dataset> datasets = datasetFacade.findByInodeId(inodeId);
+    if(datasets.isEmpty()) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+    }
+    for(Dataset dataset : datasets) {
+      if(hasProjectAccess(dataset.getProject(), user)) {
+        ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId, dataset.getProject().getId(), dataset.getId(), 
+          dataset.getName(), dataset.getDescription());
+        dtos.add(dto);
+      }
+    }
+    if(dtos.isEmpty()) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
+    }
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(dtos).build();
+  }
+    
+  private boolean hasProjectAccess(Project project, Users user) {
+    for(ProjectTeam member : project.getProjectTeamCollection()) {
+      if(member.getUser().equals(user)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
