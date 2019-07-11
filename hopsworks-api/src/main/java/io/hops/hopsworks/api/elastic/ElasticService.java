@@ -43,6 +43,8 @@ import com.google.common.base.Strings;
 import io.hops.hopsworks.api.filter.AllowedProjectRoles;
 import io.hops.hopsworks.api.filter.Audience;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
+import io.hops.hopsworks.api.jwt.JWTHelper;
+import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.elastic.ElasticAggregation;
 import io.hops.hopsworks.common.elastic.ElasticController;
 import io.hops.hopsworks.common.elastic.ElasticHit;
@@ -86,6 +88,8 @@ public class ElasticService {
   private NoCacheResponse noCacheResponse;
   @EJB
   private ElasticController elasticController;
+  @EJB
+  private JWTHelper jWTHelper;
   
   /**
    * Aggregation end point aegis
@@ -99,6 +103,7 @@ public class ElasticService {
    * @param minPrice
    * @param maxPrice
    * @param projId
+   * @param owner
    * @param req
    * @return
    */
@@ -115,11 +120,12 @@ public class ElasticService {
     @ApiParam(value = "Filter by price, gte (default: all)") @QueryParam("minPrice") Float minPrice,
     @ApiParam(value = "Filter by price, lte (default: all)") @QueryParam("maxPrice") Float maxPrice,
     @ApiParam(value = "Filter by project id (default: all)") @QueryParam("projId") List<String> projId,
+    @ApiParam(value = "Filter by owner my and/or others (default: all)") @QueryParam("owner") List<String> owner,
     @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       q = "";
     }
-  
+    
     if (type == null) {
       type = new ArrayList<>();
     }
@@ -134,6 +140,10 @@ public class ElasticService {
     
     if (projId == null) {
       projId = new ArrayList<>();
+    }
+    
+    if (owner == null) {
+      owner = new ArrayList<>();
     }
   
     Long minDateLong = null;
@@ -153,11 +163,14 @@ public class ElasticService {
         e.printStackTrace();
       }
     }
+  
+    Users user = jWTHelper.getUserPrincipal(req);
+    String username = user.getFname() + " " + user.getLname();
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticAggregation>> searchResults =
       new GenericEntity<List<ElasticAggregation>>(elasticController.aggregation(q, type, fileType, license, minPrice,
-        maxPrice, projId, minDateLong, maxDateLong)) {};
+        maxPrice, projId, minDateLong, maxDateLong, owner, username)) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   
@@ -177,6 +190,7 @@ public class ElasticService {
    * @param minPrice
    * @param maxPrice
    * @param projId
+   * @param owner
    * @param req
    * @return
    */
@@ -189,7 +203,6 @@ public class ElasticService {
     @ApiParam(value = "Sort order asc/desc (default: desc)") @QueryParam("order") String order,
     @ApiParam(value = "Filter by type prof, ds or inode (default: all)") @QueryParam("type") List<String> type,
     @ApiParam(value = "Filter by file type (default: all)") @QueryParam("fileType") List<String> fileType,
-    //@QueryParam("owner") List<String> owner,
     @ApiParam(value = "Filter by date, gte (default: all)") @QueryParam("minDate") String minDate,
     @ApiParam(value = "Filter by date, lte (default: all)") @QueryParam("maxDate") String maxDate,
     @ApiParam(value = "Filter by license (default: all)") @QueryParam("license") List<String> license,
@@ -198,6 +211,7 @@ public class ElasticService {
     @ApiParam(value = "The page number of matching results") @QueryParam("page") Integer page,
     @ApiParam(value = "The maximum number of matching results per page") @QueryParam("limit") Integer limit,
     @ApiParam(value = "Filter by project id (default: all)") @QueryParam("projId") List<String> projId,
+    @ApiParam(value = "Filter by owner my and/or others (default: all)") @QueryParam("owner") List<String> owner,
     @Context HttpServletRequest req) throws ServiceException {
     if (Strings.isNullOrEmpty(q)) {
       q = "";
@@ -235,6 +249,10 @@ public class ElasticService {
       projId = new ArrayList<>();
     }
   
+    if (owner == null) {
+      owner = new ArrayList<>();
+    }
+  
     Long minDateLong = null;
     if (minDate != null) {
       try {
@@ -252,11 +270,14 @@ public class ElasticService {
         e.printStackTrace();
       }
     }
+  
+    Users user = jWTHelper.getUserPrincipal(req);
+    String username = user.getFname() + " " + user.getLname();
     
     logger.log(Level.INFO, "Local content path {0}", req.getRequestURL().toString());
     GenericEntity<List<ElasticHit>> searchResults =
       new GenericEntity<List<ElasticHit>>(elasticController.search(q, sort, order, type, fileType, license, page,
-        limit, minPrice, maxPrice, projId, minDateLong, maxDateLong)) {};
+        limit, minPrice, maxPrice, projId, minDateLong, maxDateLong, owner, username)) {};
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(searchResults).build();
   }
   

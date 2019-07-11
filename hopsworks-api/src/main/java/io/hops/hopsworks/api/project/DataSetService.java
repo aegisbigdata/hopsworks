@@ -111,6 +111,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -594,8 +595,8 @@ public class DataSetService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createTopLevelDataSet(DataSetDTO dataSet, @Context SecurityContext sc)
-    throws DatasetException, HopsSecurityException {
-
+      throws DatasetException, HopsSecurityException {
+    
     Users user = jWTHelper.getUserPrincipal(sc);
     DistributedFileSystemOps dfso = dfs.getDfsOps();
     String username = hdfsUsersController.getHdfsUserName(project, user);
@@ -1162,7 +1163,7 @@ public class DataSetService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response compressFile(@PathParam("path") String path, @Context SecurityContext sc)
-    throws JobException, DatasetException, ProjectException {
+      throws JobException, DatasetException, ProjectException {
     Users user = jWTHelper.getUserPrincipal(sc);
 
     DsPath dsPath = pathValidator.validatePath(this.project, path);
@@ -1208,11 +1209,11 @@ public class DataSetService {
   }
 
   @POST
-  @Path("/attachTempleteAndAddMetaData")
+  @Path("/attachTemplateAndAddMetaData")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response attachTempleteAndAddMetaDataWithSchema(@Context SecurityContext sc, String obj)
+  public Response attachTemplateAndAddMetaDataWithSchema(@Context SecurityContext sc, String obj)
       throws MetadataException, GenericException {
   
     JsonObject objJson = Json.createReader(new StringReader(obj)).readObject();
@@ -1221,7 +1222,7 @@ public class DataSetService {
   
     if (filetemplateData == null || filetemplateData.getString("inodePath") == null
       || filetemplateData.getString("inodePath").equals("")) {
-      throw new IllegalArgumentException("filetempleateData was not provided or its InodePath was not set");
+      throw new IllegalArgumentException("filetemplateData was not provided or its InodePath was not set");
     }
   
     String inodePath = filetemplateData.getString("inodePath");
@@ -1237,17 +1238,26 @@ public class DataSetService {
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("The template was attached to " + inode.getId() + " file and metadata was added");
   
-    JsonObject metaObj = objJson.getJsonObject("metaObj");
+    JsonArray metaObjs = objJson.getJsonArray("metaObjs");
   
-    Response metadataServiceResponse = metadataService.addMetadataWithSchema(sc, metaObj.toString());
-    
-    if (Response.Status.OK.getStatusCode() == metadataServiceResponse.getStatus()) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
-    } else {
-      return noCacheResponse.getNoCacheResponseBuilder(
-        Response.Status.fromStatusCode(metadataServiceResponse.getStatus())
-      ).entity(metadataServiceResponse.getEntity()).build();
+    if (metaObjs == null) {
+      throw new IllegalArgumentException("metaObjs missing or not provided as json array");
     }
+    
+    List<JsonObject> metaObjsAsList = metaObjs.getValuesAs(JsonObject.class);
+    
+    for(JsonObject metaObj  : metaObjsAsList) {
+      
+      Response metadataServiceResponse = metadataService.addMetadataWithSchema(sc, metaObj.toString());
+  
+      if (Response.Status.OK.getStatusCode() != metadataServiceResponse.getStatus()) {
+        return noCacheResponse.getNoCacheResponseBuilder(
+          Response.Status.fromStatusCode(metadataServiceResponse.getStatus())
+        ).entity(metadataServiceResponse.getEntity()).build();
+      }
+    }
+  
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
   }
 
   @POST
