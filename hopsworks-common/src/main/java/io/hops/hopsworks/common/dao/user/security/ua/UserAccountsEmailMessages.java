@@ -221,7 +221,7 @@ public class UserAccountsEmailMessages {
             + "A password reset has been requested on your behalf.\n\nPlease use the temporary password"
             + " below. You will be required to change your passsword when you login first time.\n\n";
 
-    String tmp_pass = "Password:" + random_password + "\n\n\n";
+    String tmp_pass = "Password: " + random_password + "\n\n\n";
     String l3 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
 
