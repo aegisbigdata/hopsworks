@@ -882,12 +882,17 @@ public class ProjectService {
   @GET
   @Path("{projectId}/accessByProjectId")
   @Produces(MediaType.APPLICATION_JSON)
-  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
   public Response hasProjectAccess(@PathParam("projectId") Integer projectId, 
     ContainerRequestContext requestContext) {
-    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
-    Users user = userFacade.findByEmail(userEmail);
+    String username = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByUsername(username);
     Project project = projectFacade.find(projectId);
+    if(user == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+    }
+    if(project == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+    }
     
     if(hasProjectAccess(project, user)) {
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
@@ -899,10 +904,12 @@ public class ProjectService {
   @GET
   @Path("{inodeId}/access")
   @Produces(MediaType.APPLICATION_JSON)
-  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
   public Response accessQuery(ContainerRequestContext requestContext, @PathParam("inodeId") Long inodeId) {
-    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
-    Users user = userFacade.findByEmail(userEmail);
+    String username = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByUsername(username);
+    if(user == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+    }
     Inode inode = inodes.findById(inodeId);
     if(inode == null) {
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
