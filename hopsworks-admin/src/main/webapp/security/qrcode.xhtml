@@ -60,18 +60,18 @@
       <p:panel id="loginPnl" styleClass="aegis" header="QRCode" style="width: 650px; margin: 150px auto;"> 
         <div align="center" style="color: gray">
           <h3>Scan the QR code using the Authenticator app in your mobile device.</h3>
-          <br></br>
+          <br/>
           First, refresh your browser to ensure it has not cached the QR code. 
           You can always delete the cached history and re-open the browser for a new request. Also, if you have
           the account already setup in your authenticator app, please delete it before scanning the new QR code.
-          <br></br>
+          <br/>
         </div>
         <div align="center">
           <h:panelGrid columns="2" >                           
             <p:graphicImage value="#{recoverySelector.qrCode}" width="200" height="200" rendered="#{recoverySelector.qrEnabled ==1}"/>
           </h:panelGrid>
         </div>
-        <br></br>
+        <br/>
         <p:commandButton type="submit" value="Back to login page" action="#{facesContext.externalContext.redirect('/aegis')}" ajax="false" process="@this"/> 
       </p:panel>
     </h:form>

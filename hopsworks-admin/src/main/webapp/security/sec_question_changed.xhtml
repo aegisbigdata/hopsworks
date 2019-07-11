@@ -56,9 +56,10 @@
     <h:form> 
       <p:panel id="loginPnl" styleClass="aegis" header="Security question reset" style="width: 350px; margin: 150px auto;">
         <div align="center" style="color: gray">
-          <h3> Security question changed successfully! </h3>
-          <p:commandLink  value="Back to login profile" action="profile"/>
+          Security question changed successfully!
         </div>
+        <br/>
+        <p:commandButton type="submit" value="Back to login page" action="#{facesContext.externalContext.redirect('/aegis')}" ajax="false" process="@this"/> 
       </p:panel>
     </h:form>
   </h:body>

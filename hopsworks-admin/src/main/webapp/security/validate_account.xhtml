@@ -77,6 +77,8 @@
         <h:panelGroup layout="block" rendered="#{!accountVerification.valid} and #{!accountVerification.dbDown} and #{!accountVerification.userNotFound}">
           <p>Email validation failed!</p> 
         </h:panelGroup>
+        <br/>
+        <p:commandButton type="submit" value="Back to login page" action="#{facesContext.externalContext.redirect('/aegis')}" ajax="false" process="@this"/> 
       </p:panel>
     </h:form>
   </h:body>  
