@@ -59,14 +59,14 @@
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
             <a class="navbar-link dropdown-toggle" data-toggle="dropdown" style="margin-top: 5px;" aria-expanded="false" id="navbarProfile">
-              <i class="fa fa-language" style="font-size: 25px" > </i>
+              <img alt="" src="images/flags/{{ getCurrentLanguage()}}.png" style="height: 35px;" class="profile-image img-circle">
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
-              <li><a ng-click="changeLanguage('en_EN')"><i class="fa fa-language"></i> English</a></li>
-              <li><a ng-click="changeLanguage('el_GR')"><i class="fa fa-language"></i> Greek</a></li>
-              <li><a ng-click="changeLanguage('de_DE')"><i class="fa fa-language"></i> German</a></li>
-              <li><a ng-click="changeLanguage('it_IT')"><i class="fa fa-language"></i> Italian</a></li>
+              <li><a ng-click="changeLanguage('en_EN')"><img alt="" src="images/flags/en_EN.png" style="height: 20px; padding-right: 10px" class="profile-image">English</a></li>
+              <li><a ng-click="changeLanguage('de_DE')"><img alt="" src="images/flags/de_DE.png" style="height: 20px; padding-right: 10px" class="profile-image">German</a></li>
+              <li><a ng-click="changeLanguage('el_GR')"><img alt="" src="images/flags/el_GR.png" style="height: 20px; padding-right: 10px" class="profile-image">Greek</a></li>
+              <li><a ng-click="changeLanguage('it_IT')"><img alt="" src="images/flags/it_IT.png" style="height: 20px; padding-right: 10px" class="profile-image">Italian</a></li>
             </ul>
           </li>
         </ul>

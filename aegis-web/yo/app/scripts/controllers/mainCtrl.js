@@ -78,6 +78,10 @@ angular.module('hopsWorksApp')
               $translate.use(langKey);
             };
 
+            $scope.getCurrentLanguage = function () {
+              return $translate.use();
+            };
+
             var checkeIsAdmin = function () {
               var isAdmin = sessionStorage.getItem("isAdmin");
               if (isAdmin != 'true' && isAdmin != 'false') {
