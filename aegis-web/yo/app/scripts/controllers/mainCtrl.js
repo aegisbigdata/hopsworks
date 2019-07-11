@@ -43,12 +43,12 @@
 'use strict';
 
 angular.module('hopsWorksApp')
-        .controller('MainCtrl', ['$interval', '$cookies', '$location', '$scope', '$rootScope',
+        .controller('MainCtrl', ['$interval', '$cookies', '$translate', '$location', '$scope', '$rootScope',
           '$http', 'AuthService', 'UtilsService', 'ElasticService', 'DelaProjectService',
           'DelaService', 'md5', 'ModalService', 'ProjectService', 'growl',
           'MessageService', '$routeParams', '$window', 'HopssiteService', 'BannerService',
           'AirflowService',
-          function ($interval, $cookies, $location, $scope, $rootScope, $http, AuthService, UtilsService,
+          function ($interval, $cookies, $translate, $location, $scope, $rootScope, $http, AuthService, UtilsService,
                   ElasticService, DelaProjectService, DelaService, md5, ModalService, 
                   ProjectService, growl,
                   MessageService, $routeParams, $window, HopssiteService, BannerService,
@@ -61,6 +61,10 @@ angular.module('hopsWorksApp')
             self.email = $cookies.get('email');
             self.emailHash = md5.createHash(self.email || '');
             var elasticService = ElasticService();
+            self.searchResult = [];
+            self.totalresults = 0;
+            self.totalResults = 0;
+
 
             if (!angular.isUndefined($routeParams.datasetName)) {
               self.searchType = "datasetCentric";
@@ -69,6 +73,14 @@ angular.module('hopsWorksApp')
             } else {
               self.searchType = "global";
             }
+
+            $scope.changeLanguage = function (langKey) {
+              $translate.use(langKey);
+            };
+
+            $scope.getCurrentLanguage = function () {
+              return $translate.use();
+            };
 
             var checkeIsAdmin = function () {
               var isAdmin = sessionStorage.getItem("isAdmin");
@@ -196,16 +208,16 @@ angular.module('hopsWorksApp')
             };
 
             self.searching = false;
-            self.pageSize = 9;
+            self.pageSize = 15;
             self.itemSearched = "";
 
-            self.viewType = function (listView) {
-              if (listView) {
-                self.pageSize = 4;
-              } else {
-                self.pageSize = 6;
-              }
-            };
+            // self.viewType = function (listView) {
+            //   if (listView) {
+            //     self.pageSize = 4;
+            //   } else {
+            //     self.pageSize = 6;
+            //   }
+            // };
 
             $scope.$on("$destroy", function () {
               $interval.cancel(getUnreadCountInterval);
@@ -231,13 +243,13 @@ angular.module('hopsWorksApp')
               });
             };
 
-            self.viewType = function (listView) {
-              if (listView) {
-                self.pageSize = 4;
-              } else {
-                self.pageSize = 9;
-              }
-            };
+            // self.viewType = function (listView) {
+            //   if (listView) {
+            //     self.pageSize = 4;
+            //   } else {
+            //     self.pageSize = 9;
+            //   }
+            // };
 
             self.viewDetail = function (result) {
               if (result.localDataset) {
@@ -282,6 +294,151 @@ angular.module('hopsWorksApp')
               parameters = parameters || {};
               $scope.activeService = serviceName;
               $location.path('/' + serviceName).search(parameters).hash('');
+            };
+            self.goToSearchProject = function (serviceName, parameters) {
+              parameters = parameters || {};
+              $scope.activeService = serviceName;
+              $location.path('project/' + $routeParams.projectID + '/' + serviceName).search(parameters).hash('');
+            }
+
+            
+
+            /*
+            * ***************** 
+            * MANAGE FILTERS
+            * *****************
+            */
+
+            self.types = [
+              {name: 'Project', value: 'proj', selected: false},
+              {name: 'Dataset', value: 'ds', selected: false},
+              {name: 'Files', value: 'inode', selected: false},
+            ];
+            self.options_sortby = [
+              {name: 'Relevance ascending', value: 'RASC'},
+              {name: 'Relevance decreasing', value: 'RDESC'},
+              {name: 'Latest ascending', value: 'LASC'},
+              {name: 'Latest descending', value: 'LDESC'},
+              {name: 'Title ascending', value: 'TASC'},
+              {name: 'Title descending', value: 'TDESC'},
+            ];
+            
+            self.initFilterType = function () {
+              var paramsType = $location.search().type;
+              if(paramsType !== '' && typeof paramsType !== 'undefined') {
+                if(angular.isArray(paramsType)){
+                  angular.forEach(self.types, function(type,key){
+                    var _type = type;
+                    angular.forEach(paramsType, function(pType,key){
+                      if(_type.value == pType) _type.selected = true;
+                    })
+                  })
+                } else {
+                  angular.forEach(self.types, function(type,key){
+                    if(type.value == paramsType) type.selected = true;
+                  })
+                }
+              }
+            }
+            self.initFilterPage = function () {
+              var paramsPage = $location.search().page;
+              if(paramsPage !== '' && typeof paramsPage !== 'undefined') {
+                self.filterPage = paramsPage;
+              } else {
+                self.filterPage = '1';
+              }
+            }
+            self.initFilterSortby = function () {
+              var paramsSortby = $location.search().sort;
+              var paramsOrderby = $location.search().order;
+              if(paramsSortby !== '' && typeof paramsSortby !== 'undefined') {
+                // TODO controllare parametri
+                self.filterSortby = paramsSortby;
+              } else {
+                self.filterSortby = '1';
+              }
+            }
+            self.updateFilterType = function () {
+              var typeSelected = [];
+              let params = $location.search();
+              angular.forEach(self.types, function(type,key){
+                if(type.selected) typeSelected.push(type.value);
+              })
+              params.type = typeSelected;
+              params.page = 1;
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
+            self.updateFilterPage = function(newPageNumber){
+              let params = $location.search();
+              params.page = newPageNumber;
+              params.limit = self.pageSize;
+              self.filterPage = newPageNumber;
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
+            self.resetAllFilters = function () {
+              let params = {q:$location.search().q}
+              if(self.searchType === "global") { 
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
+            self.updateFilterSortby = function() {
+              let params = $location.search();
+              switch(self.selectedSortby.value){
+                case 'RASC':
+                
+                break;
+                case 'RDESC':
+                
+                break;
+                case 'LASC':
+                
+                break;
+                case 'LDESC':
+                
+                break;
+                case 'TASC':
+                  params.sort = 'title';
+                  params.order = 'asc';
+                  params.page = 1
+                break;
+                case 'TDESC':
+                  params.sort = 'title';
+                  params.order = 'desc';
+                  params.page = 1
+                break;
+              }
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
+            
+            self.initFilterType();
+            self.initFilterPage();
+            self.initFilterSortby();
+
+            self.selectedSortby = {name: 'Relevance ascending', value: 'RASC'};
+
+            self.activeFilter = function(filter) {
+              switch(filter){
+                  case 'type':
+                  self.updateFilterType()
+                  break;
+                  case 'sortby':
+                  self.updateFilterSortby()
+                  break;
+              }
             };
 
 
