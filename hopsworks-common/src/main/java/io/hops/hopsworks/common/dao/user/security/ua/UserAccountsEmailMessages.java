@@ -337,7 +337,7 @@ public class UserAccountsEmailMessages {
             + "Please use the temporary password below."
             + "You need to validate the code to get a new setup.\n\n";
 
-    String tmp_pass = "Code:" + random_password + "\n\n\n";
+    String tmp_pass = "Code: " + random_password + "\n\n\n";
     String l2 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
 
