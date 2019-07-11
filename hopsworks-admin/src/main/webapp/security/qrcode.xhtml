@@ -46,17 +46,18 @@
       xmlns:p="http://primefaces.org/ui">
 
   <h:head>
-    <title>QRCode</title>
-    <link rel="icon" type="image/png" href="#{resource['images/hops-black.png']}" />
+    <title>AEGIS - QRCode</title>
+    <link rel="icon" type="image/png" href="#{resource['images/aegis-favicon.png']}" />
     <link rel="stylesheet" type="text/css" href="#{resource['/css/main.css']}" />
     <link rel="stylesheet" type="text/css" href="#{resource['/css/theme.css']}" />
+    <link rel="stylesheet" type="text/css" href="#{resource['/css/aegis.css']}" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
   </h:head>
   <h:body>
     <h:form>
-      <p:panel id="loginPnl" header="QRCode" style="width: 650px; margin: 150px auto;"> 
+      <p:panel id="loginPnl" styleClass="aegis" header="QRCode" style="width: 650px; margin: 150px auto;"> 
         <div align="center" style="color: gray">
           <h3>Scan the QR code using the Authenticator app in your mobile device.</h3>
           <br></br>
