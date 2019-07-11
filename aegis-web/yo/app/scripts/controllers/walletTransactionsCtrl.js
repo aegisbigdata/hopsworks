@@ -44,7 +44,7 @@ angular.module('hopsWorksApp')
                   },
                   function (err) {
                     // TODO: Handle error
-                  },
+                  }
                 )
               },
               function (error) {
