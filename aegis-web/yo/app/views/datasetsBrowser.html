@@ -96,40 +96,40 @@
                         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                           <div class="btn-group" role="group" aria-label="First group">
                             <div type="button" class="btn btn-default" title="Go to parent directory"
-                              ng-click="datasetsCtrl.back()"><i class="fa fa-level-up icon-menu"></i>Go up</div>
+                              ng-click="datasetsCtrl.back()"><i class="fa fa-level-up icon-menu"></i>{{ 'DATASET.GO_UP' | translate }}</div>
                             <div type="button" class="btn btn-default" title="New folder"
                               ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                              ng-click="datasetsCtrl.newDataSetModal()"><i class="fa fa-plus icon-menu"></i>New Folder
+                              ng-click="datasetsCtrl.newDataSetModal()"><i class="fa fa-plus icon-menu"></i>{{ 'DATASET.NEW_FOLDER' | translate }}
                             </div>
                             <div type="button" class="btn btn-default" title="Upload"
                               ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                              ng-click="datasetsCtrl.uploadFile()"><i class="fa fa-cloud-upload icon-menu"></i>Upload
+                              ng-click="datasetsCtrl.uploadFile()"><i class="fa fa-cloud-upload icon-menu"></i>{{ 'DATASET.UPLOAD' | translate }}
                             </div>
                           </div>
                           <div class="dropdown">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                               aria-haspopup="true" aria-expanded="false" ng-show="datasetsCtrl.isSelectedFiles() > 0">
-                              File Actions<span class="caret"></span>
+                              {{ 'DATASET.FILE_ACTIONS' | translate }}<span class="caret"></span>
                             </button>
                             <div class="dropdown-menu ">
                               <div class="btn-group list-action" role="group" aria-label="Second group"
                                 ng-show="datasetsCtrl.isSelectedFiles() > 0">
                                 <div type="button" class="btn btn-link" title="Copy"
-                                  ng-click="datasetsCtrl.copySelected();"><i class="fa fa-files-o icon-menu"></i>Copy
+                                  ng-click="datasetsCtrl.copySelected();"><i class="fa fa-files-o icon-menu"></i>{{ 'DATASET.COPY' | translate }}
                                 </div>
                                 <div type="button" class="btn btn-link" title="Move"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
-                                  ng-click="datasetsCtrl.moveSelected();"><i class="fa fa-arrows icon-menu"></i>Move
+                                  ng-click="datasetsCtrl.moveSelected();"><i class="fa fa-arrows icon-menu"></i>{{ 'DATASET.MOVE' | translate }}
                                 </div>
                                 <div type="button" class="btn btn-link" title="Rename"
                                   ng-click="datasetsCtrl.renameSelected();"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
                                   ng-if="datasetsCtrl.isSelectedFiles() === 1"><i
-                                    class="fa fa-edit icon-menu"></i>Rename</div>
+                                    class="fa fa-edit icon-menu"></i>{{ 'DATASET.RENAME' | translate }}</div>
                                 <div type="button" class="btn btn-link" title="Delete"
                                   ng-disabled="datasetsCtrl.parentDS.publicDs !== 0 && isDelaEnabled"
                                   ng-click="datasetsCtrl.deleteSelected();"><i
-                                    class="fa fa-trash-o icon-menu"></i>Delete</div>
+                                    class="fa fa-trash-o icon-menu"></i>{{ 'DATASET.DELETE' | translate }}</div>
 
                               </div>
                               <div class="btn-group list-action" role="group" aria-label="Third group"
@@ -137,10 +137,10 @@
                                                                           !datasetsCtrl.selectedFiles[datasetsCtrl.selected].dir">
                                 <div type="button" class="btn btn-link" title="Download file"
                                   ng-click="datasetsCtrl.openDir(datasetsCtrl.selectedFiles[datasetsCtrl.selected])"><i
-                                    class="fa fa-cloud-download icon-menu"></i>Download file</div>
+                                    class="fa fa-cloud-download icon-menu"></i>{{ 'DATASET.DOWNLOAD' | translate }}</div>
                                 <div type="button" class="btn btn-link" title="Preview"
                                   ng-click="datasetsCtrl.filePreview(datasetsCtrl.selected, true, false)"><i
-                                    class="fa fa-camera icon-menu"></i>Preview</div>
+                                    class="fa fa-camera icon-menu"></i>{{ 'DATASET.PREVIEW' | translate }}</div>
                                 <div type="button" class="btn btn-link" title="Unzip"
                                   ng-hide="datasetsCtrl.isZippedfile()===false"
                                   ng-click="datasetsCtrl.unzip(datasetsCtrl.selected)"><i
@@ -198,17 +198,17 @@
                           <md-icon md-svg-icon="images/checkbox_true.svg"  ></md-icon>
                         </md-button>
                         </th>                       
-                        <th ng-click="sort('dir')">Type
+                        <th ng-click="sort('dir')">{{ 'DATASET.TYPE' | translate }}
                           <span class="glyphicon sort-icon" ng-show="sortKey == 'dir'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                        <th ng-click="sort('name')">Name
+                        <th ng-click="sort('name')">{{ 'DATASET.NAME' | translate }}
                           <span class="glyphicon sort-icon" ng-show="sortKey === 'name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                        <th ng-click="sort('owner')">Owner  
+                        <th ng-click="sort('owner')">{{ 'DATASET.OWNER' | translate }}
                           <span class="glyphicon sort-icon" ng-show="sortKey === 'owner'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
                         <th ng-click="sort('project')" ng-if="datasetsCtrl.isShared()">Project  
                           <span class="glyphicon sort-icon" ng-show="sortKey === 'project'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                        <th ng-click="sort('modification')">Last modified
+                        <th ng-click="sort('modification')">{{ 'DATASET.LAST_MODIFIED' | translate }}
                           <span class="glyphicon sort-icon" ng-show="sortKey === 'modification'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                        <th ng-click="sort('size')">File size
+                        <th ng-click="sort('size')">{{ 'DATASET.SIZE' | translate }}
                           <span class="glyphicon sort-icon" ng-show="sortKey === 'size'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
                         <th></th>
                         </tr>

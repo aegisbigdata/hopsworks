@@ -48,12 +48,12 @@
 
     <ul class="nav sidebar-nav" ng-cloak ng-controller="ClusterUtilisationCtrl as clusterUtilCtrl">
 
-      <li class="dropdown-header menu-header">Project</li>
+      <li class="dropdown-header menu-header"> {{ 'NAV.PROJECT' | translate }}</li>
       
       <li ng-click="projectCtrl.goToDatasets()" ng-show="projectCtrl.cloak" id="datasetsTab">
         <a>
           <span class="menu_icon fa fa-lg fa-folder"></span>
-          Datasets
+           {{ 'NAV.DATASETS' | translate }}
           <i class=" pull-right fa " 
              uib-tooltip="Orange triangle: the filesystem is encountering problems. Red means the filesystem is down."                          
              tooltip-placement="auto right"
@@ -64,7 +64,7 @@
       <li ng-click="projectCtrl.goToSettings()" ng-show="projectCtrl.cloak">
         <a>
           <span class="menu_icon fa fa-lg fa-cog"></span>
-          Settings
+          {{ 'NAV.SETTINGS' | translate }}
         </a>
       </li>
 
@@ -78,14 +78,14 @@
       <li ng-click="projectCtrl.membersModal()" ng-show="projectCtrl.cloak">
         <a>
           <span class="menu_icon fa fa-lg fa-users"></span>
-          Members
+           {{ 'NAV.MEMBERS' | translate }}
         </a>
       </li>
       
       <li ng-click="projectCtrl.goToProjectActivities()" ng-show="projectCtrl.cloak">
         <a>
           <span class="menu_icon fa fa-lg fa-list"></span>
-          Activity-Stream
+           {{ 'NAV.ACTIVITY_STREAM' | translate }}
         </a>
       </li>
 
@@ -96,12 +96,12 @@
         </a>
       </li -->
 
-      <li class="dropdown-header menu-header">Tools</li>
+      <li class="dropdown-header menu-header">{{ 'NAV.TOOLS' | translate }}</li>
 
       <li ng-click="projectCtrl.goToProjectExtendedMetadata()">
         <a>
           <span class="menu_icon fa fa-lg fa-tags"></span>
-          Extended Metadata
+          {{ 'NAV.EXTENDED_METADATA' | translate }}
         </a>
       </li>
 
@@ -196,7 +196,7 @@
       <br>
       <div>
         <div class="sidebar-nav-static">
-          <small ng-show="clusterUtilCtrl.utilisation >= 0" style="color: #ddd; font-size: 80%;"><em>Cluster Utilization: {{clusterUtilCtrl.utilisation}}%</em></small>
+          <small ng-show="clusterUtilCtrl.utilisation >= 0" style="color: #ddd; font-size: 80%;"><em>{{ 'NAV.CLUSTER_USE' | translate }}: {{clusterUtilCtrl.utilisation}}%</em></small>
           <small ng-show="clusterUtilCtrl.utilisation < 0" style="color: #ddd;"><em>Cluster Utilization is unknown</em></small>
           <div class="progress" style="height: 10px;margin-bottom: 1px"
                uib-tooltip="Orange (> 50%): consider allocating less resources for your application.
