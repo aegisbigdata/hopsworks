@@ -49,9 +49,12 @@ angular.module('hopsWorksApp')
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
                   MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
-            const PROJECT_ID = $routeParams.projectID;
-            const DATASET_ID = $routeParams.dataSetID;
+            const parameters = $location.search();
             var self = this;
+
+            self.datasetName = decodeURI(parameters.datasetName);
+            self.PROJECT_ID = $routeParams.projectID;
+            self.DATASET_ID = $routeParams.dataSetID;
 
             self.selectedField = null;
             self.metaData = {};
@@ -129,34 +132,29 @@ angular.module('hopsWorksApp')
                   label: 'Title',
                   description: 'Description for title field',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/title',
                   required: true
                 },
                 description: {
                   label: 'Description',
                   description: 'Description for description field',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/description',
                   required: true
                 },
                 contactpointtype: {
                   label: 'Contact Point Type',
                   description: 'Description for Contact Point field',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointname: {
                   label: 'Contact Point Name',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 contactpointmail: {
                   label: 'Contact Point Mail',
                   description: 'Lorem ipsum dolor sit amet.',
-                  mapping: 'http://purl.org/dc/terms/email',
                   model: '',
                   recommended: true
                 },
@@ -165,21 +163,19 @@ angular.module('hopsWorksApp')
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
                   tags: [],
-                  mapping: 'http://xmlns.com/foaf/0.1/keywords',
                   recommended: true
                 },
-                contactpointtype: {
+                publishertype: {
                   label: 'Publisher Type',
                   description: 'Description for publisher field',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 publishername: {
                   label: 'Publisher Name',
                   description: 'Description for publisher field',
+                  mapping: 'http://xmlns.com/foaf/0.1/name',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/Agent',
                   recommended: true,
                 },
                 homepage: {
@@ -193,20 +189,17 @@ angular.module('hopsWorksApp')
                   label: 'Theme',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/theme',
                   recommended: true
                 },
                 price: {
                   label: 'Price',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://xmlns.com/foaf/0.1/currency',
                   recommended: true
                 },
                 sellable: {
                   label: 'Sellable',
                   description: 'Lorem ipsum dolor sit amet.',
-                  mapping: 'http://xmlns.com/foaf/0.1/sellable',
                   model: '',
                   recommended: true
                 },
@@ -226,7 +219,6 @@ angular.module('hopsWorksApp')
                   label: 'Language',
                   description: 'Lorem ipsum dolor sit amet.',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/language',
                   optional: true,
                   type: 'select',
                   options: ExtendedMetadataService.LANGUAGES
@@ -234,7 +226,6 @@ angular.module('hopsWorksApp')
                 spatial: {
                   label: 'Spatial',
                   model: '',
-                  mapping: 'http://purl.org/dc/terms/spatial',
                   optional: true
                 },
                 temporalfrom: {
@@ -321,30 +312,39 @@ angular.module('hopsWorksApp')
               }).join(',');
             };
 
-
             self.updateModelsFromData = function (jsonld) {
               if (!jsonld.hasOwnProperty('@graph')) return;
               var graph = jsonld['@graph'];
               var fields = $scope.data.fields;
-              var index_location, index_contactpoint, index_dataset, index_temporal;
+              var index_location, index_contactpoint, index_dataset, index_temporal, index_publisher;
 
               // Determine indexes
               graph.forEach(function(entry, index) {
-                if (!entry.hasOwnProperty('@type')) return;
-                let type = entry['@type'].split('/');
-                type = type[type.length - 1].toUpperCase();
+                if (!entry.hasOwnProperty('@type')) {
+                  if (entry.hasOwnProperty(fields.publishername.mapping)) index_publisher = index;
+                } else if (typeof(entry['@type']) === 'string') {
+                  let type = entry['@type'].split('/');
+                  type = type[type.length - 1].toUpperCase();
 
-                if (type == 'LOCATION') index_location = index;
-                if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
-                if (type == 'DCAT#DATASET') index_dataset = index;
-                if (type == 'PERIODOFTIME') index_temporal = index;
-              })
+                  if (type == 'LOCATION') index_location = index;
+                  if (type == 'NS#ORGANIZATION' || type == 'NS#INDIVIDUAL') index_contactpoint = index;
+                  if (type == 'DCAT#DATASET') index_dataset = index;
+                  if (type == 'PERIODOFTIME') index_temporal = index;
+                  if (type == 'ORGANIZATION' || type == 'INDIVIDUAL') index_publisher = index;
+                }
+              });
 
               // Set publisher Info
-              // var type_splitted = graph[index_organization]['@type'].split('/');
-              // fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
-              // fields.publishername.model = graph[index_organization].name;
-              // fields.homepage.model = graph[index_organization].homepage;
+              if (index_publisher) {
+                try {
+                  var type_splitted = graph[index_publisher]['@type'].split('/');
+                  fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
+                } catch (e) {}
+                  fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
+                if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
+                  fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
+                }
+              }
 
               // Set Language field
               if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
@@ -358,9 +358,12 @@ angular.module('hopsWorksApp')
                 fields.license.model = license_splitted[license_splitted.length - 1];
               }
 
+              let title = graph[index_dataset]['http://purl.org/dc/terms/title'];
+              let description = graph[index_dataset]['http://purl.org/dc/terms/description'];
+              fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
+              fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
+
               // Set other fields
-              fields.title.model = graph[index_dataset]['http://purl.org/dc/terms/title'] || '';
-              fields.description.model = graph[index_dataset]['http://purl.org/dc/terms/description'] || '';
               fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
               fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
               fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
@@ -387,8 +390,8 @@ angular.module('hopsWorksApp')
               // Set temporal data fields
               if (index_temporal) {
                 let temporalData = graph[index_temporal];
-                if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']);
-                if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']);
+                if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']['@value']);
+                if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']['@value']);
               }
 
               if (index_contactpoint) {
@@ -420,14 +423,13 @@ angular.module('hopsWorksApp')
              */
 
             self.loadDatasetMetadata = function () {
-              ExtendedMetadataAPIService.getDatasetMetadata(DATASET_ID, PROJECT_ID)
+              ExtendedMetadataAPIService.getDatasetMetadata(self.DATASET_ID, self.PROJECT_ID)
                 .then(function(data) {
-                  console.log(data.data);
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
                   console.error(error);
-                  if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for dataset', DATASET_ID);
+                  if (error.data && error.data === '404 - Not Found - null') console.log('No extended metadata found for dataset', self.DATASET_ID);
                 });              
             };
 
@@ -443,11 +445,11 @@ angular.module('hopsWorksApp')
               var fields = $scope.data.fields;
               var i = 0;
 
-              graph[0]['@id'] = 'https://europeandataportal.eu/set/data/' + DATASET_ID;
+              graph[0]['@id'] = 'https://europeandataportal.eu/set/data/' + self.DATASET_ID;
               graph[0]['title'] = $scope.data.fields.title.model;
               graph[0]['description'] = $scope.data.fields.description.model;
 
-              if (fields.language.model) graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
+              if (fields.language.model != '') graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
               if (fields.keywords.tags.length) graph[0]['http://www.w3.org/ns/dcat#keyword'] = fields.keywords.model.split(',');
               if (fields.price.model) graph[0]['http://www.aegis-bigdata.eu/md/voc/core/price'] = fields.price.model;
               if (fields.sellable.model) graph[0]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] = fields.sellable.model;
@@ -504,19 +506,22 @@ angular.module('hopsWorksApp')
               }
 
               // Add temporal object (from / to date)            
-              if (fields.temporalfrom.model || fields.temporalto.model) {
+              if (fields.temporalfrom.model) {
                 var temporalData = {
                   '@id': '_:b' + i,
                   '@type': 'dct:PeriodOfTime',
                   'schema:startDate': {
                     '@type': 'http://www.w3.org/2001/XMLSchema#dateTime',
-                    '@value': moment(fields.temporalfrom.model).format() || ''
-                  },
-                  'schema:endDate': {
-                    '@type': 'http://www.w3.org/2001/XMLSchema#dateTime',
-                    '@value': moment(fields.temporalto.model).format() || ''
+                    '@value': moment(fields.temporalfrom.model).format()
                   }
                 };
+
+                if (fields.temporalto.model) {
+                  temporalData['schema:endDate'] = {
+                    '@type': 'http://www.w3.org/2001/XMLSchema#dateTime',
+                    '@value': moment(fields.temporalto.model).format()
+                  }
+                }
 
                 graph[0]['dct:temporal'] = {'@id': '_:b' + i};
                 graph.push(temporalData);
@@ -541,15 +546,25 @@ angular.module('hopsWorksApp')
                 i++;
               }
 
+              if (fields.publishertype.model || fields.publishername.model || fields.homepage.model) {
+                let type = fields.publishertype.model != '' ? fields.publishertype.model : null;
+                graph[0].publisher = {
+                  "homepage": fields.homepage.model || '',
+                  "name": fields.publishername.model || ''
+                };
+                if (type) graph[0].publisher['@type'] = "http://xmlns.com/foaf/0.1/" + type;
+              }
+
+
               $scope.saveButtonIsDisabled = true;
               
               // Send to API
-              ExtendedMetadataAPIService.createOrUpdateDatasetMetadata(DATASET_ID, PROJECT_ID, metadataObject)
+              ExtendedMetadataAPIService.createOrUpdateDatasetMetadata(self.DATASET_ID, self.PROJECT_ID, metadataObject)
                 .then(function(success) {
-                  growl.success('Project metadata successfully saved.', {title: 'Success', ttl: 5000});
+                  growl.success('Dataset metadata successfully saved.', {title: 'Success', ttl: 5000});
                 })
                 .catch(function(error) {
-                  growl.error('Server error: ' + error.status, {title: 'Error while saving project metadata', ttl: 5000, referenceId: 0});
+                  growl.error('Server error: ' + error.status, {title: 'Error while saving dataset metadata', ttl: 5000, referenceId: 0});
                 })
                 .finally(function() {
                   $scope.saveButtonIsDisabled = false;
@@ -564,7 +579,7 @@ angular.module('hopsWorksApp')
             self.deleteExtendedMetadata = function () {
               $scope.deleteButtonIsDisabled = true;
 
-              ExtendedMetadataAPIService.deleteDatasetMetadata(DATASET_ID, PROJECT_ID)
+              ExtendedMetadataAPIService.deleteDatasetMetadata(self.DATASET_ID, self.PROJECT_ID)
                 .then(function(success) {
                   // Clear form fields if delete is successful
                   for (var key in $scope.data.fields) {

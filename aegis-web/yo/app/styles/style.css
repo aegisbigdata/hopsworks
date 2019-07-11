@@ -719,6 +719,10 @@ nav[data-toggle='toc'] {
     font-weight: 400;
 }
 
+tags-input .tags .tag-item {
+  background: #eaeaea;
+}
+
 /* nested links */
 .bs-docs-sidebar .nav .nav>li>a,
 .home-sidebar .nav .nav>li>a {

@@ -161,7 +161,7 @@ public class ElasticController {
   }
   
   public List<ElasticAggregation> aggregation(String searchTerm, List<String> type, List<String> fileType,
-    List<String> license, Float minPrice, Float maxPrice) throws ServiceException {
+    List<String> license, Float minPrice, Float maxPrice, List<String> projId) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
   
@@ -176,7 +176,7 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId));
     srb = srb.setSize(0);
     
     TermsAggregationBuilder typeAggregation = AggregationBuilders
@@ -208,7 +208,8 @@ public class ElasticController {
       "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
         "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
         "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null ? " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + " instanceof String ? " +
         "Float.MAX_VALUE : Float.parseFloat (" +
         "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
         "Float.MAX_VALUE : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");
@@ -220,7 +221,8 @@ public class ElasticController {
       "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
         "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
         "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null ? " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null || " +
+        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + " instanceof String ? " +
         "0.0f : Float.parseFloat (" +
         "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
         "0.0f : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");
@@ -234,6 +236,13 @@ public class ElasticController {
   
     if (response.status().getStatus() == 200) {
       List<ElasticAggregation> elasticAggregations = new LinkedList<>();
+  
+      // count all search elements
+      ElasticAggregation count = new ElasticAggregation();
+      count.setName("Count");
+      count.setValue((double) response.getHits().totalHits);
+      elasticAggregations.add(count);
+      
       for (Aggregation aggregation : response.getAggregations()) {
         if (aggregation instanceof StringTerms) {
           ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation);
@@ -266,7 +275,8 @@ public class ElasticController {
   }
   
   public List<ElasticHit> search(String searchTerm, String sort, String order, List<String> type, List<String> fileType,
-    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice) throws ServiceException {
+    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice, List<String> projId)
+      throws ServiceException {
     //some necessary client settings
     Client client = getClient();
     
@@ -281,14 +291,14 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId));
     srb = srb.setFrom(page*limit);
     srb = srb.setSize(limit);
     
     SortOrder sortOrder = order.toLowerCase().equals("asc") ? SortOrder.ASC : SortOrder.DESC;
     
     if (sort.equals("title")) {
-      srb = srb.addSort("name", sortOrder);
+      srb = srb.addSort("name.keyword", sortOrder);
     } else if (sort.equals("date")) {
       srb = srb.addSort("timestamp", sortOrder);
     } else {
@@ -711,7 +721,7 @@ public class ElasticController {
    * @return
    */
   private QueryBuilder searchQuery(String searchTerm, List<String> type, List<String> fileType, List<String> license,
-    Float minPrice, Float maxPrice) {
+    Float minPrice, Float maxPrice, List<String> projId) {
     QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
   
     QueryBuilder typeQuery;
@@ -720,6 +730,13 @@ public class ElasticController {
         Settings.DOC_TYPE_PROJECT, Settings.DOC_TYPE_DATASET, Settings.DOC_TYPE_INODE);
     } else {
       typeQuery = termsQuery(Settings.META_DOC_TYPE_FIELD, type);
+    }
+    
+    QueryBuilder projIdQuery;
+    if (projId == null || projId.isEmpty()) {
+      projIdQuery = matchAllQuery();
+    } else {
+      projIdQuery = termsQuery(Settings.META_PROJECT_ID_FIELD, projId);
     }
   
     QueryBuilder fileTypeQuery;
@@ -772,7 +789,8 @@ public class ElasticController {
       .must(nameDescQuery)
       .must(fileTypeQuery)
       .must(licenseQuery)
-      .must(priceQuery);
+      .must(priceQuery)
+      .must(projIdQuery);
     
     return query;
   }

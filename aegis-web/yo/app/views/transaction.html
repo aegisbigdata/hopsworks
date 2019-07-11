@@ -45,45 +45,63 @@
 </div>
 <div class="modal-body" id="transactionModal">
     <div class="row">
-        <div class="col-sm-12"><h4><b>Transaction Id</b></h4></div>
+        <div class="col-sm-12">
+            <h4><b>Transaction ID</b></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><p>123213123-1283-912</p></div>
+        <div class="col-sm-12">
+            <p>{{ asset.id }}</p>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><h4><b>Asset</b></h4></div>
+        <div class="col-sm-12">
+            <h4><b>Dataset Name</b></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><p>Dataset X</p></div>
+        <div class="col-sm-12">
+            <p>{{ asset.name }}</p>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><h4><b>Buyer</b></h4></div>
+        <div class="col-sm-12">
+            <h4><b>Buyer</b></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><p>User 007</p></div>
+        <div class="col-sm-12">
+            <p>{{ asset.buyer }}</p>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><h4><b>Seller</b></h4></div>
+        <div class="col-sm-12">
+            <h4><b>Seller</b></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><p>User 000</p></div>
+        <div class="col-sm-12">
+            <p>{{ asset.seller }}</p>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><h4><b>Price</b></h4></div>
+        <div class="col-sm-12">
+            <h4><b>Price</b></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><p>500 coins</p></div>
+        <div class="col-sm-12">
+            <p>{{ asset.coins }} Tokens</p>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><h4><b>Date</b></h4></div>
+        <div class="col-sm-12">
+            <h4><b>Date</b></h4>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-12"><p>12/1/2019</p></div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12"><h4><b>Contract Details</b></h4></div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12"><p><a href="http://www.google.com">http://www.google.com</a></p></div>
+        <div class="col-sm-12">
+            <p>{{ asset.date }}</p>
+        </div>
     </div>
 </div>

@@ -1403,4 +1403,39 @@ public class RESTCodes {
     }
   }
 
+  public enum WalletErrorCode implements RESTErrorCode {
+    
+    FILE_NOT_FOUND(1, "Requested file was not found", Response.Status.INTERNAL_SERVER_ERROR);
+    
+    private Integer code;
+    private String message;
+    private Response.StatusType respStatus;
+    private final int range = 300000;
+    
+    WalletErrorCode(Integer code, String message, Response.StatusType respStatus) {
+      this.code = range + code;
+      this.message = message;
+      this.respStatus = respStatus;
+    }
+    
+    @Override
+    public Response.StatusType getRespStatus() {
+      return respStatus;
+    }
+    
+    @Override
+    public Integer getCode() {
+      return code;
+    }
+    
+    @Override
+    public String getMessage() {
+      return message;
+    }
+    
+    @Override
+    public int getRange() {
+      return range;
+    }
+  }
 }
