@@ -161,7 +161,8 @@ public class ElasticController {
   }
   
   public List<ElasticAggregation> aggregation(String searchTerm, List<String> type, List<String> fileType,
-    List<String> license, Float minPrice, Float maxPrice, List<String> projId) throws ServiceException {
+    List<String> license, Float minPrice, Float maxPrice, List<String> projId, Long minDate, Long maxDate)
+      throws ServiceException {
     //some necessary client settings
     Client client = getClient();
   
@@ -176,7 +177,8 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId,
+      minDate, maxDate));
     srb = srb.setSize(0);
     
     TermsAggregationBuilder typeAggregation = AggregationBuilders
@@ -275,8 +277,8 @@ public class ElasticController {
   }
   
   public List<ElasticHit> search(String searchTerm, String sort, String order, List<String> type, List<String> fileType,
-    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice, List<String> projId)
-      throws ServiceException {
+    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice, List<String> projId,
+      Long minDate, Long maxDate) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
     
@@ -291,8 +293,13 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId));
-    srb = srb.setFrom(page*limit);
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId,
+      minDate, maxDate));
+    if (page > 0) {
+      srb = srb.setFrom((page-1)*limit);
+    } else {
+      srb = srb.setFrom(page*limit);
+    }
     srb = srb.setSize(limit);
     
     SortOrder sortOrder = order.toLowerCase().equals("asc") ? SortOrder.ASC : SortOrder.DESC;
@@ -300,7 +307,7 @@ public class ElasticController {
     if (sort.equals("title")) {
       srb = srb.addSort("name.keyword", sortOrder);
     } else if (sort.equals("date")) {
-      srb = srb.addSort("timestamp", sortOrder);
+      srb = srb.addSort("modification", sortOrder);
     } else {
       srb = srb.addSort("_score", sortOrder);
     }
@@ -718,10 +725,12 @@ public class ElasticController {
    * Global search on datasets and projects.
    * <p/>
    * @param searchTerm
+   * @param minDate
+   * @param maxDate
    * @return
    */
   private QueryBuilder searchQuery(String searchTerm, List<String> type, List<String> fileType, List<String> license,
-    Float minPrice, Float maxPrice, List<String> projId) {
+    Float minPrice, Float maxPrice, List<String> projId, Long minDate, Long maxDate) {
     QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
   
     QueryBuilder typeQuery;
@@ -783,6 +792,18 @@ public class ElasticController {
       priceQuery = nestedQuery(Settings.AEGIS_ELASTIC, boolQuery().filter(scriptQuery(minPriceScript))
         .filter(scriptQuery(maxPriceScript)), ScoreMode.None);
     }
+  
+    QueryBuilder dateQuery;
+    
+    if (minDate == null && maxDate == null) {
+      dateQuery = matchAllQuery();
+    } else if (minDate == null) {
+      dateQuery = QueryBuilders.rangeQuery("modification").lte(maxDate);
+    } else if (maxDate == null) {
+      dateQuery = QueryBuilders.rangeQuery("modification").gte(minDate);
+    } else {
+      dateQuery = QueryBuilders.rangeQuery("modification").gte(minDate).lte(maxDate);
+    }
     
     QueryBuilder query = boolQuery()
       .must(typeQuery)
@@ -790,7 +811,8 @@ public class ElasticController {
       .must(fileTypeQuery)
       .must(licenseQuery)
       .must(priceQuery)
-      .must(projIdQuery);
+      .must(projIdQuery)
+      .must(dateQuery);
     
     return query;
   }
