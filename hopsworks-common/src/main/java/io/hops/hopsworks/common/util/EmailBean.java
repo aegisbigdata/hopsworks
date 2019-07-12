@@ -42,12 +42,14 @@ package io.hops.hopsworks.common.util;
 import javax.annotation.Resource;
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -66,22 +68,21 @@ public class EmailBean {
   public void sendEmail(String to, Message.RecipientType recipientType,
       String subject, String body) throws
       MessagingException {
-
-    MimeMessage message = new MimeMessage(mailSession);
-    message.setFrom(new InternetAddress(mailSession.getProperty("mail.from"), "AEGIS"));
-    message.setReplyTo(new InternetAddress("aegis@fokus.fraunhofer.de"));
-    InternetAddress[] address = {new InternetAddress(to)};
-    message.setRecipients(recipientType, address);
-    message.setSubject(subject);
-    message.setContent(body, "text/html");
-
-    // set the timestamp
-    message.setSentDate(new Date());
-
-    message.setText(body);
     try {
+      MimeMessage message = new MimeMessage(mailSession);
+      message.setFrom(new InternetAddress(mailSession.getProperty("mail.from"), "AEGIS"));
+      message.setReplyTo(new Address[]{new InternetAddress("aegis@fokus.fraunhofer.de")});
+      InternetAddress[] address = {new InternetAddress(to)};
+      message.setRecipients(recipientType, address);
+      message.setSubject(subject);
+      message.setContent(body, "text/html");
+  
+      // set the timestamp
+      message.setSentDate(new Date());
+  
+      message.setText(body);
       Transport.send(message);
-    } catch (MessagingException ex) {
+    } catch (MessagingException | UnsupportedEncodingException ex) {
       LOG.log(Level.SEVERE, ex.getMessage(), ex);
     }
   }
