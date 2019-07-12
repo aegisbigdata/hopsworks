@@ -25,7 +25,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             createUser: function(user) {
                 var req = {
                     method: 'POST',
-                    url: '/api/wallet/create-user',
+                    url: '/api/wallet/user',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -36,7 +36,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             getUsers: function() {
                 var req = {
                     method: 'GET',
-                    url: '/api/wallet/get-users',
+                    url: '/api/wallet/user',
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -45,8 +45,8 @@ angular.module('hopsWorksApp').factory('WalletService', [
             },
             getUser: function(uid) {
                 var req = {
-                    method: 'POST',
-                    url: '/api/wallet/get-user/' + uid,
+                    method: 'GET',
+                    url: '/api/wallet/user/' + uid,
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -56,7 +56,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             createAsset: function(asset) {
                 var req = {
                     method: 'POST',
-                    url: '/api/wallet/create-asset',
+                    url: '/api/wallet/asset',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -67,7 +67,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             getAssets: function() {
                 var req = {
                     method: 'GET',
-                    url: '/api/wallet/get-assets',
+                    url: '/api/wallet/asset',
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -76,8 +76,8 @@ angular.module('hopsWorksApp').factory('WalletService', [
             },
             getAsset: function(aid) {
                 var req = {
-                    method: 'POST',
-                    url: '/api/wallet/get-asset/' + aid,
+                    method: 'GET',
+                    url: '/api/wallet/asset/' + aid,
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -87,7 +87,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             createContract: function(contract) {
                 var req = {
                     method: 'POST',
-                    url: '/api/wallet/create-contract',
+                    url: '/api/wallet/contract',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -98,7 +98,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             getContracts: function() {
                 var req = {
                     method: 'GET',
-                    url: '/api/wallet/get-contracts',
+                    url: '/api/wallet/contract',
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -108,7 +108,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             getBuyContracts: function(uid) {
                 var req = {
                     method: 'GET',
-                    url: '/api/wallet/get-buy-contracts/' + uid,
+                    url: '/api/wallet/contract/buy/' + uid,
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -117,8 +117,8 @@ angular.module('hopsWorksApp').factory('WalletService', [
             },
             getSellContracts: function(uid) {
                 var req = {
-                    method: 'POST',
-                    url: '/api/wallet/get-sell-contracts/' + uid,
+                    method: 'GET',
+                    url: '/api/wallet/contract/sell/' + uid,
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -128,7 +128,7 @@ angular.module('hopsWorksApp').factory('WalletService', [
             validateContract: function(validation) {
                 var req = {
                     method: 'POST',
-                    url: '/api/wallet/validate-contract',
+                    url: '/api/wallet/contract/validate',
                     headers: {
                         'Content-Type': 'application/json'
                     },
