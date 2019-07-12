@@ -113,7 +113,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 import javax.ws.rs.Consumes;
@@ -1231,7 +1230,7 @@ public class DataSetService {
     }
   
     String inodePath = filetemplateData.getString("inodePath");
-    int templateid = filetemplateData.getInt("templateId");
+    String templateName = filetemplateData.getString("templateName");
     
     JsonObject metadata = objJson.getJsonObject("metadata");
   
@@ -1240,9 +1239,9 @@ public class DataSetService {
     }
   
     Inode inode = inodes.getInodeAtPath(inodePath);
-    Template temp = template.findByTemplateId(templateid);
+    Template temp = template.findByTemplateName(templateName).get(0);
     
-    long inodepid = inode.getInodePK().getPartitionId();
+    long inodepid = inode.getInodePK().getParentId();
     String inodename = inode.getInodePK().getName();
   
     Map<String, Integer> fields = new HashMap<>();
@@ -1258,20 +1257,14 @@ public class DataSetService {
     }
     
     for (String field : metadata.keySet()) {
-      if (!(metadata.get(field) instanceof JsonArray)) {
-        throw new IllegalArgumentException("Error: Metadata values not provided as jsonarray");
-      } else {
-        for (Object value : metadata.getJsonArray(field)) {
-          if (!(value instanceof JsonString)) {
-            throw new IllegalArgumentException("Error: Metadata values inside jsonarray not provided as string");
-          }
-        }
+      if (!(metadata.get(field) instanceof JsonString)) {
+        throw new IllegalArgumentException("Error: Metadata values not provided as string");
       }
     }
   
     List<Template> templates = new LinkedList<>(inode.getTemplates());
     if (templates.contains(temp)) {
-      metadataService.detachTemplateFromInode(inode.getId(), templateid);
+      metadataService.detachTemplateFromInode(inode.getId(), temp.getId());
     }
     
     //add template
@@ -1286,19 +1279,17 @@ public class DataSetService {
     for(String field  : metadata.keySet()) {
       if (!fields.containsKey(field)) continue;
       
-      List<JsonString> metadataValues = metadata.getJsonArray(field).getValuesAs(JsonString.class);
+      String value = metadata.getString(field);
       
-      for(JsonString value : metadataValues) {
-        JsonObject metaObj = Json.createObjectBuilder()
-          .add("inodepid", inodepid)
-          .add("inodename", inodename)
-          .add("tableid", -1)
-          .add("metadata",
-            Json.createObjectBuilder().add(fields.get(field).toString(), value).build()
-          ).build();
-        
-        metadataService.addMetadataWithSchema(sc, metaObj.toString());
-      }
+      JsonObject metaObj = Json.createObjectBuilder()
+        .add("inodepid", inodepid)
+        .add("inodename", inodename)
+        .add("tableid", -1)
+        .add("metadata",
+          Json.createObjectBuilder().add(fields.get(field).toString(), value).build()
+        ).build();
+      
+      metadataService.addMetadataWithSchema(sc, metaObj.toString());
     }
   
     return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
