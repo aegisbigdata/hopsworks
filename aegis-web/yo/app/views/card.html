@@ -38,8 +38,8 @@
   -->
 
 <div id="card-{{pageNo}}-{{cardIndex}}" class="card-item">
-  <div class="card-item-content">
-    <div class="header col-md-3" ng-click="cardCtrl.goToProject(content.id)">
+  <div class="card-item-content dropdown">
+    <div class="header col-md-3 dropdown-toggle" ng-click="cardCtrl.goToProject(content)" data-toggle="dropdown">
       <label>
         {{content.type === 'proj'? 'project': ''}}
         {{content.type === 'ds' && !content.public_ds ? 'dataset': ''}} 
@@ -76,7 +76,7 @@
         </div>
       </div>
     </div>
-    <div class="card-body col-md-8">
+    <div class="card-body col-md-8 dropdown-toggle">
       <div class="details">
         <h3>{{content.name}}
           <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
@@ -130,5 +130,10 @@
            <i class="card-footer-icon fa fa-arrow-down fa-bounce icon-stack-1x" aria-hidden="true" style="color: white;"></i>
       </span>
     </div>
+    <ul class="dropdown-menu" ng-class="{'hideDd' : cardCtrl.hideDropdown }" style="top:30px;left:30px;" aria-labelledby="simple-dropdown">
+      <li ng-repeat="dataset in cardCtrl.listDatasets">
+        <a href="#!/project/{{dataset.projectId}}/datasets/{{dataset.name}}">{{dataset.name}}</a>
+      </li>
+    </ul>
   </div>
 </div>
