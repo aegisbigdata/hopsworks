@@ -11,9 +11,9 @@ import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,11 +25,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-@RequestScoped
+@Stateless
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Api(value = "Wallet Service",
   description = "Wallet Service")
+@Path("/wallet")
 @TransactionAttribute(TransactionAttributeType.NEVER)
 public class WalletService {
   @EJB
@@ -40,6 +41,7 @@ public class WalletService {
   private JWTHelper jWTHelper;
 
   @POST
+  @Path("/share")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
@@ -58,6 +60,7 @@ public class WalletService {
   }
 
   @GET
+  @Path("/user")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUsers() throws WalletException {
@@ -66,7 +69,7 @@ public class WalletService {
   }
 
   @GET
-  @Path("{uid}")
+  @Path("/user/{uid}")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUser(@PathParam("uid") String uid) throws WalletException {
@@ -75,6 +78,7 @@ public class WalletService {
   }
   
   @POST
+  @Path("/user")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN"})
   public Response createUser(WalletController.UserJSON user) throws WalletException {
@@ -83,6 +87,7 @@ public class WalletService {
   }
 
   @POST
+  @Path("/asset")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createAsset(WalletController.AEGISAssetJSON asset) throws WalletException {
@@ -91,6 +96,7 @@ public class WalletService {
   }
 
   @GET
+  @Path("/asset")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAssets() throws WalletException {
@@ -99,7 +105,7 @@ public class WalletService {
   }
 
   @GET
-  @Path("{aid}")
+  @Path("/asset/{aid}")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAsset(@PathParam("aid") String aid) throws WalletException {
@@ -108,6 +114,7 @@ public class WalletService {
   }
 
   @POST
+  @Path("/contract")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createContract(WalletController.ContractJSON contract) throws WalletException {
@@ -116,6 +123,7 @@ public class WalletService {
   }
 
   @GET
+  @Path("/contract")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getContracts() throws WalletException {
@@ -124,7 +132,7 @@ public class WalletService {
   }
 
   @GET
-  @Path("{uid}")
+  @Path("/contract/buy/{uid}")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getBuyContracts(@PathParam("uid") String uid) throws WalletException {
@@ -133,7 +141,7 @@ public class WalletService {
   }
 
   @GET
-  @Path("{uid}")
+  @Path("/contract/sell/{uid}")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getSellContracts(@PathParam("uid") String uid) throws WalletException {
@@ -142,6 +150,7 @@ public class WalletService {
   }
 
   @POST
+  @Path("/contract/validate")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response validateContract(WalletController.ValidationJSON validation) throws WalletException {
