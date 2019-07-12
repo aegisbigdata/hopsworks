@@ -62,6 +62,7 @@ import io.hops.hopsworks.common.dao.dataset.DataSetDTO;
 import io.hops.hopsworks.common.dao.dataset.Dataset;
 import io.hops.hopsworks.common.dao.dataset.DatasetFacade;
 import io.hops.hopsworks.common.dao.dataset.DatasetPermissions;
+import io.hops.hopsworks.common.dao.dataset.ItemAccessWrapperDTO;
 import io.hops.hopsworks.common.dao.hdfs.inode.Inode;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.jobs.quota.YarnPriceMultiplicator;
@@ -882,30 +883,43 @@ public class ProjectService {
   @GET
   @Path("{projectId}/accessByProjectId")
   @Produces(MediaType.APPLICATION_JSON)
-  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
   public Response hasProjectAccess(@PathParam("projectId") Integer projectId, 
     ContainerRequestContext requestContext) {
-    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
-    Users user = userFacade.findByEmail(userEmail);
+    String username = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByUsername(username);
     Project project = projectFacade.find(projectId);
+    if(user == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
+    }
+    if(project == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
+    }
     
     if(hasProjectAccess(project, user)) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).build();
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("OK")).build();
     } else {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
     }
   }
   
   @GET
   @Path("{inodeId}/access")
   @Produces(MediaType.APPLICATION_JSON)
-  @AllowedProjectRoles({AllowedProjectRoles.ANYONE})
   public Response accessQuery(ContainerRequestContext requestContext, @PathParam("inodeId") Long inodeId) {
-    String userEmail = requestContext.getSecurityContext().getUserPrincipal().getName();
-    Users user = userFacade.findByEmail(userEmail);
+    String username = requestContext.getSecurityContext().getUserPrincipal().getName();
+    Users user = userFacade.findByUsername(username);
+    if(user == null) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
+    }
     Inode inode = inodes.findById(inodeId);
     if(inode == null) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
     }
     List<ItemAccessDTO> dtos = new LinkedList<>();
     Project project = projectFacade.findByInodeId(inode.getInodePK().getParentId(), inode.getInodePK().getName());
@@ -914,27 +928,33 @@ public class ProjectService {
         ItemAccessDTO dto = new ItemAccessDTO("project", inodeId, project.getId(), null,
           project.getName(), project.getDescription());
         dtos.add(dto);
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(dtos).build();
+        ItemAccessWrapperDTO result = new ItemAccessWrapperDTO("OK", dtos);
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
       } else {
-        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+          .entity(new ItemAccessWrapperDTO("DENIED")).build();
       }
     }
     
     List<Dataset> datasets = datasetFacade.findByInodeId(inodeId);
     if(datasets.isEmpty()) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.NOT_FOUND).build();
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
     }
     for(Dataset dataset : datasets) {
       if(hasProjectAccess(dataset.getProject(), user)) {
-        ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId, dataset.getProject().getId(), dataset.getId(), 
+        ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId,
+          dataset.getProject().getId(), dataset.getId(),
           dataset.getName(), dataset.getDescription());
         dtos.add(dto);
       }
     }
     if(dtos.isEmpty()) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.UNAUTHORIZED).build();
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ItemAccessWrapperDTO("DENIED")).build();
     }
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(dtos).build();
+    ItemAccessWrapperDTO result = new ItemAccessWrapperDTO("OK", dtos);
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
   }
     
   private boolean hasProjectAccess(Project project, Users user) {

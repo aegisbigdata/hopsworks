@@ -39,73 +39,38 @@
 package io.hops.hopsworks.common.dao.dataset;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 @XmlRootElement
-public class ItemAccessDTO {
-  private String type;
-  private Long inodeId;
-  private Integer projectId;
-  private Integer datasetId;
-  private String name;
-  private String description;
+public class ItemAccessWrapperDTO {
+  private String result;
+  private List<ItemAccessDTO> items;
   
-  public ItemAccessDTO() {}
+  public ItemAccessWrapperDTO() {}
   
-  public ItemAccessDTO(String type, Long inodeId, Integer projectId, Integer datasetId,
-    String name, String description) {
-    this.type = type;
-    this.inodeId = inodeId;
-    this.projectId = projectId;
-    this.datasetId = datasetId;
-    this.name = name;
-    this.description = description;
+  public ItemAccessWrapperDTO(String result) {
+    this.result = result;
+    this.items = null;
   }
   
-  public String getType() {
-    return type;
+  public ItemAccessWrapperDTO(String result, List<ItemAccessDTO> items) {
+    this.result = result;
+    this.items = items;
   }
   
-  public void setType(String type) {
-    this.type = type;
+  public String getResult() {
+    return result;
   }
   
-  public Long getInodeId() {
-    return inodeId;
+  public void setResult(String result) {
+    this.result = result;
   }
   
-  public void setInodeId(Long inodeId) {
-    this.inodeId = inodeId;
+  public List<ItemAccessDTO> getItems() {
+    return items;
   }
   
-  public Integer getProjectId() {
-    return projectId;
-  }
-  
-  public void setProjectId(Integer projectId) {
-    this.projectId = projectId;
-  }
-  
-  public Integer getDatasetId() {
-    return datasetId;
-  }
-  
-  public void setDatasetId(Integer datasetId) {
-    this.datasetId = datasetId;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public String getDescription() {
-    return description;
-  }
-  
-  public void setDescription(String description) {
-    this.description = description;
+  public void setItems(List<ItemAccessDTO> items) {
+    this.items = items;
   }
 }
