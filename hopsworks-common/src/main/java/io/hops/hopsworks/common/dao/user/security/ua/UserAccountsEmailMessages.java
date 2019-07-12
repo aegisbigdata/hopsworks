@@ -73,7 +73,7 @@ public class UserAccountsEmailMessages {
   /*
    * Subject of blocked acouunt
    */
-  public static String HOPSWORKS_SUPPORT_EMAIL = "support@hops.io";
+  public static String HOPSWORKS_SUPPORT_EMAIL = "aegis@fokus.fraunhofer.de";
 
   /*
    * Subject of profile update
@@ -206,7 +206,7 @@ public class UserAccountsEmailMessages {
     String l1 = GREETINGS_HEADER + ",\n\n"
             + "Your AEGIS account has been blocked.\n\n";
     String l2
-            = "If you have any questions please visit www.hops.io or contact support@hops.io";
+            = "If you have any questions please visit www.aegis-bigdata.eu or contact aegis@fokus.fraunhofer.de";
     String l3 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
 

@@ -68,7 +68,8 @@ public class EmailBean {
       MessagingException {
 
     MimeMessage message = new MimeMessage(mailSession);
-    message.setFrom(new InternetAddress(mailSession.getProperty("mail.from")));
+    message.setFrom(new InternetAddress(mailSession.getProperty("mail.from"), "AEGIS"));
+    message.setReplyTo(new InternetAddress("aegis@fokus.fraunhofer.de"));
     InternetAddress[] address = {new InternetAddress(to)};
     message.setRecipients(recipientType, address);
     message.setSubject(subject);
