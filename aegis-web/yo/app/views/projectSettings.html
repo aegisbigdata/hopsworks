@@ -203,7 +203,16 @@
                                         ng-click="projectCtrl.getCerts()">
                                   Export Certificates
                                 </button>
-                                <i class="fa fa-info-circle" uib-tooltip="Click to download project's certificates. It allows communication with the project's services from outside Hospworks." style="margin-left: 10px; margin-bottom:0px"></i>
+                                <i class="fa fa-info-circle" uib-tooltip="Click to download project's certificates. It allows communication with the project's services from outside AEGIS." style="margin-left: 10px; margin-bottom:0px"></i>
+                              </div>
+                              <p></p>
+                              <div class="row" style="margin-left:15px; margin-bottom:0px">
+                                <button class="btn btn-danger" type="button"
+                                        ng-disabled="projectCtrl.working"
+                                        ng-click="projectCtrl.deleteProjectAndDatasets()">
+                                  Delete Project
+                                </button>
+                                <i class="fa fa-info-circle" uib-tooltip="Click to delete project and all datasets." style="margin-left: 10px; margin-bottom:0px"></i>
                               </div>
                             </div>
   
