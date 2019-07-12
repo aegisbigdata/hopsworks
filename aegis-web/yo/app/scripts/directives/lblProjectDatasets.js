@@ -19,7 +19,7 @@ angular.module('hopsWorksApp').directive('lblProjectDatasets', [function () {
                 files = parseInt($scope.files);
             }
             if (!isNaN(projectId)) {
-                AegisProjectInfoService.getDatasets(projectId).then(function (data) {
+                AegisProjectInfoService.getDatasetsCount(projectId).then(function (data) {
                     if (data && data.datasets) {
                         $scope.label = data.datasets + " dataset";
                         if (data.datasets > 1) {

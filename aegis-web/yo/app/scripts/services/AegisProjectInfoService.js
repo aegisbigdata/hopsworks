@@ -4,20 +4,22 @@ angular.module('hopsWorksApp')
     .factory('AegisProjectInfoService', ['$http', '$q', '$cacheFactory', '$timeout', function ($http, $q, $cacheFactory, $timeout) {
         var myCache = $cacheFactory('AegisProjectInfoService');
         return {
-            getDatasets: function (projectId) {
+            getDatasetsCount: function (projectId) {
                 return $q(function (resolve, reject) {
-                    var cacheKey = projectId + 'datasets';
+                    var cacheKey = projectId + 'datasetscount';
                     var cached = myCache.get(cacheKey);
                     if (!cached) {
-                        $http.get(`/api/project/${projectId}/dataset/getContent`).then(function (success) {
-                            if (success.data && success.data.length) {
-                                var value = success.data.length;
+                        $http.get(`/api/project/${projectId}/dataset/getContent?count=true`).then(function (success) {
+                            if (success.data && success.data.datasetCount) {
+                                var value = success.data.datasetCount;
                                 $timeout(function () {
                                     myCache.put(cacheKey, value);
                                 }, 0);
                                 resolve({
                                     datasets: value
                                 });
+                            } else {
+                                reject("Server error: not expected response");
                             }
                         }, reject);
                     } else {
@@ -41,6 +43,8 @@ angular.module('hopsWorksApp')
                                 resolve({
                                     files: value
                                 });
+                            } else {
+                                reject("Server error: not expected response");
                             }
                         }, reject);
                     } else {
