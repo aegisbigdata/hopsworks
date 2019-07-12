@@ -82,15 +82,13 @@ angular.module('hopsWorksApp')
             var type_splitted = graph[index_publisher]['@type'].split('/');
             fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
           } catch (e) {}
-            fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
-          if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
-            fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
-          }
+            fields.publishername.model = graph[index_publisher]['name'];
+            fields.homepage.model = graph[index_publisher]['homepage'];
         }
 
         // Set Language field
-        if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
-          var language_splitted = graph[index_dataset]['http://purl.org/dc/terms/language']['@id'].split('/');
+        if (graph[index_dataset].hasOwnProperty('language')) {
+          var language_splitted = graph[index_dataset]['language'].split('/');
           fields.language.model = language_splitted[language_splitted.length - 1];
         }
 
@@ -100,54 +98,54 @@ angular.module('hopsWorksApp')
           fields.license.model = license_splitted[license_splitted.length - 1];
         }
 
-        let title = graph[index_dataset]['http://purl.org/dc/terms/title'];
-        let description = graph[index_dataset]['http://purl.org/dc/terms/description'];
+        let title = graph[index_dataset]['title'];
+        let description = graph[index_dataset]['description'];
 
         // Set other fields
-        fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
-        fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
-        fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
+        fields.accessRights.model = graph[index_dataset]['accessRights'] || '';
+        fields.price.model = graph[index_dataset]['price'] || '';
+        fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == true) || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
         fields.title.model = this.setFieldFromStringOrArray(title);
         fields.description.model = this.setFieldFromStringOrArray(description);
         
-        if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#keyword')) {
-          let tags = graph[index_dataset]['http://www.w3.org/ns/dcat#keyword'];
+        if (graph[index_dataset].hasOwnProperty('keyword')) {
+          let tags = graph[index_dataset]['keyword'];
           fields.keywords.model = tags.join();
           fields.keywords.tags = tags.map(tag => {
             return {text: tag};
           });
         }
 
-        if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#theme')) {
-          var theme_splitted = graph[index_dataset]['http://www.w3.org/ns/dcat#theme']['@id'].split('/');
+        if (graph[index_dataset].hasOwnProperty('theme')) {
+          var theme_splitted = graph[index_dataset]['theme'].split('/');
           fields.theme.model = theme_splitted[theme_splitted.length - 1];
         }
 
-        if (graph[index_dataset].hasOwnProperty('http://xmlns.com/foaf/0.1/page')) {
-          fields.documentation.model = graph[index_dataset]['http://xmlns.com/foaf/0.1/page']['@id'] || '';
+        if (graph[index_dataset].hasOwnProperty('page')) {
+          fields.documentation.model = graph[index_dataset]['page'] || '';
         }
 
         // Set temporal data fields
         if (index_temporal) {
           let temporalData = graph[index_temporal];
-          if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']);
-          if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']);
+          if (temporalData.hasOwnProperty('startDate')) fields.temporalfrom.model = moment(temporalData['startDate']);
+          if (temporalData.hasOwnProperty('endDate')) fields.temporalto.model = moment(temporalData['endDate']);
         }
 
         if (index_contactpoint) {
           var type_splitted = graph[index_contactpoint]['@type'].split('#');
           fields.contactpointtype.model = type_splitted[type_splitted.length - 1].toUpperCase() || '';
-          fields.contactpointname.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#fn'] || '';
+          fields.contactpointname.model = graph[index_contactpoint]['fn'] || '';
 
-          if (graph[index_contactpoint].hasOwnProperty('http://www.w3.org/2006/vcard/ns#hasEmail')) {
-            fields.contactpointmail.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#hasEmail']['@id'];
+          if (graph[index_contactpoint].hasOwnProperty('hasEmail')) {
+            fields.contactpointmail.model = graph[index_contactpoint]['hasEmail'];
             fields.contactpointmail.model = fields.contactpointmail.model.split(':');
             fields.contactpointmail.model = fields.contactpointmail.model[fields.contactpointmail.model.length - 1];
           }
         }
 
-        if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('http://www.w3.org/ns/locn#geometry')) {
-          var geoJSON = graph[index_location]['http://www.w3.org/ns/locn#geometry'];
+        if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('geometry')) {
+          var geoJSON = graph[index_location]['geometry'];
           try {
             geoJSON = JSON.parse(geoJSON);
             fields.spatial.model = geoJSON.coordinates;
@@ -160,27 +158,32 @@ angular.module('hopsWorksApp')
         return fields;
       },
       parseDistributionGraph (jsonld, fields) {
-        var graph = jsonld['@graph'];
+        if(jsonld.hasOwnProperty('@graph')) {
+          var graph = jsonld['@graph'];
+        } else {
+          var graph = [jsonld];
+        }
+
         fields.typeannotation.model.fields = [];
 
         graph.forEach((entry, index) => {
-          if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
+          if (entry.hasOwnProperty('accessURL')) {
             let distro = graph[index];
-            let title = graph[index]['http://purl.org/dc/terms/title'];
-            let description = graph[index]['http://purl.org/dc/terms/description'];
+            let title = graph[index]['title'];
+            let description = graph[index]['description'] || graph[index]['http://purl.org/dc/terms/description'];
             
             fields.title.model = this.setFieldFromStringOrArray(title);
             fields.description.model = this.setFieldFromStringOrArray(description);
-            fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
+            fields.format.model = distro['format'] || '';
 
-            if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
-            if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
-              var language_splitted = distro['http://purl.org/dc/terms/language']['@id'].split('/');
+            if (distro.hasOwnProperty('accessURL')) fields.accessUrl.model = distro['accessURL'] || '';
+            if (distro.hasOwnProperty('language')) {
+              var language_splitted = distro['language'].split('/');
               fields.language.model = language_splitted[language_splitted.length - 1];
             }
 
-            if (distro.hasOwnProperty('http://purl.org/dc/terms/license')) {
-              var license_splitted = distro['http://purl.org/dc/terms/license']['@id'].split('/');
+            if (distro.hasOwnProperty('license')) {
+              var license_splitted = distro['license'].split('/');
               fields.license.model = license_splitted[license_splitted.length - 1];
             }
 
@@ -188,17 +191,15 @@ angular.module('hopsWorksApp')
             var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
             var type = null;
 
-            if (entry.hasOwnProperty(aegis_prexix + 'type')) {
-              if (entry[aegis_prexix + 'type']['@id'] != '') {
-                var type_splitted = entry[aegis_prexix + 'type']['@id'].split('/');
+            if (entry.hasOwnProperty('type')) {
+                var type_splitted = entry['type'].split('/');
                 type = type_splitted[type_splitted.length - 1].toLowerCase();
-              }
             }
 
             var new_field = {
-              description: entry[aegis_prexix + 'description'] || '',
-              name: entry[aegis_prexix + 'name'] || '',
-              number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
+              description: entry[aegis_prexix + 'description'] || entry['description'] || '',
+              name: entry['name'] || '',
+              number: parseInt(entry['number'], 10) || '',
               type
             }
             

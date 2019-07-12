@@ -45,16 +45,17 @@ const AEGIS_DISTRIBUTION_TEMPLATE_NAME = 'aegis-distribution';
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataFileCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', 
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', 'AEGIS_CONFIG',
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, AEGIS_CONFIG) {
             const PROJECT_ID = $routeParams.projectID;
             const DISTRIBUTION_ID = $routeParams.distributionID;
             const parameters = $location.search();
             const self = this;
 
             self.fileName = decodeURI(parameters.file);
+            self.metadataExists = false;
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
             self.template = {
@@ -186,53 +187,61 @@ angular.module('hopsWorksApp')
 
             var dataSetService = DataSetService(PROJECT_ID);
 
+            $scope.getRDFLink = function() {
+              var path = 'hdfs://' + decodeURI(parameters.path);
+              return AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + encodeURIComponent(path) + '?useIdentifier=true';
+            };
+
             self.updateModelsFromData = function (jsonld) {
               var fields = $scope.data.fields;
-              var graph = jsonld['@graph'];
+
+              if(jsonld.hasOwnProperty('@graph')) {
+                var graph = jsonld['@graph'];
+              } else {
+                var graph = [jsonld];
+              }s
               fields.typeannotation.model.fields = [];
 
               graph.forEach((entry, index) => {
-                if (entry.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) {
-                  let distro = graph[index];
-                  let title = graph[index]['http://purl.org/dc/terms/title'];
-                  let description = graph[index]['http://purl.org/dc/terms/description'];
-                  fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
-                  fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
-                  fields.format.model = distro['http://purl.org/dc/terms/format'] || '';
+                if (entry.hasOwnProperty('accessURL')) {
+                let distro = graph[index];
+                let title = graph[index]['title'];
+                let description = graph[index]['description'] || graph[index]['http://purl.org/dc/terms/description'];
+                fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
+                fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
+                fields.format.model = distro['format'] || '';
 
-                  if (distro.hasOwnProperty('http://www.w3.org/ns/dcat#accessURL')) fields.accessUrl.model = distro['http://www.w3.org/ns/dcat#accessURL']['@id'] || '';
-                  if (distro.hasOwnProperty('http://purl.org/dc/terms/language')) {
-                    var language_splitted = distro['http://purl.org/dc/terms/language']['@id'].split('/');
-                    fields.language.model = language_splitted[language_splitted.length - 1];
-                  }
-
-                  if (distro.hasOwnProperty('http://purl.org/dc/terms/license')) {
-                    var license_splitted = distro['http://purl.org/dc/terms/license']['@id'].split('/');
-                    fields.license.model = license_splitted[license_splitted.length - 1];
-                  }
-
-                } else {
-                  var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
-                  var type = null;
-
-                  if (entry.hasOwnProperty(aegis_prexix + 'type')) {
-                    if (entry[aegis_prexix + 'type']['@id'] != '') {
-                      var type_splitted = entry[aegis_prexix + 'type']['@id'].split('/');
-                      type = type_splitted[type_splitted.length - 1].toLowerCase();
-                    }
-                  }
-
-                  var new_field = {
-                    primary: entry[aegis_prexix + 'primary'] || false,
-                    description: entry[aegis_prexix + 'description'] || '',
-                    name: entry[aegis_prexix + 'name'] || '',
-                    number: parseInt(entry[aegis_prexix + 'number'], 10) || '',
-                    type
-                  }
-                  
-                  fields.typeannotation.model.fields.push(new_field)
+                if (distro.hasOwnProperty('accessURL')) fields.accessUrl.model = distro['accessURL'] || '';
+                if (distro.hasOwnProperty('language')) {
+                  var language_splitted = distro['language'].split('/');
+                  fields.language.model = language_splitted[language_splitted.length - 1];
                 }
-              });
+
+                if (distro.hasOwnProperty('license')) {
+                  var license_splitted = distro['license'].split('/');
+                  fields.license.model = license_splitted[license_splitted.length - 1];
+                }
+
+              } else {
+                var aegis_prexix = 'http://www.aegis-bigdata.eu/md/voc/core/';
+                var type = null;
+
+                if (entry.hasOwnProperty('type')) {
+                  var type_splitted = entry['type'].split('/');
+                  type = type_splitted[type_splitted.length - 1].toLowerCase();
+                }
+
+                var new_field = {
+                  primary: entry[aegis_prexix + 'primary'] || false,
+                  description: entry[aegis_prexix + 'description'] || entry['description'] || '',
+                  name: entry['name'] || '',
+                  number: parseInt(entry['number'], 10) || '',
+                  type
+                }
+
+                fields.typeannotation.model.fields.push(new_field)
+              }
+            });
             };
 
             /**
@@ -246,6 +255,7 @@ angular.module('hopsWorksApp')
 
               ExtendedMetadataAPIService.getDistributionMetadata(path)
                 .then(function(data) {
+                  self.metadataExists = true;
                   self.updateModelsFromData(data.data);
                 })
                 .catch(function(error) {
@@ -302,16 +312,31 @@ angular.module('hopsWorksApp')
               }
 
               // Send to API
-              ExtendedMetadataAPIService.createOrUpdateDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
-                .then(function(success) {
-                  growl.success('Distribution metadata successfully saved.', {title: 'Success', ttl: 5000});
-                })
-                .catch(function(error) {
-                  growl.error('Server error: ' + error.status, {title: 'Error while saving distribution metadata', ttl: 5000, referenceId: 0});
-                })
-                .finally(function() {
-                  $scope.saveButtonIsDisabled = false;
-                });
+              if(self.metadataExists) {
+                ExtendedMetadataAPIService.updateDistributionMetadata($scope.data.fields.accessUrl.model, metadataObject)
+                    .then(function(success) {
+                      growl.success('Distribution metadata successfully saved.', {title: 'Success', ttl: 5000});
+                    })
+                    .catch(function(error) {
+                      growl.error('Server error: ' + error.status, {title: 'Error while saving distribution metadata', ttl: 5000, referenceId: 0});
+                    })
+                    .finally(function() {
+                      $scope.saveButtonIsDisabled = false;
+                    });
+              } else {
+                ExtendedMetadataAPIService.createDistributionMetadata(parameters.datasetID, PROJECT_ID, metadataObject)
+                    .then(function(success) {
+                      growl.success('Distribution metadata successfully saved.', {title: 'Success', ttl: 5000});
+                    })
+                    .catch(function(error) {
+                      growl.error('Server error: ' + error.status, {title: 'Error while saving distribution metadata', ttl: 5000, referenceId: 0});
+                    })
+                    .finally(function() {
+                      $scope.saveButtonIsDisabled = false;
+                    });
+              }
+
+
             };
 
             /**
