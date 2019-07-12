@@ -45,20 +45,20 @@ public class UserAccountsEmailMessages {
    * Subject of account request
    */
   public final static String ACCOUNT_REQUEST_SUBJECT
-          = "Your Hopsworks account needs verification";
+          = "Your AEGIS account needs verification";
   /*
    * Subject of cluster request
    */
-  public final static String CLUSTER_REQUEST_SUBJECT = "Your Hopsworks cluster needs verification";
+  public final static String CLUSTER_REQUEST_SUBJECT = "Your AEGIS cluster needs verification";
 
   /*
    * Subject of account activation email
    */
   public final static String ACCOUNT_CONFIRMATION_SUBJECT
-          = "Welcome to Hopsworks!";
+          = "Welcome to AEGIS!";
 
   public final static String ALERT_SERVICE_DOWN
-          = "A Hopsworks service has stopped ";
+          = "A AEGIS service has stopped ";
 
   /*
    * Subject of device lost
@@ -73,7 +73,7 @@ public class UserAccountsEmailMessages {
   /*
    * Subject of blocked acouunt
    */
-  public static String HOPSWORKS_SUPPORT_EMAIL = "support@hops.io";
+  public static String HOPSWORKS_SUPPORT_EMAIL = "aegis@fokus.fraunhofer.de";
 
   /*
    * Subject of profile update
@@ -97,7 +97,7 @@ public class UserAccountsEmailMessages {
    * Subject of rejected accounts
    */
   public final static String ACCOUNT_REJECT
-          = "Your Hopsworks account request has been rejected";
+          = "Your AEGIS account request has been rejected";
 
   /*
    * Default accpount acitvation period
@@ -110,7 +110,7 @@ public class UserAccountsEmailMessages {
    * Account deactivation
    */
   public final static String ACCOUNT_DEACTIVATED
-          = "Your Hopsworks account has expired";
+          = "Your AEGIS account has expired";
 
   /**
    * Build an email message for mobile users upon registration.
@@ -125,7 +125,7 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "We received an account request for HopsWorks on your behalf.\n\n";
+            + "We received an account request for AEGIS on your behalf.\n\n";
     String l2
             = "Please click on the following link to verify your email address. We"
             + " will activate your account within "
@@ -155,7 +155,7 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "We received an account request for Hopsworks on your behalf.\n\n";
+            + "We received an account request for AEGIS on your behalf.\n\n";
     String l2
             = "Please click on the following link to verify your email address. We"
             + " will activate your account within "
@@ -185,7 +185,7 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "We received a password recovery request for Hopsworks on your behalf.\n\n";
+            + "We received a password recovery request for AEGIS on your behalf.\n\n";
     String l2
             = "Please click on the following link to recover your password: \n";
 
@@ -204,9 +204,9 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "Your Hopsworks account has been blocked.\n\n";
+            + "Your AEGIS account has been blocked.\n\n";
     String l2
-            = "If you have any questions please visit www.hops.io or contact support@hops.io";
+            = "If you have any questions please visit www.aegis-bigdata.eu or contact aegis@fokus.fraunhofer.de";
     String l3 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
 
@@ -221,7 +221,7 @@ public class UserAccountsEmailMessages {
             + "A password reset has been requested on your behalf.\n\nPlease use the temporary password"
             + " below. You will be required to change your passsword when you login first time.\n\n";
 
-    String tmp_pass = "Password:" + random_password + "\n\n\n";
+    String tmp_pass = "Password: " + random_password + "\n\n\n";
     String l3 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
 
@@ -274,7 +274,7 @@ public class UserAccountsEmailMessages {
 
     String message;
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "We receieved an account deactivation request and your Hopsworks "
+            + "We receieved an account deactivation request and your AEGIS "
             + "account has been deactivated.\n\n";
     String l2 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
@@ -306,7 +306,7 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "Your account request to access Hopsworks has been approved.\n\n";
+            + "Your account request to access AEGIS has been approved.\n\n";
     String l2 = "You can login with your username: " + username
             + " and other credentials you setup.\n\n\n";
     String l3 = "If you have any questions please contact "
@@ -320,7 +320,7 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "Your Hopsworks account request has been rejected.\n\n";
+            + "Your AEGIS account request has been rejected.\n\n";
     String l2 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
     message = l1 + l2;
@@ -337,7 +337,7 @@ public class UserAccountsEmailMessages {
             + "Please use the temporary password below."
             + "You need to validate the code to get a new setup.\n\n";
 
-    String tmp_pass = "Code:" + random_password + "\n\n\n";
+    String tmp_pass = "Code: " + random_password + "\n\n\n";
     String l2 = "If you have any questions please contact "
             + HOPSWORKS_SUPPORT_EMAIL;
 
@@ -352,7 +352,7 @@ public class UserAccountsEmailMessages {
     String message;
 
     String l1 = GREETINGS_HEADER + ",\n\n"
-            + "We received an account request for Hopsworks on your behalf.\n\n";
+            + "We received an account request for AEGIS on your behalf.\n\n";
     String l2 = "Please click on the following link to verify your email address. Within"
             + ACCOUNT_ACITVATION_PERIOD
             + " hours of getting this email.\n\n\n";

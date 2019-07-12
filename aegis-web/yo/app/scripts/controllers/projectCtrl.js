@@ -718,6 +718,41 @@ angular.module('hopsWorksApp')
                       });
             };
 
+            //Note, this is a duplicate from homeCtrl.js, needed to delete project from project settings page.
+            self.deleteProjectAndDatasets = function () {
+              var projectId = self.projectId;
+              self.working = true;
+
+              ModalService
+                .confirm('sm', 'Delete Project', 'Are you sure you want to delete the project and datasets?')
+                .then(function (success) {
+                  self.goToUrl('home');
+                  //Clear project StorageService state
+                  StorageService.remove(projectId + "-tftour-finished");
+
+                  ProjectService.delete({ id: projectId }).$promise.then(
+                    function (success) {
+                      growl.success(success.successMessage, { title: 'Success', ttl: 5000 });
+                      updateUIAfterChange(false);
+                      if (self.tourService.currentStep_TourOne > -1) {
+                        self.tourService.resetTours();
+                      }
+                      self.working = false;
+
+                    }, function (error) {
+                      if (typeof error.data.usrMsg !== 'undefined') {
+                        growl.error(error.data.usrMsg, { title: error.data.errorMsg, ttl: 8000 });
+                      } else {
+                        growl.error("", { title: error.data.errorMsg, ttl: 8000 });
+                      }
+                      self.working = false;
+                    }
+                  );
+                }, function (reason) {
+                  self.working = false;
+                });
+            };
+
             var download = function (text, fileName) {
               var bytes = toByteArray(text);
               var data = new Blob([bytes], {type: 'application/octet-binary'});

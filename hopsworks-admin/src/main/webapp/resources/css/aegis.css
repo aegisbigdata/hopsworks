@@ -1,0 +1,43 @@
+/* AEGIS theme for login issue forms 
+----------------------------------*/
+.aegis table {
+    width: 100%;
+}
+.aegis table td:first-child .ui-state-default .ui-button-text {
+    background-color: #ffffff;
+    color: #000000;
+}
+.aegis table td:last-child .ui-state-default .ui-button-text {
+    background-color: #5d9cec;
+    color: #fff;
+}
+.aegis .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    width: 100%;
+}
+.aegis .ui-button-text.ui-c {
+    border-color: transparent;
+    font-weight: normal;
+}
+.aegis .ui-widget-header {
+    background: #ffffff;
+    border-width: 0px;
+}
+.aegis .ui-panel .ui-panel-titlebar {
+    padding: .5em 1.5em .3em;
+} 
+.aegis .ui-button-text-only .ui-button-text {
+    padding: 6px 12px;
+}
+
+.aegis .ui-panel-content.ui-widget-content > table tr {
+    display: flex;
+    flex-flow: row wrap;
+}
+.aegis .ui-panel-content.ui-widget-content > table tr td {
+    width: 100%;
+}
+.aegis .ui-panel-content.ui-widget-content > table tr td .ui-inputfield, .ui-widget-content .ui-inputfield {
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid #cccccc;
+}
