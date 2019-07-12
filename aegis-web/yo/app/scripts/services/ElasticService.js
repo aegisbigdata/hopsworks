@@ -60,6 +60,7 @@ angular.module('hopsWorksApp')
                     var types = searchTerm.type;
                     angular.forEach(types, function(type,key){
                       baseUrl +=  '&type='+ type;
+                      aggUrl +=  '&type='+ type;
                     })
                   }
                   if(searchTerm.page) {

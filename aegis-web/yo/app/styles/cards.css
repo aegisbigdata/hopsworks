@@ -232,3 +232,8 @@
   padding: 15px;
   background: white;
 }
+
+
+.card-item .dropdown-menu.hideDd{
+    opacity: 0;
+}

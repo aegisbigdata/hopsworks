@@ -44,6 +44,9 @@ angular.module('hopsWorksApp')
           function ($scope, ProjectService, DelaService, $routeParams, $rootScope, $location, ItemAccessService) {
             var self = this;
             self.detail = [];
+            self.listDatasets = [];
+            self.hideDropdown = true;
+
             var init = function (content) {
               if (content.details !== undefined) {
                 console.log("No need to get detail: ", content);
@@ -150,15 +153,42 @@ angular.module('hopsWorksApp')
               }
             };
 
-            // self.goToProject = function (id) {
-            //   console.log(id);
-            //   var itemAccessService = ItemAccessService();
-            //   itemAccessService.projectAccess(id).then(function (response) {
-            //     console.log(response);
-            //   }, function (error) {
-            //     console.log("error ", error);
-            //   });
-            // }
+            self.goToProject = function (item) {
+              var itemAccessService = ItemAccessService();
+              if(item.type === 'proj') {
+                var projectId = item.id;
+                itemAccessService.projectAccess(projectId).then(function (response) {
+                  if(response.data.result === 'OK'){
+                    $location.path('/project/' + projectId + '/datasets').search({});
+                  } else if(response.data.result === 'DENIED') {
+                    // Popup access request
+                    $scope.detailsFn($scope.content)
+                  }
+                }, function (error) {
+                  console.log("error ", error);
+                });
+              } else if(item.type === 'ds') {
+                var inodeId = item.id;
+                itemAccessService.itemAccess(inodeId).then(function (response) {
+                  if(response.data.result === 'OK'){
+                    self.listDatasets = response.data.items;
+                    if(datasets.length > 1){
+                      // Show List URL
+                      self.hideDropdown = false;
+                    } else {
+                      $location.path('/project/' + listDatasets[0].projectId + '/datasets/' + listDatasets[0].name).search({});
+                    }
+                  } else if(response.data.result === 'DENIED') {
+                    // Popup access request
+                    $scope.detailsFn($scope.content)
+                  }
+                }, function (error) {
+                  console.log("error ", error);
+                });
+              } else {
+                // Files?
+              }
+            }
             
           }]);
 
