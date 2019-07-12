@@ -114,6 +114,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -313,28 +314,34 @@ public class DataSetService {
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_SCIENTIST, AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response findDataSetsInProjectID() {
+  public Response findDataSetsInProjectID(@QueryParam("count") @DefaultValue("false") boolean count) {
 
     List<InodeView> kids = new ArrayList<>();
     Collection<Dataset> dsInProject = this.project.getDatasetCollection();
-    for (Dataset ds : dsInProject) {
-      String path = datasetController.getDatasetPath(ds).toString();
-      List<Dataset> inodeOccurrence = datasetFacade.findByInodeId(ds.getInodeId());
-      int sharedWith = inodeOccurrence.size() - 1; // -1 for ds itself
-      InodeView inodeView = new InodeView(inodes.findParent(ds.getInode()), ds, path);
-      Users user = userFacade.findByUsername(inodeView.getOwner());
-      if (user != null) {
-        inodeView.setOwner(user.getFname() + " " + user.getLname());
-        inodeView.setEmail(user.getEmail());
+    if(count) {
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+        .entity(new ProjectContentDTO(dsInProject.size())).build();
+    } else {
+      for (Dataset ds : dsInProject) {
+        String path = datasetController.getDatasetPath(ds).toString();
+        List<Dataset> inodeOccurrence = datasetFacade.findByInodeId(ds.getInodeId());
+        int sharedWith = inodeOccurrence.size() - 1; // -1 for ds itself
+        InodeView inodeView = new InodeView(inodes.findParent(ds.getInode()), ds, path);
+        Users user = userFacade.findByUsername(inodeView.getOwner());
+        if (user != null) {
+          inodeView.setOwner(user.getFname() + " " + user.getLname());
+          inodeView.setEmail(user.getEmail());
+        }
+        inodeView.setSharedWith(sharedWith);
+        kids.add(inodeView);
       }
-      inodeView.setSharedWith(sharedWith);
-      kids.add(inodeView);
+  
+      GenericEntity<List<InodeView>> inodViews
+        = new GenericEntity<List<InodeView>>(kids) {
+      };
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
+        inodViews).build();
     }
-
-    GenericEntity<List<InodeView>> inodViews
-            = new GenericEntity<List<InodeView>>(kids) { };
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
-            inodViews).build();
   }
 
   /**
