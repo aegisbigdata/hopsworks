@@ -336,9 +336,7 @@ public class DataSetService {
         kids.add(inodeView);
       }
   
-      GenericEntity<List<InodeView>> inodViews
-        = new GenericEntity<List<InodeView>>(kids) {
-      };
+      GenericEntity<List<InodeView>> inodViews = new GenericEntity<List<InodeView>>(kids) {};
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(
         inodViews).build();
     }
