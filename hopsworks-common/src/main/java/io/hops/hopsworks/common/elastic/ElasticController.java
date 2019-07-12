@@ -209,32 +209,12 @@ public class ElasticController {
     
     Script minPriceScript = new Script("try { return Float.parseFloat(params._source." +
       Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return Float.MAX_VALUE; }");
-    
-    /*Script minPriceScript = new Script(
-      "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + " instanceof String ? " +
-        "Float.MAX_VALUE : Float.parseFloat (" +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
-        "Float.MAX_VALUE : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");*/
   
     MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
     srb.addAggregation(minPriceAggregation);
   
     Script maxPriceScript = new Script("try { return Float.parseFloat(params._source." +
       Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return 0.0f; }");
-  
-    /*Script maxPriceScript = new Script(
-      "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + " instanceof String ? " +
-        "0.0f : Float.parseFloat (" +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
-        "0.0f : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");*/
     
     MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
     srb.addAggregation(maxPriceAggregation);

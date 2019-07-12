@@ -64,6 +64,8 @@ import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeView;
 import io.hops.hopsworks.common.dao.jobhistory.Execution;
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
+import io.hops.hopsworks.common.dao.metadata.Field;
+import io.hops.hopsworks.common.dao.metadata.MTable;
 import io.hops.hopsworks.common.dao.metadata.Template;
 import io.hops.hopsworks.common.dao.metadata.db.TemplateFacade;
 import io.hops.hopsworks.common.dao.project.Project;
@@ -113,6 +115,7 @@ import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -132,7 +135,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
@@ -1220,16 +1226,55 @@ public class DataSetService {
   
     JsonObject filetemplateData = objJson.getJsonObject("filetemplateData");
   
-    if (filetemplateData == null || filetemplateData.getString("inodePath") == null
-      || filetemplateData.getString("inodePath").equals("")) {
-      throw new IllegalArgumentException("filetemplateData was not provided or its InodePath was not set");
+    if (filetemplateData == null) {
+      throw new IllegalArgumentException("Error: filetemplateData was not provided");
     }
   
     String inodePath = filetemplateData.getString("inodePath");
     int templateid = filetemplateData.getInt("templateId");
+    
+    JsonObject metadata = objJson.getJsonObject("metadata");
+  
+    if (metadata == null) {
+      throw new IllegalArgumentException("Error: Metadata missing or not provided as json object");
+    }
   
     Inode inode = inodes.getInodeAtPath(inodePath);
     Template temp = template.findByTemplateId(templateid);
+    
+    long inodepid = inode.getInodePK().getPartitionId();
+    String inodename = inode.getInodePK().getName();
+  
+    Map<String, Integer> fields = new HashMap<>();
+    
+    for(MTable table : temp.getMTables()) {
+      for (Field f : table.getFields()) {
+        fields.put(f.getName(), f.getId());
+      }
+    }
+    
+    if (fields.isEmpty()) {
+      throw new IllegalArgumentException("Error: Template has no fields");
+    }
+    
+    for (String field : metadata.keySet()) {
+      if (!(metadata.get(field) instanceof JsonArray)) {
+        throw new IllegalArgumentException("Error: Metadata values not provided as jsonarray");
+      } else {
+        for (Object value : metadata.getJsonArray(field)) {
+          if (!(value instanceof JsonString)) {
+            throw new IllegalArgumentException("Error: Metadata values inside jsonarray not provided as string");
+          }
+        }
+      }
+    }
+  
+    List<Template> templates = new LinkedList<>(inode.getTemplates());
+    if (templates.contains(temp)) {
+      metadataService.detachTemplateFromInode(inode.getId(), templateid);
+    }
+    
+    //add template
     temp.getInodes().add(inode);
   
     //persist the relationship
@@ -1237,23 +1282,22 @@ public class DataSetService {
   
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("The template was attached to " + inode.getId() + " file and metadata was added");
-  
-    JsonArray metaObjs = objJson.getJsonArray("metaObjs");
-  
-    if (metaObjs == null) {
-      throw new IllegalArgumentException("metaObjs missing or not provided as json array");
-    }
     
-    List<JsonObject> metaObjsAsList = metaObjs.getValuesAs(JsonObject.class);
-    
-    for(JsonObject metaObj  : metaObjsAsList) {
+    for(String field  : metadata.keySet()) {
+      if (!fields.containsKey(field)) continue;
       
-      Response metadataServiceResponse = metadataService.addMetadataWithSchema(sc, metaObj.toString());
-  
-      if (Response.Status.OK.getStatusCode() != metadataServiceResponse.getStatus()) {
-        return noCacheResponse.getNoCacheResponseBuilder(
-          Response.Status.fromStatusCode(metadataServiceResponse.getStatus())
-        ).entity(metadataServiceResponse.getEntity()).build();
+      List<JsonString> metadataValues = metadata.getJsonArray(field).getValuesAs(JsonString.class);
+      
+      for(JsonString value : metadataValues) {
+        JsonObject metaObj = Json.createObjectBuilder()
+          .add("inodepid", inodepid)
+          .add("inodename", inodename)
+          .add("tableid", -1)
+          .add("metadata",
+            Json.createObjectBuilder().add(fields.get(field).toString(), value).build()
+          ).build();
+        
+        metadataService.addMetadataWithSchema(sc, metaObj.toString());
       }
     }
   
