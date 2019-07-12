@@ -65,7 +65,7 @@
           title="{{project.project.name.length > 28 ? project.project.name:''}}"
         >
           <h4 class="home-project-container-title">{{ project.project.name | limitTo: 18 }}{{project.project.name.length > 18 ? '...' : ''}}</h4>
-          <div class="home-project-container-title">5 datasets</div>
+          <div class="home-project-container-title"><lbl-project-datasets project-id="{{project.project.id}}"></lbl-project-datasets></div>
         </a>
       </div>
 
