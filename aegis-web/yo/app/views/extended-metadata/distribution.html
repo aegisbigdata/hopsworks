@@ -47,7 +47,7 @@
                 <div>
                     <div class="container-fluid content-wrapper">
                         <div growl reference="3" class="pull-right"></div>
-                        <extmd-header type="Distribution" name="{{extendedMetadataFileCtrl.fileName}}"></extmd-header>
+                        <extmd-header type="Distribution" name="{{extendedMetadataFileCtrl.fileName}}" rdf-link="{{ getRDFLink() }}"></extmd-header>
                         <div class="row" style="margin-top: 15px">
                             <!-- Left menu -->
                             <div class="col-md-4 col-sm-4 col-lg-3">
@@ -259,7 +259,6 @@
                                 </div>
 
                                 <div ng-if="extendedMetadataFileCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
-                                    <h5>Usage note</h5>
                                     <p><small>{{ selectedFieldDescription }}</small></p>
                                 </div>
                             </div>

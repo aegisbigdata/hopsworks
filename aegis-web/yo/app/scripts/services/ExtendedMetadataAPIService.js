@@ -141,7 +141,7 @@ angular.module('hopsWorksApp')
 
       // DISTRIBUTION METADATA
 
-      createOrUpdateDistributionMetadata: function(datasetID, projectID, metadata) {
+      createDistributionMetadata: function(datasetID, projectID, metadata) {
         var req = {
           method: 'POST',
           url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT,
@@ -149,6 +149,20 @@ angular.module('hopsWorksApp')
             catalogue: projectID,
             dataset: datasetID
           },
+          headers: {
+            'Content-Type': 'application/ld+json',
+            'Authorization': AEGIS_CONFIG.metadata.API_KEY
+          },
+          data: metadata
+        };
+        return $http(req);
+      },
+
+      updateDistributionMetadata: function(identifier, metadata) {
+        identifier = encodeURIComponent(encodeURIComponent(identifier)) + '?useIdentifier=true';
+        var req = {
+          method: 'PUT',
+          url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + identifier,
           headers: {
             'Content-Type': 'application/ld+json',
             'Authorization': AEGIS_CONFIG.metadata.API_KEY
