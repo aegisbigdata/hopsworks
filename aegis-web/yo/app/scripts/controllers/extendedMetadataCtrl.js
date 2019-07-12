@@ -45,10 +45,10 @@ const AEGIS_PROJECT_TEMPLATE_NAME = 'aegis-distribution';
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService',
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', '$http',
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, $http) {
             const PROJECT_ID = $routeParams.projectID;
             var self = this;
 
@@ -442,5 +442,77 @@ angular.module('hopsWorksApp')
 
               self.saveExtendedProjectMetadata();
             };
+
+            $scope.selected = undefined;
+            $scope.getLocation = function(val) {
+              return ["hallo"];
+            };
+
+            $scope.getLindaLicences = function(val) {
+              return ["hallo"];
+              var url = "https://bbc6.sics.se:8181/hopsworks-api/linda/licence_index/_search?pretty";
+
+              var query = {
+                "query": {
+                  "bool": {
+                    "should": [
+                      {
+                        "nested": {
+                          "path": "altLabel",
+                          "query": {
+                            "match": {
+                              "altLabel.#text": {
+                                "query": val,
+                                "operator": "and"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "nested": {
+                          "path": "prefLabel",
+                          "query": {
+                            "match": {
+                              "prefLabel.#text": {
+                                "query": val,
+                                "operator": "and"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              };
+               var options = {
+                 headers: {
+                   'Content-Type': 'application/json',
+                 }
+               };
+
+              return $http.post(url, query, options).then(function(response){
+                return ["hallo"];
+                var selection = [];
+                var results = response.data.hits.hits;
+                results.forEach(function (val) {
+                  val._source.prefLabel.map(function (item) {
+                    if(item['@lang'] === 'en') {
+                      selection.push(item['#text']);
+                    }
+                  });
+                });
+
+                console.info(selection);
+                return selection;
+                // return response.data.hits.hits.map(function(item){
+                //   return item._source.altLabel['#text'];
+                // });
+              });
+            };
+
+            $scope.states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Dakota', 'North Carolina', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+
           }
         ]);
