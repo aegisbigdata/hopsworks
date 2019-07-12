@@ -189,7 +189,7 @@ angular.module('hopsWorksApp')
 
             $scope.getRDFLink = function() {
               var path = 'hdfs://' + decodeURI(parameters.path);
-              return AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + encodeURIComponent(path) + '?useIdentifier=true';
+              return AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
             };
 
             self.updateModelsFromData = function (jsonld) {
@@ -199,7 +199,7 @@ angular.module('hopsWorksApp')
                 var graph = jsonld['@graph'];
               } else {
                 var graph = [jsonld];
-              }s
+              }
               fields.typeannotation.model.fields = [];
 
               graph.forEach((entry, index) => {

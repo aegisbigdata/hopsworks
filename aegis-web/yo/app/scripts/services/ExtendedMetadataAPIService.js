@@ -159,7 +159,7 @@ angular.module('hopsWorksApp')
       },
 
       updateDistributionMetadata: function(identifier, metadata) {
-        identifier = encodeURIComponent(identifier) + '?useIdentifier=true';
+        identifier = encodeURIComponent(encodeURIComponent(identifier)) + '?useIdentifier=true';
         var req = {
           method: 'PUT',
           url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + identifier,
@@ -173,8 +173,7 @@ angular.module('hopsWorksApp')
       },
 
       getDistributionMetadata: function (path) {
-        //path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
-        path = encodeURIComponent(path) + '?useIdentifier=true';
+        path = encodeURIComponent(encodeURIComponent(path)) + '?useIdentifier=true';
         var req = {
           method: 'GET',
           url: AEGIS_CONFIG.metadata.DISTRIBUTION_ENDPOINT + path,

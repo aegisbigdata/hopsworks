@@ -226,7 +226,7 @@
                                    tabindex="4"
                                    ng-click="metadataCtrl.attachTemplate(dataset); $event.stopPropagation();">
                                   <span><i class="fa fa-upload"></i>
-                                    Add metadata</span>
+                                    Add Details</span>
                                 </a>
                               </li>
                               <li ng-if="dataset.name.indexOf('::') === -1" ng-show="projectCtrl.role === 'Data owner' && dataset.publicDs === 0">
@@ -235,7 +235,7 @@
                                    tabindex="5"
                                    ng-click="metadataCtrl.detachTemplate(dataset); $event.stopPropagation();">
                                   <span><i class="fa fa-download"></i>
-                                    Remove metadata</span>
+                                    Remove Details</span>
                                 </a>
                               </li>
                               <!--
@@ -264,7 +264,7 @@
                                    tabindex="5"
                                    ng-click="projectCtrl.goToDatasetExtendedMetadata(dataset); $event.stopPropagation();">
                                   <span><i class="fa fa-tag"></i>
-                                    Add or edit extended metadata</span>
+                                    Extended Metadata</span>
                                 </a>
                               </li>
                               <li class="divider" ng-if="dataset.name.indexOf('::') === -1 && projectCtrl.role === 'Data owner'  && (dataset.publicDs === 0)"></li>

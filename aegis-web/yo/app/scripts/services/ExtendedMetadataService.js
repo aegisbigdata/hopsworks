@@ -45,11 +45,31 @@ angular.module('hopsWorksApp')
       setFieldFromStringOrArray (input) {
         let string = '';
 
+        console.log(input);
         if (typeof(input) === 'string') {
           string = input;
         } else if (Array.isArray(input) && input.length > 0) {
           try {
-            string = input.find(el => el['@language'] === 'en')['@value'];
+            var fallback = '';
+            input.forEach(function (entry) {
+              if(typeof(entry) === 'string') {
+                fallback = entry;
+              } else if(typeof(entry) === 'object') {
+                if(entry['@language'].startsWith('en')) {
+                  string = entry['@value']
+                }
+              }
+            });
+            if(!string.length > 0) {
+              string = fallback;
+            }
+          } catch (e) {
+            console.log(e);
+            string = '';
+          }
+        } else if (typeof(input) === 'object') {
+          try {
+            string = input['@value'];
           } catch (e) {
             console.log(e);
             string = '';
