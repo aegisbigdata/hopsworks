@@ -92,7 +92,7 @@ angular.module('hopsWorksApp')
                         var vCoreUtilisation = (self.allocatedVCores / totalVCores) * 100;
                         var MBUtilisation = (self.allocatedMB / totalMB) * 100;
                         self.utilisation = Math.round(Math.max(vCoreUtilisation, MBUtilisation))
-                        self.utilisationBar = Math.max(self.utilisation, 10);
+                        self.utilisationBar = Math.max(self.utilisation, 1);
                         
                         if (self.utilisation <= 50) {
                           self.progressBarClass = 'progress-bar-success';
