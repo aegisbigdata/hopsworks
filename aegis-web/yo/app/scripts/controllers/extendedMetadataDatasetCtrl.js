@@ -45,10 +45,10 @@ const AEGIS_DATASET_TEMPLATE_NAME = 'aegis-distribution';
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataDatasetCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService',
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', 'AEGIS_CONFIG',
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, AEGIS_CONFIG) {
             const parameters = $location.search();
             var self = this;
 
@@ -246,6 +246,10 @@ angular.module('hopsWorksApp')
 
             var dataSetService = DataSetService($routeParams.projectID);
 
+            $scope.getRDFLink = function() {
+              return AEGIS_CONFIG.metadata.DATASET_ENDPOINT + self.DATASET_ID + '?catalogue=' + self.PROJECT_ID;
+            };
+
             //update the current template whenever other users make changes
             var listener = $rootScope.$on('template.change', function (event, response) {
               try {
@@ -340,15 +344,14 @@ angular.module('hopsWorksApp')
                   var type_splitted = graph[index_publisher]['@type'].split('/');
                   fields.publishertype.model = type_splitted[type_splitted.length - 1].toUpperCase();
                 } catch (e) {}
-                  fields.publishername.model = graph[index_publisher]['http://xmlns.com/foaf/0.1/name'];
-                if (graph[index_publisher][fields.homepage.mapping] && graph[index_publisher][fields.homepage.mapping].hasOwnProperty('@id')) {
-                  fields.homepage.model =  graph[index_publisher][fields.homepage.mapping]['@id'];
-                }
+                  fields.publishername.model = graph[index_publisher]['name'];
+                  fields.homepage.model = graph[index_publisher]['homepage'];
+
               }
 
               // Set Language field
-              if (graph[index_dataset].hasOwnProperty('http://purl.org/dc/terms/language')) {
-                var language_splitted = graph[index_dataset]['http://purl.org/dc/terms/language']['@id'].split('/');
+              if (graph[index_dataset].hasOwnProperty('language')) {
+                var language_splitted = graph[index_dataset]['language'].split('/');
                 fields.language.model = language_splitted[language_splitted.length - 1];
               }
 
@@ -358,56 +361,56 @@ angular.module('hopsWorksApp')
                 fields.license.model = license_splitted[license_splitted.length - 1];
               }
 
-              let title = graph[index_dataset]['http://purl.org/dc/terms/title'];
-              let description = graph[index_dataset]['http://purl.org/dc/terms/description'];
+              let title = graph[index_dataset]['title'];
+              let description = graph[index_dataset]['description'];
               fields.title.model = ExtendedMetadataService.setFieldFromStringOrArray(title);
               fields.description.model = ExtendedMetadataService.setFieldFromStringOrArray(description);
 
               // Set other fields
-              fields.accessRights.model = graph[index_dataset]['http://purl.org/dc/terms/accessRights'] || '';
-              fields.price.model = graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/price'] || '';
-              fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == 'true') || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
+              fields.accessRights.model = graph[index_dataset]['accessRights'] || '';
+              fields.price.model = graph[index_dataset]['price'] || '';
+              fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == true) || graph[index_dataset]['sellable'];
 
 
               
-              if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#keyword')) {
-                let tags = graph[index_dataset]['http://www.w3.org/ns/dcat#keyword'];
+              if (graph[index_dataset].hasOwnProperty('keyword')) {
+                let tags = graph[index_dataset]['keyword'];
                 fields.keywords.model = tags.join();
                 fields.keywords.tags = tags.map(tag => {
                   return {text: tag};
                 });
               }
 
-              if (graph[index_dataset].hasOwnProperty('http://www.w3.org/ns/dcat#theme')) {
-                var theme_splitted = graph[index_dataset]['http://www.w3.org/ns/dcat#theme']['@id'].split('/');
+              if (graph[index_dataset].hasOwnProperty('theme')) {
+                var theme_splitted = graph[index_dataset]['theme'].split('/');
                 fields.theme.model = theme_splitted[theme_splitted.length - 1];
               }
 
-              if (graph[index_dataset].hasOwnProperty('http://xmlns.com/foaf/0.1/page')) {
-                fields.documentation.model = graph[index_dataset]['http://xmlns.com/foaf/0.1/page']['@id'] || '';
+              if (graph[index_dataset].hasOwnProperty('page')) {
+                fields.documentation.model = graph[index_dataset]['page'] || '';
               }
 
               // Set temporal data fields
               if (index_temporal) {
                 let temporalData = graph[index_temporal];
-                if (temporalData.hasOwnProperty('http://schema.org/startDate')) fields.temporalfrom.model = moment(temporalData['http://schema.org/startDate']['@value']);
-                if (temporalData.hasOwnProperty('http://schema.org/endDate')) fields.temporalto.model = moment(temporalData['http://schema.org/endDate']['@value']);
+                if (temporalData.hasOwnProperty('startDate')) fields.temporalfrom.model = moment(temporalData['startDate']);
+                if (temporalData.hasOwnProperty('endDate')) fields.temporalto.model = moment(temporalData['endDate']);
               }
 
               if (index_contactpoint) {
                 var type_splitted = graph[index_contactpoint]['@type'].split('#');
                 fields.contactpointtype.model = type_splitted[type_splitted.length - 1].toUpperCase() || '';
-                fields.contactpointname.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#fn'] || '';
+                fields.contactpointname.model = graph[index_contactpoint]['fn'] || '';
 
-                if (graph[index_contactpoint].hasOwnProperty('http://www.w3.org/2006/vcard/ns#hasEmail')) {
-                  fields.contactpointmail.model = graph[index_contactpoint]['http://www.w3.org/2006/vcard/ns#hasEmail']['@id'];
+                if (graph[index_contactpoint].hasOwnProperty('hasEmail')) {
+                  fields.contactpointmail.model = graph[index_contactpoint]['hasEmail'];
                   fields.contactpointmail.model = fields.contactpointmail.model.split(':');
                   fields.contactpointmail.model = fields.contactpointmail.model[fields.contactpointmail.model.length - 1];
                 }
               }
 
-              if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('http://www.w3.org/ns/locn#geometry')) {
-                var geoJSON = graph[index_location]['http://www.w3.org/ns/locn#geometry'];
+              if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('geometry')) {
+                var geoJSON = graph[index_location]['geometry'];
                 try {
                   geoJSON = JSON.parse(geoJSON);
                   $scope.geoJSON = geoJSON;
