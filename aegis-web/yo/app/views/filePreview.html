@@ -63,7 +63,7 @@ else {
 				data: dataText,
             })
             .done(function (data) {
-			//Add translation block
+			//Add translation block here
 			$('.filepreview').prepend("<div id='translationblock'><h2><img height='20px' src='"+ $("#navbarLanguage img")[0].src + "'/>Translation preview</h2><hr style='border-color:black'><div>" + data[0]["translations"][0]["text"] + "</div></div><hr style='border-color:black'>")
             })
             .error(function (data) {
