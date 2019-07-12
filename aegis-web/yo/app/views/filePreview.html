@@ -36,10 +36,46 @@
   ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
+<script>
+function mytranslate(){
+if ($("#translationblock").length) {
+   $("#translationblock").remove();
+}
+else {
+   if (~$("#navbarLanguage img")[0].src.indexOf("en_EN")){
+      curLanguage = 'en'
+   }
+   else if (~$("#navbarLanguage img")[0].src.indexOf("de_DE")){
+      curLanguage = 'de'
+   }
+      else if (~$("#navbarLanguage img")[0].src.indexOf("it_IT")){
+      curLanguage = 'it'
+   }
+      else if (~$("#navbarLanguage img")[0].src.indexOf("el_GR")){
+      curLanguage = 'el'
+   }
+   textToTranslate = $('.filepreview').text().substring(0,3000);
+   dataText = "[{'Text':'" + textToTranslate + "'}]";
+   $.ajax({
+                type: 'POST',
+                url: 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=' + curLanguage,
+                headers: {'Ocp-Apim-Subscription-Key' : '8153ccc25be142dea909dc66caac9182', 'Content-Type' : 'application/json'},
+				data: dataText,
+            })
+            .done(function (data) {
+			//Add translation block
+			$('.filepreview').prepend("<div id='translationblock'><h2><img height='20px' src='"+ $("#navbarLanguage img")[0].src + "'/>Translation preview</h2><hr style='border-color:black'><div>" + data[0]["translations"][0]["text"] + "</div></div><hr style='border-color:black'>")
+            })
+            .error(function (data) {
+                alert(JSON.stringify(data));
+            });
+ }; //end if translation block exists
 
+}
+</script>
 <div class="modal-header">
   <button class="close" ng-click="filePreviewCtrl.close()" data-dismiss="modal" aria-hidden="true" type="button">&times;</button>
-  <h2 class="modal-title">File Preview - {{filePreviewCtrl.fileName}}</h2>
+  <h2 class="modal-title">File Preview - {{filePreviewCtrl.fileName}}</h2> 
 </div>
 <div growl reference="23" class="pull-right"></div>
 <div ng-show="filePreviewCtrl.type === 'text'">
@@ -50,7 +86,9 @@
     <button style="border-color:#eee; min-width: 64px;"
           ng-click="filePreviewCtrl.fetchFile(filePreviewCtrl.modes[1])">
       <span style="color: #4285f4" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Tail</button>
+<button id="translateBtn" style="text-align:right;padding-left:10px;padding-right:10px;border-color: #eee; min-width: 64px;" onclick="mytranslate()" ><span style="color: blue" class="glyphicon glyphicon-globe" aria-hidden="true"></span> Translate</button>
 </div>
+
 <div class="modal-body content" ng-show="filePreviewCtrl.type === 'image'">
   <img class="img-preview" src="data:image/{{filePreviewCtrl.extension}};base64,{{filePreviewCtrl.content}}" alt="Waiting for image download...">
 </div>
