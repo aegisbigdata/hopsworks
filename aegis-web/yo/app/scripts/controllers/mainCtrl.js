@@ -387,28 +387,31 @@ angular.module('hopsWorksApp')
               let params = $location.search();
               switch(self.selectedSortby.value){
                 case 'RASC':
-                
+                  params.sort = 'relevance';
+                  params.order = 'asc';
                 break;
                 case 'RDESC':
-                
+                  params.sort = 'relevance';
+                  params.order = 'desc';
                 break;
                 case 'LASC':
-                
+                  params.sort = 'date';
+                  params.order = 'asc';
                 break;
                 case 'LDESC':
-                
+                  params.sort = 'date';
+                  params.order = 'desc';
                 break;
                 case 'TASC':
                   params.sort = 'title';
                   params.order = 'asc';
-                  params.page = 1
                 break;
                 case 'TDESC':
                   params.sort = 'title';
                   params.order = 'desc';
-                  params.page = 1
                 break;
               }
+              params.page = 1
               if(self.searchType === "global") {
                 self.goToSearchHome('search', params);
               } else {
