@@ -64,6 +64,8 @@ import io.hops.hopsworks.common.dao.hdfs.inode.InodeFacade;
 import io.hops.hopsworks.common.dao.hdfs.inode.InodeView;
 import io.hops.hopsworks.common.dao.jobhistory.Execution;
 import io.hops.hopsworks.common.dao.jobs.description.Jobs;
+import io.hops.hopsworks.common.dao.metadata.Field;
+import io.hops.hopsworks.common.dao.metadata.MTable;
 import io.hops.hopsworks.common.dao.metadata.Template;
 import io.hops.hopsworks.common.dao.metadata.db.TemplateFacade;
 import io.hops.hopsworks.common.dao.project.Project;
@@ -112,6 +114,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -132,7 +135,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
@@ -599,8 +605,8 @@ public class DataSetService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createTopLevelDataSet(DataSetDTO dataSet, @Context SecurityContext sc)
-    throws DatasetException, HopsSecurityException {
-
+      throws DatasetException, HopsSecurityException {
+    
     Users user = jWTHelper.getUserPrincipal(sc);
     DistributedFileSystemOps dfso = dfs.getDfsOps();
     String username = hdfsUsersController.getHdfsUserName(project, user);
@@ -1167,7 +1173,7 @@ public class DataSetService {
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response compressFile(@PathParam("path") String path, @Context SecurityContext sc)
-    throws JobException, DatasetException, ProjectException {
+      throws JobException, DatasetException, ProjectException {
     Users user = jWTHelper.getUserPrincipal(sc);
 
     DsPath dsPath = pathValidator.validatePath(this.project, path);
@@ -1213,27 +1219,60 @@ public class DataSetService {
   }
 
   @POST
-  @Path("/attachTempleteAndAddMetaData")
+  @Path("/attachTemplateAndAddMetaData")
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response attachTempleteAndAddMetaDataWithSchema(@Context SecurityContext sc, String obj)
+  public Response attachTemplateAndAddMetaDataWithSchema(@Context SecurityContext sc, String obj)
       throws MetadataException, GenericException {
   
     JsonObject objJson = Json.createReader(new StringReader(obj)).readObject();
   
     JsonObject filetemplateData = objJson.getJsonObject("filetemplateData");
   
-    if (filetemplateData == null || filetemplateData.getString("inodePath") == null
-      || filetemplateData.getString("inodePath").equals("")) {
-      throw new IllegalArgumentException("filetempleateData was not provided or its InodePath was not set");
+    if (filetemplateData == null) {
+      throw new IllegalArgumentException("Error: filetemplateData was not provided");
     }
   
     String inodePath = filetemplateData.getString("inodePath");
-    int templateid = filetemplateData.getInt("templateId");
+    String templateName = filetemplateData.getString("templateName");
+    
+    JsonObject metadata = objJson.getJsonObject("metadata");
+  
+    if (metadata == null) {
+      throw new IllegalArgumentException("Error: Metadata missing or not provided as json object");
+    }
   
     Inode inode = inodes.getInodeAtPath(inodePath);
-    Template temp = template.findByTemplateId(templateid);
+    Template temp = template.findByTemplateName(templateName).get(0);
+    
+    long inodepid = inode.getInodePK().getParentId();
+    String inodename = inode.getInodePK().getName();
+  
+    Map<String, Integer> fields = new HashMap<>();
+    
+    for(MTable table : temp.getMTables()) {
+      for (Field f : table.getFields()) {
+        fields.put(f.getName(), f.getId());
+      }
+    }
+    
+    if (fields.isEmpty()) {
+      throw new IllegalArgumentException("Error: Template has no fields");
+    }
+    
+    for (String field : metadata.keySet()) {
+      if (!(metadata.get(field) instanceof JsonString)) {
+        throw new IllegalArgumentException("Error: Metadata values not provided as string");
+      }
+    }
+  
+    List<Template> templates = new LinkedList<>(inode.getTemplates());
+    if (templates.contains(temp)) {
+      metadataService.detachTemplateFromInode(inode.getId(), temp.getId());
+    }
+    
+    //add template
     temp.getInodes().add(inode);
   
     //persist the relationship
@@ -1241,18 +1280,24 @@ public class DataSetService {
   
     RESTApiJsonResponse json = new RESTApiJsonResponse();
     json.setSuccessMessage("The template was attached to " + inode.getId() + " file and metadata was added");
-  
-    JsonObject metaObj = objJson.getJsonObject("metaObj");
-  
-    Response metadataServiceResponse = metadataService.addMetadataWithSchema(sc, metaObj.toString());
     
-    if (Response.Status.OK.getStatusCode() == metadataServiceResponse.getStatus()) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
-    } else {
-      return noCacheResponse.getNoCacheResponseBuilder(
-        Response.Status.fromStatusCode(metadataServiceResponse.getStatus())
-      ).entity(metadataServiceResponse.getEntity()).build();
+    for(String field  : metadata.keySet()) {
+      if (!fields.containsKey(field)) continue;
+      
+      String value = metadata.getString(field);
+      
+      JsonObject metaObj = Json.createObjectBuilder()
+        .add("inodepid", inodepid)
+        .add("inodename", inodename)
+        .add("tableid", -1)
+        .add("metadata",
+          Json.createObjectBuilder().add(fields.get(field).toString(), value).build()
+        ).build();
+      
+      metadataService.addMetadataWithSchema(sc, metaObj.toString());
     }
+  
+    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(json).build();
   }
 
   @POST
