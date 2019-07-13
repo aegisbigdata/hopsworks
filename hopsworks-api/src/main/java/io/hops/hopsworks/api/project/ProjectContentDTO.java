@@ -36,76 +36,25 @@
  * DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.hops.hopsworks.common.dao.dataset;
+package io.hops.hopsworks.api.project;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class ItemAccessDTO {
-  private String type;
-  private Long inodeId;
-  private Integer projectId;
-  private Integer datasetId;
-  private String name;
-  private String description;
+public class ProjectContentDTO {
+  private int datasetCount;
   
-  public ItemAccessDTO() {}
+  public ProjectContentDTO(){}
   
-  public ItemAccessDTO(String type, Long inodeId, Integer projectId, Integer datasetId,
-    String name, String description) {
-    this.type = type;
-    this.inodeId = inodeId;
-    this.projectId = projectId;
-    this.datasetId = datasetId;
-    this.name = name;
-    this.description = description;
+  public ProjectContentDTO(int datasetCount) {
+    this.datasetCount = datasetCount;
   }
   
-  public String getType() {
-    return type;
+  public int getDatasetCount() {
+    return datasetCount;
   }
   
-  public void setType(String type) {
-    this.type = type;
-  }
-  
-  public Long getInodeId() {
-    return inodeId;
-  }
-  
-  public void setInodeId(Long inodeId) {
-    this.inodeId = inodeId;
-  }
-  
-  public Integer getProjectId() {
-    return projectId;
-  }
-  
-  public void setProjectId(Integer projectId) {
-    this.projectId = projectId;
-  }
-  
-  public Integer getDatasetId() {
-    return datasetId;
-  }
-  
-  public void setDatasetId(Integer datasetId) {
-    this.datasetId = datasetId;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public String getDescription() {
-    return description;
-  }
-  
-  public void setDescription(String description) {
-    this.description = description;
+  public void setDatasetCount(int datasetCount) {
+    this.datasetCount = datasetCount;
   }
 }

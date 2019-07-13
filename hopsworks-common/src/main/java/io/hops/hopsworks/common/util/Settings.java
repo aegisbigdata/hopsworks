@@ -1706,7 +1706,7 @@ public class Settings implements Serializable {
     return HOPSWORKS_REST_LOG_LEVEL;
   }
 
-  private String SUPPORT_EMAIL_ADDR = "support@hops.io";
+  private String SUPPORT_EMAIL_ADDR = "aegis@fokus.fraunhofer.de";
 
   public synchronized String getSupportEmailAddr() {
     checkCache();

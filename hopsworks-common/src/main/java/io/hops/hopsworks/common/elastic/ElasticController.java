@@ -161,7 +161,9 @@ public class ElasticController {
   }
   
   public List<ElasticAggregation> aggregation(String searchTerm, List<String> type, List<String> fileType,
-    List<String> license, Float minPrice, Float maxPrice, List<String> projId) throws ServiceException {
+    List<String> license, Float minPrice, Float maxPrice, List<String> projId, Long minDate, Long maxDate,
+    List<String> owner, String username)
+      throws ServiceException {
     //some necessary client settings
     Client client = getClient();
   
@@ -176,7 +178,8 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId));
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId,
+      minDate, maxDate, owner, username));
     srb = srb.setSize(0);
     
     TermsAggregationBuilder typeAggregation = AggregationBuilders
@@ -203,32 +206,22 @@ public class ElasticController {
         );
   
     srb.addAggregation(licenseAggregation);
-  
-    Script minPriceScript = new Script(
-      "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + " instanceof String ? " +
-        "Float.MAX_VALUE : Float.parseFloat (" +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
-        "Float.MAX_VALUE : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");
+    
+    Script minPriceScript = new Script("try { return Float.parseFloat(params._source." +
+      Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return Float.MAX_VALUE; }");
   
     MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
     srb.addAggregation(minPriceAggregation);
   
-    Script maxPriceScript = new Script(
-      "params._source." + Settings.AEGIS_ELASTIC + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "== null || " +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + " instanceof String ? " +
-        "0.0f : Float.parseFloat (" +
-        "params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + ") < 0 ? " +
-        "0.0f : Float.parseFloat(params._source." + Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE +" )");
+    Script maxPriceScript = new Script("try { return Float.parseFloat(params._source." +
+      Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return 0.0f; }");
     
     MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
     srb.addAggregation(maxPriceAggregation);
+  
+    TermsAggregationBuilder ownerAggregation = AggregationBuilders
+      .terms("Owner").field("user").size(1000);
+    srb.addAggregation(ownerAggregation);
     
     LOG.log(Level.INFO, "Aggregation Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
@@ -244,7 +237,10 @@ public class ElasticController {
       elasticAggregations.add(count);
       
       for (Aggregation aggregation : response.getAggregations()) {
-        if (aggregation instanceof StringTerms) {
+        if (aggregation.getName().equals("Owner")) {
+          ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation, username);
+          elasticAggregations.add(elasticAggregation);
+        } else if (aggregation instanceof StringTerms) {
           ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation);
           elasticAggregations.add(elasticAggregation);
         } else if (aggregation instanceof InternalNested) {
@@ -275,8 +271,8 @@ public class ElasticController {
   }
   
   public List<ElasticHit> search(String searchTerm, String sort, String order, List<String> type, List<String> fileType,
-    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice, List<String> projId)
-      throws ServiceException {
+    List<String> license, Integer page, Integer limit, Float minPrice, Float maxPrice, List<String> projId,
+    Long minDate, Long maxDate, List<String> owner, String username) throws ServiceException {
     //some necessary client settings
     Client client = getClient();
     
@@ -291,8 +287,13 @@ public class ElasticController {
     //hit the indices - execute the queries
     SearchRequestBuilder srb = client.prepareSearch(Settings.META_INDEX);
     srb = srb.setTypes(Settings.META_DEFAULT_TYPE);
-    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId));
-    srb = srb.setFrom(page*limit);
+    srb = srb.setQuery(this.searchQuery(searchTerm.toLowerCase(), type, fileType, license, minPrice, maxPrice, projId,
+      minDate, maxDate, owner, username));
+    if (page > 0) {
+      srb = srb.setFrom((page-1)*limit);
+    } else {
+      srb = srb.setFrom(page*limit);
+    }
     srb = srb.setSize(limit);
     
     SortOrder sortOrder = order.toLowerCase().equals("asc") ? SortOrder.ASC : SortOrder.DESC;
@@ -300,7 +301,7 @@ public class ElasticController {
     if (sort.equals("title")) {
       srb = srb.addSort("name.keyword", sortOrder);
     } else if (sort.equals("date")) {
-      srb = srb.addSort("timestamp", sortOrder);
+      srb = srb.addSort("modification", sortOrder);
     } else {
       srb = srb.addSort("_score", sortOrder);
     }
@@ -718,10 +719,15 @@ public class ElasticController {
    * Global search on datasets and projects.
    * <p/>
    * @param searchTerm
+   * @param minDate
+   * @param maxDate
+   * @param owner
+   * @param username
    * @return
    */
   private QueryBuilder searchQuery(String searchTerm, List<String> type, List<String> fileType, List<String> license,
-    Float minPrice, Float maxPrice, List<String> projId) {
+    Float minPrice, Float maxPrice, List<String> projId, Long minDate, Long maxDate,
+    List<String> owner, String username) {
     QueryBuilder nameDescQuery = getNameDescriptionMetadataQuery(searchTerm);
   
     QueryBuilder typeQuery;
@@ -783,6 +789,28 @@ public class ElasticController {
       priceQuery = nestedQuery(Settings.AEGIS_ELASTIC, boolQuery().filter(scriptQuery(minPriceScript))
         .filter(scriptQuery(maxPriceScript)), ScoreMode.None);
     }
+  
+    QueryBuilder dateQuery;
+    
+    if (minDate == null && maxDate == null) {
+      dateQuery = matchAllQuery();
+    } else if (minDate == null) {
+      dateQuery = QueryBuilders.rangeQuery("modification").lte(maxDate);
+    } else if (maxDate == null) {
+      dateQuery = QueryBuilders.rangeQuery("modification").gte(minDate);
+    } else {
+      dateQuery = QueryBuilders.rangeQuery("modification").gte(minDate).lte(maxDate);
+    }
+  
+    QueryBuilder ownerQuery;
+    
+    if (owner != null && owner.contains("my") && !owner.contains("other")) {
+      ownerQuery = boolQuery().must(termsQuery("user", username));
+    } else if (owner != null && !owner.contains("my") && owner.contains("other")) {
+      ownerQuery = boolQuery().mustNot(termsQuery("user", username));
+    } else {
+      ownerQuery = matchAllQuery();
+    }
     
     QueryBuilder query = boolQuery()
       .must(typeQuery)
@@ -790,7 +818,9 @@ public class ElasticController {
       .must(fileTypeQuery)
       .must(licenseQuery)
       .must(priceQuery)
-      .must(projIdQuery);
+      .must(projIdQuery)
+      .must(dateQuery)
+      .must(ownerQuery);
     
     return query;
   }

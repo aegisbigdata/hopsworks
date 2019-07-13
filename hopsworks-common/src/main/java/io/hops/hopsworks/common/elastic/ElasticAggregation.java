@@ -41,6 +41,24 @@ public class ElasticAggregation implements Comparator<ElasticAggregation> {
     }
   }
   
+  public ElasticAggregation(StringTerms aggregation, String username) {
+    this.name = aggregation.getName();
+    
+    this.map = new HashMap<>();
+  
+    this.map.put("my", 0L);
+    this.map.put("other", 0L);
+    
+    for (Terms.Bucket bucket : aggregation.getBuckets()) {
+      long count = bucket.getDocCount();
+      if (bucket.getKey().toString().equals(username)) {
+        this.map.put("my", this.map.get("my") + count);
+      } else {
+        this.map.put("other", this.map.get("other") + count);
+      }
+    }
+  }
+  
   public String getName() {
     return name;
   }

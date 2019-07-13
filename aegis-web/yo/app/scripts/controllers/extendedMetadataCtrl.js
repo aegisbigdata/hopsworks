@@ -45,10 +45,10 @@ const AEGIS_PROJECT_TEMPLATE_NAME = 'aegis-distribution';
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', '$http',
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', '$http', 'AEGIS_CONFIG',
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, $http) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, $http, AEGIS_CONFIG) {
             const PROJECT_ID = $routeParams.projectID;
             var self = this;
 
@@ -187,6 +187,10 @@ angular.module('hopsWorksApp')
             };
 
             var dataSetService = DataSetService($routeParams.projectID);
+
+            $scope.getRDFLink = function() {
+              return AEGIS_CONFIG.metadata.CATALOGUE_ENDPOINT + PROJECT_ID;
+            };
 
             //update the current template whenever other users make changes
             var listener = $rootScope.$on("template.change", function (event, response) {

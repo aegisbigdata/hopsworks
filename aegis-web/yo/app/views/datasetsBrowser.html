@@ -405,7 +405,7 @@
                                  tabindex="6"
                                  ng-click="metadataCtrl.attachTemplate(file); $event.stopPropagation();">
                                 <span><i class="fa fa-upload"></i>
-                                  Add metadata</span>
+                                  Add Details</span>
                               </a>
                             </li>
                             <li ng-show="datasetsCtrl.isSelectedFiles() <= 1">
@@ -414,7 +414,7 @@
                                  tabindex="7"
                                  ng-click="metadataCtrl.detachTemplate(file); $event.stopPropagation();">
                                 <span><i class="fa fa-download"></i>
-                                  Remove metadata</span>
+                                  Remove Details</span>
                               </a>
                             </li>
                             <li class="divider" ng-if="datasetsCtrl.isSelectedFiles() <= 1"></li>
@@ -424,7 +424,7 @@
                                  tabindex="8"
                                  ng-click="projectCtrl.goToDistributionExtendedMetadata(file); $event.stopPropagation();">
                                 <span><i class="fa fa-tag"></i>
-                                  Add or edit extended metadata</span>
+                                  Extended Metadata</span>
                               </a>
                             </li>
                           </ul>
