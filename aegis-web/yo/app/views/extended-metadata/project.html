@@ -122,20 +122,13 @@
 
                                             <div class="form-group">
                                                 <label for="input-licence" id="input-license">Licence</label>
-                                                <select name="input-licence" ng-model="data.fields.license.model" class="form-control">
-                                                    <!-- <option value="" disabled selected hidden>Select Licence</option> -->
-                                                    <option ng-repeat="option in data.fields.license.options" value="{{option.id}}">{{option.name}}</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>Licence</label>
-                                                <pre>Model: {{licenceSelected | json}}</pre>
-                                                <input type="text" ng-model="licenceSelected" placeholder="Locations loaded via $http" uib-typeahead="loc for loc in getLocation($viewValue)"
-                                                       typeahead-loading="loadingLic" typeahead-no-results="zeroResults" class="form-control">
+                                                <input type="text" ng-model="data.fields.license.model" placeholder="Licence via LinDa"
+                                                       uib-typeahead="lic.about as lic.label for lic in getLindaLicences($viewValue)"
+                                                       typeahead-loading="loadingLic" typeahead-no-results="zeroResults" class="form-control" id="input-licence">
                                                 <i ng-show="loadingLic" class="glyphicon glyphicon-refresh"></i>
+                                                <pre ng-if="data.fields.license.extra">{{data.fields.license.extra }}</pre>
                                                 <div ng-show="zeroResults">
-                                                    <i class="glyphicon glyphicon-remove"></i> No Results Found
+                                                    <i class="glyphicon glyphicon-remove"></i>No match in LinDA
                                                 </div>
                                             </div>
 

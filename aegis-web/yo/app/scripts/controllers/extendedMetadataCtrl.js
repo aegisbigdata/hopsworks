@@ -45,10 +45,11 @@ const AEGIS_PROJECT_TEMPLATE_NAME = 'aegis-distribution';
 angular.module('hopsWorksApp')
         .controller('ExtendedMetadataCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
-          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', '$http', 'AEGIS_CONFIG',
+          'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService',
+          'AEGIS_CONFIG', 'LindaService',
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, $http, AEGIS_CONFIG) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, AEGIS_CONFIG, LindaService) {
             const PROJECT_ID = $routeParams.projectID;
             var self = this;
 
@@ -165,7 +166,8 @@ angular.module('hopsWorksApp')
                   model: '',
                   mapping: 'license',
                   recommended: true,
-                  options: ExtendedMetadataService.LICENCES
+                  options: ExtendedMetadataService.LICENCES,
+                  extra: ''
                 },
                 language: {
                   label: 'Language',
@@ -294,8 +296,8 @@ angular.module('hopsWorksApp')
 
               // Set License field
               if (graph[index_catalog].hasOwnProperty('license')) {
-                var license_splitted = graph[index_catalog].license.split('/');
-                fields.license.model = license_splitted[license_splitted.length - 1];
+                fields.license.model = graph[index_catalog].license;
+                 self.resolveLicence(fields.license.model);
               }
 
               if (typeof(index_location) == 'number' && graph[index_location].hasOwnProperty('geometry')) {
@@ -353,7 +355,7 @@ angular.module('hopsWorksApp')
                 }
               }
 
-              if ($scope.data.fields.license.model  != '') graph.license = 'http://publications.europa.eu/resource/authority/licence/' + $scope.data.fields.license.model;
+              if ($scope.data.fields.license.model  != '') graph.license = $scope.data.fields.license.model;
               if ($scope.data.fields.language.model  != '') graph.language = 'http://publications.europa.eu/resource/authority/language/' + $scope.data.fields.language.model;
               graph.publisher['@type'] = 'http://xmlns.com/foaf/0.1/' + $scope.data.fields.publishertype.model;
 
@@ -447,76 +449,19 @@ angular.module('hopsWorksApp')
               self.saveExtendedProjectMetadata();
             };
 
-            $scope.selected = undefined;
-            $scope.getLocation = function(val) {
-              return ["hallo"];
-            };
-
             $scope.getLindaLicences = function(val) {
-              return ["hallo"];
-              var url = "https://bbc6.sics.se:8181/hopsworks-api/linda/licence_index/_search?pretty";
-
-              var query = {
-                "query": {
-                  "bool": {
-                    "should": [
-                      {
-                        "nested": {
-                          "path": "altLabel",
-                          "query": {
-                            "match": {
-                              "altLabel.#text": {
-                                "query": val,
-                                "operator": "and"
-                              }
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "nested": {
-                          "path": "prefLabel",
-                          "query": {
-                            "match": {
-                              "prefLabel.#text": {
-                                "query": val,
-                                "operator": "and"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              };
-               var options = {
-                 headers: {
-                   'Content-Type': 'application/json',
-                 }
-               };
-
-              return $http.post(url, query, options).then(function(response){
-                return ["hallo"];
-                var selection = [];
-                var results = response.data.hits.hits;
-                results.forEach(function (val) {
-                  val._source.prefLabel.map(function (item) {
-                    if(item['@lang'] === 'en') {
-                      selection.push(item['#text']);
-                    }
-                  });
-                });
-
-                console.info(selection);
-                return selection;
-                // return response.data.hits.hits.map(function(item){
-                //   return item._source.altLabel['#text'];
-                // });
-              });
+               return LindaService.autocompleteLicence(val).then(function(response) {
+                 return LindaService.parseLicenceResponse(response);
+               }
+              );
             };
 
-            $scope.states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Dakota', 'North Carolina', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+            self.resolveLicence = function (url) {
+              return LindaService.resolveLicenceURL(url).then(function(response) {
+                  $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response);
+                  }
+              );
+            }
 
           }
         ]);

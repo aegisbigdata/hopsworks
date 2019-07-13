@@ -6,4 +6,7 @@ var AEGIS_CONFIG;
         DATASET_ENDPOINT: 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/datasets/',
         DISTRIBUTION_ENDPOINT: 'https://bbc6.sics.se:8181/hopsworks-api/aegis-metadata/distributions/'
     };
+    AEGIS_CONFIG.linda = {
+        LICENCE_INDEX: 'https://platform.aegis-bigdata.eu/hopsworks-api/linda/licence_index/_search'
+    };
 })(AEGIS_CONFIG || (AEGIS_CONFIG = {}));
