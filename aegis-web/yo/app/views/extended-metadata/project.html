@@ -51,8 +51,8 @@
                         <div class="row" style="margin-top: 15px">
                             <!-- Left menu -->
                             <div class="col-md-4 col-sm-4 col-lg-3">
-                              <!--Nav Bar -->
-                              <extmd-sidebar-nav />
+                                <!--Nav Bar -->
+                                <extmd-sidebar-nav/>
                             </div>
                             <!-- END Left menu -->
 
@@ -60,117 +60,127 @@
                             <div class="col-md-8 col-sm-8 col-lg-6" style="border-right: 1px dashed lightgrey; border-left: 1px dashed lightgrey;">
                                 <form id="extendedMetadata" name="form.extendedMetadata">
 
-                                <div class="row" style="margin-bottom: 15px">
-                                    <div class="col-md-12">
-                                        <h3 id="fields-mandatory">Mandatory</h3>
+                                    <div class="row" style="margin-bottom: 15px">
+                                        <div class="col-md-12">
+                                            <h3 id="fields-mandatory">Mandatory</h3>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                      <!-- Mandatory -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <!-- Mandatory -->
 
-                                      <div class="form-group">
-                                        <label for="input-title" id="input-title">Title *</label>
-                                        <input type="text" ng-model="data.fields.title.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" ng-required="true" placeholder="Title">
-                                      </div>
+                                            <div class="form-group">
+                                                <label for="input-title" id="input-title">Title *</label>
+                                                <input type="text" ng-model="data.fields.title.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('title')" ng-required="true"
+                                                       placeholder="Title">
+                                            </div>
 
-                                      <div class="form-group">
-                                        <label for="input-description" id="input-description">Description *</label>
-                                        <textarea ng-model="data.fields.description.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('description')" ng-required="true" placeholder="Description"></textarea>
-                                      </div>
+                                            <div class="form-group">
+                                                <label for="input-description" id="input-description">Description *</label>
+                                                <textarea ng-model="data.fields.description.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('description')" ng-required="true"
+                                                          placeholder="Description"></textarea>
+                                            </div>
 
-                                      <div class="form-group bs-callout">
-                                        <label for="input-publisher">Publisher *</label>
+                                            <div class="form-group bs-callout">
+                                                <label for="input-publisher">Publisher *</label>
 
-                                        <div style="margin-bottom: 10px;margin-top: 10px">
-                                          <label for="publisher-type" id="input-publishertype" style="font-size: 14px">Publisher Type</label>
-                                          <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" ng-required="true" required class="form-control">
-                                            <option value="" disabled selected hidden>Select Publisher Type</option>
-                                            <option value="ORGANIZATION">Organization</option>
-                                            <option value="INDIVIDUAL">Individual</option>
-                                          </select>
+                                                <div style="margin-bottom: 10px;margin-top: 10px">
+                                                    <label for="publisher-type" id="input-publishertype" style="font-size: 14px">Publisher Type</label>
+                                                    <select name="publisher-type" id="publisher-type" ng-model="data.fields.publishertype.model" ng-required="true" required class="form-control">
+                                                        <option value="" disabled selected hidden>Select Publisher Type</option>
+                                                        <option value="ORGANIZATION">Organization</option>
+                                                        <option value="INDIVIDUAL">Individual</option>
+                                                    </select>
+                                                </div>
+
+                                                <div style="margin-bottom: 10px;">
+                                                    <label for="publisher-name" id="input-publishername" style="font-size: 14px">Publisher Name</label>
+                                                    <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name"
+                                                           ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" ng-required="true" placeholder="Publisher Name">
+                                                </div>
+
+                                                <div style="margin-bottom: 10px;">
+                                                    <label for="publisher-web" id="input-homepage" style="font-size: 14px">Publisher Homepage</label>
+                                                    <input type="url" ng-model="data.fields.homepage.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')"
+                                                           ng-required="true" placeholder="Publisher Homepage">
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <div style="margin-bottom: 10px;">
-                                          <label for="publisher-name" id="input-publishername" style="font-size: 14px">Publisher Name</label>
-                                          <input type="text" ng-model="data.fields.publishername.model" class="form-control" id="publisher-name" ng-focus="extendedMetadataCtrl.onFieldFocus('publishername')" ng-required="true" placeholder="Publisher Name">
-                                        </div>
-
-                                        <div style="margin-bottom: 10px;">
-                                          <label for="publisher-web" id="input-homepage" style="font-size: 14px">Publisher Homepage</label>
-                                          <input type="url" ng-model="data.fields.homepage.model" class="form-control" ng-focus="extendedMetadataCtrl.onFieldFocus('homepage')" ng-required="true" placeholder="Publisher Homepage">
-                                        </div>
-                                      </div>
                                     </div>
-                                </div>
+
+                                    <hr>
+
+                                    <div class="row" style="margin-bottom: 15px">
+                                        <div class="col-md-12">
+                                            <h3 id="fields-recommended">Recommended</h3>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+
+                                            <div class="form-group">
+                                                <label for="input-licence" id="input-license">Licence</label>
+                                                <input type="text" ng-model="data.fields.license.model" placeholder="Licence via LinDa"
+                                                       uib-typeahead="lic.about as lic.label for lic in getLindaLicences($viewValue)"
+                                                       typeahead-loading="loadingLic" typeahead-no-results="zeroResults" class="form-control" id="input-licence">
+                                                <i ng-show="loadingLic" class="glyphicon glyphicon-refresh"></i>
+                                                <pre ng-if="data.fields.license.extra">{{data.fields.license.extra }}</pre>
+                                                <div ng-show="zeroResults">
+                                                    <i class="glyphicon glyphicon-remove"></i>No match in LinDA
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="input-language" id="input-language">Language</label>
+                                                <select name="input-language" ng-model="data.fields.language.model" class="form-control">
+                                                    <!-- <option value="" disabled selected hidden>Select Language</option> -->
+                                                    <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="row" style="margin-bottom: 15px">
+                                        <div class="col-md-12">
+                                            <h3 id="fields-optional">Optional</h3>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+
+                                                <label for="inputMap1" id="input-spatial">Spatial</label>
+
+                                                <div style="portion:relative;height: 310px;">
+                                                    <leaflet id="inputMap1" geoJSON="{{geoJSON}}" style="width: 500px; height: 300px; position: absolute;"></leaflet>
+                                                </div>
+
+                                                <div class="form-group" style="display: none;">
+                                                    <label for="coordinates_ne">Coordinates</label>
+                                                    <input type="text" class="form-control" name="coordinates_sw" disabled="true" ng-model="extendedMetadataCtrl.boundingBox._southWest.lat">
+                                                    <input type="text" class="form-control" name="coordinates_ne" disabled="true">
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
 
                                 <hr>
 
-                                <div class="row" style="margin-bottom: 15px">
-                                    <div class="col-md-12">
-                                        <h3 id="fields-recommended">Recommended</h3>
-                                    </div>
+                                <div style="margin-top: 40px;margin-bottom: 150px;position: relative;">
+                                    <button class="btn btn-warning" ng-class="deleteButtonIsDisabled ? 'disabled' : ''" ng-click="extendedMetadataCtrl.deleteExtendedMetadata()">Delete Metadata for
+                                        Project
+                                    </button>
+
                                 </div>
-
-                                <div class="row">
-                                  <div class="col-md-12">
-
-                                    <div class="form-group">
-                                      <label for="input-licence" id="input-license">Licence</label>
-                                      <select name="input-licence" ng-model="data.fields.license.model" class="form-control">
-                                        <!-- <option value="" disabled selected hidden>Select Licence</option> -->
-                                        <option ng-repeat="option in data.fields.license.options" value="{{option.id}}">{{option.name}}</option>
-                                      </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                      <label for="input-language" id="input-language">Language</label>
-                                      <select name="input-language" ng-model="data.fields.language.model" class="form-control">
-                                        <!-- <option value="" disabled selected hidden>Select Language</option> -->
-                                        <option ng-repeat="option in data.fields.language.options" value="{{option.id}}">{{option.name}}</option>
-                                      </select>
-                                    </div>
-
-                                  </div>
-                                </div>
-
-                                <hr>
-
-                                <div class="row" style="margin-bottom: 15px">
-                                    <div class="col-md-12">
-                                        <h3 id="fields-optional">Optional</h3>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                  <div class="col-md-12">
-                                    <div class="form-group">
-
-                                      <label for="inputMap1" id="input-spatial">Spatial</label>
-
-                                      <div style="portion:relative;height: 310px;">
-                                        <leaflet id="inputMap1" geoJSON="{{geoJSON}}" style="width: 500px; height: 300px; position: absolute;"></leaflet>
-                                      </div>
-
-                                      <div class="form-group" style="display: none;">
-                                        <label for="coordinates_ne">Coordinates</label>
-                                        <input type="text" class="form-control" name="coordinates_sw" disabled="true" ng-model="extendedMetadataCtrl.boundingBox._southWest.lat">
-                                        <input type="text" class="form-control" name="coordinates_ne" disabled="true">
-                                      </div>
-
-                                    </div>
-                                  </div>
-                                </div>
-
-                              </form>
-
-                              <hr>
-
-                              <div style="margin-top: 40px;margin-bottom: 150px;position: relative;">
-                                <button class="btn btn-warning" ng-class="deleteButtonIsDisabled ? 'disabled' : ''" ng-click="extendedMetadataCtrl.deleteExtendedMetadata()">Delete Metadata for Project</button>
-                                
-                              </div>
 
                             </div>
 
@@ -183,7 +193,9 @@
 
                                 <div ng-if="extendedMetadataCtrl.selectedField" id="sidebar-usage-note" class="fixed" style="top: 235px;">
                                     <h5>Usage note</h5>
-                                    <p><small>{{ selectedFieldDescription }}</small></p>
+                                    <p>
+                                        <small>{{ selectedFieldDescription }}</small>
+                                    </p>
                                 </div>
                             </div>
                         </div>
