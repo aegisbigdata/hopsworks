@@ -43,10 +43,10 @@ angular.module('hopsWorksApp')
         .controller('DatasetsCtrl', ['$scope', '$mdSidenav', '$mdUtil',
           'DataSetService', 'JupyterService', '$routeParams', 'ModalService', 'growl', '$location',
           'MetadataHelperService', '$rootScope', 'DelaProjectService', 'DelaClusterProjectService', 'UtilsService', 'UserService', '$mdToast',
-          'TourService', 'ExtendedMetadataAPIService', 'ExtendedMetadataService',
+          'TourService', 'ExtendedMetadataAPIService', 'ExtendedMetadataService', 'LindaService',
           function ($scope, $mdSidenav, $mdUtil, DataSetService, JupyterService, $routeParams,
                   ModalService, growl, $location, MetadataHelperService,
-                  $rootScope, DelaProjectService, DelaClusterProjectService, UtilsService, UserService, $mdToast, TourService, ExtendedMetadataAPIService, ExtendedMetadataService) {
+                  $rootScope, DelaProjectService, DelaClusterProjectService, UtilsService, UserService, $mdToast, TourService, ExtendedMetadataAPIService, ExtendedMetadataService, LindaService) {
 
             var self = this;
             self.itemsPerPage = 14;
@@ -1294,6 +1294,13 @@ angular.module('hopsWorksApp')
 
             self.toggleLeft = buildToggler('left');
             self.toggleRight = buildToggler('right');
+
+              self.resolveLicence = function (url) {
+                  return LindaService.resolveLicenceURL(url).then(function(response) {
+                          $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response);
+                      }
+                  );
+              };
 
             function buildToggler(navID) {
               var debounceFn = $mdUtil.debounce(function () {
