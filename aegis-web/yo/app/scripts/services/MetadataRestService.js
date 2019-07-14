@@ -121,6 +121,31 @@ angular.module('hopsWorksApp')
                 };
                 return $http(req);
               },
+
+              addExtendedMetadata: function (projectID, projectName, datasetName, fileName, metadata) {
+                var iNode = '/Projects/' + projectName + '/' + datasetName;
+                if(fileName != null) {
+                  iNode = iNode + '/' + fileName;
+                }
+
+                var jsonObj =  JSON.stringify({
+                  filetemplateData: {
+                    inodePath: iNode,
+                    templateName: 'aegis'
+                  },
+                  metadata: metadata
+                });
+
+                var req = {
+                  method: 'POST',
+                  url: '/api/project/' + projectID + '/dataset/attachTemplateAndAddMetaData',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  data: jsonObj
+                };
+                return $http(req);
+              }
               
             };
             return service;

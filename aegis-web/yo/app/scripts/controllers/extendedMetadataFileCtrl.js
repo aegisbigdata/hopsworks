@@ -46,15 +46,18 @@ angular.module('hopsWorksApp')
         .controller('ExtendedMetadataFileCtrl', ['$location', '$anchorScroll', '$cookies', '$uibModal', '$scope', '$rootScope', '$routeParams',
           '$filter', 'DataSetService', 'ModalService', 'growl', 'MetadataActionService',
           'MetadataRestService', 'MetadataHelperService', 'ProjectService', 'ExtendedMetadataService', 'ExtendedMetadataAPIService', 'AEGIS_CONFIG',
+          'LindaService',
           function ($location, $anchorScroll, $cookies, $uibModal, $scope, $rootScope, $routeParams, $filter, DataSetService,
                   ModalService, growl, MetadataActionService, MetadataRestService,
-                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, AEGIS_CONFIG) {
+                  MetadataHelperService, ProjectService, ExtendedMetadataService, ExtendedMetadataAPIService, AEGIS_CONFIG, LindaService) {
             const PROJECT_ID = $routeParams.projectID;
             const DISTRIBUTION_ID = $routeParams.distributionID;
             const parameters = $location.search();
             const self = this;
 
             self.fileName = decodeURI(parameters.file);
+            self.projectName = decodeURI(parameters.project);
+            self.datasetName = decodeURI(parameters.dataset);
             self.metadataExists = false;
             self.filePreviewLoaded = false;
             self.filePreviewShowing = false;
@@ -218,8 +221,8 @@ angular.module('hopsWorksApp')
                 }
 
                 if (distro.hasOwnProperty('license')) {
-                  var license_splitted = distro['license'].split('/');
-                  fields.license.model = license_splitted[license_splitted.length - 1];
+                  fields.license.model = distro['license'];
+                  self.resolveLicence(fields.license.model);
                 }
 
               } else {
@@ -287,7 +290,7 @@ angular.module('hopsWorksApp')
 
               if (fields.format.model != '') graph[0]['dct:format'] = fields.format.model;
               if (fields.language.model != '') graph[0]['language'] = 'http://publications.europa.eu/resource/authority/language/' + fields.language.model;
-              if (fields.license.model != '') graph[0].license = 'https://creativecommons.org/licenses/by/4.0/' + fields.license.model;
+              if (fields.license.model != '') graph[0].license = fields.license.model;
 
               if (fields.typeannotation.model.fields.length) {
                 var tabularFields = fields.typeannotation.model.fields;
@@ -336,6 +339,33 @@ angular.module('hopsWorksApp')
                     });
               }
 
+              var hopsExtendedMetadata = {};
+              if (fields.format.model) {
+                hopsExtendedMetadata['filetype'] = fields.format.model;
+              }
+
+              if (fields.license.model) {
+                LindaService.resolveLicenceURL(fields.license.model).then(function(response) {
+                  hopsExtendedMetadata['license'] = LindaService.parseLicenceResolve(response, 'altLabel');
+                  MetadataRestService.addExtendedMetadata(
+                      PROJECT_ID,
+                      self.projectName,
+                      self.datasetName,
+                      self.fileName,
+                      hopsExtendedMetadata
+                  );
+                });
+
+              } else {
+                MetadataRestService.addExtendedMetadata(
+                    PROJECT_ID,
+                    self.projectName,
+                    self.datasetName,
+                    self.fileName,
+                    hopsExtendedMetadata
+                );
+              }
+
 
             };
 
@@ -367,6 +397,20 @@ angular.module('hopsWorksApp')
               if ($scope.data.fields.hasOwnProperty(field)) {
                 $scope.selectedFieldDescription = $scope.data.fields[field].description;
               }
+            };
+
+            $scope.getLindaLicences = function(val) {
+              return LindaService.autocompleteLicence(val).then(function(response) {
+                    return LindaService.parseLicenceResponse(response);
+                  }
+              );
+            };
+
+            self.resolveLicence = function (url) {
+              return LindaService.resolveLicenceURL(url).then(function(response) {
+                    $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response, 'prefLabel');
+                  }
+              );
             };
 
             self.filePreview = function () {

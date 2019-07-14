@@ -77,6 +77,33 @@ angular.module('hopsWorksApp')
         }
         return string;
       },
+
+      extractTranslations (input) {
+        try {
+          if (typeof(input) === 'string') {
+            return {};
+          } else if (Array.isArray(input) && input.length > 0) {
+            var result = {};
+            input.forEach(function (entry) {
+              if(typeof(entry) === 'object') {
+                result[entry['@language'].substring(0,2)] = entry['@value'];
+              }
+            });
+            return result;
+          }  else if (typeof(input) === 'object') {
+            var result = {};
+            result[input['@language'].substring(0,2)] = input['@value'];
+            return result;
+          } else {
+            return {};
+          }
+        } catch (e) {
+          console.log(e);
+          return {};
+        }
+      },
+
+
       parseDatasetGraph (jsonld, fields) {
         if (!jsonld.hasOwnProperty('@graph')) return;
         var graph = jsonld['@graph'];
@@ -125,7 +152,9 @@ angular.module('hopsWorksApp')
         fields.accessRights.model = graph[index_dataset]['accessRights'] || '';
         fields.price.model = graph[index_dataset]['price'] || '';
         fields.sellable.model = (graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'] == true) || graph[index_dataset]['http://www.aegis-bigdata.eu/md/voc/core/sellable'];
+        fields.title.i18n = this.extractTranslations(title);
         fields.title.model = this.setFieldFromStringOrArray(title);
+        fields.description.i18n = this.extractTranslations(description);
         fields.description.model = this.setFieldFromStringOrArray(description);
         
         if (graph[index_dataset].hasOwnProperty('keyword')) {
@@ -191,8 +220,10 @@ angular.module('hopsWorksApp')
             let distro = graph[index];
             let title = graph[index]['title'];
             let description = graph[index]['description'] || graph[index]['http://purl.org/dc/terms/description'];
-            
+
+            fields.title.i18n = this.extractTranslations(title);
             fields.title.model = this.setFieldFromStringOrArray(title);
+            fields.description.i18n = this.extractTranslations(description);
             fields.description.model = this.setFieldFromStringOrArray(description);
             fields.format.model = distro['format'] || '';
 
@@ -203,8 +234,7 @@ angular.module('hopsWorksApp')
             }
 
             if (distro.hasOwnProperty('license')) {
-              var license_splitted = distro['license'].split('/');
-              fields.license.model = license_splitted[license_splitted.length - 1];
+              fields.license.model = distro['license'];
             }
 
           } else {

@@ -71,12 +71,12 @@ angular.module('hopsWorksApp')
                 return $http(req);
             },
 
-            parseLicenceResolve: function(response) {
+            parseLicenceResolve: function(response, label) {
                 var results = response.data.hits.hits;
                 var returnValue = '';
                 if(results.length > 0) {
                     var result = results[0];
-                    var labels = result._source.prefLabel;
+                    var labels = result._source[label];
                     if(!Array.isArray(labels)) {
                         return labels['#text'];
                     } else {

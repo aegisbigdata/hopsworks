@@ -53,6 +53,7 @@ angular.module('hopsWorksApp')
             var self = this;
 
             self.datasetName = decodeURI(parameters.datasetName);
+            self.projectName = decodeURI(parameters.projectName);
             self.PROJECT_ID = $routeParams.projectID;
             self.DATASET_ID = $routeParams.dataSetID;
 
@@ -572,6 +573,20 @@ angular.module('hopsWorksApp')
                 .finally(function() {
                   $scope.saveButtonIsDisabled = false;
                 });
+
+
+              var hopsExtendedMetadata = {};
+              if (fields.price.model) {
+                hopsExtendedMetadata['price'] = fields.price.model;
+              }
+
+              MetadataRestService.addExtendedMetadata(
+                    self.PROJECT_ID,
+                    self.projectName,
+                    self.datasetName,
+                    null,
+                    hopsExtendedMetadata
+                );
             };
 
             /**
@@ -611,7 +626,6 @@ angular.module('hopsWorksApp')
                 console.warn('Can"t submit form - missing or invalid fields!');
                 return;
               }
-
               self.saveExtendedDatasetMetadata();
             };
           }

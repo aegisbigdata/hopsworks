@@ -43,10 +43,10 @@ angular.module('hopsWorksApp')
         .controller('DatasetsCtrl', ['$scope', '$mdSidenav', '$mdUtil',
           'DataSetService', 'JupyterService', '$routeParams', 'ModalService', 'growl', '$location',
           'MetadataHelperService', '$rootScope', 'DelaProjectService', 'DelaClusterProjectService', 'UtilsService', 'UserService', '$mdToast',
-          'TourService', 'ExtendedMetadataAPIService', 'ExtendedMetadataService',
+          'TourService', 'ExtendedMetadataAPIService', 'ExtendedMetadataService', 'LindaService',
           function ($scope, $mdSidenav, $mdUtil, DataSetService, JupyterService, $routeParams,
                   ModalService, growl, $location, MetadataHelperService,
-                  $rootScope, DelaProjectService, DelaClusterProjectService, UtilsService, UserService, $mdToast, TourService, ExtendedMetadataAPIService, ExtendedMetadataService) {
+                  $rootScope, DelaProjectService, DelaClusterProjectService, UtilsService, UserService, $mdToast, TourService, ExtendedMetadataAPIService, ExtendedMetadataService, LindaService) {
 
             var self = this;
             self.itemsPerPage = 14;
@@ -74,8 +74,8 @@ angular.module('hopsWorksApp')
             $scope.data = {
               fields: {
                 dataset: {
-                  title: { label: 'Title', model: '' },
-                  description: { label: 'Description', model: '' },
+                  title: { label: 'Title', model: '' , i18n: '' },
+                  description: { label: 'Description', model: '', i18n: ''},
                   contactpointtype: { label: 'Contact Point Type', model: '' },
                   contactpointname: { label: 'Contact Point Name', model: '' },
                   contactpointmail: { label: 'Contact Point Mail', model: '' },
@@ -95,8 +95,8 @@ angular.module('hopsWorksApp')
                 },
                 distribution: {
                   accessUrl: { label: 'Access URL', model: '' },
-                  title: { label: 'Title', model: '' },
-                  description: { label: 'Description', model: '' },
+                  title: { label: 'Title', model: '', i18n: ''},
+                  description: { label: 'Description', model: '', i18n: '' },
                   format: { label: 'Format', model: '' },
                   license: { label: 'Licence', model: '' },
                   language: { label: 'Language', model: '' },
@@ -1189,11 +1189,25 @@ angular.module('hopsWorksApp')
                 ExtendedMetadataAPIService.getDistributionMetadata(DISTRIBUTION_PATH).
                   then(function (response) {
                     self.extendedMetadata = ExtendedMetadataService.parseDistributionGraph(response.data, $scope.data.fields.distribution);
+                    if($scope.data.fields.distribution.license.model) {
+                        self.resolveLicence($scope.data.fields.distribution.license.model);
+                    }
+
                   }).catch(function (error) {
                     console.log(error);
                   });
               }
             }
+
+            self.getTranslationForMetadata = function(model, language) {
+                language = language.substring(0,2);
+                if(model.hasOwnProperty('i18n') && model.i18n.hasOwnProperty(language)) {
+                    return model.i18n[language];
+                } else {
+                    return model.model;
+                }
+            };
+
 
             self.haveSelected = function (file) {
               if (file === undefined || file === null || file.name === undefined || file.name === null) {
@@ -1294,6 +1308,13 @@ angular.module('hopsWorksApp')
 
             self.toggleLeft = buildToggler('left');
             self.toggleRight = buildToggler('right');
+
+              self.resolveLicence = function (url) {
+                  return LindaService.resolveLicenceURL(url).then(function(response) {
+                        $scope.data.fields.distribution.license.model = LindaService.parseLicenceResolve(response, 'prefLabel');
+                      }
+                  );
+              };
 
             function buildToggler(navID) {
               var debounceFn = $mdUtil.debounce(function () {

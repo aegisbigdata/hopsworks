@@ -458,7 +458,7 @@ angular.module('hopsWorksApp')
 
             self.resolveLicence = function (url) {
               return LindaService.resolveLicenceURL(url).then(function(response) {
-                  $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response);
+                  $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response, 'prefLabel');
                   }
               );
             }
