@@ -40,7 +40,7 @@
 <div ng-show="metadataCtrl.noTemplates" ng-show="!datasetsCtrl.selected">
 
   <div ng-show="datasetsCtrl.extendedMetadata" style="font-family: sans-serif;">
-    <h5>Extended Metadata</h5>
+    <h4>Extended Metadata</h4>
     <table class="table table-striped ng-scope" style="margin-top: 16px; font-size: 12px;box-shadow: none;">
       <thead style="box-shadow: none;border-bottom: 1px solid #ddd;font-weight: bold;margin-bottom: 10px;">
         <tr>
@@ -51,7 +51,10 @@
       <tbody>
         <tr ng-repeat="entry in datasetsCtrl.extendedMetadata" style="border-bottom: 1px solid #ddd;">
           <td style="text-align: left;background-color: transparent;">{{ entry.label }}</td>
-          <td ng-show="!entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">{{ entry.model }}</td>
+          <td ng-show="!entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">
+            <span ng-if="entry.hasOwnProperty('i18n')">{{ datasetsCtrl.getTranslationForMetadata(entry, getCurrentLanguage() )}}</span>
+            <span ng-if="!entry.hasOwnProperty('i18n')">{{ entry.model }}</span>
+          </td>
           <td ng-show="entry.model.hasOwnProperty('fields')" style="text-align: left;background-color: transparent;">{{ entry.model.typeOfData }}, has {{ entry.model.fields.length + ' field' }}{{ entry.model.fields.length != 1 ? 's' : '' }}</td>
         </tr>
       </tbody>
