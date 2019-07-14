@@ -344,13 +344,28 @@ angular.module('hopsWorksApp')
                 hopsExtendedMetadata['filetype'] = fields.format.model;
               }
 
-              MetadataRestService.addExtendedMetadata(
-                  PROJECT_ID,
-                  self.projectName,
-                  self.datasetName,
-                  self.fileName,
-                  hopsExtendedMetadata
-              );
+              if (fields.license.model) {
+                LindaService.resolveLicenceURL(fields.license.model).then(function(response) {
+                  hopsExtendedMetadata['license'] = LindaService.parseLicenceResolve(response, 'altLabel');
+                  MetadataRestService.addExtendedMetadata(
+                      PROJECT_ID,
+                      self.projectName,
+                      self.datasetName,
+                      self.fileName,
+                      hopsExtendedMetadata
+                  );
+                });
+
+              } else {
+                MetadataRestService.addExtendedMetadata(
+                    PROJECT_ID,
+                    self.projectName,
+                    self.datasetName,
+                    self.fileName,
+                    hopsExtendedMetadata
+                );
+              }
+
 
             };
 
@@ -393,7 +408,7 @@ angular.module('hopsWorksApp')
 
             self.resolveLicence = function (url) {
               return LindaService.resolveLicenceURL(url).then(function(response) {
-                    $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response);
+                    $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response, 'prefLabel');
                   }
               );
             };

@@ -234,8 +234,7 @@ angular.module('hopsWorksApp')
             }
 
             if (distro.hasOwnProperty('license')) {
-              var license_splitted = distro['license'].split('/');
-              fields.license.model = license_splitted[license_splitted.length - 1];
+              fields.license.model = distro['license'];
             }
 
           } else {

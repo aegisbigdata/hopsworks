@@ -1189,6 +1189,10 @@ angular.module('hopsWorksApp')
                 ExtendedMetadataAPIService.getDistributionMetadata(DISTRIBUTION_PATH).
                   then(function (response) {
                     self.extendedMetadata = ExtendedMetadataService.parseDistributionGraph(response.data, $scope.data.fields.distribution);
+                    if($scope.data.fields.distribution.license.model) {
+                        self.resolveLicence($scope.data.fields.distribution.license.model);
+                    }
+
                   }).catch(function (error) {
                     console.log(error);
                   });
@@ -1307,7 +1311,7 @@ angular.module('hopsWorksApp')
 
               self.resolveLicence = function (url) {
                   return LindaService.resolveLicenceURL(url).then(function(response) {
-                          $scope.data.fields.license.extra = LindaService.parseLicenceResolve(response);
+                        $scope.data.fields.distribution.license.model = LindaService.parseLicenceResolve(response, 'prefLabel');
                       }
                   );
               };
