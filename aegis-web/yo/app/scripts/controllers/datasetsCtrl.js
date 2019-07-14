@@ -74,8 +74,8 @@ angular.module('hopsWorksApp')
             $scope.data = {
               fields: {
                 dataset: {
-                  title: { label: 'Title', model: '' },
-                  description: { label: 'Description', model: '' },
+                  title: { label: 'Title', model: '' , i18n: '' },
+                  description: { label: 'Description', model: '', i18n: ''},
                   contactpointtype: { label: 'Contact Point Type', model: '' },
                   contactpointname: { label: 'Contact Point Name', model: '' },
                   contactpointmail: { label: 'Contact Point Mail', model: '' },
@@ -95,8 +95,8 @@ angular.module('hopsWorksApp')
                 },
                 distribution: {
                   accessUrl: { label: 'Access URL', model: '' },
-                  title: { label: 'Title', model: '' },
-                  description: { label: 'Description', model: '' },
+                  title: { label: 'Title', model: '', i18n: ''},
+                  description: { label: 'Description', model: '', i18n: '' },
                   format: { label: 'Format', model: '' },
                   license: { label: 'Licence', model: '' },
                   language: { label: 'Language', model: '' },
@@ -1194,6 +1194,16 @@ angular.module('hopsWorksApp')
                   });
               }
             }
+
+            self.getTranslationForMetadata = function(model, language) {
+                language = language.substring(0,2);
+                if(model.hasOwnProperty('i18n') && model.i18n.hasOwnProperty(language)) {
+                    return model.i18n[language];
+                } else {
+                    return model.model;
+                }
+            };
+
 
             self.haveSelected = function (file) {
               if (file === undefined || file === null || file.name === undefined || file.name === null) {
