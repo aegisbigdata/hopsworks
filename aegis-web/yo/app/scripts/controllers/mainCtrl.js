@@ -383,11 +383,16 @@ angular.module('hopsWorksApp')
             }
             self.updateFilterType = function () {
               var typeSelected = [];
+              var licenceSelected = [];
               let params = $location.search();
               angular.forEach(self.types, function(type,key){
                 if(type.selected) typeSelected.push(type.value);
-              })
+              });
+              angular.forEach(self.aggregationResult.licenses, function(lic,key){
+                if(lic.selected) licenceSelected.push(lic.key);
+              });
               params.type = typeSelected;
+              params.license = licenceSelected;
               params.page = 1;
               if(self.searchType === "global") {
                 self.goToSearchHome('search', params);

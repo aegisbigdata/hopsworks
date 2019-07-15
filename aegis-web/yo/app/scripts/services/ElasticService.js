@@ -60,9 +60,15 @@ angular.module('hopsWorksApp')
                     var types = searchTerm.type;
                     angular.forEach(types, function(type,key){
                       baseUrl +=  '&type='+ type;
-                      aggUrl +=  '&type='+ type;
-                    })
+                    });
                   }
+                  if(Array.isArray(searchTerm.license)) {
+                    var types = searchTerm.license;
+                    angular.forEach(types, function(license,key){
+                      baseUrl +=  '&license='+ license;
+                    });
+                  }
+
                   if(searchTerm.page) {
                     baseUrl +=  '&page='+ searchTerm.page;
                   }
@@ -75,12 +81,44 @@ angular.module('hopsWorksApp')
                   if(searchTerm.order) {
                     baseUrl +=  '&order='+ searchTerm.order;
                   }
-                  
-                  return {
-                    'search': $http.get(baseUrl),
-                    'aggr': $http.get(aggUrl)
-                  }
+
+                  return $http.get(baseUrl);
                 },
+
+                globalAggregationSearch: function (searchTerm) {
+                  // return $http.get('/api/elastic/globalsearch/' + searchTerm);
+                  var baseUrl = '/api/elastic/search?q=' + searchTerm.q;
+                  var aggUrl = '/api/elastic/aggregation?q=' + searchTerm.q;
+                  if(Array.isArray(searchTerm.type)) {
+                    var types = searchTerm.type;
+                    angular.forEach(types, function(type,key){
+                      aggUrl +=  '&type='+ type;
+                    })
+                  }
+                  if(Array.isArray(searchTerm.license)) {
+                    var types = searchTerm.license;
+                    angular.forEach(types, function(license,key){
+                      aggUrl +=  '&license='+ license;
+                    });
+                  }
+
+                  if(searchTerm.page) {
+                    baseUrl +=  '&page='+ searchTerm.page;
+                  }
+                  if(searchTerm.limit) {
+                    baseUrl +=  '&limit='+ searchTerm.limit;
+                  }
+                  if(searchTerm.sort) {
+                    baseUrl +=  '&sort='+ searchTerm.sort;
+                  }
+                  if(searchTerm.order) {
+                    baseUrl +=  '&order='+ searchTerm.order;
+                  }
+
+                  return $http.get(aggUrl);
+
+                },
+
                 /**
                  * Search under a project hitting hitting 'project' index
                  * 

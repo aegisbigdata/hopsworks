@@ -112,27 +112,14 @@
                     </div>
                 </div>
             </form>
-            <form action="" class="navbar-form-search">
-                <div  class="navbar-search-header">
-                    <div class="search-header">License</div>
-                    <button class="btn btn-link btn-bold"
-                               ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        RESET
-                    </button>
-                </div>
-                <div class="navbar-search-radio">
-                    <div><input type="radio" id="license1" name="license" value="license1"><label for="license1">CC BT 3.0 Austria</label></div>
-                    <div><input type="radio" id="license2" name="license" value="license2"><label for="license2">CC-BY 4.0</label></div>
-                    <div><input type="radio" id="license3" name="license" value="license3"><label for="license3">CC-BY 3.0 NL</label></div>
-                    <div><input type="radio" id="license4" name="license" value="license4"><label for="license4">CC-BY-NC 4.0</label></div>
-                    <div><input type="radio" id="license5" name="license" value="license5"><label for="license5">CC-BY-NC-ND 4.0</label></div>
-                    <div class="navbar-search-radio-more">
-                        <span>More</span>
-                        <span type="button" class="btn btn-xs fas fa-sort-down pull-right"
-                              data-toggle="collapse" 
-                              data-target="""> </span>
+            <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.licenses">
+                <div  class="navbar-search-header">License</div>
+                    <div class="navbar-search-check">
+                    <div ng-repeat="lic in mainCtrl.aggregationResult.licenses">
+                        <input type="checkbox" id="{{ lic.key }}" name="selectedLicence[]" value="{{ lic.key }}" class="filter-menu" ng-change="mainCtrl.activeFilter('type')" ng-model="lic.selected">
+                        <label for="{{ lic.key }}">{{ lic.key }} ({{ lic.value }})</label>
                     </div>
-                </div>
+                    </div>
             </form>
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header-slider">Price/Sellable</div>
@@ -143,10 +130,6 @@
                             </rzslider>
                         </div>
                 </div>
-            </form>
-            <form action="" class="navbar-form-search">
-                <div class="navbar-search-header">Spatial</div>
-                
             </form>
             
             <!-- <li class="dropdown-search-header">Date Created</li>
@@ -265,7 +248,8 @@
       >
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
-                   details-fn="mainCtrl.viewDetail(result)" 
+                   details-fn="mainCtrl.viewDetail(result)"
+                   metadata="mainCtrl.processMetadata(result)"
                    download-fn="mainCtrl.downloadPublicDataset(result)"
                    page-no="mainCtrl.currentPage" 
                    card-index="$index"

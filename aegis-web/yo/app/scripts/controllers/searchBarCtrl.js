@@ -90,8 +90,7 @@ angular.module('hopsWorksApp')
             queryParams = $location.search();
           }
           //  Call API Search
-          elasticService.globalSearch(queryParams)
-            .search.then(function (response) {
+          elasticService.globalSearch(queryParams).then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
@@ -119,8 +118,8 @@ angular.module('hopsWorksApp')
               });
           });
           //  Call API Aggregation
-          elasticService.globalSearch(queryParams)
-            .aggr.then(function (response) {
+
+          elasticService.globalAggregationSearch(queryParams).then(function (response) {
               mainParent.totalResults = response.data[0].value;
             }, function (error) {
               growl.error(error.data.errorMsg, {
@@ -145,7 +144,7 @@ angular.module('hopsWorksApp')
           }
         //  Call API Search
           elasticService.globalSearch(queryParams)
-            .search.then(function (response) {
+            .then(function (response) {
               searchHits = response.data;
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
@@ -164,10 +163,10 @@ angular.module('hopsWorksApp')
           });
             
           //  Call API Aggregation
-          elasticService.globalSearch(queryParams)
-            .aggr.then(function (response) {
+          elasticService.globalAggregationSearch(queryParams)
+            .then(function (response) {
+              mainParent.aggregationResult = self.processAggregation(response.data);
               mainParent.totalResults = response.data[0].value;
-              mainParent.aggregationResult = response.data;
             }, function (error) {
               growl.error(error.data.errorMsg, {
                 title: 'Error',
@@ -224,6 +223,39 @@ angular.module('hopsWorksApp')
         }
         datePicker(); // this will load the function so that the date picker can call it.
       };
+
+
+      self.processAggregation = function (data) {
+        var result = {};
+        var paramsLicense = $location.search().license;
+
+        data.forEach(function (item) {
+          if(item['name'] === 'Licenses' && item['map']['entry'].length > 0) {
+            result['licenses'] = item['map']['entry'];
+            result['licenses'].forEach(function (licItem) {
+              licItem['selected'] = false;
+              if(paramsLicense !== '' && typeof paramsLicense !== 'undefined') {
+                if(angular.isArray(paramsLicense)){
+                  angular.forEach(paramsLicense, function(pLicence,key){
+                    if(licItem['key'] == pLicence)  licItem['selected'] = true;
+                  })
+                } else {
+                    if(licItem['key'] == paramsLicense)  licItem['selected'] = true;
+                }
+              }
+
+            })
+          }
+        });
+
+        return result;
+      };
+
+      mainParent.processMetadata = function (content) {
+        var meta = content.map.entry;
+        return meta;
+      };
+
 
       var concatUnique = function (a, array2) {
         a = a.concat(array2);

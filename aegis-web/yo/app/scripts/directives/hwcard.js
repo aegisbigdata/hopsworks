@@ -44,6 +44,7 @@ angular.module('hopsWorksApp').directive('hwCard', function() {
     restrict: 'E',
     scope: {
       content: '=',
+      metadata: '=',
       limit: '=',
       cardIndex: '=',
       pageNo: '=',
