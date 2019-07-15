@@ -38,6 +38,7 @@
  */
 package io.hops.hopsworks.api.project;
 
+import io.hops.common.Pair;
 import io.hops.hopsworks.api.airflow.AirflowService;
 import io.hops.hopsworks.api.activities.ProjectActivitiesResource;
 import io.hops.hopsworks.api.dela.DelaClusterProjectService;
@@ -937,24 +938,55 @@ public class ProjectService {
     }
     
     List<Dataset> datasets = datasetFacade.findByInodeId(inodeId);
-    if(datasets.isEmpty()) {
-      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
-        .entity(new ItemAccessWrapperDTO("DENIED")).build();
-    }
-    for(Dataset dataset : datasets) {
-      if(hasProjectAccess(dataset.getProject(), user)) {
-        ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId,
-          dataset.getProject().getId(), dataset.getId(),
-          dataset.getName(), dataset.getDescription());
-        dtos.add(dto);
+    if (!datasets.isEmpty()) {
+      for (Dataset dataset : datasets) {
+        if (hasProjectAccess(dataset.getProject(), user)) {
+          ItemAccessDTO dto = new ItemAccessDTO("dataset", inodeId,
+              dataset.getProject().getId(), dataset.getId(),
+              dataset.getName(), dataset.getDescription());
+          dtos.add(dto);
+        }
       }
+      if (dtos.isEmpty()) {
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+            .entity(new ItemAccessWrapperDTO("DENIED")).build();
+      }
+      ItemAccessWrapperDTO result = new ItemAccessWrapperDTO("OK", dtos);
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
     }
-    if(dtos.isEmpty()) {
+   
+    try {
+      Pair<Inode, Inode> projDataset = inodes.getProjectAndDatasetRootForInode(inode);
+      Inode datasetInode = projDataset.getR();
+      List<Dataset> dss = datasetFacade.findByInode(datasetInode);
+
+      for (Dataset dataset : dss) {
+        if (hasProjectAccess(dataset.getProject(), user)) {
+          String inodePath = inodes.getPath(inode);
+
+          inodePath = inodePath.substring(inodePath.indexOf("/") + 1);
+          inodePath = inodePath.substring(inodePath.indexOf("/") + 1);
+          inodePath = inodePath.substring(inodePath.indexOf("/") + 1);
+          inodePath = inodePath.substring(inodePath.indexOf("/") + 1);
+
+          ItemAccessDTO dto = new ItemAccessDTO("inode", inodeId,
+              dataset.getProject().getId(), dataset.getId(),
+              dataset.getName(), dataset.getDescription(), inodePath);
+          dtos.add(dto);
+        }
+      }
+
+      if (dtos.isEmpty()) {
+        return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
+            .entity(new ItemAccessWrapperDTO("DENIED")).build();
+      }
+      ItemAccessWrapperDTO result = new ItemAccessWrapperDTO("OK", dtos);
+      return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
+
+    } catch (IllegalStateException ex) {
       return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK)
-        .entity(new ItemAccessWrapperDTO("DENIED")).build();
+          .entity(new ItemAccessWrapperDTO("DENIED")).build();
     }
-    ItemAccessWrapperDTO result = new ItemAccessWrapperDTO("OK", dtos);
-    return noCacheResponse.getNoCacheResponseBuilder(Response.Status.OK).entity(result).build();
   }
     
   private boolean hasProjectAccess(Project project, Users user) {
