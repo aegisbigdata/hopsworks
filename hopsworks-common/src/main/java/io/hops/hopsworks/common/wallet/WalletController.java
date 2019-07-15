@@ -272,7 +272,7 @@ public class WalletController {
     }
 
     public void setTid(String tid) {
-      this.tid = tidl
+      this.tid = tid;
     }
 
     public void setExclusivity(String exclusivity) {
