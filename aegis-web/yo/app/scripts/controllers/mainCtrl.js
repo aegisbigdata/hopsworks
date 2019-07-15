@@ -1,4 +1,5 @@
 /*
+import default from '../../../bower_components/apexcharts/rollup.config';
  * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
  * are released under the following license:
  *
@@ -352,10 +353,33 @@ angular.module('hopsWorksApp')
               var paramsSortby = $location.search().sort;
               var paramsOrderby = $location.search().order;
               if(paramsSortby !== '' && typeof paramsSortby !== 'undefined') {
-                // TODO controllare parametri
-                self.filterSortby = paramsSortby;
+                switch(paramsSortby){
+                  case 'title':
+                    if(paramsOrderby === 'desc'){
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'TDESC'})[0];
+                    } else {
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'TASC'})[0];
+                    }
+                  break;
+                  case 'relevance':
+                    if(paramsOrderby === 'desc'){
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'RDESC'})[0];
+                    } else {
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'RASC'})[0];
+                    }
+                  break;
+                  case 'date':
+                    if(paramsOrderby === 'desc'){
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'LDESC'})[0];
+                    } else {
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'LASC'})[0];
+                    }
+                  break;
+                  default:
+                  self.selectedSortby = self.options_sortby[0];
+                }
               } else {
-                self.filterSortby = '1';
+                self.selectedSortby = self.options_sortby[0];
               }
             }
             self.updateFilterType = function () {
@@ -431,7 +455,7 @@ angular.module('hopsWorksApp')
             self.initFilterPage();
             self.initFilterSortby();
 
-            self.selectedSortby = {name: 'Relevance ascending', value: 'RASC'};
+            // self.selectedSortby = {name: 'Title ascending', value: 'TASC'};
 
             self.activeFilter = function(filter) {
               switch(filter){
