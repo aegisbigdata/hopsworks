@@ -10,6 +10,7 @@ import io.hops.hopsworks.common.exception.WalletException;
 import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -21,6 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -45,7 +47,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response share(WalletController.DatasetJSON datasetJSON, @Context SecurityContext sc) 
+  public Response share(WalletController.DatasetJSON datasetJSON, @Context SecurityContext sc)
     throws WalletException {
     Users user = jWTHelper.getUserPrincipal(sc);
     walletController.shareDataset(datasetJSON, user);
@@ -64,7 +66,8 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUsers() throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getUsers();
+    GenericEntity<List<WalletController.UserJSON>> result
+      = new GenericEntity<List<WalletController.UserJSON>>(walletController.getUsers()) {};
     return successResponse(result);
   }
 
@@ -73,16 +76,16 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUser(@PathParam("uid") String uid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getUser(uid);
+    WalletController.UserJSON result = walletController.getUser(uid);
     return successResponse(result);
   }
-  
+
   @POST
   @Path("/user")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN"})
   public Response createUser(WalletController.UserJSON user) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.createUser(user);
+    WalletController.UserJSON result = walletController.createUser(user);
     return successResponse(result);
   }
 
@@ -91,7 +94,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createAsset(WalletController.AEGISAssetJSON asset) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.createAsset(asset);
+    WalletController.AEGISAssetJSON result = walletController.createAsset(asset);
     return successResponse(result);
   }
 
@@ -100,7 +103,8 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAssets() throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getAssets();
+    GenericEntity<List<WalletController.AEGISAssetJSON>> result =
+      new GenericEntity<List<WalletController.AEGISAssetJSON>>(walletController.getAssets()) {};
     return successResponse(result);
   }
 
@@ -109,7 +113,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAsset(@PathParam("aid") String aid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getAsset(aid);
+    WalletController.AEGISAssetJSON result = walletController.getAsset(aid);
     return successResponse(result);
   }
 
@@ -118,7 +122,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createContract(WalletController.ContractJSON contract) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.createContract(contract);
+    WalletController.ContractJSON result = walletController.createContract(contract);
     return successResponse(result);
   }
 
@@ -127,7 +131,8 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getContracts() throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getContracts();
+    GenericEntity<List<WalletController.ContractJSON>> result
+      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getContracts()) {};
     return successResponse(result);
   }
 
@@ -136,7 +141,8 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getBuyContracts(@PathParam("uid") String uid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getBuyContracts(uid);
+    GenericEntity<List<WalletController.ContractJSON>> result
+      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getBuyContracts(uid)) {};
     return successResponse(result);
   }
 
@@ -145,7 +151,8 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getSellContracts(@PathParam("uid") String uid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getSellContracts(uid);
+    GenericEntity<List<WalletController.ContractJSON>> result
+      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getSellContracts(uid)) {};
     return successResponse(result);
   }
 
@@ -154,7 +161,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response validateContract(WalletController.ValidationJSON validation) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.validateContract(validation);
+    WalletController.ContractJSON result = walletController.validateContract(validation);
     return successResponse(result);
   }
 }

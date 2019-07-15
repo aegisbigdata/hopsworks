@@ -80,14 +80,12 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter;
 import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
-import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.min.InternalMin;
-import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.JSONArray;
@@ -206,22 +204,14 @@ public class ElasticController {
         );
   
     srb.addAggregation(licenseAggregation);
-    
-    Script minPriceScript = new Script("try { return Float.parseFloat(params._source." +
-      Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return Float.MAX_VALUE; }");
   
-    MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
-    srb.addAggregation(minPriceAggregation);
+    FilterAggregationBuilder ownerAggregationMy = AggregationBuilders
+      .filter("MY", boolQuery().must(termsQuery("user", username)));
+    srb.addAggregation(ownerAggregationMy);
   
-    Script maxPriceScript = new Script("try { return Float.parseFloat(params._source." +
-      Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return 0.0f; }");
-    
-    MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
-    srb.addAggregation(maxPriceAggregation);
-  
-    TermsAggregationBuilder ownerAggregation = AggregationBuilders
-      .terms("Owner").field("user").size(1000);
-    srb.addAggregation(ownerAggregation);
+    FilterAggregationBuilder ownerAggregationOther = AggregationBuilders
+      .filter("OTHER", boolQuery().mustNot(termsQuery("user", username)));
+    srb.addAggregation(ownerAggregationOther);
     
     LOG.log(Level.INFO, "Aggregation Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
@@ -237,8 +227,8 @@ public class ElasticController {
       elasticAggregations.add(count);
       
       for (Aggregation aggregation : response.getAggregations()) {
-        if (aggregation.getName().equals("Owner")) {
-          ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation, username);
+        if (aggregation instanceof InternalFilter) {
+          ElasticAggregation elasticAggregation = new ElasticAggregation((InternalFilter) aggregation);
           elasticAggregations.add(elasticAggregation);
         } else if (aggregation instanceof StringTerms) {
           ElasticAggregation elasticAggregation = new ElasticAggregation((StringTerms) aggregation);
@@ -251,14 +241,6 @@ public class ElasticController {
               elasticAggregations.add(elasticAggregation);
             }
           }
-        } else if (aggregation instanceof InternalMax) {
-          ElasticAggregation elasticAggregation =
-            new ElasticAggregation((InternalMax) aggregation);
-          elasticAggregations.add(elasticAggregation);
-        } else if (aggregation instanceof InternalMin) {
-          ElasticAggregation elasticAggregation =
-            new ElasticAggregation((InternalMin) aggregation);
-          elasticAggregations.add(elasticAggregation);
         }
       }
       return elasticAggregations;
