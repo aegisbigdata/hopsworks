@@ -65,9 +65,9 @@ public class WalletController {
   }
 
   public List<UserJSON> getUsers() {
-    ClientWrapper<List<UserJSON>> client = ClientWrapper.httpsInstance(List<UserJSON>.class)
+    ClientWrapper<UserJSON> client = ClientWrapper.httpsInstance(UserJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/User").setMediaType(MediaType.APPLICATION_JSON);
-    List<UserJSON> result = client.doGet();
+    List<UserJSON> result = (List<UserJSON>) client.doGetGenericType();
     client.close();
     return result;
   }
@@ -89,9 +89,9 @@ public class WalletController {
   }
 
   public List<AEGISAssetJSON> getAssets() {
-    ClientWrapper<List<AEGISAssetJSON>> client = ClientWrapper.httpsInstance(List<AEGISAssetJSON>.class)
+    ClientWrapper<AEGISAssetJSON> client = ClientWrapper.httpsInstance(AEGISAssetJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset").setMediaType(MediaType.APPLICATION_JSON);
-    List<AEGISAssetJSON> result = client.doGet();
+    List<AEGISAssetJSON> result = (List<AEGISAssetJSON>) client.doGetGenericType();
     client.close();
     return result;
   }
@@ -114,27 +114,27 @@ public class WalletController {
   }
 
   public List<ContractJSON> getContracts() {
-    ClientWrapper<List<ContractJSON>> client = ClientWrapper.httpsInstance(List<ContractJSON>.class)
+    ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON);
-    List<ContractJSON> result = client.doGet();
+    List<ContractJSON> result = (List<ContractJSON>) client.doGetGenericType();
     client.close();
     return result;
   }
 
   public List<ContractJSON> getBuyContracts(String uid) {
     String filter = URLEncoder.encode("{\"where\": {\"buyer\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
-    ClientWrapper<List<ContractJSON>> client = ClientWrapper.httpsInstance(List<ContractJSON>.class)
+    ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    List<ContractJSON> result = client.doGet();
+    List<ContractJSON> result = (List<ContractJSON>) client.doGetGenericType();
     client.close();
     return result;
   }
 
   public List<ContractJSON> getSellContracts(String uid) {
     String filter = URLEncoder.encode("{\"where\": {\"seller\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
-    ClientWrapper<List<ContractJSON>> client = ClientWrapper.httpsInstance(List<ContractJSON>.class)
+    ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    List<ContractJSON> result = client.doGet();
+    List<ContractJSON> result = (List<ContractJSON>) client.doGetGenericType();
     client.close();
     return result;
   }

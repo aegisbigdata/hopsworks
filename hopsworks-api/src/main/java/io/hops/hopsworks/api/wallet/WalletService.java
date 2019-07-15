@@ -10,6 +10,7 @@ import io.hops.hopsworks.common.exception.WalletException;
 import io.hops.hopsworks.common.wallet.WalletController;
 import io.hops.hopsworks.jwt.annotation.JWTRequired;
 import io.swagger.annotations.Api;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -45,7 +46,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @AllowedProjectRoles({AllowedProjectRoles.DATA_OWNER})
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
-  public Response share(WalletController.DatasetJSON datasetJSON, @Context SecurityContext sc) 
+  public Response share(WalletController.DatasetJSON datasetJSON, @Context SecurityContext sc)
     throws WalletException {
     Users user = jWTHelper.getUserPrincipal(sc);
     walletController.shareDataset(datasetJSON, user);
@@ -64,7 +65,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUsers() throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getUsers();
+    List<WalletController.UserJSON> result = walletController.getUsers();
     return successResponse(result);
   }
 
@@ -73,16 +74,16 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getUser(@PathParam("uid") String uid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getUser(uid);
+    WalletController.UserJSON result = walletController.getUser(uid);
     return successResponse(result);
   }
-  
+
   @POST
   @Path("/user")
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN"})
   public Response createUser(WalletController.UserJSON user) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.createUser(user);
+    WalletController.UserJSON result = walletController.createUser(user);
     return successResponse(result);
   }
 
@@ -91,7 +92,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createAsset(WalletController.AEGISAssetJSON asset) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.createAsset(asset);
+    WalletController.AEGISAssetJSON result = walletController.createAsset(asset);
     return successResponse(result);
   }
 
@@ -100,7 +101,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAssets() throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getAssets();
+    List<WalletController.AEGISAssetJSON> result = walletController.getAssets();
     return successResponse(result);
   }
 
@@ -109,7 +110,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getAsset(@PathParam("aid") String aid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getAsset(aid);
+    WalletController.AEGISAssetJSON result = walletController.getAsset(aid);
     return successResponse(result);
   }
 
@@ -118,7 +119,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response createContract(WalletController.ContractJSON contract) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.createContract(contract);
+    WalletController.ContractJSON result = walletController.createContract(contract);
     return successResponse(result);
   }
 
@@ -127,7 +128,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getContracts() throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getContracts();
+    List<WalletController.ContractJSON> result = walletController.getContracts();
     return successResponse(result);
   }
 
@@ -136,7 +137,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getBuyContracts(@PathParam("uid") String uid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getBuyContracts(uid);
+    List<WalletController.ContractJSON> result = walletController.getBuyContracts(uid);
     return successResponse(result);
   }
 
@@ -145,7 +146,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getSellContracts(@PathParam("uid") String uid) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.getSellContracts(uid);
+    List<WalletController.ContractJSON> result = walletController.getSellContracts(uid);
     return successResponse(result);
   }
 
@@ -154,7 +155,7 @@ public class WalletService {
   @Produces(MediaType.APPLICATION_JSON)
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response validateContract(WalletController.ValidationJSON validation) throws WalletException {
-    WalletController.WalletServerJSONResult result = walletController.validateContract(validation);
+    WalletController.ContractJSON result = walletController.validateContract(validation);
     return successResponse(result);
   }
 }
