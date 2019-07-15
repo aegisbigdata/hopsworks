@@ -1,5 +1,6 @@
 package io.hops.hopsworks.common.elastic;
 
+import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.InternalNumericMetricsAggregation;
@@ -41,22 +42,9 @@ public class ElasticAggregation implements Comparator<ElasticAggregation> {
     }
   }
   
-  public ElasticAggregation(StringTerms aggregation, String username) {
+  public ElasticAggregation(InternalFilter aggregation) {
     this.name = aggregation.getName();
-    
-    this.map = new HashMap<>();
-  
-    this.map.put("my", 0L);
-    this.map.put("other", 0L);
-    
-    for (Terms.Bucket bucket : aggregation.getBuckets()) {
-      long count = bucket.getDocCount();
-      if (bucket.getKey().toString().equals(username)) {
-        this.map.put("my", this.map.get("my") + count);
-      } else {
-        this.map.put("other", this.map.get("other") + count);
-      }
-    }
+    this.value = (double) aggregation.getDocCount();
   }
   
   public String getName() {
