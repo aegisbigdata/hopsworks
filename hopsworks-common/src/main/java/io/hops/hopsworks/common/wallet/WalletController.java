@@ -155,6 +155,24 @@ public class WalletController {
     public String $class = "eu.aegis.User";
     public String uid;
     public float balance;
+
+    public UserJSON() {}
+
+    public String getUid() {
+      return this.uid;
+    }
+
+    public float getBalance() {
+      return this.balance;
+    }
+
+    public void setUid(String uid) {
+      this.uid = uid;
+    }
+
+    public void setBalance(float balance) {
+      this.balance = balance;
+    }
   }
 
   public static class AEGISAssetJSON {
@@ -164,6 +182,48 @@ public class WalletController {
     public float cost;
     public String status;
     public String owner;
+
+    public AEGISAssetJSON() {}
+
+    public String getAid() {
+      return this.aid;
+    }
+
+    public String getAssetType() {
+      return this.assetType;
+    }
+
+    public float getCost() {
+      return this.cost;
+    }
+
+    public String getStatus() {
+      return this.status;
+    }
+
+    public String getOwner() {
+      return this.owner;
+    }
+
+    public void setAid(String aid) {
+      this.aid = aid;
+    }
+
+    public void setAssetType(String assetType) {
+      this.assetType = assetType;
+    }
+
+    public void setCost(float cost) {
+      this.cost = cost;
+    }
+
+    public void setStatus(String status) {
+      this.status = status;
+    }
+
+    public void setOwner(String owner) {
+      this.owner = owner;
+    }
   }
 
   public static class ContractJSON {
@@ -176,10 +236,82 @@ public class WalletController {
     public String seller;
     public String buyer;
     public String relatedAsset;
+
+    public ContractJSON() {}
+
+    public String getTid() {
+      return this.tid;
+    }
+
+    public String getExclusivity() {
+      return this.exclusivity;
+    }
+
+    public float getAmountPaid() {
+      return this.amountPaid;
+    }
+
+    public String getStatus() {
+      return this.status;
+    }
+
+    public String getText() {
+      return this.text;
+    }
+
+    public String getSeller() {
+      return this.seller;
+    }
+
+    public String getBuyer() {
+      return this.buyer;
+    }
+
+    public String getRelatedAsset() {
+      return this.relatedAsset;
+    }
+
+    public void setTid(String tid) {
+      this.tid = tidl
+    }
+
+    public void setExclusivity(String exclusivity) {
+      this.exclusivity = exclusivity;
+    }
+
+    public void setAmountPaid(float amountPaid) {
+      this.amountPaid = amountPaid;
+    }
+
+    public void setStatus(String status) {
+      this.status = status;
+    }
+
+    public void setSeller(String seller) {
+      this.seller = seller;
+    }
+
+    public void setBuyer(String buyer) {
+      this.buyer = buyer;
+    }
+
+    public void setRelatedAsset(String relatedAsset) {
+      this.relatedAsset = relatedAsset;
+    }
   }
 
   public static class ValidationJSON {
     public String contract;
+
+    public ValidationJSON() {}
+
+    public String getContract() {
+      return this.contract;
+    }
+
+    public void setContract(String contract) {
+      this.contract = contract;
+    }
   }
 
   public static class DatasetJSON{
