@@ -167,6 +167,7 @@ angular.module('hopsWorksApp')
           elasticService.globalSearch(queryParams)
             .aggr.then(function (response) {
               mainParent.totalResults = response.data[0].value;
+              mainParent.aggregationResult = response.data;
             }, function (error) {
               growl.error(error.data.errorMsg, {
                 title: 'Error',

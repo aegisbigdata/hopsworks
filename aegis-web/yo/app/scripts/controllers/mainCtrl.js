@@ -66,7 +66,6 @@ angular.module('hopsWorksApp')
             self.totalresults = 0;
             self.totalResults = 0;
 
-
             if (!angular.isUndefined($routeParams.datasetName)) {
               self.searchType = "datasetCentric";
             } else if (!angular.isUndefined($routeParams.projectID)) {

@@ -181,7 +181,7 @@ angular.module('hopsWorksApp')
                       // Show List URL
                       self.hideDropdown = false;
                     } else {
-                      $location.path('/project/' + self.listUrl.url[0].projectId + '/datasets/' + self.self.listUrl.url[0].name).search({});
+                      $location.path('/project/' + self.listUrl.url[0].projectId + '/datasets/' + self.listUrl.url[0].name).search({});
                     }
                   } else if(response.data.result === 'DENIED') {
                     // Popup access request
