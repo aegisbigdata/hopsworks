@@ -86,10 +86,6 @@ import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
-import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.min.InternalMin;
-import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.JSONArray;
@@ -208,25 +204,13 @@ public class ElasticController {
         );
   
     srb.addAggregation(licenseAggregation);
-    
-    Script minPriceScript = new Script("try { return Float.parseFloat(params._source." +
-      Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return null; }");
-  
-    MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
-    srb.addAggregation(minPriceAggregation);
-  
-    Script maxPriceScript = new Script("try { return Float.parseFloat(params._source." +
-      Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return null; }");
-    
-    MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
-    srb.addAggregation(maxPriceAggregation);
   
     FilterAggregationBuilder ownerAggregationMy = AggregationBuilders
-      .filter("My Assets", boolQuery().must(termsQuery("user", username)));
+      .filter("MY", boolQuery().must(termsQuery("user", username)));
     srb.addAggregation(ownerAggregationMy);
   
     FilterAggregationBuilder ownerAggregationOther = AggregationBuilders
-      .filter("No access", boolQuery().mustNot(termsQuery("user", username)));
+      .filter("OTHER", boolQuery().mustNot(termsQuery("user", username)));
     srb.addAggregation(ownerAggregationOther);
     
     LOG.log(Level.INFO, "Aggregation Elastic query is: {0}", srb.toString());
@@ -257,14 +241,6 @@ public class ElasticController {
               elasticAggregations.add(elasticAggregation);
             }
           }
-        } else if (aggregation instanceof InternalMax) {
-          ElasticAggregation elasticAggregation =
-            new ElasticAggregation((InternalMax) aggregation);
-          elasticAggregations.add(elasticAggregation);
-        } else if (aggregation instanceof InternalMin) {
-          ElasticAggregation elasticAggregation =
-            new ElasticAggregation((InternalMin) aggregation);
-          elasticAggregations.add(elasticAggregation);
         }
       }
       return elasticAggregations;
