@@ -67,7 +67,7 @@ public class WalletController {
   public List<UserJSON> getUsers() {
     ClientWrapper<UserJSON> client = ClientWrapper.httpsInstance(UserJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/User").setMediaType(MediaType.APPLICATION_JSON);
-    List<UserJSON> result = (List<UserJSON>) client.doGetGenericType();
+    List<UserJSON> result = client.doGetGenericType();
     client.close();
     return result;
   }
@@ -91,7 +91,7 @@ public class WalletController {
   public List<AEGISAssetJSON> getAssets() {
     ClientWrapper<AEGISAssetJSON> client = ClientWrapper.httpsInstance(AEGISAssetJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset").setMediaType(MediaType.APPLICATION_JSON);
-    List<AEGISAssetJSON> result = (List<AEGISAssetJSON>) client.doGetGenericType();
+    List<AEGISAssetJSON> result = client.doGetGenericType();
     client.close();
     return result;
   }
@@ -116,7 +116,7 @@ public class WalletController {
   public List<ContractJSON> getContracts() {
     ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON);
-    List<ContractJSON> result = (List<ContractJSON>) client.doGetGenericType();
+    List<ContractJSON> result = client.doGetGenericType();
     client.close();
     return result;
   }
@@ -125,7 +125,7 @@ public class WalletController {
     String filter = URLEncoder.encode("{\"where\": {\"buyer\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
     ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    List<ContractJSON> result = (List<ContractJSON>) client.doGetGenericType();
+    List<ContractJSON> result = client.doGetGenericType();
     client.close();
     return result;
   }
@@ -134,7 +134,7 @@ public class WalletController {
     String filter = URLEncoder.encode("{\"where\": {\"seller\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
     ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    List<ContractJSON> result = (List<ContractJSON>) client.doGetGenericType();
+    List<ContractJSON> result = client.doGetGenericType();
     client.close();
     return result;
   }
