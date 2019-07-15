@@ -5,7 +5,6 @@ import io.hops.hopsworks.api.filter.Audience;
 import io.hops.hopsworks.api.filter.NoCacheResponse;
 import io.hops.hopsworks.api.jwt.JWTHelper;
 import io.hops.hopsworks.api.util.RESTApiJsonResponse;
-import io.hops.hopsworks.common.dao.project.pia.Pia;
 import io.hops.hopsworks.common.dao.user.Users;
 import io.hops.hopsworks.common.exception.WalletException;
 import io.hops.hopsworks.common.wallet.WalletController;
@@ -143,7 +142,7 @@ public class WalletService {
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getBuyContracts(@PathParam("uid") String uid) throws WalletException {
     GenericEntity<List<WalletController.ContractJSON>> result
-      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getBuyContracts()) {};
+      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getBuyContracts(uid)) {};
     return successResponse(result);
   }
 
@@ -153,7 +152,7 @@ public class WalletService {
   @JWTRequired(acceptedTokens={Audience.API}, allowedUserRoles={"HOPS_ADMIN", "HOPS_USER"})
   public Response getSellContracts(@PathParam("uid") String uid) throws WalletException {
     GenericEntity<List<WalletController.ContractJSON>> result
-      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getSellContracts()) {};
+      = new GenericEntity<List<WalletController.ContractJSON>>(walletController.getSellContracts(uid)) {};
     return successResponse(result);
   }
 
