@@ -42,70 +42,88 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class ItemAccessDTO {
+
   private String type;
   private Long inodeId;
   private Integer projectId;
   private Integer datasetId;
   private String name;
   private String description;
-  
-  public ItemAccessDTO() {}
-  
+  private String path;
+
+  public ItemAccessDTO() {
+  }
+
   public ItemAccessDTO(String type, Long inodeId, Integer projectId, Integer datasetId,
-    String name, String description) {
+      String name, String description, String path) {
     this.type = type;
     this.inodeId = inodeId;
     this.projectId = projectId;
     this.datasetId = datasetId;
     this.name = name;
     this.description = description;
+    this.path = path;
   }
-  
+
+  public ItemAccessDTO(String type, Long inodeId, Integer projectId, Integer datasetId,
+      String name, String description) {
+    this(type, inodeId, projectId, datasetId, name, description, null);
+  }
+
   public String getType() {
     return type;
   }
-  
+
   public void setType(String type) {
     this.type = type;
   }
-  
+
   public Long getInodeId() {
     return inodeId;
   }
-  
+
   public void setInodeId(Long inodeId) {
     this.inodeId = inodeId;
   }
-  
+
   public Integer getProjectId() {
     return projectId;
   }
-  
+
   public void setProjectId(Integer projectId) {
     this.projectId = projectId;
   }
-  
+
   public Integer getDatasetId() {
     return datasetId;
   }
-  
+
   public void setDatasetId(Integer datasetId) {
     this.datasetId = datasetId;
   }
-  
+
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public String getDescription() {
     return description;
   }
-  
+
   public void setDescription(String description) {
     this.description = description;
   }
+
+  public String getPath() {
+    return path;
+  }
+
+  public void setPath(String path) {
+    this.path = path;
+  }
+
 }
