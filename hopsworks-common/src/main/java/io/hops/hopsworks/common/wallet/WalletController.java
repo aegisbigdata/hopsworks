@@ -11,6 +11,7 @@ import io.hops.hopsworks.common.dataset.DatasetController;
 import io.hops.hopsworks.common.util.ClientWrapper;
 import java.net.URLEncoder;
 import java.util.logging.Logger;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.core.MediaType;
@@ -23,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 public class WalletController {
   private static final Logger LOGGER = Logger.getLogger(WalletController.class.getName());
   public static final String HYPERLEDGER_URL = "https://localhost:3001";
-  
+
   @EJB
   private DatasetController datasetCtrl;
   @EJB
@@ -32,14 +33,14 @@ public class WalletController {
   private DatasetFacade datasetFacade;
   @EJB
   private InodeFacade inodeFacade;
-  
+
   public void shareDataset(DatasetJSON datasetJSON, Users requester) {
     Inode datasetInode = inodeFacade.findById(datasetJSON.getDatasetInodeId());
     Project project = projectFacade.findByName(datasetJSON.projectName);
     Dataset dataset = datasetFacade.findByProjectAndInode(project, datasetInode);
     shareDataset(dataset, requester);
   }
-  
+
   public void shareDataset(Dataset dataset, Users requester) {
     //TODO - Users provide for email, name, username - any details needed
     //question is which user will you use? the requester or the owner
@@ -49,115 +50,113 @@ public class WalletController {
     WalletServerJSONResult result = client.doGet();
     client.close();
   }
-  
+
   public void joinDataset(Dataset dataset, Users requestingUser) {
     //TODO - use owner for email, name, username - any details needed
     Users owner = datasetCtrl.getOwner(dataset);
   }
-  
-  public WalletServerJSONResult createUser(UserJSON user) {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public UserJSON createUser(UserJSON user) {
+    ClientWrapper<UserJSON> client = ClientWrapper.httpsInstance(UserJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/User").setMediaType(MediaType.APPLICATION_JSON).setPayload(user);
-    WalletServerJSONResult result = client.doPost();
+    UserJSON result = client.doPost();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getUsers() {
-    ClientWrapper<WalletController.WalletServerJSONResult> client 
-      = ClientWrapper.httpsInstance(WalletController.WalletServerJSONResult.class)
+
+  public List<UserJSON> getUsers() {
+    ClientWrapper<List<UserJSON>> client = ClientWrapper.httpsInstance(List<UserJSON>.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/User").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    List<UserJSON> result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getUser(String uid) {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public UserJSON getUser(String uid) {
+    ClientWrapper<UserJSON> client = ClientWrapper.httpsInstance(UserJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/User/" + uid).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    UserJSON result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult createAsset(AEGISAssetJSON asset) {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public AEGISAssetJSON createAsset(AEGISAssetJSON asset) {
+    ClientWrapper<AEGISAssetJSON> client = ClientWrapper.httpsInstance(AEGISAssetJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset").setMediaType(MediaType.APPLICATION_JSON).setPayload(asset);
-    WalletServerJSONResult result = client.doPost();
+    AEGISAssetJSON result = client.doPost();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getAssets() {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public List<AEGISAssetJSON> getAssets() {
+    ClientWrapper<List<AEGISAssetJSON>> client = ClientWrapper.httpsInstance(List<AEGISAssetJSON>.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    List<AEGISAssetJSON> result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getAsset(String aid) {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public AEGISAssetJSON getAsset(String aid) {
+    ClientWrapper<AEGISAssetJSON> client = ClientWrapper.httpsInstance(AEGISAssetJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/AEGISAsset/" + aid).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    AEGISAssetJSON result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult createContract(ContractJSON contract) {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public ContractJSON createContract(ContractJSON contract) {
+    ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON)
       .setPayload(contract);
-    WalletServerJSONResult result = client.doPost();
+    ContractJSON result = client.doPost();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getContracts() {
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+
+  public List<ContractJSON> getContracts() {
+    ClientWrapper<List<ContractJSON>> client = ClientWrapper.httpsInstance(List<ContractJSON>.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    List<ContractJSON> result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getBuyContracts(String uid) {
+
+  public List<ContractJSON> getBuyContracts(String uid) {
     String filter = URLEncoder.encode("{\"where\": {\"buyer\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+    ClientWrapper<List<ContractJSON>> client = ClientWrapper.httpsInstance(List<ContractJSON>.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    List<ContractJSON> result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult getSellContracts(String uid) {
+
+  public List<ContractJSON> getSellContracts(String uid) {
     String filter = URLEncoder.encode("{\"where\": {\"seller\": {\"eq\": \"resource:eu.aegis.User#" + uid + "\"}}}");
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
+    ClientWrapper<List<ContractJSON>> client = ClientWrapper.httpsInstance(List<ContractJSON>.class)
       .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON);
-    WalletServerJSONResult result = client.doGet();
+    List<ContractJSON> result = client.doGet();
     client.close();
     return result;
   }
-  
-  public WalletServerJSONResult validateContract(ValidationJSON validation) {
-    //TODO filter was not set here
-    String filter = "";
-    ClientWrapper<WalletServerJSONResult> client = ClientWrapper.httpsInstance(WalletServerJSONResult.class)
-      .setTarget(HYPERLEDGER_URL).setPath("api/Contract?filter=" + filter).setMediaType(MediaType.APPLICATION_JSON)
+
+  public ContractJSON validateContract(ValidationJSON validation) {
+    ClientWrapper<ContractJSON> client = ClientWrapper.httpsInstance(ContractJSON.class)
+      .setTarget(HYPERLEDGER_URL).setPath("api/Contract").setMediaType(MediaType.APPLICATION_JSON)
       .setPayload(validation);
-    WalletServerJSONResult result = client.doPost();
+    ContractJSON result = client.doPost();
     client.close();
     return result;
   }
+
   public static class WalletServerJSONResult {
   }
-  
+
   public static class UserJSON {
     public String $class = "eu.aegis.User";
     public String uid;
     public float balance;
   }
-  
+
   public static class AEGISAssetJSON {
     public String $class = "eu.aegis.AEGISAsset";
     public String aid;
@@ -166,7 +165,7 @@ public class WalletController {
     public String status;
     public String owner;
   }
-  
+
   public static class ContractJSON {
     public String $class = "eu.aegis.Contract";
     public String tid;
@@ -178,11 +177,11 @@ public class WalletController {
     public String buyer;
     public String relatedAsset;
   }
-  
+
   public static class ValidationJSON {
     public String contract;
   }
-  
+
   public static class DatasetJSON{
     String projectName;
     long datasetInodeId;
