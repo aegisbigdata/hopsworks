@@ -221,13 +221,13 @@ public class ElasticController {
     MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
     srb.addAggregation(maxPriceAggregation);
   
-    FilterAggregationBuilder ownerAggregationMy = AggregationBuilders
+    /*FilterAggregationBuilder ownerAggregationMy = AggregationBuilders
       .filter("My Assets", boolQuery().must(termsQuery("user", username)));
     srb.addAggregation(ownerAggregationMy);
   
     FilterAggregationBuilder ownerAggregationOther = AggregationBuilders
       .filter("No access", boolQuery().mustNot(termsQuery("user", username)));
-    srb.addAggregation(ownerAggregationOther);
+    srb.addAggregation(ownerAggregationOther);*/
     
     LOG.log(Level.INFO, "Aggregation Elastic query is: {0}", srb.toString());
     ActionFuture<SearchResponse> futureResponse = srb.execute();
