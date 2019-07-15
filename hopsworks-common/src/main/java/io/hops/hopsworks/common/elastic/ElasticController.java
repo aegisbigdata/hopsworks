@@ -86,9 +86,7 @@ import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.max.InternalMax;
-import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.min.InternalMin;
-import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.JSONArray;
