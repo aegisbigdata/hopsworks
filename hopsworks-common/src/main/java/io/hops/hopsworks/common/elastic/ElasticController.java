@@ -208,7 +208,7 @@ public class ElasticController {
   
     srb.addAggregation(licenseAggregation);
     
-    Script minPriceScript = new Script("try { return Float.parseFloat(params._source." +
+    /*Script minPriceScript = new Script("try { return Float.parseFloat(params._source." +
       Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return null; }");
   
     MinAggregationBuilder minPriceAggregation = AggregationBuilders.min("Min Price").script(minPriceScript);
@@ -218,7 +218,7 @@ public class ElasticController {
       Settings.AEGIS_ELASTIC_PATH_SEARCH_PRICE + "); } catch (Exception e) { return null; }");
     
     MaxAggregationBuilder maxPriceAggregation = AggregationBuilders.max("Max Price").script(maxPriceScript);
-    srb.addAggregation(maxPriceAggregation);
+    srb.addAggregation(maxPriceAggregation);*/
   
     /*FilterAggregationBuilder ownerAggregationMy = AggregationBuilders
       .filter("My Assets", boolQuery().must(termsQuery("user", username)));
