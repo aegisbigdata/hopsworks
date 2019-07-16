@@ -12,7 +12,8 @@ angular.module('hopsWorksApp')
                 img: "images/tools-query.png", 
                 description: "Design queries, combine and process data in AEGIS with ease and clarity.",
                 documentationUrl: "https://github.com/aegisbigdata/documentation/wiki/Query-Builder",
-                sourceUrl: "https://github.com/aegisbigdata/query-builder"
+                sourceUrl: "https://github.com/aegisbigdata/query-builder",
+                supportDatasetParam: true
             },
             {
                 name: "Visualiser",
