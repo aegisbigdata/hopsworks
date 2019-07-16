@@ -43,12 +43,16 @@
       <div class="header col-md-3">
         <label>
           {{content.type === 'proj'? 'project': ''}}
-          {{content.type === 'ds' && !content.public_ds ? 'dataset': ''}} 
+          {{content.type === 'ds' && !content.public_ds ? 'dataset': ''}}
+          {{content.type === 'inode' && !content.public_ds ? 'File / Directory': ''}}
           {{content.type === 'ds' && content.public_ds && content.localDataset ? 'public dataset in cluster': ''}}
           {{content.type === 'ds' && content.public_ds && !content.localDataset ? 'public dataset': ''}}
         </label>
-        <div class="oval">
-            <span class="oval-license">CC-BY</span>
+        <div class="oval" ng-show="extendedMetadata.license">
+            <span class="oval-license">{{ extendedMetadata.license }}</span>
+        </div>
+        <div class="oval" ng-show="extendedMetadata.price">
+          <span class="oval-price">{{ extendedMetadata.price }} €</span>
         </div>
         <div>
           <label class="card-content title-blue">Owner</label>
@@ -86,14 +90,8 @@
           <div class="desc">{{content.description | limitTo: limit}}
             {{content.description.length > limit ? '...':''}}
           </div>
-          <div class="oval">
-              <span class="oval-license grey">csv</span>     
-              <span class="oval-license grey">wms</span>     
-              <span class="oval-license grey">csv</span>     
-              <span class="oval-license grey">txt</span>     
-              <span class="oval-license grey">txt</span>     
-              <span class="oval-license grey">txt</span>     
-              <span class="oval-license grey">html</span>     
+          <div class="oval" ng-show="extendedMetadata.filetype">
+              <span class="oval-license grey">{{ extendedMetadata.filetype }}</span>
           </div>
         </div> 
       </div>

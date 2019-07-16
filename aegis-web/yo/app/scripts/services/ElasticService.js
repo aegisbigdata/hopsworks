@@ -107,6 +107,14 @@ angular.module('hopsWorksApp')
                     });
                   }
 
+                  if(searchTerm.hasOwnProperty('minPrice') &&  searchTerm.minPrice > 0) {
+                    url +=  '&minPrice='+ searchTerm.minPrice;
+                  }
+
+                  if(searchTerm.hasOwnProperty('maxPrice')) {
+                    url +=  '&maxPrice='+ searchTerm.maxPrice;
+                  }
+
                   return url;
                 },
 
