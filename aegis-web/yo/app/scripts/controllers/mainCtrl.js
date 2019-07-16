@@ -481,9 +481,13 @@ angular.module('hopsWorksApp')
               let params = $location.search();
               if(self.dateFrom){
                 params.minDate = $filter('date')(self.dateFrom, 'dd-MM-yyyy');
+              } else{
+                delete params.minDate;
               }
               if(self.dateTo){
                 params.maxDate = $filter('date')(self.dateTo, 'dd-MM-yyyy');
+              } else{
+                delete params.maxDate;
               }
               if(self.searchType === "global") {
                 self.goToSearchHome('search', params);
@@ -491,6 +495,7 @@ angular.module('hopsWorksApp')
                 self.goToSearchProject('search', params);
               }
             }
+            
             
             self.initFilterType();
             self.initFilterPage();

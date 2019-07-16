@@ -76,7 +76,6 @@ angular.module('hopsWorksApp')
                   if(searchTerm.maxDate) {
                     baseUrl +=  '&maxDate='+ searchTerm.maxDate;
                   }
-
                   return $http.get(baseUrl);
                 },
 
@@ -111,6 +110,13 @@ angular.module('hopsWorksApp')
                     angular.forEach(types, function(fileType,key){
                       url +=  '&owner='+ fileType;
                     });
+                  }
+
+                  if(searchTerm.minDate) {
+                    url +=  '&minDate='+ searchTerm.minDate;
+                  }
+                  if(searchTerm.maxDate) {
+                    url +=  '&maxDate='+ searchTerm.maxDate;
                   }
 
                   return url;

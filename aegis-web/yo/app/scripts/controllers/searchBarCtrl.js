@@ -51,7 +51,7 @@ angular.module('hopsWorksApp')
             $scope.projectCtrl.goToUrl('search',{q:self.searchTerm});
           }
         } else {
-          mainParent.searchResult = [];
+          // mainParent.searchResult = [];
           if(self.searchTerm == '*') {
             if(self.searchType === "global") {
               $scope.mainCtrl.goToSearchHome('search', {q:self.searchTerm});
@@ -60,9 +60,9 @@ angular.module('hopsWorksApp')
             }
           } else {
             if(self.searchType === "global") {
-              $scope.mainCtrl.goToSearchHome('search');
+              $scope.mainCtrl.goToSearchHome('search', {q:'*'});
             } else {
-              $scope.projectCtrl.goToUrl('search');
+              $scope.projectCtrl.goToUrl('search', {q: '*'});
             }
           }
         }
