@@ -73,14 +73,14 @@
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Date added to AEGIS</div>
                 <div class="input-date-group">
-                  <div class="date-title">From:</div>
-                      <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
-                  <div class="date-title">To:</div>    
-                      <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
-                      <button class="btn btn-link btn-bold align-right"
-                                  ng-click="">
-                          APPLY
-                      </button>
+                    <div class="date-title">From:</div>
+                    <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control" ng-model="mainCtrl.dateFrom"></div>
+                    <div class="date-title">To:</div>    
+                    <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control" ng-model="mainCtrl.dateTo"></div>
+                    <button ng-disabled="!mainCtrl.dateFrom && !mainCtrl.dateTo" class="btn btn-link btn-bold align-right"
+                            ng-click="mainCtrl.activeFilter('dateAdded')">
+                        APPLY
+                    </button>
                 </div>
             </form>
 

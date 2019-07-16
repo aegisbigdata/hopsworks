@@ -70,6 +70,12 @@ angular.module('hopsWorksApp')
                   if(searchTerm.order) {
                     baseUrl +=  '&order='+ searchTerm.order;
                   }
+                  if(searchTerm.minDate) {
+                    baseUrl +=  '&minDate='+ searchTerm.minDate;
+                  }
+                  if(searchTerm.maxDate) {
+                    baseUrl +=  '&maxDate='+ searchTerm.maxDate;
+                  }
 
                   return $http.get(baseUrl);
                 },

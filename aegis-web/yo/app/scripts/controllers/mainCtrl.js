@@ -48,12 +48,12 @@ angular.module('hopsWorksApp')
           '$http', 'AuthService', 'UtilsService', 'ElasticService', 'DelaProjectService',
           'DelaService', 'md5', 'ModalService', 'ProjectService', 'growl',
           'MessageService', '$routeParams', '$window', 'HopssiteService', 'BannerService',
-          'AirflowService',
+          'AirflowService', '$filter',
           function ($interval, $cookies, $translate, $location, $scope, $rootScope, $http, AuthService, UtilsService,
                   ElasticService, DelaProjectService, DelaService, md5, ModalService, 
                   ProjectService, growl,
                   MessageService, $routeParams, $window, HopssiteService, BannerService,
-                  AirflowService) {
+                  AirflowService, $filter) {
             const MIN_SEARCH_TERM_LEN = 2;
             var self = this;
 
@@ -65,6 +65,8 @@ angular.module('hopsWorksApp')
             self.searchResult = [];
             self.totalresults = 0;
             self.totalResults = 0;
+            self.dateFrom = '';
+            self.dateTo = '';
 
             if (!angular.isUndefined($routeParams.datasetName)) {
               self.searchType = "datasetCentric";
@@ -381,6 +383,17 @@ angular.module('hopsWorksApp')
                 self.selectedSortby = self.options_sortby[0];
               }
             }
+            self.initFilterDateAdded = function () {
+              var dateFrom = $location.search().minDate;
+              var dateTo = $location.search().maxDate;
+              var pattern = /(\d{2})\-(\d{2})\-(\d{4})/;
+              if(dateFrom !== '' && typeof dateFrom !== 'undefined') {
+                self.dateFrom = new Date(dateFrom.replace(pattern, '$3-$2-$1'));
+              }
+              if(dateTo !== '' && typeof dateTo !== 'undefined') {
+                self.dateTo = new Date(dateTo.replace(pattern, '$3-$2-$1'));
+              }
+            }
             self.updateFilterType = function () {
               var typeSelected = [];
               var licenceSelected = [];
@@ -464,10 +477,25 @@ angular.module('hopsWorksApp')
                 self.goToSearchProject('search', params);
               }
             }
+            self.updateFilterDateAdded =  function() {
+              let params = $location.search();
+              if(self.dateFrom){
+                params.minDate = $filter('date')(self.dateFrom, 'dd-MM-yyyy');
+              }
+              if(self.dateTo){
+                params.maxDate = $filter('date')(self.dateTo, 'dd-MM-yyyy');
+              }
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
             
             self.initFilterType();
             self.initFilterPage();
             self.initFilterSortby();
+            self.initFilterDateAdded();
 
             // self.selectedSortby = {name: 'Title ascending', value: 'TASC'};
 
@@ -479,6 +507,9 @@ angular.module('hopsWorksApp')
                   case 'sortby':
                   self.updateFilterSortby()
                   break;
+                  case 'dateAdded':
+                  self.updateFilterDateAdded()
+                  break
               }
             };
 
