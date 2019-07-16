@@ -230,6 +230,8 @@ angular.module('hopsWorksApp')
         var paramsLicense = $location.search().license;
         var paramsFileType = $location.search().fileType;
         var paramOwner = $location.search().owner;
+        var minPrice = $location.search().minPrice;
+        var maxPrice = $location.search().maxPrice;
 
         result['owner'] = [];
 
@@ -268,7 +270,7 @@ angular.module('hopsWorksApp')
             })
           }
 
-          if(item['name'] === 'OTHER') {
+          if(item['name'] === 'OTHER' && item['value'] > 0) {
             if(paramOwner !== '' && typeof paramOwner !== 'undefined' && paramOwner[0] === 'other') {
               result['owner'].push({key: 'other', value: item['value'], selected: true});
             } else {
@@ -277,7 +279,7 @@ angular.module('hopsWorksApp')
 
           }
 
-          if(item['name'] === 'MY') {
+          if(item['name'] === 'MY' && item['value'] > 0) {
             if(paramOwner !== '' && typeof paramOwner !== 'undefined' && paramOwner[0] === 'my') {
               result['owner'].push({key: 'my', value: item['value'], selected: true});
             } else {
@@ -287,14 +289,20 @@ angular.module('hopsWorksApp')
 
         });
 
+        result['price'] = {};
+        if(minPrice !== '' && typeof minPrice !== 'undefined') {
+          result['price']['min'] = minPrice;
+        } else {
+          result['price']['min'] = 0;
+        }
+
+        if(maxPrice !== '' && typeof maxPrice !== 'undefined') {
+          result['price']['max'] = maxPrice;
+        } else {
+          result['price']['max'] = 2000;
+        }
         return result;
       };
-
-      mainParent.processMetadata = function (content) {
-        var meta = content.map.entry;
-        return meta;
-      };
-
 
       var concatUnique = function (a, array2) {
         a = a.concat(array2);

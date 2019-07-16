@@ -52,6 +52,7 @@ angular.module('hopsWorksApp')
             self.hideDropdown = true;
 
             var init = function (content) {
+              self.processMetadata(content);
               if (content.details !== undefined) {
                 console.log("No need to get detail: ", content);
                 return;
@@ -156,6 +157,29 @@ angular.module('hopsWorksApp')
                 $location.path('/delahopsDataset');
               }
             };
+
+
+            self.processMetadata = function (content) {
+              var meta = content.map.entry;
+              var data = {};
+              var array = [];
+              var result = {};
+              meta.forEach(function (item) {
+                if(item.key === 'xattr') {
+                  var input = item.value;
+                  data = input.substring(input.lastIndexOf("{") +1, input.indexOf("}"));
+                  data = data.split(",");
+                  data.forEach(function(a, i){
+                    array.push(a.trim().split("="))
+                  });
+                  array.forEach(function(a){
+                    result[a[0]] = a[1]
+                  });
+                }
+              });
+              $scope.extendedMetadata = result;
+            };
+
 
             self.goToProject = function (item) {
               var itemAccessService = ItemAccessService();
