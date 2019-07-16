@@ -233,7 +233,13 @@
   background: white;
 }
 
-
+.card-item .dropdown-menu {
+    top:30px;
+    left:30px;
+}
 .card-item .dropdown-menu.hideDd{
     opacity: 0;
+}
+.card-item .dropdown-toggle{
+    width: 100%;
 }

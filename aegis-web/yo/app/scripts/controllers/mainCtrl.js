@@ -1,4 +1,5 @@
 /*
+import default from '../../../bower_components/apexcharts/rollup.config';
  * Changes to this file committed after and not including commit-id: ccc0d2c5f9a5ac661e60e6eaf138de7889928b8b
  * are released under the following license:
  *
@@ -47,12 +48,12 @@ angular.module('hopsWorksApp')
           '$http', 'AuthService', 'UtilsService', 'ElasticService', 'DelaProjectService',
           'DelaService', 'md5', 'ModalService', 'ProjectService', 'growl',
           'MessageService', '$routeParams', '$window', 'HopssiteService', 'BannerService',
-          'AirflowService',
+          'AirflowService', '$filter',
           function ($interval, $cookies, $translate, $location, $scope, $rootScope, $http, AuthService, UtilsService,
                   ElasticService, DelaProjectService, DelaService, md5, ModalService, 
                   ProjectService, growl,
                   MessageService, $routeParams, $window, HopssiteService, BannerService,
-                  AirflowService) {
+                  AirflowService, $filter) {
             const MIN_SEARCH_TERM_LEN = 2;
             var self = this;
 
@@ -64,7 +65,8 @@ angular.module('hopsWorksApp')
             self.searchResult = [];
             self.totalresults = 0;
             self.totalResults = 0;
-
+            self.dateFrom = '';
+            self.dateTo = '';
 
             if (!angular.isUndefined($routeParams.datasetName)) {
               self.searchType = "datasetCentric";
@@ -352,19 +354,77 @@ angular.module('hopsWorksApp')
               var paramsSortby = $location.search().sort;
               var paramsOrderby = $location.search().order;
               if(paramsSortby !== '' && typeof paramsSortby !== 'undefined') {
-                // TODO controllare parametri
-                self.filterSortby = paramsSortby;
+                switch(paramsSortby){
+                  case 'title':
+                    if(paramsOrderby === 'desc'){
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'TDESC'})[0];
+                    } else {
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'TASC'})[0];
+                    }
+                  break;
+                  case 'relevance':
+                    if(paramsOrderby === 'desc'){
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'RDESC'})[0];
+                    } else {
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'RASC'})[0];
+                    }
+                  break;
+                  case 'date':
+                    if(paramsOrderby === 'desc'){
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'LDESC'})[0];
+                    } else {
+                      self.selectedSortby = _.filter(self.options_sortby, {value: 'LASC'})[0];
+                    }
+                  break;
+                  default:
+                  self.selectedSortby = self.options_sortby[0];
+                }
               } else {
-                self.filterSortby = '1';
+                self.selectedSortby = self.options_sortby[0];
+              }
+            }
+            self.initFilterDateAdded = function () {
+              var dateFrom = $location.search().minDate;
+              var dateTo = $location.search().maxDate;
+              var pattern = /(\d{2})\-(\d{2})\-(\d{4})/;
+              if(dateFrom !== '' && typeof dateFrom !== 'undefined') {
+                self.dateFrom = new Date(dateFrom.replace(pattern, '$3-$2-$1'));
+              }
+              if(dateTo !== '' && typeof dateTo !== 'undefined') {
+                self.dateTo = new Date(dateTo.replace(pattern, '$3-$2-$1'));
               }
             }
             self.updateFilterType = function () {
               var typeSelected = [];
+              var licenceSelected = [];
+              var fileTypesSelected = [];
+              var ownerSelected = [];
               let params = $location.search();
               angular.forEach(self.types, function(type,key){
                 if(type.selected) typeSelected.push(type.value);
-              })
+              });
+              angular.forEach(self.aggregationResult.licenses, function(lic,key){
+                if(lic.selected) licenceSelected.push(lic.key);
+              });
+              angular.forEach(self.aggregationResult.fileTypes, function(fileType,key){
+                if(fileType.selected) fileTypesSelected.push(fileType.key);
+              });
+              angular.forEach(self.aggregationResult.owner, function(owner,key){
+                if(owner.selected) ownerSelected.push(owner.key);
+              });
+
               params.type = typeSelected;
+              params.license = licenceSelected;
+              params.fileType = fileTypesSelected;
+              params.owner = ownerSelected;
+              if(self.aggregationResult.price.min > 0) {
+                params.minPrice = self.aggregationResult.price.min;
+                params.maxPrice = self.aggregationResult.price.max;
+              } else {
+                delete params.minPrice;
+                delete params.maxPrice;
+              }
+
               params.page = 1;
               if(self.searchType === "global") {
                 self.goToSearchHome('search', params);
@@ -426,12 +486,32 @@ angular.module('hopsWorksApp')
                 self.goToSearchProject('search', params);
               }
             }
+            self.updateFilterDateAdded =  function() {
+              let params = $location.search();
+              if(self.dateFrom){
+                params.minDate = $filter('date')(self.dateFrom, 'dd-MM-yyyy');
+              } else{
+                delete params.minDate;
+              }
+              if(self.dateTo){
+                params.maxDate = $filter('date')(self.dateTo, 'dd-MM-yyyy');
+              } else{
+                delete params.maxDate;
+              }
+              if(self.searchType === "global") {
+                self.goToSearchHome('search', params);
+              } else {
+                self.goToSearchProject('search', params);
+              }
+            }
+            
             
             self.initFilterType();
             self.initFilterPage();
             self.initFilterSortby();
+            self.initFilterDateAdded();
 
-            self.selectedSortby = {name: 'Relevance ascending', value: 'RASC'};
+            // self.selectedSortby = {name: 'Title ascending', value: 'TASC'};
 
             self.activeFilter = function(filter) {
               switch(filter){
@@ -441,9 +521,15 @@ angular.module('hopsWorksApp')
                   case 'sortby':
                   self.updateFilterSortby()
                   break;
+                  case 'dateAdded':
+                  self.updateFilterDateAdded()
+                  break
               }
             };
-
+            
+            self.updatePrice = function (sliderId, modelValue, highValue, pointerType) {
+              self.updateFilterType();
+            };
 
 
           }]);

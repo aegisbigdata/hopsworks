@@ -44,10 +44,15 @@ angular.module('hopsWorksApp')
           function ($scope, ProjectService, DelaService, $routeParams, $rootScope, $location, ItemAccessService) {
             var self = this;
             self.detail = [];
-            self.listDatasets = [];
+            // self.listDatasets = [];
+            self.listUrl = {
+              type: '',
+              url: []
+            }
             self.hideDropdown = true;
 
             var init = function (content) {
+              self.processMetadata(content);
               if (content.details !== undefined) {
                 console.log("No need to get detail: ", content);
                 return;
@@ -153,6 +158,29 @@ angular.module('hopsWorksApp')
               }
             };
 
+
+            self.processMetadata = function (content) {
+              var meta = content.map.entry;
+              var data = {};
+              var array = [];
+              var result = {};
+              meta.forEach(function (item) {
+                if(item.key === 'xattr') {
+                  var input = item.value;
+                  data = input.substring(input.lastIndexOf("{") +1, input.indexOf("}"));
+                  data = data.split(",");
+                  data.forEach(function(a, i){
+                    array.push(a.trim().split("="))
+                  });
+                  array.forEach(function(a){
+                    result[a[0]] = a[1]
+                  });
+                }
+              });
+              $scope.extendedMetadata = result;
+            };
+
+
             self.goToProject = function (item) {
               var itemAccessService = ItemAccessService();
               if(item.type === 'proj') {
@@ -171,12 +199,13 @@ angular.module('hopsWorksApp')
                 var inodeId = item.id;
                 itemAccessService.itemAccess(inodeId).then(function (response) {
                   if(response.data.result === 'OK'){
-                    self.listDatasets = response.data.items;
-                    if(datasets.length > 1){
+                    self.listUrl.type = item.type;
+                    self.listUrl.url = response.data.items;
+                    if(self.listUrl.url.length > 1){
                       // Show List URL
                       self.hideDropdown = false;
                     } else {
-                      $location.path('/project/' + listDatasets[0].projectId + '/datasets/' + listDatasets[0].name).search({});
+                      $location.path('/project/' + self.listUrl.url[0].projectId + '/datasets/' + self.listUrl.url[0].name).search({});
                     }
                   } else if(response.data.result === 'DENIED') {
                     // Popup access request
@@ -185,8 +214,25 @@ angular.module('hopsWorksApp')
                 }, function (error) {
                   console.log("error ", error);
                 });
-              } else {
-                // Files?
+              } else if(item.type === 'inode') {
+                var inodeId = item.id;
+                itemAccessService.itemAccess(inodeId).then(function (response) {
+                  if(response.data.result === 'OK'){
+                    self.listUrl.type = item.type;
+                    self.listUrl.url = response.data.items;
+                    if(self.listUrl.url.length > 1){
+                      // Show List URL
+                      self.hideDropdown = false;
+                    } else {
+                      $location.path('/project/' + self.listUrl.url[0].projectId + '/datasets/' + self.listUrl.url[0].name + '/' +self.listUrl.url[0].path).search({});
+                    }
+                  } else if(response.data.result === 'DENIED') {
+                    // Popup access request
+                    $scope.detailsFn($scope.content)
+                  }
+                }, function (error) {
+                  console.log("error ", error);
+                });
               }
             }
             

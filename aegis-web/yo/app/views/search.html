@@ -36,7 +36,6 @@
   ~ DAMAGES OR  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
-
 <div class="" ng-class="{'container content-wrapper': !projectView, 'container-fluid project-content-wrapper': projectView}">
     <section class="col-md-4 navbar-search">
         <nav class="navbar col-md-12">
@@ -61,93 +60,58 @@
                     </div>
                 </div>
             </form>
-            <form action="" class="navbar-form-search">
-                <div class="navbar-search-header">Ownership</div>
-                <div class="navbar-search-radio">
-                    <div><input type="radio" id="MyAssets" name="ownership" value="MyAssets"
-                       class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='proj';"><label for="MyAssets">My Assets</label></div>
-                    <div><input type="radio" id="Assetssharedwithme" name="ownership" value="Dataset"
-                       class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='ds';"><label for="Assetssharedwithme">Assets shared with me</label></div>
-                    <div><input type="radio" id="Noaccess" name="ownership" value="Noaccess"
-                       class="filter-menu"
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click=""><label for="Noaccess">No access</label></div>
+            <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.owner">
+                <div  class="navbar-search-header">Ownership</div>
+                <div class="navbar-search-check">
+                    <div ng-repeat="owner in mainCtrl.aggregationResult.owner">
+                        <input type="checkbox" id="{{ owner.key }}" name="selectedOwner[]" value="{{ owner.key }}" class="filter-menu" ng-change="mainCtrl.activeFilter('type')" ng-model="owner.selected">
+                        <label for="{{ owner.key }}" ng-if="owner.key == 'my'">My Assets ({{ owner.value }})</label>
+                        <label for="{{ owner.key }}" ng-if="owner.key == 'other'">Other Assets ({{ owner.value }})</label></div>
                 </div>
             </form>
+
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Date added to AEGIS</div>
                 <div class="input-date-group">
-                  <div class="date-title">From:</div>
-                      <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
-                  <div class="date-title">To:</div>    
-                      <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control"></div>
-                      <button class="btn btn-link btn-bold align-right"
-                                  ng-click="">
-                          APPLY
-                      </button>
-                </div>
-            </form> 
-            <form action="" class="navbar-form-search">
-                <div  class="navbar-search-header">
-                    <div class="search-header">File Types</div>
-                    <button class="btn btn-link btn-bold"
-                               ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        RESET
+                    <div class="date-title">From:</div>
+                    <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control" ng-model="mainCtrl.dateFrom"></div>
+                    <div class="date-title">To:</div>    
+                    <div class="input-date"><i class="far fa-calendar"></i><input type="date" class="form-date-control" ng-model="mainCtrl.dateTo"></div>
+                    <button class="btn btn-link btn-bold align-right"
+                            ng-click="mainCtrl.activeFilter('dateAdded')">
+                        APPLY
                     </button>
                 </div>
-                <div class="navbar-search-radio">
-                    <div><input type="radio" id="CSV" name="filetypes" value="CSV"><label for="CSV">CSV</label></div>
-                    <div><input type="radio" id="WMS" name="filetypes" value="WMS"><label for="WMS">WMS</label></div>
-                    <div><input type="radio" id="WFS" name="filetypes" value="WFS"><label for="WFS">WFS</label></div>
-                    <div><input type="radio" id="TXT" name="filetypes" value="TXT"><label for="TXT">TXT</label></div>
-                    <div><input type="radio" id="HTML" name="filetypes" value="HTML"><label for="HTML">HTML</label></div>
-                    <div class="navbar-search-radio-more">
-                        <span>More</span>
-                        <span type="button" class="btn btn-xs fas fa-sort-down pull-right"
-                              data-toggle="collapse" 
-                              data-target="""> </span>
+            </form>
+
+            <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.fileTypes">
+                <div  class="navbar-search-header">File Types</div>
+                <div class="navbar-search-check">
+                    <div ng-repeat="fileType in mainCtrl.aggregationResult.fileTypes">
+                        <input type="checkbox" id="{{ fileType.key }}" name="selectedFileTypes[]" value="{{ fileType.key }}" class="filter-menu" ng-change="mainCtrl.activeFilter('type')" ng-model="fileType.selected">
+                        <label for="{{ fileType.key }}">{{ fileType.key }} ({{ fileType.value }})</label>
                     </div>
                 </div>
             </form>
-            <form action="" class="navbar-form-search">
-                <div  class="navbar-search-header">
-                    <div class="search-header">License</div>
-                    <button class="btn btn-link btn-bold"
-                               ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        RESET
-                    </button>
-                </div>
-                <div class="navbar-search-radio">
-                    <div><input type="radio" id="license1" name="license" value="license1"><label for="license1">CC BT 3.0 Austria</label></div>
-                    <div><input type="radio" id="license2" name="license" value="license2"><label for="license2">CC-BY 4.0</label></div>
-                    <div><input type="radio" id="license3" name="license" value="license3"><label for="license3">CC-BY 3.0 NL</label></div>
-                    <div><input type="radio" id="license4" name="license" value="license4"><label for="license4">CC-BY-NC 4.0</label></div>
-                    <div><input type="radio" id="license5" name="license" value="license5"><label for="license5">CC-BY-NC-ND 4.0</label></div>
-                    <div class="navbar-search-radio-more">
-                        <span>More</span>
-                        <span type="button" class="btn btn-xs fas fa-sort-down pull-right"
-                              data-toggle="collapse" 
-                              data-target="""> </span>
+
+            <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.licenses">
+                <div  class="navbar-search-header">License</div>
+                    <div class="navbar-search-check">
+                    <div ng-repeat="lic in mainCtrl.aggregationResult.licenses">
+                        <input type="checkbox" id="{{ lic.key }}" name="selectedLicence[]" value="{{ lic.key }}" class="filter-menu" ng-change="mainCtrl.activeFilter('type')" ng-model="lic.selected">
+                        <label for="{{ lic.key }}">{{ lic.key }} ({{ lic.value }})</label>
                     </div>
-                </div>
+                    </div>
             </form>
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header-slider">Price/Sellable</div>
                 <div class="col-md-12 navbar-search-slider">
                     <div class="slider-space">
                             <rzslider id="dynexecslider" style="margin-top: 30px;"
-                                rz-slider-model="1" rz-slider-high="1000">
+                                rz-slider-model="mainCtrl.aggregationResult.price.min" rz-slider-high="mainCtrl.aggregationResult.price.max" rz-slider-options="{onEnd: mainCtrl.updatePrice, floor: 0, ceil: 2000}">
                             </rzslider>
                         </div>
                 </div>
-            </form>
-            <form action="" class="navbar-form-search">
-                <div class="navbar-search-header">Spatial</div>
-                
             </form>
             
             <!-- <li class="dropdown-search-header">Date Created</li>
@@ -266,7 +230,7 @@
       >
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
-                   details-fn="mainCtrl.viewDetail(result)" 
+                   details-fn="mainCtrl.viewDetail(result)"
                    download-fn="mainCtrl.downloadPublicDataset(result)"
                    page-no="mainCtrl.currentPage" 
                    card-index="$index"
