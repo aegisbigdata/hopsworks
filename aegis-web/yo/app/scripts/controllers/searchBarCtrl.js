@@ -228,6 +228,10 @@ angular.module('hopsWorksApp')
       self.processAggregation = function (data) {
         var result = {};
         var paramsLicense = $location.search().license;
+        var paramsFileType = $location.search().fileType;
+        var paramOwner = $location.search().owner;
+
+        result['owner'] = [];
 
         data.forEach(function (item) {
           if(item['name'] === 'Licenses' && item['map']['entry'].length > 0) {
@@ -237,15 +241,50 @@ angular.module('hopsWorksApp')
               if(paramsLicense !== '' && typeof paramsLicense !== 'undefined') {
                 if(angular.isArray(paramsLicense)){
                   angular.forEach(paramsLicense, function(pLicence,key){
-                    if(licItem['key'] == pLicence)  licItem['selected'] = true;
+                    if(licItem['key'] === pLicence)  licItem['selected'] = true;
                   })
                 } else {
-                    if(licItem['key'] == paramsLicense)  licItem['selected'] = true;
+                    if(licItem['key'] === paramsLicense)  licItem['selected'] = true;
                 }
               }
 
             })
           }
+
+          if(item['name'] === 'File Types' && item['map']['entry'].length > 0) {
+            result['fileTypes'] = item['map']['entry'];
+            result['fileTypes'].forEach(function (fileItem) {
+              fileItem['selected'] = false;
+              if(paramsFileType !== '' && typeof paramsFileType !== 'undefined') {
+                if(angular.isArray(paramsFileType)){
+                  angular.forEach(paramsFileType, function(pFileType,key){
+                    if(fileItem['key'] === pFileType)  fileItem['selected'] = true;
+                  })
+                } else {
+                  if(fileItem['key'] === paramsFileType)  fileItem['selected'] = true;
+                }
+              }
+
+            })
+          }
+
+          if(item['name'] === 'OTHER') {
+            if(paramOwner !== '' && typeof paramOwner !== 'undefined' && paramOwner[0] === 'other') {
+              result['owner'].push({key: 'other', value: item['value'], selected: true});
+            } else {
+              result['owner'].push({key: 'other', value: item['value'], selected: false});
+            }
+
+          }
+
+          if(item['name'] === 'MY') {
+            if(paramOwner !== '' && typeof paramOwner !== 'undefined' && paramOwner[0] === 'my') {
+              result['owner'].push({key: 'my', value: item['value'], selected: true});
+            } else {
+              result['owner'].push({key: 'my', value: item['value'], selected: false});
+            }
+          }
+
         });
 
         return result;

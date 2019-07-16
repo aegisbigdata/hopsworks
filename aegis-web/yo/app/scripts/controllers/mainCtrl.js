@@ -384,6 +384,8 @@ angular.module('hopsWorksApp')
             self.updateFilterType = function () {
               var typeSelected = [];
               var licenceSelected = [];
+              var fileTypesSelected = [];
+              var ownerSelected = [];
               let params = $location.search();
               angular.forEach(self.types, function(type,key){
                 if(type.selected) typeSelected.push(type.value);
@@ -391,8 +393,16 @@ angular.module('hopsWorksApp')
               angular.forEach(self.aggregationResult.licenses, function(lic,key){
                 if(lic.selected) licenceSelected.push(lic.key);
               });
+              angular.forEach(self.aggregationResult.fileTypes, function(fileType,key){
+                if(fileType.selected) fileTypesSelected.push(fileType.key);
+              });
+              angular.forEach(self.aggregationResult.owner, function(owner,key){
+                if(owner.selected) ownerSelected.push(owner.key);
+              });
               params.type = typeSelected;
               params.license = licenceSelected;
+              params.fileType = fileTypesSelected;
+              params.owner = ownerSelected;
               params.page = 1;
               if(self.searchType === "global") {
                 self.goToSearchHome('search', params);

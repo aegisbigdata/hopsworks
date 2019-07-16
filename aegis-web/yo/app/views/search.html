@@ -60,23 +60,16 @@
                     </div>
                 </div>
             </form>
-            <form action="" class="navbar-form-search">
-                <div class="navbar-search-header">Ownership</div>
-                <div class="navbar-search-radio">
-                    <div><input type="radio" id="MyAssets" name="ownership" value="MyAssets"
-                       class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='proj';"><label for="MyAssets">My Assets</label></div>
-                    <div><input type="radio" id="Assetssharedwithme" name="ownership" value="Dataset"
-                       class="filter-menu" 
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click="searchTypePub=undefined; searchType='ds';"><label for="Assetssharedwithme">Assets shared with me</label></div>
-                    <div><input type="radio" id="Noaccess" name="ownership" value="Noaccess"
-                       class="filter-menu"
-                       data-toggle="collapse" data-target="#filterdropdown"
-                       ng-click=""><label for="Noaccess">No access</label></div>
+            <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.owner">
+                <div  class="navbar-search-header">Ownership</div>
+                <div class="navbar-search-check">
+                    <div ng-repeat="owner in mainCtrl.aggregationResult.owner">
+                        <input type="checkbox" id="{{ owner.key }}" name="selectedOwner[]" value="{{ owner.key }}" class="filter-menu" ng-change="mainCtrl.activeFilter('type')" ng-model="owner.selected">
+                        <label for="{{ owner.key }}" ng-if="owner.key == 'my'">My Assets ({{ owner.value }})</label>
+                        <label for="{{ owner.key }}" ng-if="owner.key == 'other'">Other Assets ({{ owner.value }})</label></div>
                 </div>
             </form>
+
             <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Date added to AEGIS</div>
                 <div class="input-date-group">
@@ -89,29 +82,18 @@
                           APPLY
                       </button>
                 </div>
-            </form> 
-            <form action="" class="navbar-form-search">
-                <div  class="navbar-search-header">
-                    <div class="search-header">File Types</div>
-                    <button class="btn btn-link btn-bold"
-                               ng-click="datasetsCtrl.all_selected = true; datasetsCtrl.selectAll();">
-                        RESET
-                    </button>
-                </div>
-                <div class="navbar-search-radio">
-                    <div><input type="radio" id="CSV" name="filetypes" value="CSV"><label for="CSV">CSV</label></div>
-                    <div><input type="radio" id="WMS" name="filetypes" value="WMS"><label for="WMS">WMS</label></div>
-                    <div><input type="radio" id="WFS" name="filetypes" value="WFS"><label for="WFS">WFS</label></div>
-                    <div><input type="radio" id="TXT" name="filetypes" value="TXT"><label for="TXT">TXT</label></div>
-                    <div><input type="radio" id="HTML" name="filetypes" value="HTML"><label for="HTML">HTML</label></div>
-                    <div class="navbar-search-radio-more">
-                        <span>More</span>
-                        <span type="button" class="btn btn-xs fas fa-sort-down pull-right"
-                              data-toggle="collapse" 
-                              data-target="""> </span>
+            </form>
+
+            <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.fileTypes">
+                <div  class="navbar-search-header">File Types</div>
+                <div class="navbar-search-check">
+                    <div ng-repeat="fileType in mainCtrl.aggregationResult.fileTypes">
+                        <input type="checkbox" id="{{ fileType.key }}" name="selectedFileTypes[]" value="{{ fileType.key }}" class="filter-menu" ng-change="mainCtrl.activeFilter('type')" ng-model="fileType.selected">
+                        <label for="{{ fileType.key }}">{{ fileType.key }} ({{ fileType.value }})</label>
                     </div>
                 </div>
             </form>
+
             <form action="" class="navbar-form-search" ng-show="mainCtrl.aggregationResult.licenses">
                 <div  class="navbar-search-header">License</div>
                     <div class="navbar-search-check">

@@ -55,19 +55,8 @@ angular.module('hopsWorksApp')
                 globalSearch: function (searchTerm) {
                   // return $http.get('/api/elastic/globalsearch/' + searchTerm);
                   var baseUrl = '/api/elastic/search?q=' + searchTerm.q;
-                  var aggUrl = '/api/elastic/aggregation?q=' + searchTerm.q;
-                  if(Array.isArray(searchTerm.type)) {
-                    var types = searchTerm.type;
-                    angular.forEach(types, function(type,key){
-                      baseUrl +=  '&type='+ type;
-                    });
-                  }
-                  if(Array.isArray(searchTerm.license)) {
-                    var types = searchTerm.license;
-                    angular.forEach(types, function(license,key){
-                      baseUrl +=  '&license='+ license;
-                    });
-                  }
+
+                  baseUrl = this.prepareParameters(searchTerm, baseUrl);
 
                   if(searchTerm.page) {
                     baseUrl +=  '&page='+ searchTerm.page;
@@ -86,37 +75,39 @@ angular.module('hopsWorksApp')
                 },
 
                 globalAggregationSearch: function (searchTerm) {
-                  // return $http.get('/api/elastic/globalsearch/' + searchTerm);
-                  var baseUrl = '/api/elastic/search?q=' + searchTerm.q;
                   var aggUrl = '/api/elastic/aggregation?q=' + searchTerm.q;
+                  aggUrl = this.prepareParameters(searchTerm, aggUrl);
+                  return $http.get(aggUrl);
+                },
+
+                prepareParameters: function (searchTerm, url) {
                   if(Array.isArray(searchTerm.type)) {
                     var types = searchTerm.type;
                     angular.forEach(types, function(type,key){
-                      aggUrl +=  '&type='+ type;
-                    })
+                      url +=  '&type='+ type;
+                    });
                   }
                   if(Array.isArray(searchTerm.license)) {
                     var types = searchTerm.license;
                     angular.forEach(types, function(license,key){
-                      aggUrl +=  '&license='+ license;
+                      url +=  '&license='+ license;
+                    });
+                  }
+                  if(Array.isArray(searchTerm.fileType)) {
+                    var types = searchTerm.fileType;
+                    angular.forEach(types, function(fileType,key){
+                      url +=  '&fileType='+ fileType;
                     });
                   }
 
-                  if(searchTerm.page) {
-                    baseUrl +=  '&page='+ searchTerm.page;
-                  }
-                  if(searchTerm.limit) {
-                    baseUrl +=  '&limit='+ searchTerm.limit;
-                  }
-                  if(searchTerm.sort) {
-                    baseUrl +=  '&sort='+ searchTerm.sort;
-                  }
-                  if(searchTerm.order) {
-                    baseUrl +=  '&order='+ searchTerm.order;
+                  if(Array.isArray(searchTerm.owner)) {
+                    var types = searchTerm.owner;
+                    angular.forEach(types, function(fileType,key){
+                      url +=  '&owner='+ fileType;
+                    });
                   }
 
-                  return $http.get(aggUrl);
-
+                  return url;
                 },
 
                 /**
