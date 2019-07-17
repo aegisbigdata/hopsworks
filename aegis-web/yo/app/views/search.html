@@ -108,7 +108,7 @@
                 <div class="col-md-12 navbar-search-slider">
                     <div class="slider-space">
                             <rzslider id="dynexecslider" style="margin-top: 30px;"
-                                rz-slider-model="1" rz-slider-high="1000">
+                                rz-slider-model="mainCtrl.aggregationResult.price.min" rz-slider-high="mainCtrl.aggregationResult.price.max" rz-slider-options="{onEnd: mainCtrl.updatePrice, floor: 0, ceil: 2000}">
                             </rzslider>
                         </div>
                 </div>
@@ -231,7 +231,6 @@
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
           <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
                    details-fn="mainCtrl.viewDetail(result)"
-                   metadata="mainCtrl.processMetadata(result)"
                    download-fn="mainCtrl.downloadPublicDataset(result)"
                    page-no="mainCtrl.currentPage" 
                    card-index="$index"

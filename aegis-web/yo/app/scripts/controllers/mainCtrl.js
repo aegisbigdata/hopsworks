@@ -412,10 +412,19 @@ angular.module('hopsWorksApp')
               angular.forEach(self.aggregationResult.owner, function(owner,key){
                 if(owner.selected) ownerSelected.push(owner.key);
               });
+
               params.type = typeSelected;
               params.license = licenceSelected;
               params.fileType = fileTypesSelected;
               params.owner = ownerSelected;
+              if(self.aggregationResult.price.min > 0) {
+                params.minPrice = self.aggregationResult.price.min;
+                params.maxPrice = self.aggregationResult.price.max;
+              } else {
+                delete params.minPrice;
+                delete params.maxPrice;
+              }
+
               params.page = 1;
               if(self.searchType === "global") {
                 self.goToSearchHome('search', params);
@@ -517,7 +526,10 @@ angular.module('hopsWorksApp')
                   break
               }
             };
-
+            
+            self.updatePrice = function (sliderId, modelValue, highValue, pointerType) {
+              self.updateFilterType();
+            };
 
 
           }]);

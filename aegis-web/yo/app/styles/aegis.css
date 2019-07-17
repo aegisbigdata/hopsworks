@@ -463,7 +463,17 @@ button.centered-icon > .fa.fa-trash {
 }
 
 .oval-license {
-  background-color: #0492b3;  
+  background-color: #0492b3;
+  color: #ffffff;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+  margin: 10px 10px 10px 0px;
+}
+
+.oval-price {
+  background-color: #4CAE4C;
   color: #ffffff;
   text-transform: uppercase;
   padding: 5px 10px;

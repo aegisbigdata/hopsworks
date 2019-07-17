@@ -73,12 +73,7 @@ angular.module('hopsWorksApp')
                   if(searchTerm.order) {
                     baseUrl +=  '&order='+ searchTerm.order;
                   }
-                  if(searchTerm.minDate) {
-                    baseUrl +=  '&minDate='+ searchTerm.minDate;
-                  }
-                  if(searchTerm.maxDate) {
-                    baseUrl +=  '&maxDate='+ searchTerm.maxDate;
-                  }
+
                   return $http.get(baseUrl);
                 },
 
@@ -117,6 +112,13 @@ angular.module('hopsWorksApp')
 
                   if(searchTerm.projId) {
                     url +=  '&projId='+ searchTerm.projId;
+                  }
+                  if(searchTerm.hasOwnProperty('minPrice') &&  searchTerm.minPrice > 0) {
+                    url +=  '&minPrice='+ searchTerm.minPrice;
+                  }
+
+                  if(searchTerm.hasOwnProperty('maxPrice')) {
+                    url +=  '&maxPrice='+ searchTerm.maxPrice;
                   }
 
                   if(searchTerm.minDate) {
