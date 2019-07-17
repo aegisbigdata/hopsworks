@@ -64,7 +64,7 @@
         </div>
         <div>
           <label class="card-content title-blue">Date published</label>
-          <div class="value">{{content.createDate| date:'short'}}</div>        
+          <div class="value">{{content.createDate| date:'dd/MM/yy'}}</div>        
         </div>
         <div>
           <label ng-show="content.type === 'ds'" class="card-content title-blue">Size</label>
@@ -83,12 +83,16 @@
       </div>
       <div class="card-body col-md-8">
         <div class="details">
-          <h3>{{content.name}}
-            <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
+          <h3 title="{{content.name}}">
+            {{content.name}}
           </h3>
+          <div class="card-content title-blue" ng-if="content.type === 'ds' && content.public_ds && !content.localDataset">Version</div>
+          <div class="desc" ng-if="content.type === 'ds' && content.public_ds && !content.localDataset">
+              v{{content.version}}
+          </div>
           <div class="card-content title-blue">Description</div>
-          <div class="desc">{{content.description | limitTo: limit}}
-            {{content.description.length > limit ? '...':''}}
+          <div class="desc" title="{{content.description}}">
+            {{content.description}}
           </div>
           <div class="oval" ng-show="extendedMetadata.filetype">
               <span class="oval-license grey">{{ extendedMetadata.filetype }}</span>

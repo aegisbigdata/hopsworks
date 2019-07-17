@@ -174,9 +174,11 @@ textarea.form-control {
 }
 
 .project-content-wrapper {
-  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  /* border-top: 1px solid rgba(0, 0, 0, 0.15);
   margin-top: -20px;
-  padding: 30px;
+  padding: 30px; */
+  padding:0;
+  margin: 0 -15px;
 }
 
 .content-wrapper > .unwrap {

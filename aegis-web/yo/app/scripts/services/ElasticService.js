@@ -58,6 +58,9 @@ angular.module('hopsWorksApp')
 
                   baseUrl = this.prepareParameters(searchTerm, baseUrl);
 
+                  if(searchTerm.projId) {
+                    baseUrl +=  '&projId='+ searchTerm.projId;
+                  }
                   if(searchTerm.page) {
                     baseUrl +=  '&page='+ searchTerm.page;
                   }
@@ -107,6 +110,9 @@ angular.module('hopsWorksApp')
                     });
                   }
 
+                  if(searchTerm.projId) {
+                    url +=  '&projId='+ searchTerm.projId;
+                  }
                   if(searchTerm.hasOwnProperty('minPrice') &&  searchTerm.minPrice > 0) {
                     url +=  '&minPrice='+ searchTerm.minPrice;
                   }

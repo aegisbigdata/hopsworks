@@ -258,6 +258,7 @@ div.job-content--page {
   border-bottom: 1px solid lightgrey;
   margin-bottom: 0px;
   color: rgb(4, 146, 179);
+  cursor: pointer;
 }
 
 
@@ -299,7 +300,11 @@ div.job-content--page {
 
 .search-form-control {
   border: none;
-  margin: 10px 0px 10px 10px; 
+  margin: 10px 0px 10px 10px;
+  cursor: pointer;
+}
+.input-date-group input{
+  cursor: pointer;
 }
 
 .no-mrg {
@@ -429,8 +434,13 @@ button.centered-icon > .fa.fa-trash {
   height: auto;
 }
 
+.card-item-content.dropdown {
+  z-index: 999;
+}
+
 .card-item-content label {
   font-weight: normal;
+  cursor: inherit;
 }
 
 .card-item-content .header {
@@ -482,6 +492,14 @@ button.centered-icon > .fa.fa-trash {
   margin-top: 0px;
   margin-bottom: 25px;
   font-size: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.card-body .details .desc {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .search-result-sort {
