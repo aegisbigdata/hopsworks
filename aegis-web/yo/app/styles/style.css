@@ -227,10 +227,6 @@ a:focus {
   padding: 1em;
 }
 
-.datasetList > li:hover {
-  /* background-color: #2e353d; */
-}
-
 #deleteTemplateIcon{
   border-left: 3px solid white;
   height: 34px;
