@@ -83,14 +83,14 @@
       </div>
       <div class="card-body col-md-8">
         <div class="details">
-          <h3>
-            {{content.name | limitTo: cardCtrl.limitTitle}}{{content.name.length > cardCtrl.limitTitle ? '...':''}}
+          <h3 title="{{content.name}}">
+            {{content.name | limitTo: cardCtrl.limitTitle}}{{content.name.length > cardCtrl.limitTitle ? '…':''}}
             <!-- {{content.name}} -->
             <span ng-if="content.type === 'ds' && content.public_ds && !content.localDataset"> &lt;v{{content.version}}&gt; </span>
           </h3>
           <div class="card-content title-blue">Description</div>
-          <div class="desc">{{content.description | limitTo: limit}}
-            {{content.description.length > limit ? '...':''}}
+          <div class="desc" title="{{content.description}}">{{content.description | limitTo: limit}}
+            {{content.description.length > limit ? '…':''}}
           </div>
           <div class="oval" ng-show="extendedMetadata.filetype">
               <span class="oval-license grey">{{ extendedMetadata.filetype }}</span>
