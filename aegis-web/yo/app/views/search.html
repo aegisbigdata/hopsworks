@@ -49,7 +49,7 @@
             </div>
         </div>
         <div class="navbar-container col-md-11">
-            <form action="" class="navbar-form-search">
+            <form action="" class="navbar-form-search" ng-if="mainCtrl.searchType !== 'projectCentric'">
                 <div class="navbar-search-header">Type</div>
                 <div class="navbar-search-check">
                     <div ng-repeat="type in mainCtrl.types">
