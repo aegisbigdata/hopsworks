@@ -47,7 +47,6 @@ angular.module('hopsWorksApp').controller('WalletTransactionsCtrl', [
         self.assetsBought = [];
 
         UserService.profile().then(function(success) {
-            console.log(success.data.username);
             if (success.data.username === 'spiros00') {
                 self.assetsSold = [
                     {

@@ -49,8 +49,6 @@ angular.module('hopsWorksApp').controller('TransactionCtrl', [
     function($location, $scope, md5, growl, $uibModalInstance, asset) {
         var self = this;
         self.asset = asset;
-        console.log('transactionnnnn');
-        console.log(asset);
 
         this.close = function() {
             $uibModalInstance.dismiss('cancel');
