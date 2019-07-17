@@ -37,17 +37,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
-angular.module('hopsWorksApp')
-        .controller('TransactionCtrl', ['$location', '$scope', 'md5', 'growl', '$uibModalInstance', 'asset',
-          function ($location, $scope, md5, growl, $uibModalInstance, asset) {
+angular.module('hopsWorksApp').controller('TransactionCtrl', [
+    '$location',
+    '$scope',
+    'md5',
+    'growl',
+    '$uibModalInstance',
+    'asset',
+    function($location, $scope, md5, growl, $uibModalInstance, asset) {
+        var self = this;
+        self.asset = asset;
 
-            console.log("transactionnnnn");
-            console.log(asset);
-
-            this.close = function () {
-              $uibModalInstance.dismiss('cancel');
-            };
-
-          }]);
+        this.close = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    }
+]);
