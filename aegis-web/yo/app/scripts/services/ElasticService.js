@@ -58,6 +58,9 @@ angular.module('hopsWorksApp')
 
                   baseUrl = this.prepareParameters(searchTerm, baseUrl);
 
+                  if(searchTerm.projId) {
+                    baseUrl +=  '&projId='+ searchTerm.projId;
+                  }
                   if(searchTerm.page) {
                     baseUrl +=  '&page='+ searchTerm.page;
                   }
@@ -110,6 +113,10 @@ angular.module('hopsWorksApp')
                     angular.forEach(types, function(fileType,key){
                       url +=  '&owner='+ fileType;
                     });
+                  }
+
+                  if(searchTerm.projId) {
+                    url +=  '&projId='+ searchTerm.projId;
                   }
 
                   if(searchTerm.minDate) {

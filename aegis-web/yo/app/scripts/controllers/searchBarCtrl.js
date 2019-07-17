@@ -60,9 +60,9 @@ angular.module('hopsWorksApp')
             }
           } else {
             if(self.searchType === "global") {
-              $scope.mainCtrl.goToSearchHome('search', {q:'*'});
+              $scope.mainCtrl.goToSearchHome('search');
             } else {
-              $scope.projectCtrl.goToUrl('search', {q: '*'});
+              $scope.projectCtrl.goToUrl('search');
             }
           }
         }
@@ -120,6 +120,7 @@ angular.module('hopsWorksApp')
           //  Call API Aggregation
 
           elasticService.globalAggregationSearch(queryParams).then(function (response) {
+              mainParent.aggregationResult = self.processAggregation(response.data);
               mainParent.totalResults = response.data[0].value;
             }, function (error) {
               growl.error(error.data.errorMsg, {
@@ -174,29 +175,76 @@ angular.module('hopsWorksApp')
               });
           });
         } else if (self.searchType === "projectCentric") {
-          // TODO: manage with new API
+          
+          // if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
+          //   mainParent.searching = false;
+          //   return;
+          // }
+          // elasticService.projectSearch($routeParams.projectID, self.searchTerm)
+          //   .then(function (response) {
+          //     mainParent.searching = false;
+          //     var searchHits = response.data;
+          //     if (searchHits.length > 0) {
+          //       mainParent.searchResult = searchHits;
+          //     } else {
+          //       mainParent.searchResult = [];
+          //     }
+          //     self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
+          //     self.resultItems = mainParent.searchResult.length;
+          //   }, function (error) {
+          //     mainParent.searching = false;
+          //     growl.error(error.data.errorMsg, {
+          //       title: 'Error',
+          //       ttl: 5000
+          //     });
+          //   });
+
+          var searchHits;
+          mainParent.searchResult = [];
+          let queryParams = {};
           if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
-            mainParent.searching = false;
-            return;
+            if(angular.equals($location.search(), {})) {
+              queryParams.q = '*';
+            } else {
+              queryParams.q = '*';
+              for(var k in $location.search()) queryParams[k]=$location.search()[k];
+            }
+          } else {
+            queryParams = $location.search();
           }
-          elasticService.projectSearch($routeParams.projectID, self.searchTerm)
+          queryParams.projId = $routeParams.projectID;
+          //  Call API Search
+          elasticService.globalSearch(queryParams)
             .then(function (response) {
-              mainParent.searching = false;
-              var searchHits = response.data;
+              searchHits = response.data;
               if (searchHits.length > 0) {
                 mainParent.searchResult = searchHits;
               } else {
                 mainParent.searchResult = [];
               }
+              mainParent.searching = false;
               self.resultPages = Math.ceil(mainParent.searchResult.length / self.pageSize);
-              self.resultItems = mainParent.searchResult.length;
+              // self.resultItems = mainParent.searchResult.length;
             }, function (error) {
               mainParent.searching = false;
               growl.error(error.data.errorMsg, {
                 title: 'Error',
                 ttl: 5000
               });
-            });
+          });
+            
+          //  Call API Aggregation
+          elasticService.globalAggregationSearch(queryParams)
+            .then(function (response) {
+              mainParent.aggregationResult = self.processAggregation(response.data);
+              mainParent.totalResults = response.data[0].value;
+            }, function (error) {
+              growl.error(error.data.errorMsg, {
+                title: 'Error',
+                ttl: 5000
+              });
+          });
+
         } else if (self.searchType === "datasetCentric") {
           if (self.searchTerm === undefined || self.searchTerm === "" || self.searchTerm === null) {
             mainParent.searching = false;
