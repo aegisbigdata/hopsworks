@@ -440,6 +440,7 @@ button.centered-icon > .fa.fa-trash {
 
 .card-item-content label {
   font-weight: normal;
+  cursor: inherit;
 }
 
 .card-item-content .header {
