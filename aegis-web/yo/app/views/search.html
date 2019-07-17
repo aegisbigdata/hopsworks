@@ -229,7 +229,7 @@
       total-items="mainCtrl.totalResults"
       >
         <div id="cards-{{mainCtrl.currentPage}}-{{$index}}" class="col-xs-12">
-          <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" limit="listView ? 240:50" 
+          <hw-card id="{{mainCtrl.currentPage}}-{{$index}}" content="result" 
                    details-fn="mainCtrl.viewDetail(result)"
                    download-fn="mainCtrl.downloadPublicDataset(result)"
                    page-no="mainCtrl.currentPage" 

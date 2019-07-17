@@ -50,7 +50,6 @@ angular.module('hopsWorksApp')
               url: []
             }
             self.hideDropdown = true;
-            self.limitTitle = 40;
 
             var init = function (content) {
               self.processMetadata(content);
