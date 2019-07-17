@@ -49,14 +49,16 @@
             </div>
         </div>
         <div class="navbar-container col-md-11">
-            <form action="" class="navbar-form-search" ng-if="mainCtrl.searchType !== 'projectCentric'">
+            <form action="" class="navbar-form-search">
                 <div class="navbar-search-header">Type</div>
                 <div class="navbar-search-check">
                     <div ng-repeat="type in mainCtrl.types">
+                      <div ng-if="!projectView || type.value !== 'proj'">
                         <input type="checkbox" id="{{type.name}}" name="selectedType[]" value="{{type.value}}" class="filter-menu"
                             ng-change="mainCtrl.activeFilter('type')" ng-model="type.selected"
                         >
                         <label for="{{type.name}}">{{type.name}}</label>
+                      </div>
                     </div>
                 </div>
             </form>

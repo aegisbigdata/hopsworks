@@ -63,8 +63,6 @@ html, body {
 #header_nav #navbar > .navbar-right:first-of-type {
   margin-right: 0;
 }
-.project-navbar .navbar-right {
-}
 .project-navbar .navbar-form {
   margin-left: 0;
   margin-right: 0;
