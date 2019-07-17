@@ -91,7 +91,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="asset in walletTransactionsCtrl.assetsSold">
-                                        <td>{{ asset.dataset }}</td>
+                                        <td>{{ asset.name }}</td>
                                         <td>{{ asset.coins }}</td>
                                         <td>{{ asset.date }}</td>
                                         <td>
@@ -117,7 +117,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="asset in walletTransactionsCtrl.assetsBought">
-                                        <td>{{ asset.dataset }}</td>
+                                        <td>{{ asset.name }}</td>
                                         <td>{{ asset.coins }}</td>
                                         <td>{{ asset.date }}</td>
                                         <td>
