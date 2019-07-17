@@ -78,11 +78,11 @@
         <li class="dropdown">
           <a class="navbar-link dropdown-toggle" data-toggle="dropdown" style="margin-top: 5px;" aria-expanded="false" id="navbarProfile">
             <img alt="" src="https://gravatar.com/avatar/{{mainCtrl.emailHash}}?d=retro&s=50" style="height: 35px; border: 0.5px solid gray;" class="profile-image img-circle">
-            &nbsp;{{mainCtrl.email}} <b class="caret"></b>
+            &nbsp;Account <b class="caret"></b>
           </a>
           <ul class="dropdown-menu">
             <li ng-show="mainCtrl.isAdmin() === 'true'"><a ng-click="mainCtrl.goToAdminPage()"><i class="fa fa-tools"></i> Admin</a></li>
-            <li><a ng-click="mainCtrl.profileModal()"><i class="fa fa-cog"></i> Account</a></li>
+            <li><a ng-click="mainCtrl.profileModal()"><i class="fa fa-cog"></i> Profile</a></li>
             <li><a href="#!/walletTransactions"><i class="fa fa-suitcase"></i> Wallet Transactions</a></li>
             <!--<li><a ng-click="mainCtrl.sshKeysModal()"><i class="fa fa-key"></i> Ssh Keys</a></li>-->
             <li><a href="#!/" ng-click="mainCtrl.logout()"><i class="fa fa-sign-out-alt"></i> Sign out</a></li>
