@@ -159,7 +159,7 @@ public class UsersController {
     WalletController.UserJSON jsonUser = new WalletController.UserJSON();
     jsonUser.uid = newUser.getEmail();
     jsonUser.balance = 10000;
-    walletController.createUser(jsonUser);
+    //walletController.createUser(jsonUser);
 
     return qrCode;
   }
