@@ -51,7 +51,7 @@ angular.module('hopsWorksApp').directive('matchPassword', function () {
         return;
       }
       //get the value of the first password
-      var firstPwd = '#' + attributes.match;
+      var firstPwd = '#' + attributes.matchPassword;
 
       element.add(firstPwd).on('keyup', function () {
         scope.$apply(function () {
